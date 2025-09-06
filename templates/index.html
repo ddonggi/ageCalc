@@ -68,7 +68,7 @@
         
         <form class="age-form" id="age-form">
             <div class="form-group">
-                <label for="birth_date">생년월일을 입력하세요:</label>
+                <h3>생년월일을 입력하세요</h3>
                 <div class="date-inputs">
                     <input type="text" id="year" name="year" placeholder="1992" maxlength="4" 
                            value="{{ year or '' }}" required>
@@ -343,7 +343,11 @@
                 <div class="footer-section">
                     <h4>연락처</h4>
                     <p>문의: ldg6153@gmail.com</p>
-                    <p>개인정보처리방침 | 이용약관</p>
+                    <p>
+                        <a href="{{ url_for('privacy') }}" style="color: #667eea; text-decoration: none; margin-right: 10px;">개인정보처리방침</a>
+                        <span style="color: #ccc;">|</span>
+                        <a href="{{ url_for('terms') }}" style="color: #667eea; text-decoration: none; margin-left: 10px;">이용약관</a>
+                    </p>
                 </div>
             </div>
             <div class="footer-bottom">

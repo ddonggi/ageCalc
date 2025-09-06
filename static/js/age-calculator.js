@@ -29,6 +29,10 @@ class AgeCalculatorUI {
             this.bindEvents();
             this.setInitialFocus();
             this.initializeZodiacInfo();
+            // URL 로드는 약간 지연시켜서 실행
+            setTimeout(() => {
+                this.loadFromUrl();
+            }, 100);
         }
     }
     
@@ -732,18 +736,23 @@ class AgeCalculatorUI {
      * 카카오톡 공유
      */
     shareToKakao() {
-        const text = '만 나이 계산기로 정확한 나이를 계산해보세요! 🎂';
-        const url = window.location.href;
+        const currentResult = this.getCurrentResult();
+        const shareUrl = this.generateShareUrl();
+        
+        let text = '만 나이 계산기로 정확한 나이를 계산해보세요! 🎂';
+        if (currentResult) {
+            text = `저는 ${currentResult.age}세입니다! 만 나이 계산기로 정확한 나이를 확인해보세요! 🎂`;
+        }
         
         if (navigator.share) {
             navigator.share({
                 title: '만 나이 계산기',
                 text: text,
-                url: url
+                url: shareUrl
             });
         } else {
             // 카카오톡 공유 링크 생성
-            const kakaoUrl = `https://story.kakao.com/share?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            const kakaoUrl = `https://story.kakao.com/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(text)}`;
             window.open(kakaoUrl, '_blank');
         }
     }
@@ -752,8 +761,8 @@ class AgeCalculatorUI {
      * 페이스북 공유
      */
     shareToFacebook() {
-        const url = window.location.href;
-        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        const shareUrl = this.generateShareUrl();
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
         window.open(facebookUrl, '_blank', 'width=600,height=400');
     }
     
@@ -761,11 +770,16 @@ class AgeCalculatorUI {
      * 인스타그램 공유
      */
     shareToInstagram() {
-        const text = '만 나이 계산기로 정확한 나이를 계산해보세요! 🎂';
-        const url = window.location.href;
+        const currentResult = this.getCurrentResult();
+        const shareUrl = this.generateShareUrl();
+        
+        let text = '만 나이 계산기로 정확한 나이를 계산해보세요! 🎂';
+        if (currentResult) {
+            text = `저는 ${currentResult.age}세입니다! 만 나이 계산기로 정확한 나이를 확인해보세요! 🎂`;
+        }
         
         // 인스타그램 공유 시도 (여러 방법)
-        this.tryInstagramShare(text, url);
+        this.tryInstagramShare(text, shareUrl);
     }
     
     /**
@@ -807,9 +821,15 @@ class AgeCalculatorUI {
      * X (구 트위터) 공유
      */
     shareToX() {
-        const text = '만 나이 계산기로 정확한 나이를 계산해보세요! 🎂';
-        const url = window.location.href;
-        const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+        const currentResult = this.getCurrentResult();
+        const shareUrl = this.generateShareUrl();
+        
+        let text = '만 나이 계산기로 정확한 나이를 계산해보세요! 🎂';
+        if (currentResult) {
+            text = `저는 ${currentResult.age}세입니다! 만 나이 계산기로 정확한 나이를 확인해보세요! 🎂`;
+        }
+        
+        const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`;
         window.open(xUrl, '_blank', 'width=600,height=400');
     }
     
@@ -817,9 +837,16 @@ class AgeCalculatorUI {
      * 링크 복사 (제목 옆 버튼용)
      */
     copyLinkToClipboard() {
-        const url = window.location.href;
+        // 먼저 결과가 있는지 확인
+        const resultContainer = document.querySelector('.result');
+        if (!resultContainer) {
+            alert('먼저 나이를 계산해주세요!');
+            return;
+        }
         
-        navigator.clipboard.writeText(url).then(() => {
+        const shareUrl = this.generateShareUrl();
+        
+        navigator.clipboard.writeText(shareUrl).then(() => {
             // 버튼 시각적 피드백만 표시 (alert 없음)
             const linkCopyBtn = document.querySelector('.link-copy-btn');
             if (linkCopyBtn) {
@@ -982,13 +1009,13 @@ class AgeCalculatorUI {
      * 클립보드 복사 (공유 버튼용)
      */
     copyToClipboard() {
-        const url = window.location.href;
+        const shareUrl = this.generateShareUrl();
         
-        navigator.clipboard.writeText(url).then(() => {
+        navigator.clipboard.writeText(shareUrl).then(() => {
             // 복사 성공 메시지
-            const copyBtn = document.querySelector('[data-share="copy"]');
+            const copyBtn = document.querySelector('.link-copy-btn');
             const originalText = copyBtn.innerHTML;
-            copyBtn.innerHTML = '<span class="share-icon">✅</span> 복사됨!';
+            copyBtn.innerHTML = '✅ 복사됨!';
             copyBtn.style.background = '#27ae60';
             
             setTimeout(() => {
@@ -996,8 +1023,93 @@ class AgeCalculatorUI {
                 copyBtn.style.background = '';
             }, 2000);
         }).catch(() => {
-            alert('링크 복사에 실패했습니다. 직접 복사해주세요: ' + url);
+            alert('링크 복사에 실패했습니다. 직접 복사해주세요: ' + shareUrl);
         });
+    }
+    
+    /**
+     * 공유용 URL 생성
+     */
+    generateShareUrl() {
+        const baseUrl = window.location.origin + window.location.pathname;
+        const currentResult = this.getCurrentResult();
+        
+        if (currentResult && currentResult.birth_date) {
+            const params = new URLSearchParams();
+            params.set('birth_date', currentResult.birth_date);
+            
+            return `${baseUrl}?${params.toString()}`;
+        }
+        
+        // 결과가 없으면 현재 입력된 값으로 URL 생성
+        const year = this.yearInput.value;
+        const month = this.monthInput.value;
+        const day = this.dayInput.value;
+        
+        if (year && month && day) {
+            const birthDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            const params = new URLSearchParams();
+            params.set('birth_date', birthDate);
+            
+            return `${baseUrl}?${params.toString()}`;
+        }
+        
+        return baseUrl;
+    }
+    
+    /**
+     * 현재 결과 가져오기
+     */
+    getCurrentResult() {
+        const resultContainer = document.querySelector('.result');
+        if (!resultContainer) return null;
+        
+        const birthDateElement = resultContainer.querySelector('.birth-date');
+        
+        if (!birthDateElement) return null;
+        
+        return {
+            birth_date: birthDateElement.textContent.replace('생년월일: ', '')
+        };
+    }
+    
+    /**
+     * URL에서 결과 로드
+     */
+    async loadFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const birthDate = urlParams.get('birth_date');
+        
+        console.log('URL에서 birth_date 파라미터:', birthDate);
+        
+        if (birthDate) {
+            // URL에서 생년월일 파싱
+            const [year, month, day] = birthDate.split('-');
+            
+            console.log('파싱된 생년월일:', { year, month, day });
+            
+            // 입력 필드에 값 설정
+            this.yearInput.value = year;
+            this.monthInput.value = month;
+            this.dayInput.value = day;
+            this.hiddenDateInput.value = birthDate;
+            
+            console.log('입력 필드 설정 완료');
+            
+            // 자동으로 계산 실행
+            try {
+                console.log('계산 시작...');
+                const result = await this.calculateAgeAsync();
+                console.log('계산 결과:', result);
+                
+                if (result) {
+                    this.displayResult(result);
+                    console.log('결과 표시 완료');
+                }
+            } catch (error) {
+                console.error('URL에서 결과 로드 오류:', error);
+            }
+        }
     }
     
     /**
@@ -1085,14 +1197,14 @@ class AgeCalculatorUI {
             if (document.readyState === 'complete') {
                 this.yearInput.focus();
             } else {
-                // DOM이 로드되면 즉시 포커스
-                document.addEventListener('DOMContentLoaded', () => {
-                    this.yearInput.focus();
-                });
-                // 페이지가 완전히 로드되면 포커스 (백업)
-                window.addEventListener('load', () => {
-                    this.yearInput.focus();
-                });
+            // DOM이 로드되면 즉시 포커스
+            document.addEventListener('DOMContentLoaded', () => {
+                this.yearInput.focus();
+            });
+            // 페이지가 완전히 로드되면 포커스 (백업)
+            window.addEventListener('load', () => {
+                this.yearInput.focus();
+            });
             }
         }
     }

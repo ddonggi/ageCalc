@@ -55,5 +55,15 @@ def index():
                          month=month if 'month' in locals() else None, 
                          day=day if 'day' in locals() else None)
 
+@app.route('/privacy')
+def privacy():
+    """개인정보 처리 방침 페이지"""
+    return render_template('privacy.html')
+
+@app.route('/terms')
+def terms():
+    """이용 약관 페이지"""
+    return render_template('terms.html')
+
 if __name__ == '__main__':
     app.run(debug=True, port=8000, host='0.0.0.0')
