@@ -229,6 +229,23 @@ sudo systemctl list-timers | grep certbot
 
 Sat 2025-09-27 21:17:00 UTC 11h left       n/a                         n/a          snap.certbot.renew.timer       snap.certbot.renew.service
 ```
+
+### robots, sitemap 매핑
+/etc/nginx/conf.d/agecalc.conf 
+```
+location = /robots.txt {
+  alias /srv/apps/agecalc/static/robots.txt;
+  default_type text/plain;
+}
+
+location = /sitemap.xml {
+  alias /srv/apps/agecalc/static/sitemap.xml;
+  default_type application/xml;
+}
+```
+
+`sudo nginx -t && sudo systemctl reload nginx`
+
 ---
 Nginx가 먼저 요청을 받아서, 도메인/경로에 따라 어떤 app.py(Gunicorn 프로세스)로 보낼지를 결정합니다.
 
