@@ -25,7 +25,7 @@ ageCalc/
 
 ## 🚀 설치 및 실행
 
-1. **conda 환경 활성화 및 pip 설치**
+1. **micromamba 환경 활성화 및 pip 설치**
    ```bash
    conda activate ageCalc
    conda install pip

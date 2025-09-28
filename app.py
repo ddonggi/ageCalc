@@ -3,6 +3,11 @@ from controllers.age_controller import AgeController
 
 app = Flask(__name__)
 
+@app.get("/health") 
+def health(): 
+    return {"ok": True}, 200
+
+
 @app.route('/', methods=['GET', 'POST'])
 def index():
     """메인 페이지 - 나이 계산 폼과 결과를 표시"""

@@ -34,14 +34,15 @@ sudo apt-get install -y nginx git curl htop bzip2 tar ca-certificates
   │   │   ├─ environment.yml
   │   │   └─ gunicorn_conf.py   # 선택
   │   └─ site-b/ (동일 구조)
-  └─ infra/
-      └─ nginx/
-          ├─ nginx.conf
-          └─ conf.d/
-              ├─ site-a.conf
-              └─ site-b.conf
+/etc/
+  └─ nginx/
+      ├─ nginx.conf
+      └─ conf.d/
+            ├─ agecalc.conf
+            └─ site-b.conf
 ```
-- sample environment.yml (두 사이트 공통으로 써도 됨)
+
+- mamba용 environment.yml (두 사이트 공통으로 써도 됨)
 ```yml
 name: ageCalc
 channels:
@@ -89,32 +90,38 @@ micromamba --version
 2.3.2
 ```
 
-1-2. 사이트별 리눅스 계정/환경 생성
+1-2. 사이트별 리눅스 계정
 각 사이트별로 리눅스 계정 분리 → 격리된 환경 관리가 깔끔합니다.
 ```bash
 # site-a (agecalc) 계정 생성
 sudo adduser --disabled-password --gecos "" agecalc
 
 # 관리자 권한으로 디렉터리 생성
-sudo mkdir -p /srv/apps/agecalc
-sudo chown -R agecalc:agecalc /srv/apps/agecalc
+sudo mkdir -p /srv/apps/
+git clone 후 
+sudo chown -R agecalc:agecalc /srv/apps/
 
 sudo -iu agecalc
 cd /srv/apps/agecalc
 
-# 환경 생성
+```
+
+
+- 환경 생성
+```
+# environment.yml 기반 환경 생성
 micromamba create -y -p /srv/apps/agecalc/.micromamba/envs/agecalc -f environment.yml
 
 # 실행 확인
 /srv/apps/agecalc/.micromamba/envs/agecalc/bin/python -V
 
-#To activate this environment, use:
+# 앱 requirements.txt 다운
+/srv/apps/agecalc/.micromamba/envs/agecalc/bin/pip install -r requirements.txt
 
-micromamba activate /srv/apps/agecalc/.micromamba/envs/agecalc
-
-#Or to execute a single command in this environment, use:
-
-micromamba run -p /srv/apps/agecalc/.micromamba/envs/agecalc mycommand
+# Flask 앱 단독 실행 (개발 서버)
+/srv/apps/agecalc/.micromamba/envs/agecalc/bin/python app.py
+# 운영용 (Gunicorn)
+/srv/apps/agecalc/.micromamba/envs/agecalc/bin/gunicorn app:app --bind 0.0.0.0:8000
 
 # site-b도 동일
 ```
@@ -133,12 +140,21 @@ User=agecalc
 Group=www-data
 WorkingDirectory=/srv/apps/agecalc
 Environment="PATH=/srv/apps/agecalc/.micromamba/envs/agecalc/bin"
-ExecStart=/srv/apps/agecalc/.micromamba/envs/agecalc/bin/gunicorn app:app \
-  --bind unix:/run/agecalc.sock \
-  --workers 4 --threads 2 --timeout 30 --keep-alive 5 \
-  --max-requests 1000 --max-requests-jitter 200
+
+# 🔸 RuntimeDirectory를 쓰면 /run/agecalc/ 를 자동 생성/정리
 RuntimeDirectory=agecalc
 RuntimeDirectoryMode=0755
+
+# 🔸 소켓을 /run/agecalc/agecalc.sock 에 만들기
+ExecStart=/srv/apps/agecalc/.micromamba/envs/agecalc/bin/gunicorn app:app \
+  --bind unix:/run/agecalc/agecalc.sock \
+  --workers 2 --threads 2 --timeout 30 --keep-alive 5 \
+  --max-requests 1000 --max-requests-jitter 200
+
+# (문제 원인 파악용) 필요시 잠깐 디버그
+# ExecStart=/srv/apps/agecalc/.micromamba/envs/agecalc/bin/gunicorn app:app \
+#   --bind unix:/run/agecalc/agecalc.sock --log-level debug
+
 Restart=always
 
 [Install]
@@ -152,25 +168,34 @@ sudo systemctl status agecalc
 ```
 
 1-4. Nginx 리버스 프록시 (vhost)
-sudo vi /srv/apps/infra/nginx/conf.d/agecalc.conf
+sudo vi /etc/nginx/conf.d/agecalc.conf
 ```bash
 server {
-  listen 80;
-  server_name calc1.example.com;
+  listen 443 ssl;
+  listen [::]:443 ssl;
+  server_name agecalc.cloud www.agecalc.cloud;
 
-  # (선택) HSTS는 443 구성 후 켜기
-  # add_header Strict-Transport-Security "max-age=31536000" always;
+  ssl_certificate /etc/letsencrypt/live/agecalc.cloud/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/agecalc.cloud/privkey.pem;
 
   location / {
+    proxy_pass http://unix:/run/agecalc/agecalc.sock;
     proxy_set_header Host $host;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
-    proxy_pass http://unix:/run/agecalc.sock;
   }
 
-  location /health { 
-    proxy_pass http://unix:/run/agecalc.sock; 
+  location /health {
+    proxy_pass http://unix:/run/agecalc/agecalc.sock;
   }
+}
+
+# HTTP 요청은 HTTPS로 리다이렉트
+server {
+  listen 80;
+  listen [::]:80;
+  server_name agecalc.cloud www.agecalc.cloud;
+  return 301 https://$host$request_uri;
 }
 ```
 
@@ -201,9 +226,18 @@ sudo certbot --nginx -d calc1.example.com -d www.calc1.example.com
 자동 갱신 확인:
 ```
 sudo systemctl list-timers | grep certbot
+
+Sat 2025-09-27 21:17:00 UTC 11h left       n/a                         n/a          snap.certbot.renew.timer       snap.certbot.renew.service
 ```
 ---
 Nginx가 먼저 요청을 받아서, 도메인/경로에 따라 어떤 app.py(Gunicorn 프로세스)로 보낼지를 결정합니다.
+
+만약 기본 nginx 만 나온다면
+1) 기본 사이트 비활성화
+
+기본 서버블록이 먼저 잡혀서 기본 페이지가 보일 수 있어요.
+
+sudo unlink /etc/nginx/sites-enabled/default  # 기본 사이트 끄기
 
 --- 
 
@@ -219,89 +253,8 @@ Nginx: /var/log/nginx/error.log
 
 새 코드 배포 → systemctl restart agecalc
 
-### 2) Docker 루트 (micromamba 베이스 이미지)
-2-1. Dockerfile
-```bash
-# syntax=docker/dockerfile:1
-FROM mambaorg/micromamba:1.5.8
-
-# 작업 디렉터리
-WORKDIR /app
-# 환경 정의 복사 & 설치
-COPY environment.yml /tmp/environment.yml
-RUN micromamba create -y -n appenv -f /tmp/environment.yml && micromamba clean --all --yes
-# 환경 활성화 없이 절대경로로 실행할 것이므로 PATH만 보강
-ENV PATH=/opt/conda/envs/appenv/bin:$PATH
-
-# 앱 복사
-COPY . /app
-
-# 비root 유저
-USER $MAMBA_USER
-
-EXPOSE 8000
-HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
-  CMD wget -qO- http://127.0.0.1:8000/health || exit 1
-
-CMD ["gunicorn","app:app","-b","0.0.0.0:8000","--workers","4","--threads","2","--timeout","30","--keep-alive","5","--max-requests","1000","--max-requests-jitter","200"]
-```
-
-2-2. docker-compose.yml (여러 사이트 + Nginx)
-```bash
-version: "3.9"
-services:
-  site_a:
-    build: ./apps/site-a
-    container_name: site_a
-    restart: always
-
-  site_b:
-    build: ./apps/site-b
-    container_name: site_b
-    restart: always
-
-  nginx:
-    image: nginx:1.27
-    container_name: edge
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./infra/nginx/conf.d:/etc/nginx/conf.d:ro
-      - /etc/letsencrypt:/etc/letsencrypt:ro   # certbot 병행 시
-    depends_on:
-      - site_a
-      - site_b
-    restart: always
-```
-
-2-3. Nginx vhost (컨테이너 이름으로 proxy)
-```bash
-/srv/apps/infra/nginx/conf.d/site-a.conf
-
-server {
-  listen 80;
-  server_name calc1.example.com;
-
-  location / {
-    proxy_set_header Host $host;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_pass http://site_a:8000;
-  }
-
-  location /health { proxy_pass http://site_a:8000/health; }
-}
-```
-2-4. 배포 명령
-```bash
-docker compose build
-docker compose up -d
-docker compose ps
-curl -I http://calc1.example.com/health
-```
 ---
-3) 운영 팁 (공통)
+1) 운영 팁 (공통)
 
 - 로그:
   - Non-Docker: journalctl -u sitea -f, Nginx /var/log/nginx/access.log

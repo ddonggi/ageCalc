@@ -6,7 +6,7 @@
     
     <!-- 메인 페이지 -->
     <url>
-        <loc>https://yourdomain.com/</loc>
+        <loc>https://agecalc.cloud/</loc>
         <lastmod>2025-01-01</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
@@ -14,14 +14,14 @@
     
     <!-- 정적 리소스 -->
     <url>
-        <loc>https://yourdomain.com/static/css/style.css</loc>
+        <loc>https://agecalc.cloud/static/css/style.css</loc>
         <lastmod>2025-01-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.3</priority>
     </url>
     
     <url>
-        <loc>https://yourdomain.com/static/js/age-calculator.js</loc>
+        <loc>https://agecalc.cloud/static/js/age-calculator.js</loc>
         <lastmod>2025-01-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.3</priority>
@@ -29,21 +29,14 @@
     
     <!-- 이미지 리소스 -->
     <url>
-        <loc>https://yourdomain.com/static/images/og-image.png</loc>
-        <lastmod>2025-01-01</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.2</priority>
-    </url>
-    
-    <url>
-        <loc>https://yourdomain.com/favicon.ico</loc>
+        <loc>https://agecalc.cloud/favicon.ico</loc>
         <lastmod>2025-01-01</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.1</priority>
     </url>
-    
+    <!-- 애플 터치 아이콘-->
     <url>
-        <loc>https://yourdomain.com/apple-touch-icon.png</loc>
+        <loc>https://agecalc.cloud/apple-touch-icon.png</loc>
         <lastmod>2025-01-01</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.1</priority>
