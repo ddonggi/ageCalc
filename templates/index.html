@@ -6,7 +6,7 @@
     
     <!-- 필수 SEO -->
     <title>만나이 계산기</title>
-    <meta name="description" content="생년월일로 정확한 만 나이를 계산하고, 연령별 가능한 권리·제도를 한눈에 확인하세요." />
+    <meta name="description" content="생년월일로 정확한 만나이를 계산하고, 연령별 가능한 권리·제도를 한눈에 확인하세요." />
     
     <!-- 중복 방지: 대표 URL로 고정 -->
     <link rel="canonical" href="https://agecalc.cloud/" />
@@ -14,13 +14,13 @@
     <!-- 소셜 미리보기 -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="만나이 계산기" />
-    <meta property="og:title" content="만나이 계산기 – 생일로 정확한 만 나이 계산" />
-    <meta property="og:description" content="만 나이 계산 + 연령별 권리·제도 안내." />
+    <meta property="og:title" content="만나이 계산기 – 생일로 정확한 만나이 계산" />
+    <meta property="og:description" content="만나이 계산 + 연령별 권리·제도 안내." />
     <meta property="og:url" content="https://agecalc.cloud/" />
     <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="만나이 계산기 – 생일로 정확한 만 나이 계산" />
-    <meta name="twitter:description" content="만 나이 계산 + 연령별 권리·제도 안내." />
+    <meta name="twitter:title" content="만나이 계산기 – 생일로 정확한 만나이 계산" />
+    <meta name="twitter:description" content="만나이 계산 + 연령별 권리·제도 안내." />
     <meta name="twitter:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
     
     <!-- 구글 검색 콘솔 인증 -->
@@ -39,6 +39,19 @@
     <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
     <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
     
+    <script type="application/ld+json">
+        {
+          "@context":"https://schema.org",
+          "@type":"SoftwareApplication",
+          "name":"만나이 계산기",
+          "applicationCategory":"UtilitiesApplication",
+          "operatingSystem":"Web",
+          "url":"https://agecalc.cloud/",
+          "description":"생년월일로 정확한 만나이를 계산하고 연령별 권리·제도를 안내합니다.",
+          "inLanguage":"ko"
+        }
+    </script>
+
     <!-- Google Consent Mode v2: 기본 거부 상태로 시작 (배너 동의 시 업데이트) -->
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -103,13 +116,13 @@
             <ul>
                 <li>생년월일을 입력하세요 (자동으로 다음 필드로 이동)</li>
                 <li>입력이 완료되면 자동으로 나이가 계산됩니다</li>
-                <li>정확한 만 나이가 표시됩니다</li>
+                <li>정확한 만나이가 표시됩니다</li>
             </ul>
         </div>
         
         <!-- 연령별 주요 권리·제도 -->
         <div class="age-rights-section">
-            <h3>🧑 연령별 주요 권리·제도 (만 나이 기준)</h3>
+            <h3>🧑 연령별 주요 권리·제도 (만나이 기준)</h3>
             
             <div class="age-rights-grid">
                 <div class="age-right-item" data-age="14">
@@ -353,7 +366,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 만 나이 계산기. All rights reserved.</p>
+                <p>&copy; 2025 만나이 계산기. All rights reserved.</p>
             </div>
         </footer>        
     </div>
@@ -377,56 +390,56 @@
 
 
 <script>
-    function loadGA_viaGTM(){ /* GTM 쓰면 별도 GA 로더 불필요. 필요시 남겨두고 GTM에서 GA 설정 */ }
+    // ads 스크립트 1회 로드 + 모든 <ins> 처리
     function loadAds(client){
-        const s=document.createElement('script');
-        s.async=true;
-        s.src=`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`;
-        s.crossOrigin="anonymous";
-        document.head.appendChild(s);
-        s.addEventListener('load', () => {
-        (window.adsbygoogle=window.adsbygoogle||[]).push({});
-        });
+      if (window.__adsLoaded) return;  // 중복 로드 방지
+      window.__adsLoaded = true;
+  
+      const s = document.createElement('script');
+      s.async = true;
+      s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`;
+      s.crossOrigin = "anonymous";
+      s.onload = () => {
+        // 페이지 내 존재하는 모든 <ins.adsbygoogle> 처리
+        window.adsbygoogle = window.adsbygoogle || [];
+        const units = document.querySelectorAll('ins.adsbygoogle');
+        units.forEach(() => (adsbygoogle = window.adsbygoogle).push({}));
+      };
+      document.head.appendChild(s);
     }
-
+  
     function applyConsent(state){
-        // Consent Mode v2 업데이트
-        const granted = (v)=>({ad_storage:v, ad_user_data:v, ad_personalization:v, analytics_storage:v});
-        gtag('consent','update', state==='accepted' ? granted('granted') : granted('denied'));
-
-        if(state==='accepted'){
-        // GA는 GTM에서 관리하면 별도 로드 필요 없음
+      // Consent Mode v2
+      const granted = v => ({
+        ad_storage: v, ad_user_data: v, ad_personalization: v, analytics_storage: v
+      });
+      if (typeof gtag === 'function') {
+        gtag('consent','update', state === 'accepted' ? granted('granted') : granted('denied'));
+      }
+      if (state === 'accepted') {
+        // GA는 GTM에서 관리한다면 별도 로드 불필요
         loadAds('ca-pub-7818333740838556'); // 실제 퍼블리셔 ID
-        }
+      }
     }
+  
     (function(){
-        const banner = document.getElementById('cookie-banner');
-        const get = k => document.cookie.split('; ').find(r=>r.startsWith(k+'='))?.split('=')[1];
-        const set = (k,v,d=365)=>{const t=new Date();t.setTime(t.getTime()+d*864e5);
-        document.cookie=`${k}=${v};expires=${t.toUTCString()};path=/;SameSite=Lax`;}
-    
-        const consent = get('cookieConsent');
-        if(!consent) banner.style.display='block';
-        else applyConsent(consent);
-    
-        document.getElementById('accept-cookies')?.addEventListener('click',()=>{
-        set('cookieConsent','accepted'); banner.style.display='none'; applyConsent('accepted');
-        });
-        document.getElementById('reject-cookies')?.addEventListener('click',()=>{
-        set('cookieConsent','rejected'); banner.style.display='none'; applyConsent('rejected');
-        });
+      const banner = document.getElementById('cookie-banner');
+      const get = k => document.cookie.split('; ').find(r=>r.startsWith(k+'='))?.split('=')[1];
+      const set = (k,v,d=365) => {
+        const t = new Date(); t.setTime(t.getTime()+d*864e5);
+        document.cookie = `${k}=${v};expires=${t.toUTCString()};path=/;SameSite=Lax`;
+      };
+  
+      const consent = get('cookieConsent');
+      if (!consent && banner) banner.style.display = 'block';
+      else if (consent) applyConsent(consent);
+  
+      document.getElementById('accept-cookies')?.addEventListener('click', () => {
+        set('cookieConsent','accepted'); if (banner) banner.style.display='none'; applyConsent('accepted');
+      });
+      document.getElementById('reject-cookies')?.addEventListener('click', () => {
+        set('cookieConsent','rejected'); if (banner) banner.style.display='none'; applyConsent('rejected');
+      });
     })();
-</script>
-<script type="application/ld+json">
-    {
-      "@context":"https://schema.org",
-      "@type":"SoftwareApplication",
-      "name":"만나이 계산기",
-      "applicationCategory":"UtilitiesApplication",
-      "operatingSystem":"Web",
-      "url":"https://agecalc.cloud/",
-      "description":"생년월일로 정확한 만 나이를 계산하고 연령별 권리·제도를 안내합니다.",
-      "inLanguage":"ko"
-    }
-    </script>
+  </script>
 </html>

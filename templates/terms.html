@@ -1,17 +1,49 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>이용 약관 - 만 나이 계산기</title>
-    <meta name="description" content="만 나이 계산기의 이용 약관입니다. 서비스 이용에 대한 조건과 규정을 확인하세요.">
-    <meta name="robots" content="index, follow">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     
-    <!-- Open Graph 메타 태그 -->
-    <meta property="og:title" content="이용 약관 - 만 나이 계산기">
-    <meta property="og:description" content="만 나이 계산기의 이용 약관입니다.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ request.url }}">
+    <title>이용약관 - 만나이계산기</title>
+    <meta name="description" content="만나이계산기의 이용약관입니다. 서비스 이용 조건, 권리와 의무, 면책 조항 등을 확인하세요." />
+    
+    <!-- Canonical: 고정 URL -->
+    <link rel="canonical" href="https://agecalc.cloud/terms" />
+    
+    <!-- Open Graph -->
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="만나이계산기" />
+    <meta property="og:title" content="이용약관 - 만나이계산기" />
+    <meta property="og:description" content="만나이계산기의 이용약관입니다. 서비스 이용 조건, 권리와 의무, 면책 조항 등을 확인하세요." />
+    <meta property="og:url" content="https://agecalc.cloud/terms" />
+    <meta property="og:image" content="https://agecalc.cloud/static/images/og-image.png" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="이용약관 - 만나이계산기" />
+    <meta name="twitter:description" content="만나이계산기의 이용약관입니다." />
+    <meta name="twitter:image" content="https://agecalc.cloud/static/images/og-image.png" />
+    
+    <!-- (선택) hreflang: 다국어가 있다면 추가 -->
+    <!-- <link rel="alternate" href="https://agecalc.cloud/terms" hreflang="ko" /> -->
+    
+    <!-- 구조화 데이터: TermsOfService -->
+    <script type="application/ld+json">
+    {
+      "@context":"https://schema.org",
+      "@type":"TermsOfService",
+      "name":"이용약관",
+      "inLanguage":"ko",
+      "url":"https://agecalc.cloud/terms",
+      "isPartOf":{
+        "@type":"WebSite",
+        "name":"만나이계산기",
+        "url":"https://agecalc.cloud/"
+      }
+    }
+    </script>
+    
     
     <!-- 파비콘 -->
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
@@ -122,7 +154,7 @@
         
         <h1>이용 약관</h1>
         
-        <p><strong>만 나이 계산기</strong> 서비스를 이용해 주셔서 감사합니다. 본 약관은 만 나이 계산기 서비스(이하 "서비스")의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
+        <p><strong>만나이계산기</strong> 서비스를 이용해 주셔서 감사합니다. 본 약관은 만나이계산기 서비스(이하 "서비스")의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
         
         <h2><span class="article-number">제1조</span> (약관의 효력 및 변경)</h2>
         <p>1. 본 약관은 서비스 화면에 게시하거나 기타의 방법으로 이용자에게 공지함으로써 효력을 발생합니다.</p>
@@ -133,7 +165,7 @@
         <p>1. "서비스"란 생년월일을 입력받아 정확한 만 나이를 계산하고, 연령별 주요 권리와 제도를 안내하는 웹 기반 서비스를 의미합니다.</p>
         <p>2. 서비스는 다음과 같은 기능을 제공합니다:</p>
         <ul>
-            <li>생년월일을 통한 정확한 만 나이 계산</li>
+            <li>생년월일을 통한 정확한 만나이계산</li>
             <li>연령별 주요 권리와 제도 안내</li>
             <li>노령연금, 청년 지원, 중장년층 혜택 등 관련 정보 제공</li>
             <li>계산 결과 공유 기능</li>
@@ -156,7 +188,7 @@
         
         <h2><span class="article-number">제5조</span> (개인정보보호)</h2>
         <div class="highlight">
-            <p><strong>만 나이 계산기는 개인정보를 수집하지 않습니다.</strong></p>
+            <p><strong>만나이계산기는 개인정보를 수집하지 않습니다.</strong></p>
             <p>서비스 이용 시 입력하는 생년월일 정보는 서버에 저장되지 않으며, 브라우저를 닫으면 즉시 삭제됩니다.</p>
         </div>
         
