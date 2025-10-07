@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>만나이 가이드 | 만나이 계산기</title>
+    <meta name="description" content="만나이 제도와 계산 방식, 한국식·국제식 나이 차이를 정리한 가이드입니다. 법 개정 내용과 FAQ를 확인하세요." />
+    <link rel="canonical" href="https://agecalc.cloud/guide" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="만나이 가이드 | 만나이 계산기" />
+    <meta property="og:description" content="만나이 제도와 계산 방식, 한국식·국제식 나이 차이를 정리한 가이드입니다." />
+    <meta property="og:url" content="https://agecalc.cloud/guide" />
+    <meta property="og:site_name" content="만나이 계산기" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+    <!-- 파비콘/매니페스트 -->
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+
+</head>
+
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← 메인으로 돌아가기</a>
+        <header>
+            <h1>만나이 가이드</h1>
+            <h3 style="text-align: center;">2023년 법 개정으로 통일된 만나이 제도와 계산 방법을 정리했습니다.</h3>
+        </header>
+
+        <section>
+            <h2>만나이란?</h2>
+            <p>
+                만나이는 태어난 날을 기준으로 생일이 지날 때만 나이가 증가하는 방식입니다.<br>
+                예를 들어 1992년 10월 2일에 태어났다면 <br>
+                <span class="current-year"></span>년 10월 1일에는 만 <span class="ex-age"></span>세, <span class="current-year"></span>년 10월 2일 생일이 지나면 만 <span class="current-age"></span>세가 됩니다.
+            </p>
+        </section>
+
+        <section>
+            <h2>왜 만나이로 통일되었을까?</h2>
+            <p>
+                대한민국에서는 과거에 한국식 나이, 연 나이, 만나이가 혼용되어 혼란이 많았습니다.<br>
+                특히 법률·행정에서 기준이 달라 생활에서 불편을 겪는 경우가 많았죠.<br>
+                이에 따라 <strong>2023년 6월 28일부로 모든 공적 영역에서 만나이 기준이 공식 채택</strong>되었습니다.
+            </p>
+        </section>
+
+        <section>
+            <h2>다른 나이 계산 방식과 비교</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>구분</th>
+                        <th>정의</th>
+                        <th>예시(1992-10-02 기준, <br><span id="today-date"></span>)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>만나이</td>
+                        <td>생일이 지나야 1살 증가</td>
+                        <td id="age-man"></td>
+                    </tr>
+                    <tr>
+                        <td>연 나이</td>
+                        <td>올해 − 출생연도</td>
+                        <td id="age-year"></td>
+                    </tr>
+                    <tr>
+                        <td>한국식 나이(폐지)</td>
+                        <td>태어나면 1세, 해마다 1월 1일에 한 살 증가</td>
+                        <td id="age-korean"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>자주 묻는 질문</h2>
+            <h3>Q. 모든 제도가 만나이로 바뀌었나요?</h3>
+            <p>A. 행정·법률상 제도는 만나이 기준으로 통일되었지만, 일상 대화에서는 한국식 나이가 여전히 쓰이기도 합니다.</p>
+
+            <h3>Q. 연 나이는 어디에 쓰이나요?</h3>
+            <p>A. 연 나이는 통계나 설문 등 일부 비공식 영역에서만 참고용으로 쓰입니다.</p>
+
+            <h3>Q. 국제식 나이와 다른 건가요?</h3>
+            <p>A. 만나이 = 국제식 나이와 동일합니다. 한국도 이제 국제 기준과 일치합니다.</p>
+        </section>
+
+        <section>
+            <h2>참고 링크</h2>
+            <ul>
+                <li><a href="https://www.gov.kr/" target="_blank" rel="noopener noreferrer">정부24</a></li>
+                <li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">보건복지부</a></li>
+                <li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">국민연금공단</a></li>
+            </ul>
+        </section>
+
+        <!-- 푸터 -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>연락처</h4>
+                    <p>문의: ldg6153@gmail.com</p>
+                    <p>
+                        <a href="{{ url_for('privacy') }}"
+                            style="color: #667eea; text-decoration: none; margin-right: 10px;">개인정보처리방침</a>
+                        <span style="color: #ccc;">|</span>
+                        <a href="{{ url_for('terms') }}"
+                            style="color: #667eea; text-decoration: none; margin-left: 10px;">이용약관</a>
+                        <span style="color: #ccc;">|</span>
+                        <a href="{{ url_for('guide') }}"
+                            style="color: #667eea; text-decoration: none; margin-left: 10px;">만나이 가이드</a>
+                        <span style="color: #ccc;">|</span>
+                        <a href="{{ url_for('faq') }}"
+                            style="color: #667eea; text-decoration: none; margin-left: 10px;">자주 묻는 질문</a>
+                    </p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 만나이 계산기. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+</body>
+<script>
+    // 기준 생일
+    const birthDate = new Date("1992-10-02");
+
+    // 오늘 날짜
+    const today = new Date();
+    const todayStr = today.toISOString().split("T")[0]; // YYYY-MM-DD
+    const currentYear = today.getFullYear();
+
+    document.getElementById("today-date").textContent = todayStr;
+    document.querySelectorAll(".current-year").forEach(element => {
+        element.textContent = currentYear;
+    });
+
+    // 만나이 계산
+    let manAge = today.getFullYear() - birthDate.getFullYear();
+    let exAge = manAge-1;
+    const hasHadBirthday =
+        today.getMonth() > birthDate.getMonth() ||
+        (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+    if (!hasHadBirthday) {
+        manAge--;
+        
+    }
+
+    // 연 나이
+    const yearAge = today.getFullYear() - birthDate.getFullYear();
+
+    // 한국식 나이 (폐지된 방식)
+    const koreanAge = yearAge + 1;
+
+    // DOM에 반영
+    document.querySelector(".ex-age").textContent = exAge;
+    document.querySelector(".current-age").textContent = manAge;
+    document.getElementById("age-man").textContent = manAge + "세";
+    document.getElementById("age-year").textContent = yearAge + "세";
+    document.getElementById("age-korean").textContent = koreanAge + "세";
+</script>
+
+</html>

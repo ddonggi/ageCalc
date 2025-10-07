@@ -601,7 +601,6 @@ input[type="date"]:focus {
     padding: 2rem;
     border-radius: 15px;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-left: 4px solid rgba(139, 92, 246, 0.6);
     max-width: 800px;
     margin: 0 auto 3rem auto;
     box-shadow: 
@@ -644,7 +643,6 @@ input[type="date"]:focus {
     padding: 2.5rem;
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-left: 4px solid rgba(139, 92, 246, 0.6);
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
@@ -1253,5 +1251,156 @@ body {
     .scroll-top-btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+    }
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 2rem;
+    color: black;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.back-link:hover {
+    color: #764ba2;
+}
+
+
+/* Section 태그 스타일 */
+section {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 2.5rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 2rem auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    word-break: keep-all;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 800px;
+}
+
+section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+section h2 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 2px solid rgba(139, 92, 246, 0.3);
+    padding-bottom: 0.8rem;
+}
+
+section h3 {
+    color: #444;
+    margin: 1.5rem 0 1rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+section p {
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    word-break: keep-all;
+}
+
+section ul, section ol {
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+}
+
+section li {
+    margin-bottom: 0.5rem;
+    word-break: keep-all;
+}
+
+section table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+section table th,
+section table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    word-break: keep-all;
+}
+
+section table th {
+    background: rgba(139, 92, 246, 0.1);
+    color: #333;
+    font-weight: 600;
+}
+
+section table td {
+    color: #555;
+}
+
+section table tr:last-child th,
+section table tr:last-child td {
+    border-bottom: none;
+}
+
+section a {
+    color: #667eea;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+section a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+/* 모바일에서 section 스타일 */
+@media (max-width: 600px) {
+    section {
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        border-radius: 16px;
+    }
+    
+    section h2 {
+        font-size: 1.3rem;
+        margin-bottom: 1.2rem;
+    }
+    
+    section h3 {
+        font-size: 1.1rem;
+        margin: 1.2rem 0 0.8rem 0;
+    }
+    
+    section p,
+    section ul,
+    section ol {
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    
+    section table {
+        font-size: 0.9rem;
+    }
+    
+    section table th,
+    section table td {
+        padding: 0.8rem;
     }
 }

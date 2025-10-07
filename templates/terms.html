@@ -1,231 +1,192 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    
-    <title>이용약관 - 만나이계산기</title>
-    <meta name="description" content="만나이계산기의 이용약관입니다. 서비스 이용 조건, 권리와 의무, 면책 조항 등을 확인하세요." />
-    
-    <!-- Canonical: 고정 URL -->
+
+    <title>이용약관 | 만나이 계산기</title>
+    <meta name="description" content="만나이 계산기의 이용약관입니다. 서비스 이용 조건, 권리와 의무, 면책 조항 등을 확인하세요." />
+
+    <!-- Canonical -->
     <link rel="canonical" href="https://agecalc.cloud/terms" />
-    
+
     <!-- Open Graph -->
     <meta property="og:locale" content="ko_KR" />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="만나이계산기" />
-    <meta property="og:title" content="이용약관 - 만나이계산기" />
-    <meta property="og:description" content="만나이계산기의 이용약관입니다. 서비스 이용 조건, 권리와 의무, 면책 조항 등을 확인하세요." />
+    <meta property="og:site_name" content="만나이 계산기" />
+    <meta property="og:title" content="이용약관 | 만나이 계산기" />
+    <meta property="og:description" content="만나이 계산기의 이용약관입니다. 서비스 이용 조건, 권리와 의무, 면책 조항 등을 확인하세요." />
     <meta property="og:url" content="https://agecalc.cloud/terms" />
-    <meta property="og:image" content="https://agecalc.cloud/static/images/og-image.png" />
-    
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="이용약관 - 만나이계산기" />
-    <meta name="twitter:description" content="만나이계산기의 이용약관입니다." />
-    <meta name="twitter:image" content="https://agecalc.cloud/static/images/og-image.png" />
-    
-    <!-- (선택) hreflang: 다국어가 있다면 추가 -->
-    <!-- <link rel="alternate" href="https://agecalc.cloud/terms" hreflang="ko" /> -->
-    
+    <meta name="twitter:title" content="이용약관 | 만나이 계산기" />
+    <meta name="twitter:description" content="만나이 계산기의 이용약관입니다." />
+    <meta name="twitter:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
     <!-- 구조화 데이터: TermsOfService -->
     <script type="application/ld+json">
-    {
-      "@context":"https://schema.org",
-      "@type":"TermsOfService",
-      "name":"이용약관",
-      "inLanguage":"ko",
-      "url":"https://agecalc.cloud/terms",
-      "isPartOf":{
-        "@type":"WebSite",
-        "name":"만나이계산기",
-        "url":"https://agecalc.cloud/"
-      }
-    }
-    </script>
-    
-    
-    <!-- 파비콘 -->
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    
+  {
+    "@context":"https://schema.org",
+    "@type":"TermsOfService",
+    "name":"이용약관",
+    "inLanguage":"ko",
+    "url":"https://agecalc.cloud/terms",
+    "isPartOf":{
+      "@type":"WebSite",
+      "name":"만나이 계산기",
+      "url":"https://agecalc.cloud/"
+    },
+    "dateModified":"2025-10-07"
+  }
+  </script>
+
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+
     <!-- CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    
-    <style>
-        .terms-container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-        
-        .terms-container h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 2rem;
-        }
-        
-        .terms-container h2 {
-            color: #444;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-            border-bottom: 2px solid rgba(139, 92, 246, 0.3);
-            padding-bottom: 0.5rem;
-        }
-        
-        .terms-container p {
-            color: #555;
-            line-height: 1.8;
-            margin-bottom: 1rem;
-        }
-        
-        .terms-container ul {
-            color: #555;
-            line-height: 1.8;
-            margin-bottom: 1rem;
-            padding-left: 1.5rem;
-        }
-        
-        .terms-container li {
-            margin-bottom: 0.5rem;
-        }
-        
-        .back-link {
-            display: inline-block;
-            margin-bottom: 2rem;
-            color: black;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-        
-        .back-link:hover {
-            color: #764ba2;
-        }
-        
-        .highlight {
-            background: rgba(139, 92, 246, 0.1);
-            padding: 1rem;
-            border-radius: 8px;
-            border-left: 4px solid rgba(139, 92, 246, 0.6);
-            margin: 1rem 0;
-        }
-        
-        .warning {
-            background: rgba(255, 193, 7, 0.1);
-            padding: 1rem;
-            border-radius: 8px;
-            border-left: 4px solid rgba(255, 193, 7, 0.6);
-            margin: 1rem 0;
-        }
-        
-        .contact-info {
-            background: rgba(102, 126, 234, 0.1);
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin: 2rem 0;
-        }
-        
-        .contact-info h3 {
-            color: #333;
-            margin-bottom: 1rem;
-        }
-        
-        .contact-info p {
-            margin-bottom: 0.5rem;
-        }
-        
-        .article-number {
-            font-weight: bold;
-            
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+    <!-- 스크립트 -->
+    <script src="{{ url_for('static', filename='js/age-calculator.js') }}" defer></script>
 </head>
+
 <body>
-    <div class="terms-container">
+    <div class="container">
         <a href="{{ url_for('index') }}" class="back-link">← 메인으로 돌아가기</a>
-        
-        <h1>이용 약관</h1>
-        
-        <p><strong>만나이계산기</strong> 서비스를 이용해 주셔서 감사합니다. 본 약관은 만나이계산기 서비스(이하 "서비스")의 이용과 관련하여 회사와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
-        
-        <h2><span class="article-number">제1조</span> (약관의 효력 및 변경)</h2>
-        <p>1. 본 약관은 서비스 화면에 게시하거나 기타의 방법으로 이용자에게 공지함으로써 효력을 발생합니다.</p>
-        <p>2. 회사는 합리적인 사유가 발생할 경우에는 본 약관을 변경할 수 있으며, 약관이 변경되는 경우 변경된 약관의 내용과 시행일을 정하여, 시행일로부터 최소 7일 이전에 공지합니다.</p>
-        <p>3. 이용자가 변경된 약관에 동의하지 않는 경우, 이용자는 서비스 이용을 중단하고 이용계약을 해지할 수 있습니다.</p>
-        
-        <h2><span class="article-number">제2조</span> (서비스의 정의)</h2>
-        <p>1. "서비스"란 생년월일을 입력받아 정확한 만 나이를 계산하고, 연령별 주요 권리와 제도를 안내하는 웹 기반 서비스를 의미합니다.</p>
-        <p>2. 서비스는 다음과 같은 기능을 제공합니다:</p>
-        <ul>
-            <li>생년월일을 통한 정확한 만나이계산</li>
-            <li>연령별 주요 권리와 제도 안내</li>
-            <li>노령연금, 청년 지원, 중장년층 혜택 등 관련 정보 제공</li>
-            <li>계산 결과 공유 기능</li>
-        </ul>
-        
-        <h2><span class="article-number">제3조</span> (서비스의 제공)</h2>
-        <p>1. 회사는 연중무휴, 1일 24시간 서비스를 제공함을 원칙으로 합니다.</p>
-        <p>2. 회사는 컴퓨터 등 정보통신설비의 보수점검, 교체 및 고장, 통신의 두절 등의 사유가 발생한 경우에는 서비스의 제공을 일시적으로 중단할 수 있습니다.</p>
-        <p>3. 회사는 서비스의 제공에 필요한 경우 정기점검을 실시할 수 있으며, 정기점검시간은 서비스제공화면에 공지한 바에 따릅니다.</p>
-        
-        <h2><span class="article-number">제4조</span> (서비스의 이용)</h2>
-        <p>1. 서비스는 별도의 회원가입 없이 이용할 수 있습니다.</p>
-        <p>2. 이용자는 서비스 이용 시 다음 행위를 하여서는 안 됩니다:</p>
-        <ul>
-            <li>타인의 정보를 도용하여 서비스를 이용하는 행위</li>
-            <li>서비스의 안정적 운영을 방해할 수 있는 정보를 전송하는 행위</li>
-            <li>서비스에 게시된 정보를 변경하는 행위</li>
-            <li>기타 불법적이거나 부당한 행위</li>
-        </ul>
-        
-        <h2><span class="article-number">제5조</span> (개인정보보호)</h2>
-        <div class="highlight">
-            <p><strong>만나이계산기는 개인정보를 수집하지 않습니다.</strong></p>
-            <p>서비스 이용 시 입력하는 생년월일 정보는 서버에 저장되지 않으며, 브라우저를 닫으면 즉시 삭제됩니다.</p>
-        </div>
-        
-        <h2><span class="article-number">제6조</span> (서비스의 변경 및 중단)</h2>
-        <p>1. 회사는 운영정책상 또는 기술상의 필요에 의하여 서비스를 변경할 수 있습니다.</p>
-        <p>2. 서비스의 내용, 이용방법, 이용시간에 대하여 변경이 있는 경우에는 변경사유, 변경될 서비스의 내용 및 제공일자 등을 그 변경 전 7일 이상의 기간을 두고 공지합니다.</p>
-        <p>3. 회사는 무료로 제공되는 서비스의 일부 또는 전부를 회사의 정책 및 운영의 필요상 수정, 중단, 변경할 수 있으며, 이에 대하여 관련법에 특별한 규정이 없는 한 이용자에게 별도의 보상을 하지 않습니다.</p>
-        
-        <h2><span class="article-number">제7조</span> (면책사항)</h2>
-        <div class="warning">
-            <p><strong>중요한 면책사항</strong></p>
-            <p>본 서비스에서 제공하는 정보는 참고용이며, 실제 법적 효력이나 구체적인 혜택 적용은 관련 기관의 최종 확인이 필요합니다.</p>
-        </div>
-        
-        <p>1. 회사는 천재지변 또는 이에 준하는 불가항력으로 인하여 서비스를 제공할 수 없는 경우에는 서비스 제공에 관한 책임이 면제됩니다.</p>
-        <p>2. 회사는 이용자의 귀책사유로 인한 서비스 이용의 장애에 대하여는 책임을 지지 않습니다.</p>
-        <p>3. 회사는 이용자가 서비스를 이용하여 기대하는 수익을 상실한 것에 대하여 책임을 지지 않으며, 그 밖에 서비스를 통하여 얻은 자료로 인한 손해에 관하여는 책임을 지지 않습니다.</p>
-        <p>4. 회사는 이용자간 또는 이용자와 제3자 상호간에 서비스를 매개로 하여 거래 등을 한 행위에 대해서는 책임을 지지 않습니다.</p>
-        <p>5. 회사는 서비스에서 제공하는 정보의 정확성, 신뢰성, 완전성에 대해 보장하지 않으며, 이용자가 서비스의 정보를 신뢰하여 취한 조치에 대해 책임을 지지 않습니다.</p>
-        
-        <h2><span class="article-number">제8조</span> (분쟁의 해결)</h2>
-        <p>1. 회사와 이용자간에 발생한 분쟁에 관한 소송은 민사소송법상의 관할법원에 제기합니다.</p>
-        <p>2. 회사와 이용자간에 제기된 소송에는 대한민국 법을 적용합니다.</p>
-        
-        <h2><span class="article-number">제9조</span> (기타)</h2>
-        <p>1. 본 약관에서 정하지 아니한 사항과 본 약관의 해석에 관하여는 관련법령 또는 상관례에 따릅니다.</p>
-        <p>2. 본 약관에 명시되지 않은 사항에 대해서는 관련법령에 의하고, 법에 명시되지 않은 부분에 대하여는 관습법에 의합니다.</p>
-        
-        <h2><span class="article-number">제10조</span> (약관의 시행일)</h2>
-        <p>본 약관은 2025년 1월 1일부터 시행합니다.</p>
-        
-        <div class="contact-info">
-            <h3>문의사항</h3>
-            <p>본 약관에 대한 문의사항이 있으시면 언제든지 연락해 주시기 바랍니다.</p>
-            <p><strong>이메일</strong>: ldg6153@gmail.com</p>
-            <p><strong>최종 수정일</strong>: 2025년 9월 6일</p>
-        </div>
+
+        <h1>이용약관</h1>
+
+        <h3 style="text-align: center;">만나이 계산기(이하 “서비스”)의 이용과 관련하여 서비스 제공자와 이용자 간의 권리, 의무 및 책임사항을 규정합니다.</h3>
+
+        <section>
+            <h2><span class="article-number">제1조</span> (약관의 효력 및 변경)</h2>
+            <p>1. 본 약관은 서비스 화면에 게시하거나 기타 방법으로 공지함으로써 효력을 발생합니다.</p>
+            <p>2. 서비스는 합리적인 사유가 있을 경우 약관을 변경할 수 있으며, 변경 시 변경 내용과 시행일을 명시하여 시행일 7일 전까지 공지합니다.</p>
+            <p>3. 이용자가 변경된 약관에 동의하지 않는 경우, 서비스 이용을 중단하고 이용계약을 해지할 수 있습니다.</p>
+        </section>
+
+        <section>
+            <h2><span class="article-number">제2조</span> (서비스의 정의)</h2>
+            <p>1. “서비스”란 생년월일 입력을 바탕으로 만나이를 계산하고, 연령별 주요 권리·제도 정보를 안내하는 웹 기반 서비스를 의미합니다.</p>
+            <p>2. 주요 기능은 다음과 같습니다.</p>
+            <ul>
+                <li>생년월일을 통한 만나이 계산</li>
+                <li>연령별 주요 권리·제도 안내</li>
+                <li>관련 정보 제공(예: 청년·중장년·노년 관련 제도)</li>
+                <li>계산 결과 공유 기능(선택)</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2><span class="article-number">제3조</span> (서비스의 제공)</h2>
+            <p>1. 서비스는 연중무휴, 1일 24시간 제공을 원칙으로 합니다.</p>
+            <p>2. 정보통신설비의 보수점검, 교체, 고장, 통신 두절 등의 사유가 발생한 경우 서비스 제공이 일시 중단될 수 있습니다.</p>
+            <p>3. 필요한 경우 정기점검을 실시할 수 있으며, 점검 시간은 화면 공지에 따릅니다.</p>
+        </section>
+
+        <section>
+            <h2><span class="article-number">제4조</span> (서비스 이용 및 금지 행위)</h2>
+            <p>1. 서비스는 회원가입 없이 이용할 수 있습니다.</p>
+            <p>2. 이용자는 다음 각 호의 행위를 하여서는 안 됩니다.</p>
+            <ul>
+                <li>타인의 정보를 도용하여 서비스를 이용하는 행위</li>
+                <li>서비스의 안정적 운영을 방해할 수 있는 정보 전송 또는 시스템 접근 시도</li>
+                <li>서비스에 게시된 정보의 임의 변경·삭제</li>
+                <li>관련 법령 또는 본 약관을 위반하는 행위</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2><span class="article-number">제5조</span> (개인정보보호)</h2>
+            <div class="highlight">
+                <p><strong>서비스는 계산 입력값을 서버에 저장하지 않습니다.</strong> 입력한 생년월일은 브라우저 내에서 처리되며, 개인정보 처리에 관한 세부 사항은 <a
+                        href="{{ url_for('privacy') }}">개인정보처리방침</a>을 따릅니다.</p>
+            </div>
+        </section>
+
+        <section>
+            <h2><span class="article-number">제6조</span> (서비스의 변경 및 중단)</h2>
+            <p>1. 서비스는 운영 또는 기술상 필요에 따라 서비스 내용을 변경할 수 있습니다.</p>
+            <p>2. 서비스 내용·이용방법·이용시간에 변경이 있는 경우 변경 사유, 내용, 제공일자를 사전에 공지합니다.</p>
+            <p>3. 무료로 제공되는 서비스의 일부 또는 전부는 정책 및 운영상 필요에 따라 수정·중단·변경될 수 있으며, 관련 법령에 특별 규정이 없는 한 별도 보상이 제공되지 않습니다.</p>
+        </section>
+
+        <section>
+            <h2><span class="article-number">제7조</span> (면책사항)</h2>
+            <div class="warning">
+                <p><strong>중요 고지</strong> : 서비스에서 제공하는 정보는 일반적인 참고용이며, 실제 법적 효력이나 구체적 혜택 적용은 관계 기관의 최신 안내를 반드시 확인하시기
+                    바랍니다.</p>
+            </div>
+            <p>1. 천재지변 등 불가항력으로 서비스 제공이 불가능한 경우 책임이 면제됩니다.</p>
+            <p>2. 이용자의 귀책사유로 인한 장애에 대해서는 책임을 지지 않습니다.</p>
+            <p>3. 서비스 이용으로 기대한 수익 상실 및 자료 활용으로 인한 손해에 대해 책임을 지지 않습니다.</p>
+            <p>4. 서비스 매개로 발생한 이용자 간 또는 이용자와 제3자 간 거래 등에 대해 책임을 지지 않습니다.</p>
+            <p>5. 서비스에서 제공되는 정보의 정확성·신뢰성·완전성을 보장하지 않으며, 해당 정보를 신뢰하여 취한 조치에 대한 책임을 지지 않습니다.</p>
+        </section>
+
+        <section>
+            <h2><span class="article-number">제8조</span> (분쟁의 해결 및 준거법)</h2>
+            <p>1. 서비스와 이용자 간 분쟁에 관한 소송의 관할은 민사소송법상 관할법원으로 합니다.</p>
+            <p>2. 분쟁에 대해서는 대한민국 법을 준거법으로 합니다.</p>
+        </section>
+
+        <section>
+            <h2><span class="article-number">제9조</span> (기타)</h2>
+            <p>1. 본 약관에 정하지 아니한 사항과 해석은 관련 법령 또는 상관례에 따릅니다.</p>
+            <p>2. 광고·태그 관리 등 제3자 서비스의 이용 조건은 각 제공사의 약관·정책을 따릅니다.</p>
+        </section>
+
+        <section>
+            <h2><span class="article-number">제10조</span> (시행일 및 문의)</h2>
+            <ul>
+                <li><strong>시행일</strong> : 2025-09-06</li>
+                <li><strong>최종 수정일</strong> : 2025-10-07</li>
+            </ul>
+            <div class="contact-info">
+                <h3>문의</h3>
+                <p>약관 관련 문의는 아래 이메일로 연락해 주세요.</p>
+                <p><strong>이메일</strong> : <a href="mailto:ldg6153@gmail.com">ldg6153@gmail.com</a></p>
+            </div>
+        </section>
+
+        <!-- 푸터 -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>연락처</h4>
+                    <p>문의: ldg6153@gmail.com</p>
+                    <p>
+                        <a href="{{ url_for('privacy') }}"
+                            style="color: #667eea; text-decoration: none; margin-right: 10px;">개인정보처리방침</a>
+                        <span style="color: #ccc;">|</span>
+                        <a href="{{ url_for('terms') }}"
+                            style="color: #667eea; text-decoration: none; margin-left: 10px;">이용약관</a>
+                        <span style="color: #ccc;">|</span>
+                        <a href="{{ url_for('guide') }}"
+                            style="color: #667eea; text-decoration: none; margin-left: 10px;">만나이 가이드</a>
+                        <span style="color: #ccc;">|</span>
+                        <a href="{{ url_for('faq') }}"
+                            style="color: #667eea; text-decoration: none; margin-left: 10px;">자주 묻는 질문</a>
+                    </p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 만나이 계산기. All rights reserved.</p>
+            </div>
+        </footer>
+
+        <!-- 스크롤 상단 버튼 -->
+        <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
+            ↑
+        </button>
     </div>
 </body>
+
 </html>

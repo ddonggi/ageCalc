@@ -70,5 +70,16 @@ def terms():
     """이용 약관 페이지"""
     return render_template('terms.html')
 
+@app.route('/guide')
+def guide():
+    """가이드 페이지"""
+    return render_template('guide.html')
+
+@app.route('/faq')
+def faq():
+    """자주 묻는 질문 페이지"""
+    return render_template('faq.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=8000, host='0.0.0.0')

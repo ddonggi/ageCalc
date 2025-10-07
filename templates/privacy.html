@@ -1,226 +1,216 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    
-    <title>개인정보처리방침 - 만나이 계산기</title>
+
+    <title>개인정보처리방침 | 만나이 계산기</title>
     <meta name="description" content="만나이 계산기의 개인정보 처리 방침입니다. 수집·이용·보관·제3자 제공 등 개인정보 관련 정책을 확인하세요." />
-    
-    <!-- Canonical: 고정 URL -->
     <link rel="canonical" href="https://agecalc.cloud/privacy" />
-    
+
     <!-- Open Graph -->
     <meta property="og:locale" content="ko_KR" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="만나이 계산기" />
-    <meta property="og:title" content="개인정보처리방침 - 만나이 계산기" />
+    <meta property="og:title" content="개인정보처리방침 | 만나이 계산기" />
     <meta property="og:description" content="만나이 계산기의 개인정보 처리 방침입니다. 수집·이용·보관·제3자 제공 등 개인정보 관련 정책을 확인하세요." />
     <meta property="og:url" content="https://agecalc.cloud/privacy" />
-    <meta property="og:image" content="https://agecalc.cloud/static/images/og-image.png" />
-    
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="개인정보처리방침 - 만나이 계산기" />
+    <meta name="twitter:title" content="개인정보처리방침 | 만나이 계산기" />
     <meta name="twitter:description" content="만나이 계산기의 개인정보 처리 방침입니다." />
-    <meta name="twitter:image" content="https://agecalc.cloud/static/images/og-image.png" />
-    
-    <!-- (선택) hreflang: 다국어가 있다면 추가 -->
-    <!-- <link rel="alternate" href="https://agecalc.cloud/privacy" hreflang="ko" /> -->
-    
-    <!-- 파비콘 -->
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    
+    <meta name="twitter:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+
     <!-- CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <!-- 스크립트 -->
+    <script src="{{ url_for('static', filename='js/age-calculator.js') }}" defer></script>
+
     <!-- 구조화 데이터: PrivacyPolicy -->
     <script type="application/ld+json">
-        {
-            "@context":"https://schema.org",
-            "@type":"PrivacyPolicy",
-            "name":"개인정보처리방침",
-            "inLanguage":"ko",
-            "url":"https://agecalc.cloud/privacy",
-            "isPartOf":{
-            "@type":"WebSite",
-            "name":"만나이 계산기",
-            "url":"https://agecalc.cloud/"
-            }
-        }
-        </script>
+  {
+    "@context":"https://schema.org",
+    "@type":"PrivacyPolicy",
+    "name":"개인정보처리방침",
+    "inLanguage":"ko",
+    "url":"https://agecalc.cloud/privacy",
+    "isPartOf": {
+      "@type":"WebSite",
+      "name":"만나이 계산기",
+      "url":"https://agecalc.cloud/"
+    },
+    "dateModified":"2025-10-07"
+  }
+  </script>
 
-    <style>
-        .privacy-container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-        
-        .privacy-container h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 2rem;
-        }
-        
-        .privacy-container h2 {
-            color: #444;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-            border-bottom: 2px solid rgba(139, 92, 246, 0.3);
-            padding-bottom: 0.5rem;
-        }
-        
-        .privacy-container p {
-            color: #555;
-            line-height: 1.8;
-            margin-bottom: 1rem;
-        }
-        
-        .privacy-container ul {
-            color: #555;
-            line-height: 1.8;
-            margin-bottom: 1rem;
-            padding-left: 1.5rem;
-        }
-        
-        .privacy-container li {
-            margin-bottom: 0.5rem;
-        }
-        
-        .back-link {
-            display: inline-block;
-            margin-bottom: 2rem;
-            color: black;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
-        }
-        
-        .back-link:hover {
-            color: #764ba2;
-        }
-        
-        .highlight {
-            background: rgba(139, 92, 246, 0.1);
-            padding: 1rem;
-            border-radius: 8px;
-            border-left: 4px solid rgba(139, 92, 246, 0.6);
-            margin: 1rem 0;
-        }
-        
-        .contact-info {
-            background: rgba(102, 126, 234, 0.1);
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin: 2rem 0;
-        }
-        
-        .contact-info h3 {
-            color: #333;
-            margin-bottom: 1rem;
-        }
-        
-        .contact-info p {
-            margin-bottom: 0.5rem;
-        }
-    </style>
 </head>
+
 <body>
-    <div class="privacy-container">
+    <div class="container">
         <a href="{{ url_for('index') }}" class="back-link">← 메인으로 돌아가기</a>
-        
+
         <h1>개인정보 처리 방침</h1>
-        
-        <p><strong>만나이 계산기</strong>는 개인정보보호법에 따라 이용자의 개인정보 보호 및 권익을 보호하고자 다음과 같이 개인정보 처리 방침을 수립·공개합니다.</p>
-        
-        <h2>1. 개인정보의 처리 목적</h2>
-        <p>만나이 계산기는 다음의 목적을 위하여 개인정보를 처리합니다. 처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며, 이용 목적이 변경되는 경우에는 개인정보보호법 제18조에 따라 별도의 동의를 받는 등 필요한 조치를 이행할 예정입니다.</p>
-        
-        <ul>
-            <li><strong>나이 계산 서비스 제공</strong>: 생년월일을 입력받아 정확한 만나이를 계산하고, 연령별 권리와 제도를 안내</li>
-            <li><strong>서비스 개선</strong>: 이용자의 서비스 이용 패턴을 분석하여 서비스 품질 향상</li>
-            <li><strong>고객 지원</strong>: 문의사항에 대한 답변 및 기술 지원 제공</li>
-        </ul>
-        
-        <h2>2. 개인정보의 처리 및 보유 기간</h2>
-        <div class="highlight">
-            <p><strong>만나이 계산기는 개인정보를 수집하지 않습니다.</strong></p>
-            <p>본 서비스는 생년월일 입력을 받아 나이를 계산하지만, 이 정보는 서버에 저장되지 않으며 브라우저를 닫으면 즉시 삭제됩니다.</p>
-        </div>
-        
-        <h2>3. 처리하는 개인정보의 항목</h2>
-        <p>만나이 계산기는 다음과 같은 개인정보를 처리합니다:</p>
-        
-        <ul>
-            <li><strong>필수항목</strong>: 없음 (개인정보를 수집하지 않음)</li>
-            <li><strong>선택항목</strong>: 없음 (개인정보를 수집하지 않음)</li>
-            <li><strong>자동 수집 정보</strong>: 
-                <ul>
-                    <li>IP 주소, 쿠키, 방문 일시, 서비스 이용 기록, 접속 로그</li>
-                    <li>브라우저 종류 및 버전, 운영체제 정보</li>
-                </ul>
-            </li>
-        </ul>
-        
-        <h2>4. 개인정보의 제3자 제공</h2>
-        <p>만나이 계산기는 개인정보를 제3자에게 제공하지 않습니다. 다만, 다음의 경우에는 예외로 합니다:</p>
-        
-        <ul>
-            <li>이용자가 사전에 동의한 경우</li>
-            <li>법령의 규정에 의거하거나, 수사 목적으로 법령에 정해진 절차와 방법에 따라 수사기관의 요구가 있는 경우</li>
-        </ul>
-        
-        <h2>5. 개인정보 처리의 위탁</h2>
-        <p>만나이 계산기는 개인정보 처리업무를 위탁하지 않습니다.</p>
-        
-        <h2>6. 정보주체의 권리·의무 및 행사방법</h2>
-        <p>이용자는 개인정보주체로서 다음과 같은 권리를 행사할 수 있습니다:</p>
-        
-        <ul>
-            <li><strong>개인정보 처리현황 통지 요구</strong></li>
-            <li><strong>개인정보의 열람</strong></li>
-            <li><strong>개인정보의 정정·삭제</strong></li>
-            <li><strong>개인정보의 처리정지</strong></li>
-        </ul>
-        
-        <h2>7. 개인정보의 안전성 확보조치</h2>
-        <p>만나이 계산기는 개인정보의 안전성 확보를 위해 다음과 같은 조치를 취하고 있습니다:</p>
-        
-        <ul>
-            <li><strong>관리적 조치</strong>: 내부관리계획 수립·시행, 정기적 직원 교육 등</li>
-            <li><strong>기술적 조치</strong>: 개인정보처리시스템 등의 접근권한 관리, 접근통제시스템 설치, 개인정보의 암호화, 보안프로그램 설치</li>
-            <li><strong>물리적 조치</strong>: 전산실, 자료보관실 등의 접근통제</li>
-        </ul>
-        
-        <h2>8. 개인정보 보호책임자</h2>
-        <div class="contact-info">
-            <h3>개인정보 보호책임자</h3>
-            <p><strong>성명</strong>: 만나이 계산기 관리자</p>
-            <p><strong>연락처</strong>: ldg6153@gmail.com</p>
-            <p><strong>직책</strong>: 개인정보보호책임자</p>
-        </div>
-        
-        <h2>9. 개인정보 처리방침의 변경</h2>
-        <p>이 개인정보 처리방침은 시행일로부터 적용되며, 법령 및 방침에 따른 변경내용의 추가, 삭제 및 정정이 있는 경우에는 변경사항의 시행 7일 전부터 공지사항을 통하여 고지할 것입니다.</p>
-        
-        <h2>10. 개인정보 처리방침 시행일</h2>
-        <p>본 개인정보 처리방침은 2025년 1월 1일부터 시행됩니다.</p>
-        
-        <div class="contact-info">
-            <h3>문의사항</h3>
-            <p>개인정보 처리방침에 대한 문의사항이 있으시면 언제든지 연락해 주시기 바랍니다.</p>
-            <p><strong>이메일</strong>: ldg6153@gmail.com.com</p>
-            <p><strong>최종 수정일</strong>: 2025년 9월 6일</p>
-        </div>
+        <h3 style="text-align: center;">만나이 계산기(이하 “서비스”)는 개인정보보호법 등 관련 법령을 준수하며, <br> 이용자의 개인정보 보호를 위해 아래와 같이 처리 방침을
+            공개합니다.</h3>
+
+        <section>
+            <h2>1. 처리 목적</h2>
+            <ul>
+                <li><strong>나이 계산 서비스 제공</strong>: 입력한 생년월일을 바탕으로 만나이를 계산하고 관련 정보를 안내</li>
+                <li><strong>서비스 품질 개선</strong>: 오류 복구, 보안 강화, 이용 통계 분석(동의 시)</li>
+                <li><strong>고객 지원</strong>: 문의 대응 및 기술 지원</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>2. 수집 항목 및 수집 방법</h2>
+            <div class="highlight">
+                <p><strong>핵심 원칙</strong>: 생년월일 등 계산 입력값은 <u>브라우저에서만 처리</u>되며 서버에 저장하지 않습니다.</p>
+            </div>
+            <ul>
+                <li><strong>직접 수집</strong>: (필수) 없음 / (선택) 문의 시 이메일 주소</li>
+                <li><strong>자동 수집</strong>:
+                    <ul>
+                        <li><strong>필수 보안 로그</strong>: IP, User-Agent, 요청 URL/시간(서버 보안 및 장애 대응 목적, 단기 보관)</li>
+                        <li><strong>쿠키/유사기술</strong>:
+                            <ul>
+                                <li>동의 <u>전</u>: 필수 쿠키만 사용, 광고/분석 쿠키 저장 안 함</li>
+                                <li>동의 <u>후</u>: Google AdSense 자동광고, 측정 쿠키가 저장될 수 있음(옵션에 따라 맞춤/비맞춤 광고)</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>3. 이용·보유 기간</h2>
+            <ul>
+                <li>브라우저 입력값: 저장하지 않음</li>
+                <li>서버 보안 로그: 보안 목적 달성 시까지 최소한으로 보관 후 파기(통상 3~6개월 내)</li>
+                <li>문의 이메일: 처리 완료 및 관련 법령상 보존기간 경과 시 파기</li>
+                <li>광고/분석 쿠키: 제공사 정책 및 이용자 동의 설정에 따름</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>4. 제3자 제공</h2>
+            <p>원칙적으로 개인정보를 제3자에게 제공하지 않습니다. 다만 다음의 경우 예외적으로 제공될 수 있습니다.</p>
+            <ul>
+                <li>이용자가 사전에 명시적으로 동의한 경우</li>
+                <li>법령에 근거한 수사·조사 등 공공기관의 적법한 요구가 있는 경우</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>5. 처리 위탁 및 제3자 서비스</h2>
+            <p>서비스 운영 과정에서 다음 제3자 서비스가 사용될 수 있습니다.</p>
+            <ul>
+                <li><strong>Google AdSense</strong> (자동광고): 광고 노출 및 성과 측정
+                    <div class="small">동의 전에는 광고 쿠키/식별자가 저장되지 않으며, 동의 후에만 광고 쿠키가 활성화될 수 있습니다.</div>
+                </li>
+                <li><strong>Google Tag Manager</strong>: 태그 관리(동의 상태에 따라 태그 동작 제어)</li>
+            </ul>
+        </section>
+
+
+        <section>
+            <h2>6. 쿠키에 대한 안내 및 동의 철회</h2>
+            <ul>
+                <li>쿠키 목적: 서비스 품질 개선, 광고 제공 및 성과 측정(동의 후)</li>
+                <li>동의 관리: 하단 쿠키 배너에서 <em>동의/거부</em>를 선택할 수 있으며, 언제든 배너(또는 브라우저 설정)로 철회할 수 있습니다.</li>
+                <li>브라우저 설정: 쿠키 차단/삭제 방법은 각 브라우저 도움말을 참조하세요.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>7. 정보주체의 권리</h2>
+            <ul>
+                <li>개인정보 열람·정정·삭제·처리정지 요구</li>
+                <li>동의 철회 및 쿠키 설정 변경</li>
+                <li>권리 행사는 이메일(<a href="mailto:ldg6153@gmail.com">ldg6153@gmail.com</a>)로 요청하실 수 있습니다.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>8. 안전성 확보조치</h2>
+            <ul>
+                <li><strong>관리적</strong>: 내부관리계획 수립·교육, 최소권한 원칙</li>
+                <li><strong>기술적</strong>: 접근통제, 전송구간 암호화(HTTPS), 로그 모니터링, 보안 업데이트</li>
+                <li><strong>물리적</strong>: 서버실 등 물리적 접근 통제(호스팅사 정책 포함)</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>9. 개인정보 보호책임자</h2>
+            <div class="contact-info">
+                <p><strong>성명</strong>: 만나이 계산기 관리자</p>
+                <p><strong>연락처</strong>: <a href="mailto:ldg6153@gmail.com">ldg6153@gmail.com</a></p>
+                <p><strong>직책</strong>: 개인정보보호책임자</p>
+            </div>
+        </section>
+
+        <section>
+            <h2>10. 고지 및 변경</h2>
+            <ul>
+                <li>본 방침은 아래 시행일부터 적용됩니다.</li>
+                <li>중요 변경 시 최소 7일 전 공지합니다.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>11. 시행일 및 최종 수정일</h2>
+            <ul>
+                <li><strong>시행일</strong>: 2025-09-06</li>
+                <li><strong>최종 수정일</strong>: 2025-10-07</li>
+            </ul>
+        </section>
+
+
+        <h3 class="small" style="text-align: center;">참고: 광고 쿠키·맞춤형 광고와 관련한 추가 정보 및 선택 사항은 Google의 광고 설정/정책 페이지에서 확인할 수
+            있습니다.</h3>
+
+        <!-- 푸터 -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>연락처</h4>
+                    <p>문의: ldg6153@gmail.com</p>
+                    <p>
+                        <a href="{{ url_for('privacy') }}"
+                            style="color: #667eea; text-decoration: none; margin-right: 10px;">개인정보처리방침</a>
+                        <span style="color: #ccc;">|</span>
+                        <a href="{{ url_for('terms') }}"
+                            style="color: #667eea; text-decoration: none; margin-left: 10px;">이용약관</a>
+                        <span style="color: #ccc;">|</span>
+                        <a href="{{ url_for('guide') }}"
+                            style="color: #667eea; text-decoration: none; margin-left: 10px;">만나이 가이드</a>
+                        <span style="color: #ccc;">|</span>
+                        <a href="{{ url_for('faq') }}"
+                            style="color: #667eea; text-decoration: none; margin-left: 10px;">자주 묻는 질문</a>
+                    </p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 만나이 계산기. All rights reserved.</p>
+            </div>
+        </footer>
     </div>
+
+    <!-- 스크롤 상단 버튼 -->
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
+        ↑
+    </button>
 </body>
+
 </html>
