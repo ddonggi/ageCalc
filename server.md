@@ -268,7 +268,7 @@ Nginx: /var/log/nginx/error.log
 
 배포 업데이트:
 
-새 코드 배포 → systemctl restart agecalc
+새 코드 배포 → sudo systemctl restart agecalc
 
 ---
 1) 운영 팁 (공통)
