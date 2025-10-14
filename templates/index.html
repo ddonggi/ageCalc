@@ -28,9 +28,9 @@
 
     <!-- 구글 검색 콘솔 인증 -->
     <meta name="google-site-verification" content="q0nvIaon9IVWNZZEQzTRCycYka7jIHuzYu-PwxxoKu8" />
+    
     <!-- 네이버 웹마스터 도구 인증 -->
     <meta name="naver-site-verification" content="2c9ad0c903ffdf79a53d4fa573c983641577ac34" />
-
 
     <!-- 파비콘/매니페스트 -->
     <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
@@ -39,9 +39,12 @@
         href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
     <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
 
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7818333740838556"
+     crossorigin="anonymous"></script>
+     
     <!-- 성능 최적화(선연결) -->
-    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
-    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+    <!-- <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin /> -->
+    <!-- <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin /> -->
 
     <script type="application/ld+json">
         {
@@ -85,6 +88,7 @@
 
     <!-- Google Consent Mode v2: 기본 거부 상태로 시작 (배너 동의 시 업데이트) -->
     <script>
+        /*
         window.dataLayer = window.dataLayer || [];
         function gtag() { dataLayer.push(arguments); }
         gtag('consent', 'default', {
@@ -93,17 +97,22 @@
             ad_personalization: 'denied',
             analytics_storage: 'denied'
         });
+        */
     </script>
 
     <!-- Google Tag Manager -->
-    <script>(function (w, d, s, l, i) {
+    <script>
+    /*
+    (function (w, d, s, l, i) {
             w[l] = w[l] || []; w[l].push({
                 'gtm.start':
                     new Date().getTime(), event: 'gtm.js'
             }); var f = d.getElementsByTagName(s)[0],
                 j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
                     'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-        })(window, document, 'script', 'dataLayer', 'GTM-MDBMPR4B');</script>
+        })(window, document, 'script', 'dataLayer', 'GTM-MDBMPR4B');
+        */
+    </script>
     <!-- End Google Tag Manager -->
 
     <!-- CSS-->
@@ -118,6 +127,7 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MDBMPR4B" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
+    
     <div class="container">
         <h1>만나이 계산기</h1>
 
@@ -546,6 +556,7 @@
 
 
 <script>
+    /*
     // Auto ads 로더 (동의 후 1회만)
     function loadAutoAds(client) {
         if (window.__adsLoaded) return;
@@ -599,6 +610,7 @@
             set('cookieConsent', 'rejected'); if (banner) banner.style.display = 'none'; applyConsent('rejected');
         });
     })();
+    */
 </script>
 
 </html>

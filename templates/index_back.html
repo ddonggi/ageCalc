@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <meta name="google-adsense-account" content="ca-pub-7818333740838556">
+
+    <!-- 필수 SEO -->
+    <title>만나이 계산기</title>
+    <meta name="description" content="생년월일로 정확한 만나이를 계산하고, 연령별 가능한 권리·제도를 한눈에 확인하세요." />
+    
+    <!-- 중복 방지: 대표 URL로 고정 -->
+    <link rel="canonical" href="https://agecalc.cloud/" />
+    
+    <!-- 소셜 미리보기 -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="만나이 계산기" />
+    <meta property="og:title" content="만나이 계산기 – 생일로 정확한 만나이 계산" />
+    <meta property="og:description" content="만나이 계산 + 연령별 권리·제도 안내." />
+    <meta property="og:url" content="https://agecalc.cloud/" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="만나이 계산기 – 생일로 정확한 만나이 계산" />
+    <meta name="twitter:description" content="만나이 계산 + 연령별 권리·제도 안내." />
+    <meta name="twitter:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+    
+    <!-- 구글 검색 콘솔 인증 -->
+        <meta name="google-site-verification" content="q0nvIaon9IVWNZZEQzTRCycYka7jIHuzYu-PwxxoKu8" />
+        <!-- 네이버 웹마스터 도구 인증 -->
+        <meta name="naver-site-verification" content="2c9ad0c903ffdf79a53d4fa573c983641577ac34" />
+        
+    
+    <!-- 파비콘/매니페스트 -->
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+    
+    <!-- 성능 최적화(선연결) -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+    
+    <script type="application/ld+json">
+        {
+          "@context":"https://schema.org",
+          "@type":"SoftwareApplication",
+          "name":"만나이 계산기",
+          "applicationCategory":"UtilitiesApplication",
+          "operatingSystem":"Web",
+          "url":"https://agecalc.cloud/",
+          "description":"생년월일로 정확한 만나이를 계산하고 연령별 권리·제도를 안내합니다.",
+          "inLanguage":"ko"
+        }
+    </script>
+
+    <script type="application/ld+json">
+        {
+         "@context": "https://schema.org",
+         "@type": "FAQPage",
+         "mainEntity": [
+          {
+           "@type": "Question",
+           "name": "음력 생일은 어떻게 계산하나요?",
+           "acceptedAnswer": {"@type":"Answer","text":"본 계산기는 양력 기준입니다. 음력의 경우 ..."}
+          },
+          {
+           "@type": "Question",
+           "name": "2월 29일 출생은 어떻게 처리되나요?",
+           "acceptedAnswer": {"@type":"Answer","text":"윤년이 아닌 해에는 ..."}
+          }
+         ]
+        }
+    </script>
+
+    <!-- Google Consent Mode v2: 기본 거부 상태로 시작 (배너 동의 시 업데이트) -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent','default',{
+        ad_storage:'denied',
+        ad_user_data:'denied',
+        ad_personalization:'denied',
+        analytics_storage:'denied'
+        });
+    </script>
+    
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-MDBMPR4B');</script>
+    <!-- End Google Tag Manager -->
+
+    <!-- 스타일/스크립트 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <script src="{{ url_for('static', filename='js/age-calculator.js') }}" defer></script>
+</head>      
+<body>
+    <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MDBMPR4B"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div class="container">
+        <h1>만나이 계산기</h1>
+        
+        <form class="age-form" id="age-form">
+            <div class="form-group">
+                <h3>생년월일을 입력하세요</h3>
+                <div class="date-inputs">
+                    <input type="text" id="year" name="year" placeholder="1992" maxlength="4" 
+                           value="{{ year or '' }}" required>
+                    <span class="date-separator">년</span>
+                    <input type="text" id="month" name="month" placeholder="10" maxlength="2" 
+                           value="{{ month or '' }}" required>
+                    <span class="date-separator">월</span>
+                    <input type="text" id="day" name="day" placeholder="02" maxlength="2" 
+                           value="{{ day or '' }}" required>
+                    <span class="date-separator">일</span>
+                </div>
+                <input type="hidden" id="birth_date" name="birth_date" value="{{ birth_date or '' }}">
+            </div>
+            
+
+        </form>
+        
+        <div class="result-container" id="result-container">
+            <h2>계산 결과</h2>
+            <div id="result-content">
+                <!-- 결과 내용이 JavaScript로 동적 생성됨 -->
+            </div>
+        </div>
+        
+        <div class="info">
+            <h3>사용법</h3>
+            <ul>
+                <li>생년월일을 입력하세요 (자동으로 다음 필드로 이동)</li>
+                <li>입력이 완료되면 자동으로 나이가 계산됩니다</li>
+                <li>정확한 만나이가 표시됩니다</li>
+            </ul>
+        </div>
+        
+        <!-- 연령별 주요 권리·제도 -->
+        <div class="age-rights-section">
+            <h3>🧑 연령별 주요 권리·제도 (만나이 기준)</h3>
+            
+            <div class="age-rights-grid">
+                <div class="age-right-item" data-age="14">
+                    <div class="age-header">
+                        <span class="age-number">14</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.kakaocorp.com/page/" target="_blank" rel="noopener noreferrer">카카오톡, SNS 등 대부분 온라인 서비스 가입 가능</a></li>
+                        <li>형사 미성년자(만 14세 미만) → 형사처벌 불가, 만 14세부터는 형사책임 인정</li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item" data-age="15">
+                    <div class="age-header">
+                        <span class="age-number">15</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.moel.go.kr/" target="_blank" rel="noopener noreferrer">근로기준법상 취직 가능 연령 (부모 동의 필요)</a></li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item " data-age="17">
+                    <div class="age-header">
+                        <span class="age-number">17</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=13100000013" target="_blank" rel="noopener noreferrer">주민등록증 발급 가능</a></li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item" data-age="18">
+                    <div class="age-header">
+                        <span class="age-number">18</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.safedriving.or.kr/" target="_blank" rel="noopener noreferrer">자동차 운전면허 취득 가능 (2종 보통 기준)</a></li>
+                        <li><a href="https://www.nec.go.kr/" target="_blank" rel="noopener noreferrer">선거권 부여 (국회의원, 대통령 선거 모두 가능)</a></li>
+                        <li><a href="https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=12700000050" target="_blank" rel="noopener noreferrer">혼인 가능 (민법 개정 후 남녀 모두 만 18세 이상부터)</a></li>
+                        <li>일부 청년 정책(교통·문화 할인, 청소년 우대 등) 종료</li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item " data-age="19">
+                    <div class="age-header">
+                        <span class="age-number">19</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li>술·담배 구매 가능 (청소년보호법)</li>
+                        <li>성인 등급 콘텐츠 및 일부 성인 전용 시설 출입 가능/li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item" data-age="20">
+                    <div class="age-header">
+                        <span class="age-number">20</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.mma.go.kr/" target="_blank" rel="noopener noreferrer">군 입대 의무 본격 적용 (징병검사, 현역 입영 가능)</a></li>
+                        <li><a href="https://www.kosaf.go.kr/ko/main.do" target="_blank" rel="noopener noreferrer">대학 등록금·청년 지원금 일부 제도 만 20세 이상 대상</a></li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item" data-age="24">
+                    <div class="age-header">
+                        <span class="age-number">24</span>
+                        <span class="age-unit">세 이하</span>
+                    </div>
+                    <ul>
+                        <li>일부 공공기관 청년 우대금리 통장 가입 가능</li>
+                    </ul>
+                </div>
+
+                <div class="age-right-item" data-age="34">
+                    <div class="age-header">
+                        <span class="age-number">34</span>
+                        <span class="age-unit">세 이하</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.molit.go.kr/" target="_blank" rel="noopener noreferrer">청년 월세 특별 지원 (국토부, 지자체)</a></li>
+                        <li>청년 전세자금 대출 (버팀목 전세자금 등)</li>
+                        <li>청년 주택 청약 우대 (신혼부부 특별공급 등은 만 39세 이하까지 확대되기도 함)</li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item" data-age="39">
+                    <div class="age-header">
+                        <span class="age-number">39</span>
+                        <span class="age-unit">세 이하</span>
+                    </div>
+                    <ul>
+                        <li class="available">청년 주택/장기전세주택 입주 가능 연령</li>
+                        <li><a href="https://www.semas.or.kr/" target="_blank" rel="noopener noreferrer">청년 창업 지원 (중소기업청, 창업지원금 등)</a></li>
+                        <li class="available">일부 지자체 청년 지원 정책 상한선</li>
+                    </ul>
+                </div>
+                <!-- 구글 애드센스 광고 -->
+                <div class="ad-container" style="display:block;min-height:250px">
+                    <ins class="adsbygoogle"
+                        style="display:block"
+                        data-ad-client="ca-pub-7818333740838556"
+                        data-ad-slot="9304110805"
+                        data-ad-format="auto"
+                        data-full-width-responsive="true"></ins>
+                </div>
+                <div class="age-right-item" data-age="40">
+                    <div class="age-header">
+                        <span class="age-number">40</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.semas.or.kr/" target="_blank" rel="noopener noreferrer">중장년층 창업 지원 (중소기업청, 중장년 창업지원금)</a></li>
+                        <li><a href="https://www.work.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 재취업 지원 (고용지원센터)</a></li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item" data-age="45">
+                    <div class="age-header">
+                        <span class="age-number">45</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.molit.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 전용 주택 청약 (일부 지자체)</a></li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item" data-age="50">
+                    <div class="age-header">
+                        <span class="age-number">50</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.work.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 전용 취업 지원 프로그램</a></li>
+                        <li><a href="https://www.nhis.or.kr/" target="_blank" rel="noopener noreferrer">중장년층 건강검진 무료 (국가건강검진)</a></li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item" data-age="55">
+                    <div class="age-header">
+                        <span class="age-number">55</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.molit.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 전용 주택 분양 (일부 아파트)</a></li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item" data-age="60">
+                    <div class="age-header">
+                        <span class="age-number">60</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 특별 지원 (일부 지자체)</a></li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item" data-age="61">
+                    <div class="age-header">
+                        <span class="age-number">61</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">노령연금 지급 시작 (1953-56년생)</a></li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item" data-age="62">
+                    <div class="age-header">
+                        <span class="age-number">62</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">노령연금 지급 시작 (1957-60년생)</a></li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item" data-age="63">
+                    <div class="age-header">
+                        <span class="age-number">63</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">노령연금 지급 시작 (1961-64년생)</a></li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item" data-age="64">
+                    <div class="age-header">
+                        <span class="age-number">64</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">노령연금 지급 시작 (1965-68년생)</a></li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item" data-age="65">
+                    <div class="age-header">
+                        <span class="age-number">65</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">노인복지법상 노인 혜택 시작</a></li>
+                        <li><a href="https://www.work.go.kr/" target="_blank" rel="noopener noreferrer">노인교통카드 할인 (대중교통)</a></li>
+                        <li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">노인 문화시설 할인 (박물관, 영화관 등)</a></li>
+                        <li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">기초연금 수급 자격 (만 65세 이상)</a></li>
+                        <li><a href="https://www.longtermcare.or.kr/" target="_blank" rel="noopener noreferrer">노인장기요양보험 수급 자격</a></li>
+                    </ul>
+                </div>
+                
+                <div class="age-right-item" data-age="70">
+                    <div class="age-header">
+                        <span class="age-number">70</span>
+                        <span class="age-unit">세 이상</span>
+                    </div>
+                    <ul>
+                        <li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">노인 우선 대기 및 할인 혜택 확대</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+
+        <!-- 푸터 -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>연락처</h4>
+                    <p>문의: ldg6153@gmail.com</p>
+                    <p>
+                        <a href="{{ url_for('privacy') }}" style="color: #667eea; text-decoration: none; margin-right: 10px;">개인정보처리방침</a>
+                        <span style="color: #ccc;">|</span>
+                        <a href="{{ url_for('terms') }}" style="color: #667eea; text-decoration: none; margin-left: 10px;">이용약관</a>
+                    </p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 만나이 계산기. All rights reserved.</p>
+            </div>
+        </footer>        
+    </div>
+    <!-- 쿠키 동의 배너 -->
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>이 웹사이트는 쿠키를 사용하여 사용자 경험을 개선합니다. 계속 사용하시면 쿠키 사용에 동의하는 것으로 간주됩니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 스크롤 상단 버튼 -->
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
+        ↑
+    </button>
+
+</body>
+
+
+<script>
+    // ads 스크립트 1회 로드 + 모든 <ins> 처리
+    function loadAds(client){
+      if (window.__adsLoaded) return;  // 중복 로드 방지
+      window.__adsLoaded = true;
+  
+      const s = document.createElement('script');
+      s.async = true;
+      s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`;
+      s.crossOrigin = "anonymous";
+      s.onload = () => {
+        // 페이지 내 존재하는 모든 <ins.adsbygoogle> 처리
+        window.adsbygoogle = window.adsbygoogle || [];
+        const units = document.querySelectorAll('ins.adsbygoogle');
+        units.forEach(() => (adsbygoogle = window.adsbygoogle).push({}));
+      };
+      document.head.appendChild(s);
+    }
+  
+    function applyConsent(state){
+      // Consent Mode v2
+      const granted = v => ({
+        ad_storage: v, ad_user_data: v, ad_personalization: v, analytics_storage: v
+      });
+      if (typeof gtag === 'function') {
+        gtag('consent','update', state === 'accepted' ? granted('granted') : granted('denied'));
+      }
+      if (state === 'accepted') {
+        // GA는 GTM에서 관리한다면 별도 로드 불필요
+        loadAds('ca-pub-7818333740838556'); // 실제 퍼블리셔 ID
+      }
+    }
+  
+    (function(){
+      const banner = document.getElementById('cookie-banner');
+      const get = k => document.cookie.split('; ').find(r=>r.startsWith(k+'='))?.split('=')[1];
+      const set = (k,v,d=365) => {
+        const t = new Date(); t.setTime(t.getTime()+d*864e5);
+        document.cookie = `${k}=${v};expires=${t.toUTCString()};path=/;SameSite=Lax`;
+      };
+  
+      const consent = get('cookieConsent');
+      if (!consent && banner) banner.style.display = 'block';
+      else if (consent) applyConsent(consent);
+  
+      document.getElementById('accept-cookies')?.addEventListener('click', () => {
+        set('cookieConsent','accepted'); if (banner) banner.style.display='none'; applyConsent('accepted');
+      });
+      document.getElementById('reject-cookies')?.addEventListener('click', () => {
+        set('cookieConsent','rejected'); if (banner) banner.style.display='none'; applyConsent('rejected');
+      });
+    })();
+  </script>
+</html>

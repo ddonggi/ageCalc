@@ -26,23 +26,6 @@
     <meta name="twitter:description" content="만나이 계산기의 이용약관입니다." />
     <meta name="twitter:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
-    <!-- 구조화 데이터: TermsOfService -->
-    <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"TermsOfService",
-    "name":"이용약관",
-    "inLanguage":"ko",
-    "url":"https://agecalc.cloud/terms",
-    "isPartOf":{
-      "@type":"WebSite",
-      "name":"만나이 계산기",
-      "url":"https://agecalc.cloud/"
-    },
-    "dateModified":"2025-10-07"
-  }
-  </script>
-
     <!-- Favicon -->
     <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
     <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
@@ -55,6 +38,24 @@
 
     <!-- 스크립트 -->
     <script src="{{ url_for('static', filename='js/age-calculator.js') }}" defer></script>
+
+    <!-- 구조화 데이터: TermsOfService -->
+    <script type="application/ld+json">
+    {
+        "@context":"https://schema.org",
+        "@type":"TermsOfService",
+        "name":"이용약관",
+        "inLanguage":"ko",
+        "url":"https://agecalc.cloud/terms",
+        "isPartOf":{
+            "@type":"WebSite",
+            "name":"만나이 계산기",
+            "url":"https://agecalc.cloud/"
+        },
+        "dateModified":"2025-10-07"
+    }
+    </script>
+
 </head>
 
 <body>
