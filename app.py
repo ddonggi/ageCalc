@@ -16,17 +16,8 @@ def index():
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             # AJAX 요청 처리
             result = None
-            birth_date = None
-            
-            # 개별 년/월/일 값 또는 전체 날짜 값 처리
-            if 'birth_date' in request.form and request.form['birth_date']:
-                birth_date = request.form['birth_date']
-            elif all(key in request.form for key in ['year', 'month', 'day']):
-                year = request.form['year']
-                month = request.form['month'].zfill(2)
-                day = request.form['day'].zfill(2)
-                birth_date = f"{year}-{month}-{day}"
-            
+            birth_date = request.form.get('birth_date') or request.form.get('birth_compact')
+
             if birth_date:
                 controller = AgeController()
                 result = controller.calculate_age_from_string(birth_date)
@@ -36,29 +27,15 @@ def index():
         
         # 일반 폼 제출 처리 (기존 코드 유지)
         result = None
-        birth_date = None
-        year = None
-        month = None
-        day = None
-        
-        if 'birth_date' in request.form and request.form['birth_date']:
-            birth_date = request.form['birth_date']
-        elif all(key in request.form for key in ['year', 'month', 'day']):
-            year = request.form['year']
-            month = request.form['month'].zfill(2)
-            day = request.form['day'].zfill(2)
-            birth_date = f"{year}-{month}-{day}"
-        
+        birth_date = request.form.get('birth_date') or request.form.get('birth_compact')
+
         if birth_date:
             controller = AgeController()
             result = controller.calculate_age_from_string(birth_date)
     
     # GET 요청 또는 일반 폼 제출 시
-    return render_template('index.html', result=result if 'result' in locals() else None, 
-                         birth_date=birth_date if 'birth_date' in locals() else None, 
-                         year=year if 'year' in locals() else None, 
-                         month=month if 'month' in locals() else None, 
-                         day=day if 'day' in locals() else None)
+    return render_template('index.html', result=result if 'result' in locals() else None,
+                         birth_date=birth_date if 'birth_date' in locals() else None)
 
 @app.route('/privacy')
 def privacy():

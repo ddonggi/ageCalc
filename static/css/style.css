@@ -172,7 +172,7 @@ label {
 }
 
 .date-inputs input[type="text"] {
-    width: 80px;
+    width: 160px;
     padding: 12px 8px;
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 12px;
@@ -1066,7 +1066,7 @@ body {
     }
 
     .date-inputs input[type="text"] {
-        width: 65px;
+        width: 140px;
         padding: 12px 8px;
         font-size: 16px;
     }
