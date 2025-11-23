@@ -1413,3 +1413,25 @@ section a:hover {
     font-size: 14px;
     font-weight: 600;
 }
+
+/* 기본 입력창 스타일 */
+#birth-input {
+    width: 200px;              /* 데스크톱 기본 크기 */
+    max-width: 100%;           /* 부모 범위 넘지 않도록 */
+    padding: 12px 16px;
+    font-size: 20px;
+    text-align: center;
+    border-radius: 10px;
+    letter-spacing: 4px;       /* 6자리 입력 가독성 ↑ */
+    box-sizing: border-box;
+}
+
+/* 모바일 화면에서 더 크게 / 전체 폭 사용 */
+@media (max-width: 600px) {
+    #birth-input {
+        width: 100%;
+        font-size: 24px;
+        padding: 16px;
+        letter-spacing: 6px;
+    }
+}
