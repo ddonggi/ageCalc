@@ -4,9 +4,8 @@
  */
 class AgeCalculatorUI {
     constructor() {
-        this.yearInput = null;
-        this.monthInput = null;
-        this.dayInput = null;
+        this.birthInput = null;
+        this.birthErrorEl = null;
         this.hiddenDateInput = null;
         this.form = null;
         this.adRefreshTimer = null; // 구글 애드 리프레시 타이머
@@ -19,17 +18,15 @@ class AgeCalculatorUI {
      * 초기화
      */
     init() {
-        this.yearInput = document.getElementById('year');
-        this.monthInput = document.getElementById('month');
-        this.dayInput = document.getElementById('day');
-        this.hiddenDateInput = document.getElementById('birth_date');
+        // 🔹 6자리 모드 요소
+        this.birthInput    = document.getElementById('birth-input');
+        this.birthErrorEl  = document.getElementById('birth-error');
         this.form = document.querySelector('.age-form');
         
         if (this.validateElements()) {
             this.bindEvents();
             this.setInitialFocus();
             this.initializeZodiacInfo();
-            // URL 로드는 약간 지연시켜서 실행
             setTimeout(() => {
                 this.loadFromUrl();
             }, 100);
@@ -40,26 +37,15 @@ class AgeCalculatorUI {
      * 필수 요소들이 존재하는지 검증
      */
     validateElements() {
-        const requiredElements = [
-            this.yearInput,
-            this.monthInput,
-            this.dayInput,
-            this.hiddenDateInput,
-            this.form
-        ];
-        
-        return requiredElements.every(element => element !== null);
+        return this.birthInput !== null && this.form !== null;
     }
     
     /**
      * 이벤트 바인딩
      */
     bindEvents() {
-        this.bindInputEvents();
-        this.bindKeyPressEvents();
+        this.bind6DigitInputEvents();
         this.bindAutoCalculation();
-        this.bindBackspaceEvents();
-        this.bindEnterKeyEvents();
         this.bindZodiacPreview();
         this.bindShareEvents();
         this.bindCookieEvents();
@@ -81,6 +67,17 @@ class AgeCalculatorUI {
         this.monthInput.addEventListener('input', (e) => {
             if (e.target.value.length === 2) {
                 this.dayInput.focus();
+            }
+        });
+    }
+
+    bind6DigitInputEvents() {
+        if (!this.birthInput) return;
+
+        // 숫자만 입력 허용
+        this.birthInput.addEventListener('keypress', (e) => {
+            if (!/[0-9]/.test(e.key)) {
+                e.preventDefault();
             }
         });
     }
@@ -163,7 +160,8 @@ class AgeCalculatorUI {
      * 12지신 정보 업데이트 (단순화된 버전)
      */
     updateZodiacInfo() {
-        const year = parseInt(this.yearInput.value);
+        //const year = parseInt(this.yearInput.value);
+        const year = this.getBirthYear();
         console.log('12지신 업데이트 시도, 년도:', year); // 디버깅용
         
         if (year && year >= 1900) {
@@ -360,9 +358,21 @@ class AgeCalculatorUI {
     /**
      * 비동기 나이 계산
      */
-    async calculateAgeAsync() {
+    async calculateAgeAsync(isoBirthDate) {
         const formData = new FormData(this.form);
-        
+
+        // 6자리 모드: iso 인자로 넘어온 값 우선
+        if (isoBirthDate) {
+            formData.set('birth_date', isoBirthDate);
+        } else if (this.birthInput) {
+            // 혹시라도 직접 호출됐을 때 방어
+            const v = this.validateBirth6(this.birthInput.value);
+            if (!v.valid) {
+                throw new Error(v.msg || '잘못된 생년월일입니다.');
+            }
+            formData.set('birth_date', v.iso);
+        }
+
         const response = await fetch('/', {
             method: 'POST',
             body: formData,
@@ -370,11 +380,11 @@ class AgeCalculatorUI {
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
-        
+
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const result = await response.json();
         return result;
     }
@@ -432,7 +442,8 @@ class AgeCalculatorUI {
      */
     createSuccessResultHTML(result) {
         // 12지신 정보 가져오기
-        const year = parseInt(this.yearInput.value);
+        //const year = parseInt(this.yearInput.value);
+        const year = this.getBirthYear();
         const zodiacInfo = year && year >= 1900 ? DateUtils.getZodiacSign(year) : null;
         const zodiacText = zodiacInfo ? `(${zodiacInfo.emoji} ${zodiacInfo.animal})` : '';
         
@@ -532,7 +543,8 @@ class AgeCalculatorUI {
         ];
 
         // 사용자의 출생연도에 따른 노령연금 정보 선택
-        const userYear = parseInt(this.yearInput.value);
+        //const userYear = parseInt(this.yearInput.value);
+        const userYear = this.getBirthYear();
         let selectedPension = null;
         
         if (userYear && userYear >= 1953) {
@@ -599,36 +611,11 @@ class AgeCalculatorUI {
      * 입력값 검증
      */
     validateInputs() {
-        const year = this.yearInput.value.trim();
-        const month = this.monthInput.value.trim();
-        const day = this.dayInput.value.trim();
-        
-        if (!year || !month || !day) {
-            this.showError(null, '생년월일을 모두 입력해주세요.');
+        const v = this.validateBirth6(this.birthInput.value);
+        if (!v.valid) {
+            this.showBirthError(v.msg);
             return false;
         }
-        
-        if (!this.validateYear(year)) {
-            this.showError(this.yearInput, '올바른 년도를 입력하세요 (1900년 이상)');
-            return false;
-        }
-        
-        if (!this.validateMonth(month)) {
-            this.showError(this.monthInput, '올바른 월을 입력하세요 (01-12)');
-            return false;
-        }
-        
-        if (!this.validateDay(day)) {
-            this.showError(this.dayInput, '올바른 일을 입력하세요 (01-31)');
-            return false;
-        }
-        
-        // 날짜 유효성 검사
-        if (!DateUtils.isValidDate(parseInt(year), parseInt(month), parseInt(day))) {
-            this.showError(null, '존재하지 않는 날짜입니다. 다시 확인해주세요.');
-            return false;
-        }
-        
         return true;
     }
     
@@ -1027,33 +1014,26 @@ class AgeCalculatorUI {
         });
     }
     
-    /**
-     * 공유용 URL 생성
-     */
+/**
+ * 공유용 URL 생성
+ * - 6자리 모드: birth_date=YYMMDD (예: 921002)
+ * - 3필드 모드: 기존처럼 YYYY-MM-DD 유지 (백워드 호환)
+ */
     generateShareUrl() {
         const baseUrl = window.location.origin + window.location.pathname;
-        const currentResult = this.getCurrentResult();
-        
-        if (currentResult && currentResult.birth_date) {
-            const params = new URLSearchParams();
-            params.set('birth_date', currentResult.birth_date);
-            
-            return `${baseUrl}?${params.toString()}`;
+        const params = new URLSearchParams();
+
+        // 현재 입력값 기준으로
+        if (this.birthInput) {
+            const v = this.validateBirth6(this.birthInput.value);
+            if (v.valid) {
+                // 6자리 그대로 사용
+                params.set('birth_date', v.digits); // 예: 921002
+                return `${baseUrl}?${params.toString()}`;
+            }
         }
-        
-        // 결과가 없으면 현재 입력된 값으로 URL 생성
-        const year = this.yearInput.value;
-        const month = this.monthInput.value;
-        const day = this.dayInput.value;
-        
-        if (year && month && day) {
-            const birthDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-            const params = new URLSearchParams();
-            params.set('birth_date', birthDate);
-            
-            return `${baseUrl}?${params.toString()}`;
-        }
-        
+
+        // fallback: 그냥 base URL
         return baseUrl;
     }
     
@@ -1077,38 +1057,40 @@ class AgeCalculatorUI {
      * URL에서 결과 로드
      */
     async loadFromUrl() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const birthDate = urlParams.get('birth_date');
-        
-        console.log('URL에서 birth_date 파라미터:', birthDate);
-        
-        if (birthDate) {
-            // URL에서 생년월일 파싱
-            const [year, month, day] = birthDate.split('-');
-            
-            console.log('파싱된 생년월일:', { year, month, day });
-            
-            // 입력 필드에 값 설정
-            this.yearInput.value = year;
-            this.monthInput.value = month;
-            this.dayInput.value = day;
-            this.hiddenDateInput.value = birthDate;
-            
-            console.log('입력 필드 설정 완료');
-            
-            // 자동으로 계산 실행
-            try {
-                console.log('계산 시작...');
-                const result = await this.calculateAgeAsync();
-                console.log('계산 결과:', result);
-                
-                if (result) {
-                    this.displayResult(result);
-                    console.log('결과 표시 완료');
-                }
-            } catch (error) {
-                console.error('URL에서 결과 로드 오류:', error);
+        const params = new URLSearchParams(window.location.search);
+        const q = params.get("birth_date");
+        if (!q) return;
+    
+        // 6자리 모드
+        if (this.birthInput) {
+            const digits = q.replace(/\D/g, "");
+    
+            // case 1: URL이 이미 YYMMDD (예: 921002)
+            if (digits.length === 6) {
+                this.birthInput.value = digits;
+                this.checkAndCalculate6Digit();
+                return;
             }
+    
+            // case 2: 혹시 예전 포맷(YYYY-MM-DD)으로 온 경우도 처리
+            if (DateUtils.validateDateFormat(q)) {
+                const [y, m, d] = q.split("-");
+                const yy = y.slice(-2);
+                this.birthInput.value = `${yy}${m}${d}`; // 921002 형태
+                this.checkAndCalculate6Digit();
+                return;
+            }
+    
+            return;
+        }
+    
+        // 3필드 모드 (기존 로직)
+        if (DateUtils.validateDateFormat(q)) {
+            const [y, m, d] = q.split("-");
+            this.yearInput.value = y;
+            this.monthInput.value = m;
+            this.dayInput.value = d;
+            this.checkAndCalculate();
         }
     }
     
@@ -1116,20 +1098,13 @@ class AgeCalculatorUI {
      * 자동 계산 이벤트
      */
     bindAutoCalculation() {
-        // 년도, 월, 일 입력 시 자동 계산
-        this.yearInput.addEventListener('input', () => {
-            this.checkAndCalculate();
+        if (!this.birthInput) return;
+
+        this.birthInput.addEventListener('input', () => {
+            this.checkAndCalculate6Digit();
         });
-        
-        this.monthInput.addEventListener('input', () => {
-            this.checkAndCalculate();
-        });
-        
-        this.dayInput.addEventListener('input', () => {
-            this.checkAndCalculate();
-        });
-        
-        // 폼 제출 방지 (자동 계산이므로)
+
+        // 폼 제출은 막고, 자동 계산만 사용
         this.form.addEventListener('submit', (e) => {
             e.preventDefault();
         });
@@ -1158,6 +1133,119 @@ class AgeCalculatorUI {
             }, 500); // 0.5초 지연
         }
     }
+
+        // YY -> YYYY 변환
+        convertYYtoYYYY(yy) {
+            const num = parseInt(yy, 10);
+            const currentYY = new Date().getFullYear() % 100; // 예: 2025 → 25
+    
+            // 00~현재년 → 2000년대, 그 외 → 1900년대
+            if (num <= currentYY) return 2000 + num;
+            return 1900 + num;
+        }
+    
+        // 6자리 YYMMDD 검증
+        validateBirth6(raw) {
+            const digits = (raw || '').replace(/\D/g, '');
+    
+            if (digits.length !== 6) {
+                return { valid: false, msg: '생년월일 6자리(YYMMDD)를 입력해주세요.' };
+            }
+    
+            const yy = digits.slice(0, 2);
+            const mm = digits.slice(2, 4);
+            const dd = digits.slice(4, 6);
+    
+            const year  = this.convertYYtoYYYY(yy);
+            const month = parseInt(mm, 10);
+            const day   = parseInt(dd, 10);
+    
+            const now = new Date();
+    
+            if (month < 1 || month > 12) {
+                return { valid: false, msg: '월은 1~12 사이여야 합니다.' };
+            }
+            if (day < 1 || day > 31) {
+                return { valid: false, msg: '일을 다시 확인해주세요.' };
+            }
+    
+            const date = new Date(year, month - 1, day);
+            if (
+                date.getFullYear() !== year ||
+                date.getMonth() + 1 !== month ||
+                date.getDate() !== day
+            ) {
+                return { valid: false, msg: '존재하지 않는 날짜입니다.' };
+            }
+    
+            if (date > now) {
+                return { valid: false, msg: '미래 날짜는 입력할 수 없습니다.' };
+            }
+    
+            const iso = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    
+            return {
+                valid: true,
+                msg: '',
+                iso,
+                digits
+            };
+        }
+    
+        showBirthError(msg) {
+            if (!this.birthErrorEl || !this.birthInput) return;
+            this.birthErrorEl.textContent = msg || '';
+            if (msg) {
+                this.birthInput.classList.add('error');
+            } else {
+                this.birthInput.classList.remove('error');
+            }
+        }
+    
+        // 6자리 모드에서 입력 시 호출
+        checkAndCalculate6Digit() {
+            const raw = this.birthInput.value;
+            const digits = raw.replace(/\D/g, '');
+    
+            // 입력이 바뀌면 기존 결과 숨기기
+            this.hideResult();
+    
+            if (digits.length < 6) {
+                this.showBirthError('');
+                return;
+            }
+    
+            const v = this.validateBirth6(raw);
+            if (!v.valid) {
+                this.showBirthError(v.msg);
+                return;
+            }
+    
+            this.showBirthError('');
+    
+            if (this.autoCalcTimer) {
+                clearTimeout(this.autoCalcTimer);
+            }
+            this.autoCalcTimer = setTimeout(() => {
+                this.autoCalculateFromBirth6(v);
+            }, 500);
+        }
+    
+
+        async autoCalculateFromBirth6(v) {
+            // 여기서 v.iso = YYYY-MM-DD
+            this.showLoading(true);
+            try {
+                const result = await this.calculateAgeAsync(v.iso);
+                this.displayResult(result);
+            } catch (error) {
+                console.error('나이 계산 오류:', error);
+                this.showError(null, '나이 계산 중 오류가 발생했습니다. 다시 시도해주세요.');
+            } finally {
+                this.showLoading(false);
+            }
+        }
+    
     
     /**
      * 자동 계산 실행
@@ -1191,20 +1279,13 @@ class AgeCalculatorUI {
      * 초기 포커스 설정
      */
     setInitialFocus() {
-        // 페이지 로드 시 년도 필드에 자동 포커스
-        if (this.yearInput) {
-            // DOM이 완전히 로드된 후 포커스
+        const target = this.birthInput || this.yearInput;
+        if (target) {
             if (document.readyState === 'complete') {
-                this.yearInput.focus();
+                target.focus();
             } else {
-            // DOM이 로드되면 즉시 포커스
-            document.addEventListener('DOMContentLoaded', () => {
-                this.yearInput.focus();
-            });
-            // 페이지가 완전히 로드되면 포커스 (백업)
-            window.addEventListener('load', () => {
-                this.yearInput.focus();
-            });
+                document.addEventListener('DOMContentLoaded', () => target.focus());
+                window.addEventListener('load', () => target.focus());
             }
         }
     }
@@ -1314,6 +1395,29 @@ class AgeCalculatorUI {
         if (month) this.monthInput.value = month;
         if (day) this.dayInput.value = day;
     }
+
+    getBirthYear() {
+        // 6자리 모드
+        if (this.birthInput) {
+            const iso = this.hiddenDateInput && this.hiddenDateInput.value;
+            if (iso && DateUtils.validateDateFormat(iso)) {
+                return parseInt(iso.split('-')[0], 10);
+            }
+            const digits = this.birthInput.value.replace(/\D/g, '');
+            if (digits.length === 6) {
+                const yy = digits.slice(0, 2);
+                return this.convertYYtoYYYY(yy);
+            }
+            return null;
+        }
+    
+        // 기존 3필드 모드
+        if (this.yearInput && this.yearInput.value) {
+            return parseInt(this.yearInput.value, 10);
+        }
+        return null;
+    }
+    
 }
 
 /**

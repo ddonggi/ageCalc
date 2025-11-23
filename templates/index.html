@@ -120,6 +120,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 
     <!-- 스크립트 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
     <script src="{{ url_for('static', filename='js/age-calculator.js') }}" defer></script>
 </head>
 
@@ -127,25 +130,26 @@
     <div class="container">
         <h1>만나이 계산기</h1>
 
-        <form class="age-form" id="age-form">
+        <form class="age-form" id="age-form" autocomplete="off">
             <div class="form-group">
-                <h3>생년월일을 입력하세요</h3>
-                <div class="date-inputs">
-                    <input type="text" id="year" name="year" placeholder="1992" maxlength="4" value="{{ year or '' }}"
-                        required>
-                    <span class="date-separator">년</span>
-                    <input type="text" id="month" name="month" placeholder="10" maxlength="2" value="{{ month or '' }}"
-                        required>
-                    <span class="date-separator">월</span>
-                    <input type="text" id="day" name="day" placeholder="02" maxlength="2" value="{{ day or '' }}"
-                        required>
-                    <span class="date-separator">일</span>
-                </div>
-                <input type="hidden" id="birth_date" name="birth_date" value="{{ birth_date or '' }}">
+              <h3>생년월일을 입력하세요 (6자리)</h3>
+          
+              <div class="date-inputs">
+                <input
+                  type="text"
+                  id="birth-input"
+                  name="birth-inputh"
+                  placeholder="예: 921002"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  maxlength="6"
+                  required
+                >
+              </div>
+          
+              <small id="birth-error" class="error-msg" aria-live="polite"></small>
             </div>
-
-
-        </form>
+          </form>
 
         <div class="result-container" id="result-container">
             <h2>계산 결과</h2>

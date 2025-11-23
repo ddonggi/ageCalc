@@ -1404,3 +1404,12 @@ section a:hover {
         padding: 0.8rem;
     }
 }
+
+.error-msg {
+    display: block;
+    margin-top: 8px;
+    text-align: center;
+    color: #be185d;
+    font-size: 14px;
+    font-weight: 600;
+}
