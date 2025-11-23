@@ -11,7 +11,7 @@ class AgeController:
         생년월일 문자열로부터 나이를 계산
         
         Args:
-            birth_date_string (str): YYYY-MM-DD 형식의 날짜 문자열
+            birth_date_string (str): YYYY-MM-DD 또는 YYMMDD 형식의 날짜 문자열
             
         Returns:
             dict: 계산 결과를 담은 딕셔너리
@@ -25,20 +25,22 @@ class AgeController:
         
         # 날짜 파싱
         birth_date = self.age_calculator.parse_birth_date(birth_date_string)
-        
+
         if birth_date is None:
             return {
                 'success': False,
-                'message': '올바른 날짜 형식을 입력해주세요 (YYYY-MM-DD)',
+                'message': '올바른 날짜 형식을 입력해주세요 (예: 921002 또는 1992-10-02)',
                 'age': None
             }
-        
+
         # 나이 계산
         age = self.age_calculator.calculate_age(birth_date)
-        
+        normalized = birth_date.strftime('%Y-%m-%d')
+
         return {
             'success': True,
-            'message': f'생년월일: {birth_date_string}',
-            'age': age
+            'message': f'생년월일: {normalized}',
+            'age': age,
+            'birth_date': normalized
         }
 

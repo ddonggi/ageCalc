@@ -109,15 +109,18 @@
             <div class="form-group">
                 <h3>생년월일을 입력하세요</h3>
                 <div class="date-inputs">
-                    <input type="text" id="year" name="year" placeholder="1992" maxlength="4" 
-                           value="{{ year or '' }}" required>
-                    <span class="date-separator">년</span>
-                    <input type="text" id="month" name="month" placeholder="10" maxlength="2" 
-                           value="{{ month or '' }}" required>
-                    <span class="date-separator">월</span>
-                    <input type="text" id="day" name="day" placeholder="02" maxlength="2" 
-                           value="{{ day or '' }}" required>
-                    <span class="date-separator">일</span>
+                    <input
+                        type="text"
+                        id="birth-compact"
+                        name="birth_compact"
+                        placeholder="921002"
+                        maxlength="6"
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        autocomplete="bday"
+                        value="{{ birth_date.replace('-', '')[2:] if birth_date else '' }}"
+                        required
+                    >
                 </div>
                 <input type="hidden" id="birth_date" name="birth_date" value="{{ birth_date or '' }}">
             </div>
@@ -135,7 +138,7 @@
         <div class="info">
             <h3>사용법</h3>
             <ul>
-                <li>생년월일을 입력하세요 (자동으로 다음 필드로 이동)</li>
+                <li>생년월일을 6자리 숫자(예: 921002)로 입력하세요</li>
                 <li>입력이 완료되면 자동으로 나이가 계산됩니다</li>
                 <li>정확한 만나이가 표시됩니다</li>
             </ul>

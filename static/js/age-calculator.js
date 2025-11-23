@@ -4,9 +4,7 @@
  */
 class AgeCalculatorUI {
     constructor() {
-        this.yearInput = null;
-        this.monthInput = null;
-        this.dayInput = null;
+        this.compactInput = null;
         this.hiddenDateInput = null;
         this.form = null;
         this.adRefreshTimer = null; // 구글 애드 리프레시 타이머
@@ -19,9 +17,7 @@ class AgeCalculatorUI {
      * 초기화
      */
     init() {
-        this.yearInput = document.getElementById('year');
-        this.monthInput = document.getElementById('month');
-        this.dayInput = document.getElementById('day');
+        this.compactInput = document.getElementById('birth-compact');
         this.hiddenDateInput = document.getElementById('birth_date');
         this.form = document.querySelector('.age-form');
         
@@ -41,9 +37,7 @@ class AgeCalculatorUI {
      */
     validateElements() {
         const requiredElements = [
-            this.yearInput,
-            this.monthInput,
-            this.dayInput,
+            this.compactInput,
             this.hiddenDateInput,
             this.form
         ];
@@ -56,9 +50,7 @@ class AgeCalculatorUI {
      */
     bindEvents() {
         this.bindInputEvents();
-        this.bindKeyPressEvents();
         this.bindAutoCalculation();
-        this.bindBackspaceEvents();
         this.bindEnterKeyEvents();
         this.bindZodiacPreview();
         this.bindShareEvents();
@@ -70,52 +62,15 @@ class AgeCalculatorUI {
      * 입력 이벤트 바인딩
      */
     bindInputEvents() {
-        // 년도 입력 시 자동 포커스 이동
-        this.yearInput.addEventListener('input', (e) => {
-            if (e.target.value.length === 4) {
-                this.monthInput.focus();
+        this.compactInput.addEventListener('input', (e) => {
+            // 숫자만 허용하고 최대 6자리까지 제한
+            const sanitized = e.target.value.replace(/\D/g, '').slice(0, 6);
+            if (sanitized !== e.target.value) {
+                e.target.value = sanitized;
             }
-        });
-        
-        // 월 입력 시 자동 포커스 이동
-        this.monthInput.addEventListener('input', (e) => {
-            if (e.target.value.length === 2) {
-                this.dayInput.focus();
-            }
-        });
-    }
-    
-    /**
-     * 키 입력 제한 (숫자만 허용)
-     */
-    bindKeyPressEvents() {
-        const inputs = [this.yearInput, this.monthInput, this.dayInput];
-        
-        inputs.forEach(input => {
-            input.addEventListener('keypress', (e) => {
-                if (!/[0-9]/.test(e.key)) {
-                    e.preventDefault();
-                }
-            });
-        });
-    }
-    
-    /**
-     * 백스페이스로 이전 필드 이동
-     */
-    bindBackspaceEvents() {
-        // 월 필드에서 백스페이스
-        this.monthInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Backspace' && e.target.value.length === 0) {
-                this.yearInput.focus();
-            }
-        });
-        
-        // 일 필드에서 백스페이스
-        this.dayInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Backspace' && e.target.value.length === 0) {
-                this.monthInput.focus();
-            }
+
+            // 숨겨진 YYYY-MM-DD 필드를 최신화
+            this.updateHiddenBirthDate();
         });
     }
     
@@ -123,35 +78,10 @@ class AgeCalculatorUI {
      * 엔터키 이벤트 처리
      */
     bindEnterKeyEvents() {
-        // 년도 필드에서 엔터키
-        this.yearInput.addEventListener('keydown', (e) => {
+        this.compactInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                if (this.validateYear(this.yearInput.value)) {
-                    this.monthInput.focus();
-                } else {
-                    this.showError(this.yearInput, '올바른 년도를 입력하세요 (1900년 이상)');
-                }
-            }
-        });
-        
-        // 월 필드에서 엔터키
-        this.monthInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                if (this.validateMonth(this.monthInput.value)) {
-                    this.dayInput.focus();
-                } else {
-                    this.showError(this.monthInput, '올바른 월을 입력하세요 (01-12)');
-                }
-            }
-        });
-        
-        // 일 필드에서 엔터키 - 폼 제출
-        this.dayInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                if (this.validateDay(this.dayInput.value)) {
-                    this.submitForm();
-                } else {
-                    this.showError(this.dayInput, '올바른 일을 입력하세요 (01-31)');
+                if (this.validateInputs()) {
+                    this.autoCalculate();
                 }
             }
         });
@@ -163,7 +93,8 @@ class AgeCalculatorUI {
      * 12지신 정보 업데이트 (단순화된 버전)
      */
     updateZodiacInfo() {
-        const year = parseInt(this.yearInput.value);
+        const birthInfo = this.getBirthDateParts();
+        const year = birthInfo ? birthInfo.year : null;
         console.log('12지신 업데이트 시도, 년도:', year); // 디버깅용
         
         if (year && year >= 1900) {
@@ -385,7 +316,7 @@ class AgeCalculatorUI {
     displayResult(result) {
         const resultContainer = document.getElementById('result-container');
         const resultContent = document.getElementById('result-content');
-        
+
         if (!resultContainer || !resultContent) {
             console.error('결과 컨테이너를 찾을 수 없습니다.');
             return;
@@ -431,9 +362,8 @@ class AgeCalculatorUI {
      * 성공 결과 HTML 생성
      */
     createSuccessResultHTML(result) {
-        // 12지신 정보 가져오기
-        const year = parseInt(this.yearInput.value);
-        const zodiacInfo = year && year >= 1900 ? DateUtils.getZodiacSign(year) : null;
+        const birthInfo = this.getBirthDateParts();
+        const zodiacInfo = birthInfo ? DateUtils.getZodiacSign(birthInfo.year) : null;
         const zodiacText = zodiacInfo ? `(${zodiacInfo.emoji} ${zodiacInfo.animal})` : '';
         
         // 권리·제도 정보 생성
@@ -532,7 +462,8 @@ class AgeCalculatorUI {
         ];
 
         // 사용자의 출생연도에 따른 노령연금 정보 선택
-        const userYear = parseInt(this.yearInput.value);
+        const birthInfo = this.getBirthDateParts();
+        const userYear = birthInfo ? birthInfo.year : null;
         let selectedPension = null;
         
         if (userYear && userYear >= 1953) {
@@ -599,36 +530,21 @@ class AgeCalculatorUI {
      * 입력값 검증
      */
     validateInputs() {
-        const year = this.yearInput.value.trim();
-        const month = this.monthInput.value.trim();
-        const day = this.dayInput.value.trim();
-        
-        if (!year || !month || !day) {
-            this.showError(null, '생년월일을 모두 입력해주세요.');
+        const compact = this.compactInput.value.trim();
+
+        if (compact.length !== 6) {
+            this.showError(this.compactInput, '생년월일 6자리를 입력해주세요 (예: 921002)');
             return false;
         }
-        
-        if (!this.validateYear(year)) {
-            this.showError(this.yearInput, '올바른 년도를 입력하세요 (1900년 이상)');
+
+        const parsed = DateUtils.parseCompactDate(compact);
+
+        if (!parsed) {
+            this.showError(this.compactInput, '올바른 날짜를 입력해주세요 (예: 921002)');
             return false;
         }
-        
-        if (!this.validateMonth(month)) {
-            this.showError(this.monthInput, '올바른 월을 입력하세요 (01-12)');
-            return false;
-        }
-        
-        if (!this.validateDay(day)) {
-            this.showError(this.dayInput, '올바른 일을 입력하세요 (01-31)');
-            return false;
-        }
-        
-        // 날짜 유효성 검사
-        if (!DateUtils.isValidDate(parseInt(year), parseInt(month), parseInt(day))) {
-            this.showError(null, '존재하지 않는 날짜입니다. 다시 확인해주세요.');
-            return false;
-        }
-        
+
+        this.hiddenDateInput.value = parsed.fullDate;
         return true;
     }
     
@@ -1037,20 +953,17 @@ class AgeCalculatorUI {
         if (currentResult && currentResult.birth_date) {
             const params = new URLSearchParams();
             params.set('birth_date', currentResult.birth_date);
-            
+
             return `${baseUrl}?${params.toString()}`;
         }
-        
+
         // 결과가 없으면 현재 입력된 값으로 URL 생성
-        const year = this.yearInput.value;
-        const month = this.monthInput.value;
-        const day = this.dayInput.value;
-        
-        if (year && month && day) {
-            const birthDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        const birthDate = this.hiddenDateInput.value || (DateUtils.parseCompactDate(this.compactInput.value.trim())?.fullDate);
+
+        if (birthDate) {
             const params = new URLSearchParams();
             params.set('birth_date', birthDate);
-            
+
             return `${baseUrl}?${params.toString()}`;
         }
         
@@ -1079,20 +992,30 @@ class AgeCalculatorUI {
     async loadFromUrl() {
         const urlParams = new URLSearchParams(window.location.search);
         const birthDate = urlParams.get('birth_date');
-        
+
         console.log('URL에서 birth_date 파라미터:', birthDate);
-        
+
         if (birthDate) {
-            // URL에서 생년월일 파싱
-            const [year, month, day] = birthDate.split('-');
-            
+            let normalizedDate = birthDate;
+
+            if (!DateUtils.validateDateFormat(birthDate) && /^\d{6}$/.test(birthDate)) {
+                const parsed = DateUtils.parseCompactDate(birthDate);
+                normalizedDate = parsed ? parsed.fullDate : null;
+            }
+
+            if (!normalizedDate || !DateUtils.validateDateFormat(normalizedDate)) {
+                console.warn('잘못된 날짜 형식으로 URL 로드를 건너뜀');
+                return;
+            }
+
+            const [year, month, day] = normalizedDate.split('-');
+            const compactValue = `${year.slice(-2)}${month}${day}`;
+
             console.log('파싱된 생년월일:', { year, month, day });
-            
+
             // 입력 필드에 값 설정
-            this.yearInput.value = year;
-            this.monthInput.value = month;
-            this.dayInput.value = day;
-            this.hiddenDateInput.value = birthDate;
+            this.compactInput.value = compactValue;
+            this.hiddenDateInput.value = normalizedDate;
             
             console.log('입력 필드 설정 완료');
             
@@ -1116,16 +1039,7 @@ class AgeCalculatorUI {
      * 자동 계산 이벤트
      */
     bindAutoCalculation() {
-        // 년도, 월, 일 입력 시 자동 계산
-        this.yearInput.addEventListener('input', () => {
-            this.checkAndCalculate();
-        });
-        
-        this.monthInput.addEventListener('input', () => {
-            this.checkAndCalculate();
-        });
-        
-        this.dayInput.addEventListener('input', () => {
+        this.compactInput.addEventListener('input', () => {
             this.checkAndCalculate();
         });
         
@@ -1139,15 +1053,13 @@ class AgeCalculatorUI {
      * 입력값 확인 및 자동 계산
      */
     checkAndCalculate() {
-        const year = this.yearInput.value.trim();
-        const month = this.monthInput.value.trim();
-        const day = this.dayInput.value.trim();
-        
+        const compact = this.compactInput.value.trim();
+
         // 입력값이 변경되면 기존 결과 숨기기
         this.hideResult();
-        
+
         // 모든 필드가 채워지고 유효한 경우에만 계산
-        if (year && month && day) {
+        if (compact.length === 6) {
             // 입력 완료 후 약간의 지연을 두고 계산 (사용자 입력 완료 대기)
             if (this.autoCalcTimer) {
                 clearTimeout(this.autoCalcTimer);
@@ -1191,19 +1103,19 @@ class AgeCalculatorUI {
      * 초기 포커스 설정
      */
     setInitialFocus() {
-        // 페이지 로드 시 년도 필드에 자동 포커스
-        if (this.yearInput) {
+        // 페이지 로드 시 입력 필드에 자동 포커스
+        if (this.compactInput) {
             // DOM이 완전히 로드된 후 포커스
             if (document.readyState === 'complete') {
-                this.yearInput.focus();
+                this.compactInput.focus();
             } else {
             // DOM이 로드되면 즉시 포커스
             document.addEventListener('DOMContentLoaded', () => {
-                this.yearInput.focus();
+                this.compactInput.focus();
             });
             // 페이지가 완전히 로드되면 포커스 (백업)
             window.addEventListener('load', () => {
-                this.yearInput.focus();
+                this.compactInput.focus();
             });
             }
         }
@@ -1217,38 +1129,16 @@ class AgeCalculatorUI {
     }
     
     /**
-     * 년도 검증
-     */
-    validateYear(year) {
-        const yearNum = parseInt(year);
-        return year.length === 4 && yearNum >= 1900;
-    }
-    
-    /**
-     * 월 검증
-     */
-    validateMonth(month) {
-        const monthNum = parseInt(month);
-        return month.length === 2 && monthNum >= 1 && monthNum <= 12;
-    }
-    
-    /**
-     * 일 검증
-     */
-    validateDay(day) {
-        const dayNum = parseInt(day);
-        return day.length === 2 && dayNum >= 1 && dayNum <= 31;
-    }
-    
-    /**
      * 에러 표시
      */
     showError(input, message) {
         // 기존 에러 메시지 제거
         this.removeError(input);
-        
+
         // 에러 스타일 적용
-        input.classList.add('error');
+        if (input) {
+            input.classList.add('error');
+        }
         
         // 에러 메시지를 날짜 입력 영역 아래에 표시
         const dateInputsContainer = document.querySelector('.date-inputs');
@@ -1275,23 +1165,57 @@ class AgeCalculatorUI {
      * 에러 제거
      */
     removeError(input) {
-        input.classList.remove('error');
+        if (input) {
+            input.classList.remove('error');
+        }
         const errorMessage = document.querySelector('.error-message');
         if (errorMessage) {
             errorMessage.remove();
         }
     }
-    
+
+    /**
+     * 입력된 생년월일(YYYY-MM-DD) 정보 반환
+     */
+    getBirthDateParts() {
+        const dateString = this.hiddenDateInput.value || '';
+
+        if (DateUtils.validateDateFormat(dateString)) {
+            const [year, month, day] = dateString.split('-');
+            return {
+                year: parseInt(year),
+                month: parseInt(month),
+                day: parseInt(day)
+            };
+        }
+
+        const parsed = DateUtils.parseCompactDate(this.compactInput.value.trim());
+        if (parsed) {
+            this.hiddenDateInput.value = parsed.fullDate;
+            return parsed;
+        }
+
+        return null;
+    }
+
     /**
      * 제출 전 날짜 형식 변환
      */
     formatDateBeforeSubmit() {
-        const year = this.yearInput.value;
-        const month = this.monthInput.value.padStart(2, '0');
-        const day = this.dayInput.value.padStart(2, '0');
-        
-        if (year && month && day) {
-            this.hiddenDateInput.value = `${year}-${month}-${day}`;
+        this.updateHiddenBirthDate();
+    }
+
+    /**
+     * YYYY-MM-DD hidden 필드 업데이트
+     */
+    updateHiddenBirthDate() {
+        const compact = this.compactInput.value.trim();
+        const parsed = DateUtils.parseCompactDate(compact);
+
+        if (parsed) {
+            this.hiddenDateInput.value = parsed.fullDate;
+        } else {
+            this.hiddenDateInput.value = '';
         }
     }
     
@@ -1299,20 +1223,9 @@ class AgeCalculatorUI {
      * 입력 필드 초기화
      */
     clearInputs() {
-        this.yearInput.value = '';
-        this.monthInput.value = '';
-        this.dayInput.value = '';
+        this.compactInput.value = '';
         this.hiddenDateInput.value = '';
-        this.yearInput.focus();
-    }
-    
-    /**
-     * 입력 필드에 값 설정
-     */
-    setDateValues(year, month, day) {
-        if (year) this.yearInput.value = year;
-        if (month) this.monthInput.value = month;
-        if (day) this.dayInput.value = day;
+        this.compactInput.focus();
     }
 }
 
@@ -1342,7 +1255,33 @@ const DateUtils = {
         const regex = /^\d{4}-\d{2}-\d{2}$/;
         return regex.test(dateString);
     },
-    
+
+    /**
+     * YYMMDD(6자리) 형식을 YYYY-MM-DD 정보로 변환
+     */
+    parseCompactDate: (compact) => {
+        if (!/^\d{6}$/.test(compact)) return null;
+
+        const yearPart = parseInt(compact.slice(0, 2), 10);
+        const month = parseInt(compact.slice(2, 4), 10);
+        const day = parseInt(compact.slice(4, 6), 10);
+
+        const currentTwoDigitYear = parseInt(new Date().getFullYear().toString().slice(-2), 10);
+        const century = yearPart <= currentTwoDigitYear ? 2000 : 1900;
+        const fullYear = century + yearPart;
+
+        if (!DateUtils.isValidDate(fullYear, month, day)) {
+            return null;
+        }
+
+        return {
+            year: fullYear,
+            month,
+            day,
+            fullDate: `${fullYear}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+        };
+    },
+
     /**
      * 12지신 계산 (단순화된 버전)
      */
