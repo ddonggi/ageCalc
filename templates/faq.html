@@ -17,6 +17,11 @@
   <meta property="og:url" content="https://agecalc.cloud/faq" />
   <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
+  <!-- Google Fonts: Nunito -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 
   <!-- 파비콘/매니페스트 -->
@@ -49,101 +54,114 @@
 </head>
 
 <body>
-  <div class="container">
-    <a href="/" class="back-link">← 메인으로 돌아가기</a>
-    <header class="page-header">
-      <h1>자주 묻는 질문(FAQ)</h1>
-      <h3 style="text-align: center;">만나이 계산, 윤년/음력 처리, 데이터 저장 여부 등 자주 묻는 질문을 정리했습니다.</h3>
-    </header>
+  <main class="layout-wrapper">
+    <div class="container">
+      <a href="/" class="back-link"
+        style="color: #667eea; text-decoration: none; margin-bottom: 20px; display: inline-block;">← 메인으로 돌아가기</a>
+      <header class="page-header">
+        <h1>자주 묻는 질문(FAQ)</h1>
+        <h3 style="text-align: center;">만나이 계산, 윤년/음력 처리, 데이터 저장 여부 등 자주 묻는 질문을 정리했습니다.</h3>
+      </header>
 
-    <!-- 간단 토글(아코디언) 스타일: 기존 CSS에 의존, 없으면 기본 블록으로 표시됩니다. -->
-    <section class="faq">
+      <!-- 간단 토글(아코디언) 스타일: 기존 CSS에 의존, 없으면 기본 블록으로 표시됩니다. -->
+      <section class="faq" style="margin-top: 30px;">
 
-      <div><strong>1) 만나이는 어떻게 계산하나요?</strong>
-        <p>만나이는 출생일을 기준으로 생일이 지날 때 1살이 증가합니다. 오늘 날짜가 생일 전이면 전년도 나이가 유지되고, 생일 당일 또는 지난 이후라면 1살 증가한 값이 표시됩니다. 계산은 날짜 단위로만
-          이루어집니다.</p>
-      </div>
+        <div class="faq-item" style="margin-bottom: 20px;">
+          <strong>1) 만나이는 어떻게 계산하나요?</strong>
+          <p style="margin-top: 5px; color: #4a5568;">만나이는 출생일을 기준으로 생일이 지날 때 1살이 증가합니다. 오늘 날짜가 생일 전이면 전년도 나이가 유지되고, 생일
+            당일 또는 지난 이후라면 1살 증가한 값이 표시됩니다. 계산은 날짜 단위로만 이루어집니다.</p>
+        </div>
 
-      <div><strong>2) 2월 29일(윤년) 출생은 어떻게 처리하나요?</strong>
-        <p>윤년이 아닌 해에는 통상 2월 28일 또는 3월 1일을 기준으로 간주하는 관행이 있습니다. 기관·서비스별 안내가 다를 수 있으므로 최종 판단은 관계 기관의 지침을 확인하세요.</p>
-      </div>
+        <div class="faq-item" style="margin-bottom: 20px;">
+          <strong>2) 2월 29일(윤년) 출생은 어떻게 처리하나요?</strong>
+          <p style="margin-top: 5px; color: #4a5568;">윤년이 아닌 해에는 통상 2월 28일 또는 3월 1일을 기준으로 간주하는 관행이 있습니다. 기관·서비스별 안내가 다를
+            수 있으므로 최종 판단은 관계 기관의 지침을 확인하세요.</p>
+        </div>
 
-      <div>
-        <strong>3) 음력 생일은 지원하나요?</strong>
-        <p>현재 계산기는 양력 기준으로 동작합니다. 음력 생일의 경우 해당 연도의 양력 환산일을 확인한 뒤 입력해 주세요. (지자체/기관 또는 달력 서비스에서 음력→양력 변환을 제공)</p>
-      </div>
+        <div class="faq-item" style="margin-bottom: 20px;">
+          <strong>3) 음력 생일은 지원하나요?</strong>
+          <p style="margin-top: 5px; color: #4a5568;">현재 계산기는 양력 기준으로 동작합니다. 음력 생일의 경우 해당 연도의 양력 환산일을 확인한 뒤 입력해 주세요.
+            (지자체/기관 또는 달력 서비스에서 음력→양력 변환을 제공)</p>
+        </div>
 
-      <div>
-        <strong>4) 연나이와의 차이는 무엇인가요?</strong>
-        <p>연나이는 <em>올해 − 출생연도</em>로 계산하는 값이며, 생일 전후를 고려하지 않습니다. 공적 영역의 기준은 만나이입니다.</p>
-      </div>
+        <div class="faq-item" style="margin-bottom: 20px;">
+          <strong>4) 연나이와의 차이는 무엇인가요?</strong>
+          <p style="margin-top: 5px; color: #4a5568;">연나이는 <em>올해 − 출생연도</em>로 계산하는 값이며, 생일 전후를 고려하지 않습니다. 공적 영역의 기준은
+            만나이입니다.</p>
+        </div>
 
-      <div>
-        <strong>5) 결과 값에 법적 효력이 있나요?</strong>
-        <p>본 서비스의 결과는 일반 정보 제공을 목적으로 하며, 법적 판단이나 권리 행사에는 관계 법령과 기관 고시를 우선해 주세요.</p>
-      </div>
+        <div class="faq-item" style="margin-bottom: 20px;">
+          <strong>5) 결과 값에 법적 효력이 있나요?</strong>
+          <p style="margin-top: 5px; color: #4a5568;">본 서비스의 결과는 일반 정보 제공을 목적으로 하며, 법적 판단이나 권리 행사에는 관계 법령과 기관 고시를 우선해
+            주세요.</p>
+        </div>
 
-      <div>
-        <strong>6) 입력한 생년월일이 서버에 저장되나요?</strong>
-        <p>아니요. 계산은 브라우저 내에서 처리되며, 서버로 전송·저장하지 않습니다. (네트워크 탭/개발자 도구로 확인 가능)</p>
-      </div>
-
-      <div>
-        <strong>7) 시간대/서머타임은 계산에 영향을 주나요?</strong>
-        <p>영향을 주지 않습니다. 본 계산기는 날짜(연·월·일)만 사용하며 시·분·타임존은 반영하지 않습니다.</p>
-      </div>
-
-      <div>
-        <strong>8) 모바일에서도 정확히 동작하나요?</strong>
-        <p>네, 반응형 레이아웃을 지원하며 주요 모바일 브라우저에서 정상 동작하도록 테스트하고 있습니다.</p>
-      </div>
-
-      <div>
-        <strong>9) 잘못 입력했을 때는 어떻게 하나요?</strong>
-        <p>비정상 날짜(예: 2025-13-40)는 오류로 안내되며, 올바른 날짜를 다시 입력하면 즉시 재계산됩니다.</p>
-      </div>
-
-      <div>
-        <strong>10) 만나이 관련 제도·정책은 어디서 확인하나요?</strong>
-        <p>정책·제도는 기관·지자체별로 상이할 수 있습니다. 아래 공식 사이트에서 최신 안내를 확인하세요.</p>
-        <ul>
-          <li><a href="https://www.gov.kr/" target="_blank" rel="noopener noreferrer">정부24</a></li>
-          <li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">보건복지부</a></li>
-          <li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">국민연금공단</a></li>
-        </ul>
-      </div>
-    </section>
-
-    <section class="notice">
-      <h2>고지</h2>
-      <p>본 서비스는 일반 정보 제공용이며, 행정·법률상 판단은 관계 법령 및 기관 안내를 확인하시기 바랍니다. 정책·제도는 변경될 수 있습니다.</p>
-    </section>
-
-    <!-- 푸터 -->
-    <footer class="footer">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h4>연락처</h4>
-          <p>문의: ldg6153@gmail.com</p>
-          <p>
-            <a href="{{ url_for('privacy') }}"
-              style="color: #667eea; text-decoration: none; margin-right: 10px;">개인정보처리방침</a>
-            <span style="color: #ccc;">|</span>
-            <a href="{{ url_for('terms') }}" style="color: #667eea; text-decoration: none; margin-left: 10px;">이용약관</a>
-            <span style="color: #ccc;">|</span>
-            <a href="{{ url_for('guide') }}" style="color: #667eea; text-decoration: none; margin-left: 10px;">만나이
-              가이드</a>
-            <span style="color: #ccc;">|</span>
-            <a href="{{ url_for('faq') }}" style="color: #667eea; text-decoration: none; margin-left: 10px;">자주 묻는
-              질문</a>
+        <div class="faq-item" style="margin-bottom: 20px;">
+          <strong>6) 입력한 생년월일이 서버에 저장되나요?</strong>
+          <p style="margin-top: 5px; color: #4a5568;">아니요. 계산은 브라우저 내에서 처리되며, 서버로 전송·저장하지 않습니다. (네트워크 탭/개발자 도구로 확인 가능)
           </p>
         </div>
+
+        <div class="faq-item" style="margin-bottom: 20px;">
+          <strong>7) 시간대/서머타임은 계산에 영향을 주나요?</strong>
+          <p style="margin-top: 5px; color: #4a5568;">영향을 주지 않습니다. 본 계산기는 날짜(연·월·일)만 사용하며 시·분·타임존은 반영하지 않습니다.</p>
+        </div>
+
+        <div class="faq-item" style="margin-bottom: 20px;">
+          <strong>8) 모바일에서도 정확히 동작하나요?</strong>
+          <p style="margin-top: 5px; color: #4a5568;">네, 반응형 레이아웃을 지원하며 주요 모바일 브라우저에서 정상 동작하도록 테스트하고 있습니다.</p>
+        </div>
+
+        <div class="faq-item" style="margin-bottom: 20px;">
+          <strong>9) 잘못 입력했을 때는 어떻게 하나요?</strong>
+          <p style="margin-top: 5px; color: #4a5568;">비정상 날짜(예: 2025-13-40)는 오류로 안내되며, 올바른 날짜를 다시 입력하면 즉시 재계산됩니다.</p>
+        </div>
+
+        <div class="faq-item" style="margin-bottom: 20px;">
+          <strong>10) 만나이 관련 제도·정책은 어디서 확인하나요?</strong>
+          <p style="margin-top: 5px; color: #4a5568;">정책·제도는 기관·지자체별로 상이할 수 있습니다. 아래 공식 사이트에서 최신 안내를 확인하세요.</p>
+          <ul style="margin-top: 5px; padding-left: 20px;">
+            <li><a href="https://www.gov.kr/" target="_blank" rel="noopener noreferrer" style="color: #667eea;">정부24</a>
+            </li>
+            <li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer"
+                style="color: #667eea;">보건복지부</a></li>
+            <li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer"
+                style="color: #667eea;">국민연금공단</a></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="notice" style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+        <h2>고지</h2>
+        <p style="color: #718096;">본 서비스는 일반 정보 제공용이며, 행정·법률상 판단은 관계 법령 및 기관 안내를 확인하시기 바랍니다. 정책·제도는 변경될 수 있습니다.</p>
+      </section>
+    </div>
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>연락처</h4>
+        <p>문의: ldg6153@gmail.com</p>
+        <p>
+          <a href="{{ url_for('privacy') }}"
+            style="color: #667eea; text-decoration: none; margin-right: 10px;">개인정보처리방침</a>
+          <span style="color: #ccc;">|</span>
+          <a href="{{ url_for('terms') }}" style="color: #667eea; text-decoration: none; margin-left: 10px;">이용약관</a>
+          <span style="color: #ccc;">|</span>
+          <a href="{{ url_for('guide') }}" style="color: #667eea; text-decoration: none; margin-left: 10px;">만나이
+            가이드</a>
+          <span style="color: #ccc;">|</span>
+          <a href="{{ url_for('faq') }}" style="color: #667eea; text-decoration: none; margin-left: 10px;">자주 묻는
+            질문</a>
+        </p>
       </div>
-      <div class="footer-bottom">
-        <p>&copy; 2025 만나이 계산기. All rights reserved.</p>
-      </div>
-    </footer>
-  </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 만나이 계산기. All rights reserved.</p>
+    </div>
+  </footer>
 </body>
 
 </html>

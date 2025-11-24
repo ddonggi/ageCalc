@@ -28,7 +28,7 @@
 
     <!-- 구글 검색 콘솔 인증 -->
     <meta name="google-site-verification" content="q0nvIaon9IVWNZZEQzTRCycYka7jIHuzYu-PwxxoKu8" />
-    
+
     <!-- 네이버 웹마스터 도구 인증 -->
     <meta name="naver-site-verification" content="2c9ad0c903ffdf79a53d4fa573c983641577ac34" />
 
@@ -41,11 +41,7 @@
     <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
 
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7818333740838556"
-     crossorigin="anonymous"></script>
-     
-    <!-- 성능 최적화(선연결) -->
-    <!-- <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin /> -->
-    <!-- <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin /> -->
+        crossorigin="anonymous"></script>
 
     <script type="application/ld+json">
         {
@@ -87,7 +83,7 @@
         }
     </script>
 
-    <!-- Google Consent Mode v2: 기본 거부 상태로 시작 (배너 동의 시 업데이트) -->
+    <!-- Google Consent Mode v2 -->
     <script>
         /*
         window.dataLayer = window.dataLayer || [];
@@ -103,58 +99,60 @@
 
     <!-- Google Tag Manager -->
     <script>
-    /*
-    (function (w, d, s, l, i) {
-            w[l] = w[l] || []; w[l].push({
-                'gtm.start':
-                    new Date().getTime(), event: 'gtm.js'
-            }); var f = d.getElementsByTagName(s)[0],
+        /*
+        (function (w, d, s, l, i) {
+                w[l] = w[l] || []; w[l].push({
+                    'gtm.start':
+                        new Date().getTime(), event: 'gtm.js'
+                }); var f = d.getElementsByTagName(s)[0],
                 j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
                     'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-        })(window, document, 'script', 'dataLayer', 'GTM-MDBMPR4B');
+            })(window, document, 'script', 'dataLayer', 'GTM-WMK3KFNZ');
         */
     </script>
-    <!-- End Google Tag Manager -->
 
-    <!-- CSS-->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <!-- Google Fonts: Nunito -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 
-    <!-- 스크립트 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer"></script>
-    <script src="{{ url_for('static', filename='js/age-calculator.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
-    <div class="container">
-        <h1>만나이 계산기</h1>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WMK3KFNZ" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
 
-        <form class="age-form" id="age-form" autocomplete="off">
-            <div class="form-group">
-              <h3>생년월일을 입력하세요 (6자리)</h3>
-          
-              <div class="date-inputs">
-                <input
-                  type="text"
-                  id="birth-input"
-                  name="birth-inputh"
-                  placeholder="예: 921002"
-                  inputmode="numeric"
-                  pattern="[0-9]*"
-                  maxlength="6"
-                  required
-                >
-              </div>
-          
-              <small id="birth-error" class="error-msg" aria-live="polite"></small>
+    <main class="layout-wrapper">
+        <div class="container">
+            <h1>만나이 계산기</h1>
+            <form id="age-form">
+                <div class="input-group">
+                    <label for="birth-date">생년월일</label>
+                    <input type="text" id="birth-input" name="birth-input" placeholder="YYYYMMDD (예: 19900101)"
+                        maxlength="8" inputmode="numeric" autocomplete="off">
+                    <div id="error-msg" class="error-msg"></div>
+                </div>
+                <div class="input-group">
+                    <label for="base-date">기준일 (선택)</label>
+                    <input type="date" id="base-date">
+                </div>
+                <button type="submit" id="calc-btn">나이 계산하기</button>
+            </form>
+
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>계산 중...</p>
             </div>
-          </form>
 
-        <div class="result-container" id="result-container">
-            <h2>계산 결과</h2>
-            <div id="result-content">
-                <!-- 결과 내용이 JavaScript로 동적 생성됨 -->
+            <div id="result-container" class="result-container" style="display: none;">
+                <div id="result-content"></div>
+                <div class="share-buttons">
+                    <button id="copy-btn" class="btn btn-secondary">결과 복사</button>
+                    <button id="share-twitter" class="btn btn-secondary">트위터 공유</button>
+                    <button id="save-img-btn" class="btn btn-secondary">이미지 저장</button>
+                </div>
             </div>
         </div>
 
@@ -229,7 +227,7 @@
                     </div>
                     <ul>
                         <li>술·담배 구매 가능 (청소년보호법)</li>
-                        <li>성인 등급 콘텐츠 및 일부 성인 전용 시설 출입 가능/li>
+                        <li>성인 등급 콘텐츠 및 일부 성인 전용 시설 출입 가능</li>
                     </ul>
                 </div>
 
@@ -508,34 +506,34 @@
                 <li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">국민연금공단</a></li>
             </ul>
         </section>
+    </main>
 
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>연락처</h4>
+                <p>문의: ldg6153@gmail.com</p>
+                <p>
+                    <a href="{{ url_for('privacy') }}"
+                        style="color: #667eea; text-decoration: none; margin-right: 10px;">개인정보처리방침</a>
+                    <span style="color: #ccc;">|</span>
+                    <a href="{{ url_for('terms') }}"
+                        style="color: #667eea; text-decoration: none; margin-left: 10px;">이용약관</a>
+                    <span style="color: #ccc;">|</span>
+                    <a href="{{ url_for('guide') }}"
+                        style="color: #667eea; text-decoration: none; margin-left: 10px;">만나이 가이드</a>
+                    <span style="color: #ccc;">|</span>
+                    <a href="{{ url_for('faq') }}" style="color: #667eea; text-decoration: none; margin-left: 10px;">자주
+                        묻는 질문</a>
+                </p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 만나이 계산기. All rights reserved.</p>
+        </div>
+    </footer>
 
-        <!-- 푸터 -->
-        <footer class="footer">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>연락처</h4>
-                    <p>문의: ldg6153@gmail.com</p>
-                    <p>
-                        <a href="{{ url_for('privacy') }}"
-                            style="color: #667eea; text-decoration: none; margin-right: 10px;">개인정보처리방침</a>
-                        <span style="color: #ccc;">|</span>
-                        <a href="{{ url_for('terms') }}"
-                            style="color: #667eea; text-decoration: none; margin-left: 10px;">이용약관</a>
-                        <span style="color: #ccc;">|</span>
-                        <a href="{{ url_for('guide') }}"
-                            style="color: #667eea; text-decoration: none; margin-left: 10px;">만나이 가이드</a>
-                        <span style="color: #ccc;">|</span>
-                        <a href="{{ url_for('faq') }}"
-                            style="color: #667eea; text-decoration: none; margin-left: 10px;">자주 묻는 질문</a>
-                    </p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 만나이 계산기. All rights reserved.</p>
-            </div>
-        </footer>
-    </div>
     <!-- 쿠키 동의 배너 -->
     <div class="cookie-banner" id="cookie-banner">
         <div class="cookie-content">
@@ -552,65 +550,66 @@
         ↑
     </button>
 
+    <script src="{{ url_for('static', filename='js/age-calculator.js') }}"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <script>
+        /*
+        // Auto ads 로더 (동의 후 1회만)
+        function loadAutoAds(client) {
+            if (window.__adsLoaded) return;
+            window.__adsLoaded = true;
+
+            const s = document.createElement('script');
+            s.async = true;
+            s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`;
+            s.crossOrigin = "anonymous";
+            document.head.appendChild(s);
+        }
+        // (선택) 개인 데이터 축소 신호
+        function enableAdsDataRedaction() {
+            if (typeof gtag === 'function') {
+                gtag('set', 'ads_data_redaction', true);
+            }
+        }
+
+        // 기존 applyConsent 함수에 “동의 시 Auto ads 로드”만 추가
+        // (당신 파일에 이미 applyConsent가 있으니 아래 로직만 반영)
+        function applyConsent(state) {
+            const granted = v => ({
+                ad_storage: v, ad_user_data: v, ad_personalization: v, analytics_storage: v
+            });
+            if (typeof gtag === 'function') {
+                gtag('consent', 'update', state === 'accepted' ? granted('granted') : granted('denied'));
+            }
+            enableAdsDataRedaction();
+
+            if (state === 'accepted') {
+                loadAutoAds('ca-pub-7818333740838556'); // ← 당신 퍼블리셔 ID
+            }
+        }
+
+        (function () {
+            const banner = document.getElementById('cookie-banner');
+            const get = k => document.cookie.split('; ').find(r => r.startsWith(k + '='))?.split('=')[1];
+            const set = (k, v, d = 365) => {
+                const t = new Date(); t.setTime(t.getTime() + d * 864e5);
+                document.cookie = `${k}=${v};expires=${t.toUTCString()};path=/;SameSite=Lax`;
+            };
+
+            const consent = get('cookieConsent');
+            if (!consent && banner) banner.style.display = 'block';
+            else if (consent) applyConsent(consent);
+
+            document.getElementById('accept-cookies')?.addEventListener('click', () => {
+                set('cookieConsent', 'accepted'); if (banner) banner.style.display = 'none'; applyConsent('accepted');
+            });
+            document.getElementById('reject-cookies')?.addEventListener('click', () => {
+                set('cookieConsent', 'rejected'); if (banner) banner.style.display = 'none'; applyConsent('rejected');
+            });
+        })();
+        */
+    </script>
 </body>
-
-
-<script>
-    /*
-    // Auto ads 로더 (동의 후 1회만)
-    function loadAutoAds(client) {
-        if (window.__adsLoaded) return;
-        window.__adsLoaded = true;
-
-        const s = document.createElement('script');
-        s.async = true;
-        s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`;
-        s.crossOrigin = "anonymous";
-        document.head.appendChild(s);
-    }
-    // (선택) 개인 데이터 축소 신호
-    function enableAdsDataRedaction() {
-        if (typeof gtag === 'function') {
-            gtag('set', 'ads_data_redaction', true);
-        }
-    }
-
-    // 기존 applyConsent 함수에 “동의 시 Auto ads 로드”만 추가
-    // (당신 파일에 이미 applyConsent가 있으니 아래 로직만 반영)
-    function applyConsent(state) {
-        const granted = v => ({
-            ad_storage: v, ad_user_data: v, ad_personalization: v, analytics_storage: v
-        });
-        if (typeof gtag === 'function') {
-            gtag('consent', 'update', state === 'accepted' ? granted('granted') : granted('denied'));
-        }
-        enableAdsDataRedaction();
-
-        if (state === 'accepted') {
-            loadAutoAds('ca-pub-7818333740838556'); // ← 당신 퍼블리셔 ID
-        }
-    }
-
-    (function () {
-        const banner = document.getElementById('cookie-banner');
-        const get = k => document.cookie.split('; ').find(r => r.startsWith(k + '='))?.split('=')[1];
-        const set = (k, v, d = 365) => {
-            const t = new Date(); t.setTime(t.getTime() + d * 864e5);
-            document.cookie = `${k}=${v};expires=${t.toUTCString()};path=/;SameSite=Lax`;
-        };
-
-        const consent = get('cookieConsent');
-        if (!consent && banner) banner.style.display = 'block';
-        else if (consent) applyConsent(consent);
-
-        document.getElementById('accept-cookies')?.addEventListener('click', () => {
-            set('cookieConsent', 'accepted'); if (banner) banner.style.display = 'none'; applyConsent('accepted');
-        });
-        document.getElementById('reject-cookies')?.addEventListener('click', () => {
-            set('cookieConsent', 'rejected'); if (banner) banner.style.display = 'none'; applyConsent('rejected');
-        });
-    })();
-    */
-</script>
 
 </html>
