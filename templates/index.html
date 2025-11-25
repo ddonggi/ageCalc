@@ -28,7 +28,7 @@
 
     <!-- 구글 검색 콘솔 인증 -->
     <meta name="google-site-verification" content="q0nvIaon9IVWNZZEQzTRCycYka7jIHuzYu-PwxxoKu8" />
-    
+
     <!-- 네이버 웹마스터 도구 인증 -->
     <meta name="naver-site-verification" content="2c9ad0c903ffdf79a53d4fa573c983641577ac34" />
 
@@ -41,8 +41,8 @@
     <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
 
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7818333740838556"
-     crossorigin="anonymous"></script>
-     
+        crossorigin="anonymous"></script>
+
     <!-- 성능 최적화(선연결) -->
     <!-- <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin /> -->
     <!-- <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin /> -->
@@ -103,53 +103,49 @@
 
     <!-- Google Tag Manager -->
     <script>
-    /*
-    (function (w, d, s, l, i) {
-            w[l] = w[l] || []; w[l].push({
-                'gtm.start':
-                    new Date().getTime(), event: 'gtm.js'
-            }); var f = d.getElementsByTagName(s)[0],
-                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-        })(window, document, 'script', 'dataLayer', 'GTM-MDBMPR4B');
-        */
+        /*
+        (function (w, d, s, l, i) {
+                w[l] = w[l] || []; w[l].push({
+                    'gtm.start':
+                        new Date().getTime(), event: 'gtm.js'
+                }); var f = d.getElementsByTagName(s)[0],
+                    j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                        'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+            })(window, document, 'script', 'dataLayer', 'GTM-MDBMPR4B');
+            */
     </script>
     <!-- End Google Tag Manager -->
 
     <!-- CSS-->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 
+    <!-- Three.js (CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
     <!-- 스크립트 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
-        crossorigin="anonymous"
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
     <script src="{{ url_for('static', filename='js/age-calculator.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/background-3d.js') }}" defer></script>
 </head>
 
 <body>
+    <div id="canvas-container"></div>
     <div class="container">
         <h1>만나이 계산기</h1>
 
         <form class="age-form" id="age-form" autocomplete="off">
             <div class="form-group">
-              <h3>생년월일을 입력하세요 (6자리)</h3>
-          
-              <div class="date-inputs">
-                <input
-                  type="text"
-                  id="birth-input"
-                  name="birth-inputh"
-                  placeholder="예: 921002"
-                  inputmode="numeric"
-                  pattern="[0-9]*"
-                  maxlength="6"
-                  required
-                >
-              </div>
-          
-              <small id="birth-error" class="error-msg" aria-live="polite"></small>
+                <h3>생년월일을 입력하세요 (6자리)</h3>
+
+                <div class="date-inputs">
+                    <input type="text" id="birth-input" name="birth-inputh" placeholder="예: 921002" inputmode="numeric"
+                        pattern="[0-9]*" maxlength="6" required>
+                </div>
+
+                <small id="birth-error" class="error-msg" aria-live="polite"></small>
             </div>
-          </form>
+        </form>
 
         <div class="result-container" id="result-container">
             <h2>계산 결과</h2>
