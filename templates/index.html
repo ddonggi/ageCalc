@@ -113,6 +113,7 @@
                         'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
             })(window, document, 'script', 'dataLayer', 'GTM-MDBMPR4B');
             */
+
     </script>
     <!-- End Google Tag Manager -->
 
@@ -120,7 +121,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 
     <!-- Three.js (CDN) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <!-- Korean Lunar Calendar (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/korean-lunar-calendar/dist/korean-lunar-calendar.min.js"></script>
 
     <!-- 스크립트 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"
@@ -136,7 +139,20 @@
 
         <form class="age-form" id="age-form" autocomplete="off">
             <div class="form-group">
-                <h3>생년월일을 입력하세요 (6자리)</h3>
+                <div class="input-header">
+                    <h3>생년월일을 입력하세요 (6자리)</h3>
+                    <div class="calendar-type-toggle">
+                        <input type="radio" id="solar" name="calendar-type" value="solar" checked>
+                        <label for="solar">양력</label>
+                        <input type="radio" id="lunar" name="calendar-type" value="lunar">
+                        <label for="lunar">음력</label>
+                    </div>
+                </div>
+
+                <div class="lunar-options" style="display: none;">
+                    <input type="checkbox" id="is-leap" name="is-leap">
+                    <label for="is-leap">윤달</label>
+                </div>
 
                 <div class="date-inputs">
                     <input type="text" id="birth-input" name="birth-inputh" placeholder="예: 921002" inputmode="numeric"
@@ -557,7 +573,7 @@
     function loadAutoAds(client) {
         if (window.__adsLoaded) return;
         window.__adsLoaded = true;
-
+ 
         const s = document.createElement('script');
         s.async = true;
         s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`;
@@ -570,7 +586,7 @@
             gtag('set', 'ads_data_redaction', true);
         }
     }
-
+ 
     // 기존 applyConsent 함수에 “동의 시 Auto ads 로드”만 추가
     // (당신 파일에 이미 applyConsent가 있으니 아래 로직만 반영)
     function applyConsent(state) {
@@ -581,12 +597,12 @@
             gtag('consent', 'update', state === 'accepted' ? granted('granted') : granted('denied'));
         }
         enableAdsDataRedaction();
-
+ 
         if (state === 'accepted') {
             loadAutoAds('ca-pub-7818333740838556'); // ← 당신 퍼블리셔 ID
         }
     }
-
+ 
     (function () {
         const banner = document.getElementById('cookie-banner');
         const get = k => document.cookie.split('; ').find(r => r.startsWith(k + '='))?.split('=')[1];
@@ -594,11 +610,11 @@
             const t = new Date(); t.setTime(t.getTime() + d * 864e5);
             document.cookie = `${k}=${v};expires=${t.toUTCString()};path=/;SameSite=Lax`;
         };
-
+ 
         const consent = get('cookieConsent');
         if (!consent && banner) banner.style.display = 'block';
         else if (consent) applyConsent(consent);
-
+ 
         document.getElementById('accept-cookies')?.addEventListener('click', () => {
             set('cookieConsent', 'accepted'); if (banner) banner.style.display = 'none'; applyConsent('accepted');
         });
