@@ -27,9 +27,11 @@ def index():
                 day = request.form['day'].zfill(2)
                 birth_date = f"{year}-{month}-{day}"
             
+            calendar_type = request.form.get('calendar_type', 'solar')
+            
             if birth_date:
                 controller = AgeController()
-                result = controller.calculate_age_from_string(birth_date)
+                result = controller.calculate_age_from_string(birth_date, calendar_type)
                 return jsonify(result)
             else:
                 return jsonify({'success': False, 'message': '생년월일을 입력해주세요.'})
@@ -40,6 +42,7 @@ def index():
         year = None
         month = None
         day = None
+        calendar_type = 'solar'
         
         if 'birth_date' in request.form and request.form['birth_date']:
             birth_date = request.form['birth_date']
@@ -48,17 +51,20 @@ def index():
             month = request.form['month'].zfill(2)
             day = request.form['day'].zfill(2)
             birth_date = f"{year}-{month}-{day}"
+            
+        calendar_type = request.form.get('calendar_type', 'solar')
         
         if birth_date:
             controller = AgeController()
-            result = controller.calculate_age_from_string(birth_date)
+            result = controller.calculate_age_from_string(birth_date, calendar_type)
     
     # GET 요청 또는 일반 폼 제출 시
     return render_template('index.html', result=result if 'result' in locals() else None, 
                          birth_date=birth_date if 'birth_date' in locals() else None, 
                          year=year if 'year' in locals() else None, 
                          month=month if 'month' in locals() else None, 
-                         day=day if 'day' in locals() else None)
+                         day=day if 'day' in locals() else None,
+                         calendar_type=calendar_type if 'calendar_type' in locals() else 'solar')
 
 @app.route('/privacy')
 def privacy():
