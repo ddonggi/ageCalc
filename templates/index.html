@@ -8,8 +8,8 @@
     <meta name="google-adsense-account" content="ca-pub-7818333740838556">
 
     <!-- 필수 SEO -->
-    <title>만나이 계산기</title>
-    <meta name="description" content="생년월일로 정확한 만나이를 계산하고, 연령별 가능한 권리·제도를 한눈에 확인하세요." />
+    <title>만나이 계산기 - 양력/음력 생일 완벽 지원</title>
+    <meta name="description" content="생년월일만 입력하면 양력/음력 모두 정확한 만나이를 계산해 드립니다. 연령별 가능한 권리·제도까지 한눈에 확인하세요." />
 
     <!-- 중복 방지: 대표 URL로 고정 -->
     <link rel="canonical" href="https://agecalc.cloud/" />
@@ -17,13 +17,13 @@
     <!-- 소셜 미리보기 -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="만나이 계산기" />
-    <meta property="og:title" content="만나이 계산기 – 생일로 정확한 만나이 계산" />
-    <meta property="og:description" content="만나이 계산 + 연령별 권리·제도 안내." />
+    <meta property="og:title" content="만나이 계산기 – 양력/음력 생일 완벽 지원" />
+    <meta property="og:description" content="양력/음력 생일로 정확한 만나이 계산 + 연령별 권리·제도 안내." />
     <meta property="og:url" content="https://agecalc.cloud/" />
     <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="만나이 계산기 – 생일로 정확한 만나이 계산" />
-    <meta name="twitter:description" content="만나이 계산 + 연령별 권리·제도 안내." />
+    <meta name="twitter:title" content="만나이 계산기 – 양력/음력 생일 완벽 지원" />
+    <meta name="twitter:description" content="양력/음력 생일로 정확한 만나이 계산 + 연령별 권리·제도 안내." />
     <meta name="twitter:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
     <!-- 구글 검색 콘솔 인증 -->
@@ -55,7 +55,7 @@
             "applicationCategory": "UtilitiesApplication",
             "operatingSystem": "Web",
             "url": "https://agecalc.cloud/",
-            "description": "생년월일로 정확한 만나이를 계산하고 연령별 권리·제도를 안내합니다.",
+            "description": "생년월일로 양력/음력 모두 정확한 만나이를 계산하고 연령별 권리·제도를 안내합니다.",
             "inLanguage": "ko",
             "author": {
               "@type": "Organization",
@@ -135,7 +135,7 @@
 <body>
     <div class="container">
         <h1>만나이 계산기</h1>
-
+        <div style="text-align: center;margin-bottom: 2rem;">나의 양력 / 음력 만나이 알아보기</div>
         <form class="age-form" id="age-form" autocomplete="off">
             <div class="form-group">
                 <h3>생년월일을 입력하세요 (6자리)</h3>
