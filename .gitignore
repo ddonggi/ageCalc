@@ -1,44 +1,41 @@
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Flask
-instance/
-.webassets-cache
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
-# Environment
-.env
-.venv/
-venv/
-ENV/
+# testing
+/coverage
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
+# next.js
+/.next/
+/out/
 
-# OS
+# production
+/build
+
+# misc
 .DS_Store
-Thumbs.db
+*.pem
 
-# Logs
-*.log
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
+# env files (can opt-in for committing if needed)
+.env*
 
-# Temporary files
-*.tmp
-*.temp
-*.bak
-*.backup
+# vercel
+.vercel
 
-# Configuration files with sensitive data
-config.py
-secrets.py
-.secrets
+# typescript
+*.tsbuildinfo
+next-env.d.ts
