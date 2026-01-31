@@ -8,9 +8,15 @@ def health():
     return {"ok": True}, 200
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.get('/')
 def index():
-    """메인 페이지 - 나이 계산 폼과 결과를 표시"""
+    """메인 페이지 - 나이 계산 도구 안내"""
+    return render_template('index.html')
+
+
+@app.route('/age', methods=['GET', 'POST'])
+def age():
+    """만나이 계산 페이지 - 나이 계산 폼과 결과를 표시"""
     if request.method == 'POST':
         # AJAX 요청인지 확인
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -59,7 +65,7 @@ def index():
             result = controller.calculate_age_from_string(birth_date, calendar_type)
     
     # GET 요청 또는 일반 폼 제출 시
-    return render_template('index.html', result=result if 'result' in locals() else None, 
+    return render_template('age.html', result=result if 'result' in locals() else None, 
                          birth_date=birth_date if 'birth_date' in locals() else None, 
                          year=year if 'year' in locals() else None, 
                          month=month if 'month' in locals() else None, 
@@ -85,6 +91,21 @@ def guide():
 def faq():
     """자주 묻는 질문 페이지"""
     return render_template('faq.html')
+
+@app.route('/dog')
+def dog():
+    """강아지 나이 계산 페이지"""
+    return render_template('dog.html')
+
+@app.route('/cat')
+def cat():
+    """고양이 나이 계산 페이지"""
+    return render_template('cat.html')
+
+@app.route('/baby-months')
+def baby_months():
+    """아기 개월 수 계산 페이지"""
+    return render_template('baby-months.html')
 
 
 if __name__ == '__main__':

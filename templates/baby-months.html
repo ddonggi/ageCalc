@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <title>아이 개월 수 계산기 | AgeCalc</title>
+    <meta name="description" content="출생일을 입력하면 우리 아이의 현재 개월 수를 바로 확인할 수 있는 아이 개월 수 계산기입니다." />
+
+    <link rel="canonical" href="https://agecalc.cloud/baby-months" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="아이 개월 수 계산기 | AgeCalc" />
+    <meta property="og:description" content="출생일 → 현재 개월 수를 간편하게 계산해 보세요." />
+    <meta property="og:url" content="https://agecalc.cloud/baby-months" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
+    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+
+<body>
+    <div id="pixel-background"></div>
+    <div class="container">
+        <header class="site-header">
+            <a class="brand" href="{{ url_for('index') }}">AgeCalc <span>2026</span></a>
+            <nav class="nav-links">
+                <a href="{{ url_for('age') }}">만나이</a>
+                <a href="{{ url_for('dog') }}">강아지 나이</a>
+                <a href="{{ url_for('cat') }}">고양이 나이</a>
+                <a href="{{ url_for('baby_months') }}">아이 개월 수</a>
+            </nav>
+        </header>
+
+        <h1>아이 개월 수 계산기</h1>
+        <div style="text-align: center;margin-bottom: 2rem;">“우리 아이는 몇 개월?”</div>
+
+        <form class="age-form" id="baby-months-form" autocomplete="off">
+            <div class="form-group">
+                <h3>출생일을 입력하세요</h3>
+                <div class="date-inputs">
+                    <input type="number" id="baby-year" min="1900" max="2100" placeholder="년" inputmode="numeric" required>
+                    <input type="number" id="baby-month" min="1" max="12" placeholder="월" inputmode="numeric" required>
+                    <input type="number" id="baby-day" min="1" max="31" placeholder="일" inputmode="numeric" required>
+                </div>
+                <small id="baby-error" class="error-msg" aria-live="polite"></small>
+            </div>
+        </form>
+
+        <div class="result-container" id="baby-result-container">
+            <h2>계산 결과</h2>
+            <div id="baby-result-content"></div>
+        </div>
+
+        <section style="margin-top:40px">
+            <h2>설명</h2>
+            <ul>
+                <li>출생일 기준으로 현재 개월 수를 계산합니다.</li>
+                <li>예방접종 일정, 발달 단계 확인에 활용할 수 있습니다.</li>
+                <li>결과는 참고용이며, 의료적 판단은 전문가 상담을 권장합니다.</li>
+            </ul>
+        </section>
+
+        <section style="margin-top:40px">
+            <h2>도움 되는 팁</h2>
+            <ul>
+                <li>미숙아(조산)인 경우 교정 월령 기준으로 확인하는 것이 도움될 수 있습니다.</li>
+                <li>발달 이정표는 “대부분(약 75% 이상)의 아이가 그 나이에 할 수 있는 것”을 기준으로 합니다.</li>
+                <li>CDC Milestone Tracker 같은 체크리스트 앱을 활용하면 관찰이 쉬워집니다.</li>
+                <li>궁금한 점이 있다면 소아과에서 발달 선별검사를 상담해 보세요.</li>
+            </ul>
+        </section>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>연락처</h4>
+                    <p>문의: ldg6153@gmail.com</p>
+                    <p>
+                        <a href="{{ url_for('privacy') }}"
+                            style="color: #2b2b2b; text-decoration: none; margin-right: 10px;">개인정보처리방침</a>
+                        <span style="color: #2b2b2b;">|</span>
+                        <a href="{{ url_for('terms') }}"
+                            style="color: #2b2b2b; text-decoration: none; margin-left: 10px;">이용약관</a>
+                        <span style="color: #2b2b2b;">|</span>
+                        <a href="{{ url_for('guide') }}"
+                            style="color: #2b2b2b; text-decoration: none; margin-left: 10px;">나이 계산 가이드</a>
+                        <span style="color: #2b2b2b;">|</span>
+                        <a href="{{ url_for('faq') }}"
+                            style="color: #2b2b2b; text-decoration: none; margin-left: 10px;">자주 묻는 질문</a>
+                    </p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 AgeCalc. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 쿠키 동의 배너 -->
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>이 웹사이트는 쿠키를 사용하여 사용자 경험을 개선합니다. 계속 사용하시면 쿠키 사용에 동의하는 것으로 간주됩니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/baby-months.js') }}" defer></script>
+
+    <!-- 스크롤 상단 버튼 -->
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
+        ↑
+    </button>
+    <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
+</body>
+
+</html>

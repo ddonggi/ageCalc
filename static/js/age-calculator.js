@@ -357,7 +357,8 @@ class AgeCalculatorUI {
         const calendarType = document.querySelector('input[name="calendar_type"]:checked').value;
         formData.set('calendar_type', calendarType);
 
-        const response = await fetch('/', {
+        const endpoint = (this.form && this.form.getAttribute('action')) || window.location.pathname || '/age';
+        const response = await fetch(endpoint, {
             method: 'POST',
             body: formData,
             headers: {
@@ -388,6 +389,7 @@ class AgeCalculatorUI {
         if (result.success) {
             // 성공 결과 표시
             resultContent.innerHTML = this.createSuccessResultHTML(result);
+            resultContainer.classList.add('show');
 
             // 5초 후 구글 애드 리프레시
             this.scheduleAdRefresh();
@@ -400,6 +402,7 @@ class AgeCalculatorUI {
         } else {
             // 에러 결과 표시
             resultContent.innerHTML = this.createErrorResultHTML(result);
+            resultContainer.classList.add('show');
         }
 
 
@@ -414,6 +417,7 @@ class AgeCalculatorUI {
         if (resultContainer && resultContent) {
             // 결과 내용만 비우고 컨테이너는 유지
             resultContent.innerHTML = '';
+            resultContainer.classList.remove('show');
         }
 
 
@@ -621,7 +625,7 @@ class AgeCalculatorUI {
                     </div>
                 </div>
             `;
-            resultContainer.style.display = 'block';
+            resultContainer.classList.add('show');
         } else {
             // 로딩 상태는 displayResult에서 자동으로 해제됨
         }

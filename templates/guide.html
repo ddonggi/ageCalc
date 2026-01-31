@@ -5,18 +5,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>만나이 가이드 | 만나이 계산기</title>
-    <meta name="description" content="만나이 제도와 계산 방식, 한국식·국제식 나이 차이를 정리한 가이드입니다. 법 개정 내용과 FAQ를 확인하세요." />
+    <title>나이 계산 가이드 | AgeCalc</title>
+    <meta name="description" content="만나이, 연나이, 한국식 나이의 차이와 계산 방식을 정리한 나이 계산 가이드입니다." />
     <link rel="canonical" href="https://agecalc.cloud/guide" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="article" />
-    <meta property="og:title" content="만나이 가이드 | 만나이 계산기" />
-    <meta property="og:description" content="만나이 제도와 계산 방식, 한국식·국제식 나이 차이를 정리한 가이드입니다." />
+    <meta property="og:title" content="나이 계산 가이드 | AgeCalc" />
+    <meta property="og:description" content="만나이, 연나이, 한국식 나이의 차이와 계산 방식을 정리했습니다." />
     <meta property="og:url" content="https://agecalc.cloud/guide" />
-    <meta property="og:site_name" content="만나이 계산기" />
+    <meta property="og:site_name" content="AgeCalc" />
     <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 
     <!-- 파비콘/매니페스트 -->
@@ -29,11 +34,20 @@
 </head>
 
 <body>
+    <div id="pixel-background"></div>
     <div class="container">
-        <a href="/" class="back-link">← 메인으로 돌아가기</a>
+        <header class="site-header">
+            <a class="brand" href="{{ url_for('index') }}">AgeCalc <span>2026</span></a>
+            <nav class="nav-links">
+                <a href="{{ url_for('age') }}">만나이</a>
+                <a href="{{ url_for('dog') }}">강아지 나이</a>
+                <a href="{{ url_for('cat') }}">고양이 나이</a>
+                <a href="{{ url_for('baby_months') }}">아이 개월 수</a>
+            </nav>
+        </header>
         <header>
-            <h1>만나이 가이드</h1>
-            <h3 style="text-align: center;">2023년 법 개정으로 통일된 만나이 제도와 계산 방법을 정리했습니다.</h3>
+            <h1>나이 계산 가이드</h1>
+            <h3 style="text-align: center;">만나이, 연나이, 한국식 나이의 정의와 계산 방식을 한눈에 정리했습니다.</h3>
         </header>
 
         <section>
@@ -46,16 +60,24 @@
         </section>
 
         <section>
-            <h2>왜 만나이로 통일되었을까?</h2>
+            <h2>연나이란?</h2>
             <p>
-                대한민국에서는 과거에 한국식 나이, 연 나이, 만나이가 혼용되어 혼란이 많았습니다.<br>
-                특히 법률·행정에서 기준이 달라 생활에서 불편을 겪는 경우가 많았죠.<br>
-                이에 따라 <strong>2023년 6월 28일부로 모든 공적 영역에서 만나이 기준이 공식 채택</strong>되었습니다.
+                연나이는 <strong>올해 − 출생연도</strong>로 계산합니다. 생일 전후를 고려하지 않기 때문에 간편하지만,
+                법적·행정적 기준으로는 사용하지 않습니다.
             </p>
         </section>
 
         <section>
-            <h2>다른 나이 계산 방식과 비교</h2>
+            <h2>한국식 나이(관행)</h2>
+            <p>
+                한국식 나이는 태어나면 1세로 시작하고, 해마다 1월 1일에 한 살이 증가하는 방식입니다.
+                2023년 6월 28일부터 공적 영역에서는 만나이 기준으로 통일되었지만,
+                일상 대화에서는 관행적으로 사용되기도 합니다.
+            </p>
+        </section>
+
+        <section>
+            <h2>나이 계산 방식 비교</h2>
             <table>
                 <thead>
                     <tr>
@@ -71,13 +93,13 @@
                         <td id="age-man"></td>
                     </tr>
                     <tr>
-                        <td>연 나이</td>
+                        <td>연나이</td>
                         <td>올해 − 출생연도</td>
                         <td id="age-year"></td>
                     </tr>
                     <tr>
-                        <td>한국식 나이(폐지)</td>
-                        <td>태어나면 1세, 해마다 1월 1일에 한 살 증가</td>
+                        <td>한국식 나이</td>
+                        <td>태어나면 1세, 매년 1월 1일에 +1</td>
                         <td id="age-korean"></td>
                     </tr>
                 </tbody>
@@ -86,14 +108,14 @@
 
         <section>
             <h2>자주 묻는 질문</h2>
-            <h3>Q. 모든 제도가 만나이로 바뀌었나요?</h3>
-            <p>A. 행정·법률상 제도는 만나이 기준으로 통일되었지만, 일상 대화에서는 한국식 나이가 여전히 쓰이기도 합니다.</p>
+            <h3>Q. 공적 기준은 어떤 나이인가요?</h3>
+            <p>A. 대한민국은 2023년 6월부터 공적 영역에서 만나이를 기준으로 통일했습니다.</p>
 
-            <h3>Q. 연 나이는 어디에 쓰이나요?</h3>
-            <p>A. 연 나이는 통계나 설문 등 일부 비공식 영역에서만 참고용으로 쓰입니다.</p>
+            <h3>Q. 음력 생일도 계산되나요?</h3>
+            <p>A. 만나이 계산 페이지에서 음력 생일을 양력으로 환산해 계산할 수 있습니다.</p>
 
-            <h3>Q. 국제식 나이와 다른 건가요?</h3>
-            <p>A. 만나이 = 국제식 나이와 동일합니다. 한국도 이제 국제 기준과 일치합니다.</p>
+            <h3>Q. 연나이는 어디에 쓰이나요?</h3>
+            <p>A. 통계나 설문 등 일부 비공식 영역에서 참고용으로 쓰입니다.</p>
         </section>
 
         <section>
@@ -119,7 +141,7 @@
                             style="color: #667eea; text-decoration: none; margin-left: 10px;">이용약관</a>
                         <span style="color: #ccc;">|</span>
                         <a href="{{ url_for('guide') }}"
-                            style="color: #667eea; text-decoration: none; margin-left: 10px;">만나이 가이드</a>
+                            style="color: #667eea; text-decoration: none; margin-left: 10px;">나이 계산 가이드</a>
                         <span style="color: #ccc;">|</span>
                         <a href="{{ url_for('faq') }}"
                             style="color: #667eea; text-decoration: none; margin-left: 10px;">자주 묻는 질문</a>
@@ -127,10 +149,30 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 만나이 계산기. All rights reserved.</p>
+                <p>&copy; 2026 AgeCalc. All rights reserved.</p>
             </div>
         </footer>
     </div>
+
+    <!-- 쿠키 동의 배너 -->
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>이 웹사이트는 쿠키를 사용하여 사용자 경험을 개선합니다. 계속 사용하시면 쿠키 사용에 동의하는 것으로 간주됩니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+
+    <!-- 스크롤 상단 버튼 -->
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
+        ↑
+    </button>
+    <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
 </body>
 <script>
     // 기준 생일
@@ -138,7 +180,7 @@
 
     // 오늘 날짜
     const today = new Date();
-    const todayStr = today.toISOString().split("T")[0]; // YYYY-MM-DD
+    const todayStr = today.toISOString().split("T")[0];
     const currentYear = today.getFullYear();
 
     document.getElementById("today-date").textContent = todayStr;
@@ -148,19 +190,18 @@
 
     // 만나이 계산
     let manAge = today.getFullYear() - birthDate.getFullYear();
-    let exAge = manAge-1;
+    let exAge = manAge - 1;
     const hasHadBirthday =
         today.getMonth() > birthDate.getMonth() ||
         (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
     if (!hasHadBirthday) {
         manAge--;
-        
     }
 
     // 연 나이
     const yearAge = today.getFullYear() - birthDate.getFullYear();
 
-    // 한국식 나이 (폐지된 방식)
+    // 한국식 나이
     const koreanAge = yearAge + 1;
 
     // DOM에 반영

@@ -29,6 +29,62 @@ def generate_sitemap(base_url="https://yourdomain.com"):
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
+
+    <!-- 나이 계산 페이지 -->
+    <url>
+        <loc>{base_url}/age</loc>
+        <lastmod>{current_time}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <!-- 반려동물 나이 계산 페이지 -->
+    <url>
+        <loc>{base_url}/dog</loc>
+        <lastmod>{current_time}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>{base_url}/cat</loc>
+        <lastmod>{current_time}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- 아기 개월 수 계산 페이지 -->
+    <url>
+        <loc>{base_url}/baby-months</loc>
+        <lastmod>{current_time}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- 안내 페이지 -->
+    <url>
+        <loc>{base_url}/guide</loc>
+        <lastmod>{current_time}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>{base_url}/faq</loc>
+        <lastmod>{current_time}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>{base_url}/privacy</loc>
+        <lastmod>{current_time}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>{base_url}/terms</loc>
+        <lastmod>{current_time}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
     
     <!-- 정적 리소스 -->
     <url>

@@ -5,23 +5,23 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-    <title>개인정보처리방침 | 만나이 계산기</title>
-    <meta name="description" content="만나이 계산기의 개인정보 처리 방침입니다. 수집·이용·보관·제3자 제공 등 개인정보 관련 정책을 확인하세요." />
+    <title>개인정보처리방침 | AgeCalc</title>
+    <meta name="description" content="AgeCalc 나이 계산 서비스의 개인정보 처리 방침입니다. 수집·이용·보관·제3자 제공 등 개인정보 정책을 확인하세요." />
     <link rel="canonical" href="https://agecalc.cloud/privacy" />
 
     <!-- Open Graph -->
     <meta property="og:locale" content="ko_KR" />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="만나이 계산기" />
-    <meta property="og:title" content="개인정보처리방침 | 만나이 계산기" />
-    <meta property="og:description" content="만나이 계산기의 개인정보 처리 방침입니다. 수집·이용·보관·제3자 제공 등 개인정보 관련 정책을 확인하세요." />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="개인정보처리방침 | AgeCalc" />
+    <meta property="og:description" content="AgeCalc 나이 계산 서비스의 개인정보 처리 방침입니다." />
     <meta property="og:url" content="https://agecalc.cloud/privacy" />
     <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="개인정보처리방침 | 만나이 계산기" />
-    <meta name="twitter:description" content="만나이 계산기의 개인정보 처리 방침입니다." />
+    <meta name="twitter:title" content="개인정보처리방침 | AgeCalc" />
+    <meta name="twitter:description" content="AgeCalc 나이 계산 서비스의 개인정보 처리 방침입니다." />
     <meta name="twitter:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
     <!-- Favicon -->
@@ -31,7 +31,12 @@
         href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
     <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
 
-    <!-- CSS -->
+    <!-- Fonts + CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
     <!-- 스크립트 -->
     <script src="{{ url_for('static', filename='js/age-calculator.js') }}" defer></script>
@@ -46,27 +51,35 @@
     "url":"https://agecalc.cloud/privacy",
     "isPartOf": {
       "@type":"WebSite",
-      "name":"만나이 계산기",
+      "name":"AgeCalc",
       "url":"https://agecalc.cloud/"
     },
-    "dateModified":"2025-10-07"
+    "dateModified":"2026-01-24"
   }
   </script>
 
 </head>
 
 <body>
+    <div id="pixel-background"></div>
     <div class="container">
-        <a href="{{ url_for('index') }}" class="back-link">← 메인으로 돌아가기</a>
+        <header class="site-header">
+            <a class="brand" href="{{ url_for('index') }}">AgeCalc <span>2026</span></a>
+            <nav class="nav-links">
+                <a href="{{ url_for('age') }}">만나이</a>
+                <a href="{{ url_for('dog') }}">강아지 나이</a>
+                <a href="{{ url_for('cat') }}">고양이 나이</a>
+                <a href="{{ url_for('baby_months') }}">아이 개월 수</a>
+            </nav>
+        </header>
 
         <h1>개인정보 처리 방침</h1>
-        <h3 style="text-align: center;">만나이 계산기(이하 “서비스”)는 개인정보보호법 등 관련 법령을 준수하며, <br> 이용자의 개인정보 보호를 위해 아래와 같이 처리 방침을
-            공개합니다.</h3>
+        <h3 style="text-align: center;">AgeCalc 나이 계산 서비스(이하 “서비스”)는 개인정보보호법 등 관련 법령을 준수하며, <br> 이용자의 개인정보 보호를 위해 아래와 같이 처리 방침을 공개합니다.</h3>
 
         <section>
             <h2>1. 처리 목적</h2>
             <ul>
-                <li><strong>나이 계산 서비스 제공</strong>: 입력한 생년월일을 바탕으로 만나이를 계산하고 관련 정보를 안내</li>
+                <li><strong>나이 계산 서비스 제공</strong>: 입력한 생년월일을 바탕으로 만나이/연나이 등 계산 결과 제공</li>
                 <li><strong>서비스 품질 개선</strong>: 오류 복구, 보안 강화, 이용 통계 분석(동의 시)</li>
                 <li><strong>고객 지원</strong>: 문의 대응 및 기술 지원</li>
             </ul>
@@ -75,7 +88,7 @@
         <section>
             <h2>2. 수집 항목 및 수집 방법</h2>
             <div class="highlight">
-                <p><strong>핵심 원칙</strong>: 생년월일 등 계산 입력값은 <u>브라우저에서만 처리</u>되며 서버에 저장하지 않습니다.</p>
+                <p><strong>핵심 원칙</strong>: 입력한 생년월일 등 계산 데이터는 <u>계산을 위해 서버로 전송</u>되며, 서버에 저장하지 않습니다.</p>
             </div>
             <ul>
                 <li><strong>직접 수집</strong>: (필수) 없음 / (선택) 문의 시 이메일 주소</li>
@@ -96,7 +109,7 @@
         <section>
             <h2>3. 이용·보유 기간</h2>
             <ul>
-                <li>브라우저 입력값: 저장하지 않음</li>
+                <li>계산 입력값: 저장하지 않음</li>
                 <li>서버 보안 로그: 보안 목적 달성 시까지 최소한으로 보관 후 파기(통상 3~6개월 내)</li>
                 <li>문의 이메일: 처리 완료 및 관련 법령상 보존기간 경과 시 파기</li>
                 <li>광고/분석 쿠키: 제공사 정책 및 이용자 동의 설정에 따름</li>
@@ -154,7 +167,7 @@
         <section>
             <h2>9. 개인정보 보호책임자</h2>
             <div class="contact-info">
-                <p><strong>성명</strong>: 만나이 계산기 관리자</p>
+                <p><strong>성명</strong>: AgeCalc 관리자</p>
                 <p><strong>연락처</strong>: <a href="mailto:ldg6153@gmail.com">ldg6153@gmail.com</a></p>
                 <p><strong>직책</strong>: 개인정보보호책임자</p>
             </div>
@@ -171,14 +184,13 @@
         <section>
             <h2>11. 시행일 및 최종 수정일</h2>
             <ul>
-                <li><strong>시행일</strong>: 2025-09-06</li>
-                <li><strong>최종 수정일</strong>: 2025-10-07</li>
+                <li><strong>시행일</strong>: 2026-01-24</li>
+                <li><strong>최종 수정일</strong>: 2026-01-24</li>
             </ul>
         </section>
 
 
-        <h3 class="small" style="text-align: center;">참고: 광고 쿠키·맞춤형 광고와 관련한 추가 정보 및 선택 사항은 Google의 광고 설정/정책 페이지에서 확인할 수
-            있습니다.</h3>
+        <h3 class="small" style="text-align: center;">참고: 광고 쿠키·맞춤형 광고와 관련한 추가 정보 및 선택 사항은 Google의 광고 설정/정책 페이지에서 확인할 수 있습니다.</h3>
 
         <!-- 푸터 -->
         <footer class="footer">
@@ -194,7 +206,7 @@
                             style="color: #667eea; text-decoration: none; margin-left: 10px;">이용약관</a>
                         <span style="color: #ccc;">|</span>
                         <a href="{{ url_for('guide') }}"
-                            style="color: #667eea; text-decoration: none; margin-left: 10px;">만나이 가이드</a>
+                            style="color: #667eea; text-decoration: none; margin-left: 10px;">나이 계산 가이드</a>
                         <span style="color: #ccc;">|</span>
                         <a href="{{ url_for('faq') }}"
                             style="color: #667eea; text-decoration: none; margin-left: 10px;">자주 묻는 질문</a>
@@ -202,15 +214,30 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 만나이 계산기. All rights reserved.</p>
+                <p>&copy; 2026 AgeCalc. All rights reserved.</p>
             </div>
         </footer>
     </div>
+
+    <!-- 쿠키 동의 배너 -->
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>이 웹사이트는 쿠키를 사용하여 사용자 경험을 개선합니다. 계속 사용하시면 쿠키 사용에 동의하는 것으로 간주됩니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
 
     <!-- 스크롤 상단 버튼 -->
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
         ↑
     </button>
+    <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
 </body>
 
 </html>
