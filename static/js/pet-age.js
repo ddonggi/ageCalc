@@ -9,6 +9,12 @@ class PetAgeCalculator {
         this.petType = this.form ? this.form.getAttribute('data-pet') : 'dog';
         this.sizeOptions = document.querySelectorAll('.pet-size-option');
         this.sizeRadios = document.querySelectorAll('input[name="pet-size"]');
+        this.dogAgeTable = {
+            small: [15, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80],
+            medium: [15, 24, 28, 32, 36, 42, 47, 51, 56, 60, 65, 69, 74, 78, 83, 87],
+            large: [15, 24, 28, 32, 36, 45, 50, 55, 61, 66, 72, 77, 82, 88, 93, 99],
+            giant: [12, 22, 31, 38, 45, 49, 56, 64, 71, 79, 86, 93, 100, 107, 114, 121]
+        };
 
         if (this.form) {
             this.bindEvents();
@@ -69,10 +75,30 @@ class PetAgeCalculator {
 
     calcDog(ageYears) {
         if (ageYears <= 0) return 0;
-        if (ageYears <= 1) return 15 * ageYears;
-        if (ageYears <= 2) return 15 + 9 * (ageYears - 1);
-        const base = 24 + 5 * (ageYears - 2);
-        return base * this.getDogSizeFactor();
+        const size = this.getDogSize();
+        const table = this.dogAgeTable[size] || this.dogAgeTable.small;
+
+        if (ageYears <= 1) {
+            return 15 * ageYears;
+        }
+        if (ageYears <= 2) {
+            return 15 + (24 - 15) * (ageYears - 1);
+        }
+
+        const whole = Math.floor(ageYears);
+        const frac = ageYears - whole;
+        const lastIndex = table.length;
+
+        if (whole >= lastIndex) {
+            const last = table[lastIndex - 1];
+            const prev = table[lastIndex - 2] || last;
+            const step = last - prev || 4;
+            return last + step * (ageYears - lastIndex);
+        }
+
+        const base = table[whole - 1];
+        const next = table[whole] ?? base;
+        return base + (next - base) * frac;
     }
 
     calcCat(ageYears) {
@@ -135,18 +161,16 @@ class PetAgeCalculator {
         if (this.resultContainer) this.resultContainer.classList.remove('show');
     }
 
-    getDogSizeFactor() {
+    getDogSize() {
         const selected = document.querySelector('input[name="pet-size"]:checked');
-        const size = selected ? selected.value : 'small';
-        if (size === 'large') return 1.15;
-        if (size === 'medium') return 1.05;
-        return 1.0;
+        return selected ? selected.value : 'small';
     }
 
     getDogSizeLabel() {
         const selected = document.querySelector('input[name="pet-size"]:checked');
         if (!selected) return '';
         if (selected.value === 'large') return '(대형견)';
+        if (selected.value === 'giant') return '(초대형견)';
         if (selected.value === 'medium') return '(중형견)';
         return '(소형견)';
     }
