@@ -5,16 +5,16 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-    <title>아이 개월 수 계산기 | AgeCalc</title>
-    <meta name="description" content="출생일을 입력하면 우리 아이의 현재 개월 수를 바로 확인할 수 있는 아이 개월 수 계산기입니다." />
+    <title>부모·자녀 나이 관계 계산기 | AgeCalc</title>
+    <meta name="description" content="부모(부/모) 생년월일과 자녀 생년월일을 입력하면 출산 당시 나이, 현재 나이 차이, 환갑/칠순 시점의 자녀 나이를 계산합니다." />
 
-    <link rel="canonical" href="https://agecalc.cloud/baby-months" />
+    <link rel="canonical" href="https://agecalc.cloud/parent-child" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="AgeCalc" />
-    <meta property="og:title" content="아이 개월 수 계산기 | AgeCalc" />
-    <meta property="og:description" content="출생일 → 현재 개월 수를 간편하게 계산해 보세요." />
-    <meta property="og:url" content="https://agecalc.cloud/baby-months" />
+    <meta property="og:title" content="부모·자녀 나이 관계 계산기 | AgeCalc" />
+    <meta property="og:description" content="출산 당시 나이, 현재 나이 차이, 환갑/칠순 시점 자녀 나이를 확인하세요." />
+    <meta property="og:url" content="https://agecalc.cloud/parent-child" />
     <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
     <link rel="icon" href="/favicon.ico">
@@ -31,6 +31,7 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-M0RLS343N4"></script>
     <script>
@@ -40,7 +41,6 @@
 
       gtag('config', 'G-M0RLS343N4');
     </script>
-
     <script type="text/javascript">
         (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -48,7 +48,6 @@
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
         })(window, document, "clarity", "script", "vad9jplnw2");
     </script>
-
 </head>
 
 <body>
@@ -65,50 +64,46 @@
             </nav>
         </header>
 
-        <h1>아이 개월 수 계산기</h1>
-        <div style="text-align: center;margin-bottom: 2rem;">“우리 아이는 몇 개월?”</div>
+        <h1>부모·자녀 나이 관계 계산기</h1>
+        <div style="text-align: center;margin-bottom: 2rem;">부모(부/모)와 자녀의 나이 관계를 계산합니다</div>
 
-        <form class="age-form" id="baby-months-form" autocomplete="off">
+        <form class="age-form" id="parent-child-form" autocomplete="off">
             <div class="form-group">
-                <h3>출생일을 입력하세요</h3>
-                <div class="date-inputs">
-                    <input type="number" id="baby-year" min="1900" max="2100" placeholder="년" inputmode="numeric" required>
-                    <input type="number" id="baby-month" min="1" max="12" placeholder="월" inputmode="numeric" required>
-                    <input type="number" id="baby-day" min="1" max="31" placeholder="일" inputmode="numeric" required>
+                <h3>부모</h3>
+                <div class="line-actions">
+                    <button type="button" class="btn btn-primary" id="add-parent-line">+</button>
                 </div>
-                <small id="baby-error" class="error-msg" aria-live="polite"></small>
+                <div id="parent-lines" class="line-group"></div>
+            </div>
+
+            <div class="form-group" style="margin-top: 16px;">
+                <h3>자녀</h3>
+                <div class="line-actions">
+                    <button type="button" class="btn btn-primary" id="add-child-line">+</button>
+                </div>
+                <div id="child-lines" class="line-group"></div>
+                <small id="parent-child-error" class="error-msg" aria-live="polite"></small>
             </div>
         </form>
 
-        <div class="result-container" id="baby-result-container">
+        <div class="result-container" id="parent-child-result-container">
             <h2>계산 결과</h2>
-            <div id="baby-result-content"></div>
+            <div id="parent-child-result-content"></div>
+            <div class="share-section" style="margin-top:12px;">
+                <h4>결과 공유하기</h4>
+                <div class="share-buttons">
+                    <button class="share-btn" id="copy-result-link" title="링크 복사">🔗</button>
+                    <button class="share-btn" id="save-result-image" title="이미지로 저장">🖼️</button>
+                </div>
+            </div>
         </div>
 
         <section style="margin-top:40px">
             <h2>설명</h2>
             <ul>
-                <li>출생일 기준으로 현재 개월 수를 계산합니다.</li>
-                <li>예방접종 일정, 발달 단계 확인에 활용할 수 있습니다.</li>
-                <li>결과는 참고용이며, 의료적 판단은 전문가 상담을 권장합니다.</li>
-            </ul>
-        </section>
-
-        <section style="margin-top:40px">
-            <h2>도움 되는 팁</h2>
-            <ul>
-                <li>미숙아(조산)인 경우 교정 월령 기준으로 확인하는 것이 도움될 수 있습니다.</li>
-                <li>발달 이정표는 “대부분의 아이가 그 나이에 할 수 있는 것”을 기준으로 합니다.</li>
-                <li>궁금한 점이 있다면 소아과에서 발달 선별검사를 상담해 보세요.</li>
-                <li>같은 월령이라도 수면, 수유, 활동량에 개인차가 큽니다. 평균보다 흐름을 보는 것이 좋아요.</li>
-                <li>아이의 변화 기록(사진/메모)을 남겨두면 성장 패턴을 확인하는 데 도움이 됩니다.</li>
-            </ul>
-            <h3 style="margin-top:16px;">참고 링크/앱</h3>
-            <ul>
-                <li><a href="https://nip.kdca.go.kr/" target="_blank" rel="noopener noreferrer">질병관리청 예방접종도우미</a> — 접종 일정 확인, 접종기관 찾기</li>
-                <li><a href="https://hi.nhis.or.kr/" target="_blank" rel="noopener noreferrer">건강iN(국민건강보험공단)</a> — 영유아 건강검진 안내 및 문진표 작성</li>
-                <li>The건강보험 앱 — <a href="https://play.google.com/store/apps/details?hl=ko&id=kr.or.nhic" target="_blank" rel="noopener noreferrer">Android</a> / <a href="https://apps.apple.com/kr/app/the%EA%B1%B4%EA%B0%95%EB%B3%B4%ED%97%98/id375279377" target="_blank" rel="noopener noreferrer">iOS</a></li>
-                <li><a href="https://play.google.com/store/apps/details?hl=ko&id=com.mw.Android_KidsLove2" target="_blank" rel="noopener noreferrer">아이사랑 모바일(Android)</a> — 육아·보육 정보와 서비스 안내</li>
+                <li>부모가 자녀를 낳았을 때의 나이를 계산합니다.</li>
+                <li>현재 부모·자녀의 나이 차이를 확인합니다.</li>
+                <li>부모의 환갑(60세), 칠순(70세) 시점의 자녀 나이를 계산합니다.</li>
             </ul>
         </section>
 
@@ -149,9 +144,10 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/baby-months.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/parent-child.js') }}" defer></script>
 
     <!-- 스크롤 상단 버튼 -->
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">

@@ -107,6 +107,11 @@ def baby_months():
     """아기 개월 수 계산 페이지"""
     return render_template('baby-months.html')
 
+@app.route('/parent-child')
+def parent_child():
+    """부모·자녀 나이 관계 계산 페이지"""
+    return render_template('parent-child.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000, host='0.0.0.0')

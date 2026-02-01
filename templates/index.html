@@ -72,6 +72,7 @@
                 <a href="{{ url_for('dog') }}">강아지 나이</a>
                 <a href="{{ url_for('cat') }}">고양이 나이</a>
                 <a href="{{ url_for('baby_months') }}">아이 개월 수</a>
+                <a href="{{ url_for('parent_child') }}">부모·자녀</a>
             </nav>
         </header>
         <h1>나이 계산 도구 모음</h1>
@@ -132,6 +133,20 @@
                             <li>“우리 아이는 몇 개월?” 바로 확인</li>
                             <li>출생일 기준 현재 개월 수 계산</li>
                             <li>클릭하면 계산 페이지로 이동</li>
+                        </ul>
+                    </div>
+                </a>
+
+                <a class="card-link" href="{{ url_for('parent_child') }}">
+                    <div class="age-right-item">
+                        <div class="age-header">
+                            <span class="age-number">👨‍👩‍👧</span>
+                            <span class="age-unit">부모·자녀</span>
+                        </div>
+                        <ul>
+                            <li>출산 당시 부모 나이 계산</li>
+                            <li>현재 나이 차이 확인</li>
+                            <li>환갑·칠순 시점 자녀 나이</li>
                         </ul>
                     </div>
                 </a>
