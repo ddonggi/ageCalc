@@ -44,37 +44,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-M0RLS343N4"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
 
-      gtag('config', 'G-M0RLS343N4');
-    </script>
-
-    <script type="text/javascript">
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "vad9jplnw2");
-    </script>
+    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
 
 </head>
 
 <body>
     <div id="pixel-background"></div>
     <div class="container">
-        <header class="site-header">
-            <a class="brand" href="{{ url_for('index') }}">AgeCalc <span>2026</span></a>
-            <nav class="nav-links">
-                <a href="{{ url_for('age') }}">만나이</a>
-                <a href="{{ url_for('dog') }}">강아지 나이</a>
-                <a href="{{ url_for('cat') }}">고양이 나이</a>
-                <a href="{{ url_for('baby_months') }}">아이 개월 수</a>
-                <a href="{{ url_for('parent_child') }}">부모·자녀</a>
-            </nav>
-        </header>
+        {% include 'partials/header.html' %}
         <h1>나이 계산 도구 모음</h1>
         <div style="text-align: center;margin-bottom: 2rem;">필요한 나이 계산을 선택하세요</div>
 
@@ -163,6 +142,25 @@
         </section>
 
         <section style="margin-top:40px">
+            <h2>미니게임</h2>
+            <div class="age-rights-grid">
+                <a class="card-link" href="{{ url_for('snake_game') }}">
+                    <div class="age-right-item">
+                        <div class="age-header">
+                            <span class="age-number">🐍</span>
+                            <span class="age-unit">스네이크</span>
+                        </div>
+                        <ul>
+                            <li>키보드/터치로 간단 조작</li>
+                            <li>먹이를 먹을수록 길이 증가</li>
+                            <li>최고 점수 기록 저장</li>
+                        </ul>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <section style="margin-top:40px">
             <h2>AgeCalc가 필요한 상황</h2>
             <ul>
                 <li>행정/계약 기준의 만나이 확인이 필요할 때</li>
@@ -193,30 +191,7 @@
         </section>
 
         <!-- 푸터 -->
-        <footer class="footer">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>연락처</h4>
-                    <p>문의: ldg6153@gmail.com</p>
-                    <p>
-                        <a href="{{ url_for('privacy') }}"
-                            style="color: #667eea; text-decoration: none; margin-right: 10px;">개인정보처리방침</a>
-                        <span style="color: #ccc;">|</span>
-                        <a href="{{ url_for('terms') }}"
-                            style="color: #667eea; text-decoration: none; margin-left: 10px;">이용약관</a>
-                        <span style="color: #ccc;">|</span>
-                        <a href="{{ url_for('guide') }}"
-                            style="color: #667eea; text-decoration: none; margin-left: 10px;">나이 계산 가이드</a>
-                        <span style="color: #ccc;">|</span>
-                        <a href="{{ url_for('faq') }}"
-                            style="color: #667eea; text-decoration: none; margin-left: 10px;">자주 묻는 질문</a>
-                    </p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 AgeCalc. All rights reserved.</p>
-            </div>
-        </footer>
+        {% include 'partials/footer.html' %}
     </div>
     <!-- 쿠키 동의 배너 -->
     <div class="cookie-banner" id="cookie-banner">

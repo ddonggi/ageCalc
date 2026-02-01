@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <meta name="google-adsense-account" content="ca-pub-7818333740838556">
+
+    <title>스네이크 게임 | AgeCalc</title>
+    <meta name="description" content="픽셀 감성 스네이크 게임. 먹이를 먹으며 성장하고 최고 점수에 도전해 보세요." />
+    <link rel="canonical" href="https://agecalc.cloud/minigames/snake" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="스네이크 게임 | AgeCalc" />
+    <meta property="og:description" content="픽셀 감성 스네이크 게임" />
+    <meta property="og:url" content="https://agecalc.cloud/minigames/snake" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
+    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M0RLS343N4"></script>
+    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+
+    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+</head>
+
+<body class="no-scroll snake-page">
+    <div id="pixel-background"></div>
+    <div class="container">
+        {% include 'partials/header.html' %}
+
+        <h1>스네이크 게임</h1>
+        <div style="text-align: center;margin-bottom: 1.5rem;">먹이를 먹을수록 길어지는 픽셀 스네이크</div>
+
+        <section class="mini-game">
+            <div class="game-panel">
+                <canvas id="confetti-canvas" class="confetti-canvas" aria-hidden="true"></canvas>
+                <div class="best-toast" id="best-toast">최고 기록 경신! 🎉</div>
+                <div class="game-stats">
+                    <div>점수 <span id="snake-score">0</span></div>
+                    <div>최고 점수 <span id="snake-best">0</span></div>
+                </div>
+                <div class="badge-row" aria-label="성과 뱃지">
+                    <div class="badge-list">
+                        {% for i in range(1, 11) %}
+                        <span class="badge" data-badge="{{ (i - 1) * 10 }}" aria-label="{{ (i - 1) * 10 }}점 뱃지"></span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <canvas id="snake-canvas" width="320" height="320" aria-label="스네이크 게임 보드"></canvas>
+                <div class="game-controls">
+                    <button type="button" class="game-btn" id="snake-pause">일시정지</button>
+                    <button type="button" class="game-btn" id="snake-start">시작</button>
+                    <div class="game-speed">
+                        <label for="snake-speed">속도</label>
+                        <select id="snake-speed">
+                            <option value="140">느긋</option>
+                            <option value="110" selected>보통</option>
+                            <option value="85">빠름</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="game-pad">
+                    <button type="button" data-dir="up">▲</button>
+                    <div>
+                        <button type="button" data-dir="left">◀</button>
+                        <button type="button" data-dir="down">▼</button>
+                        <button type="button" data-dir="right">▶</button>
+                    </div>
+                </div>
+                <p class="game-tip">키보드 방향키 또는 WASD, 모바일에서는 조작 패드를 사용하세요.</p>
+            </div>
+        </section>
+
+        {% include 'partials/footer.html' %}
+    </div>
+
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>이 웹사이트는 쿠키를 사용하여 사용자 경험을 개선합니다. 계속 사용하시면 쿠키 사용에 동의하는 것으로 간주됩니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/snake-game.js') }}" defer></script>
+
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
+        ↑
+    </button>
+    <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
+</body>
+
+</html>

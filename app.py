@@ -1,7 +1,78 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, g
+import json
+import os
+import threading
+from datetime import datetime
+import secrets
 from controllers.age_controller import AgeController
 
 app = Flask(__name__)
+_score_lock = threading.Lock()
+_score_file = os.path.join(app.root_path, "data", "snake_scores.json")
+
+@app.before_request
+def set_csp_nonce():
+    g.csp_nonce = secrets.token_urlsafe(16)
+
+@app.context_processor
+def inject_csp_nonce():
+    return {"csp_nonce": getattr(g, "csp_nonce", "")}
+
+@app.after_request
+def add_security_headers(response):
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+    response.headers["X-XSS-Protection"] = "0"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    nonce = getattr(g, "csp_nonce", "")
+    csp = (
+        "default-src 'self'; "
+        "img-src 'self' data:; "
+        "font-src 'self' https://fonts.gstatic.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+        f"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com https://www.clarity.ms; "
+        "connect-src 'self' https://www.google-analytics.com https://www.clarity.ms; "
+        "frame-ancestors 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self'"
+    )
+    response.headers["Content-Security-Policy"] = csp
+    return response
+
+
+def _ensure_score_file():
+    os.makedirs(os.path.dirname(_score_file), exist_ok=True)
+    if not os.path.exists(_score_file):
+        with open(_score_file, "w", encoding="utf-8") as f:
+            json.dump({"scores": []}, f)
+
+
+def _load_scores():
+    _ensure_score_file()
+    with open(_score_file, "r", encoding="utf-8") as f:
+        try:
+            data = json.load(f)
+        except json.JSONDecodeError:
+            data = {"scores": []}
+    return data.get("scores", [])
+
+
+def _save_scores(scores):
+    _ensure_score_file()
+    with open(_score_file, "w", encoding="utf-8") as f:
+        json.dump({"scores": scores}, f, ensure_ascii=False)
+
+
+def _date_key(ts):
+    return ts.strftime("%Y-%m-%d")
+
+
+def _month_key(ts):
+    return ts.strftime("%Y-%m")
+
+
 
 @app.get("/health") 
 def health(): 
@@ -111,6 +182,61 @@ def baby_months():
 def parent_child():
     """부모·자녀 나이 관계 계산 페이지"""
     return render_template('parent-child.html')
+
+@app.route('/minigames')
+def minigames():
+    """미니게임 모음 페이지"""
+    return render_template('minigames.html')
+
+@app.route('/minigames/snake')
+def snake_game():
+    """스네이크 게임 페이지"""
+    return render_template('snake.html')
+
+
+
+@app.post("/snake-score")
+def snake_score():
+    data = request.get_json(silent=True) or {}
+    try:
+        score = int(data.get("score", 0))
+    except (TypeError, ValueError):
+        score = 0
+    if score < 0:
+        score = 0
+
+    now = datetime.now()
+    today = _date_key(now)
+    month = _month_key(now)
+
+    with _score_lock:
+        scores = _load_scores()
+        today_scores = [s for s in scores if s.get("date") == today]
+        prev_daily_best = max([s.get("score", 0) for s in today_scores], default=0)
+        scores.append({
+            "score": score,
+            "ts": now.isoformat(),
+            "date": today,
+            "month": month
+        })
+        # Keep recent 5000 scores
+        if len(scores) > 5000:
+            scores = scores[-5000:]
+        _save_scores(scores)
+
+    today_scores = [s for s in scores if s.get("date") == today]
+    month_scores = [s for s in scores if s.get("month") == month]
+    daily_best = max([s.get("score", 0) for s in today_scores], default=0)
+    monthly_best = max([s.get("score", 0) for s in month_scores], default=0)
+    higher = sum(1 for s in today_scores if s.get("score", 0) > score)
+    rank = higher + 1
+    total = len(today_scores)
+    is_new_daily_best = score > prev_daily_best and score > 0
+    return jsonify({
+        "ok": True,
+        "rank": rank,
+        "total": total
+    })
 
 
 if __name__ == '__main__':

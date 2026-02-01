@@ -47,7 +47,7 @@
     <!-- <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin /> -->
     <!-- <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin /> -->
 
-    <script type="application/ld+json">
+    <script type="application/ld+json" nonce="{{ csp_nonce }}">
         {
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
@@ -72,7 +72,7 @@
             }
         }
     </script>
-    <script type="application/ld+json">
+    <script type="application/ld+json" nonce="{{ csp_nonce }}">
         {
          "@context": "https://schema.org",
          "@type": "FAQPage",
@@ -87,35 +87,6 @@
         }
     </script>
 
-    <!-- Google Consent Mode v2: 기본 거부 상태로 시작 (배너 동의 시 업데이트) -->
-    <script>
-        /*
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('consent', 'default', {
-            ad_storage: 'denied',
-            ad_user_data: 'denied',
-            ad_personalization: 'denied',
-            analytics_storage: 'denied'
-        });
-        */
-    </script>
-
-    <!-- Google Tag Manager -->
-    <script>
-        /*
-        (function (w, d, s, l, i) {
-                w[l] = w[l] || []; w[l].push({
-                    'gtm.start':
-                        new Date().getTime(), event: 'gtm.js'
-                }); var f = d.getElementsByTagName(s)[0],
-                    j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-                        'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-            })(window, document, 'script', 'dataLayer', 'GTM-MDBMPR4B');
-            */
-    </script>
-    <!-- End Google Tag Manager -->
-
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -129,42 +100,22 @@
     <!-- 스크립트 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
+    <script src="{{ url_for('static', filename='js/share-codec.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/age-calculator.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-M0RLS343N4"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
 
-      gtag('config', 'G-M0RLS343N4');
-    </script>
-
-    <script type="text/javascript">
-        (function(c,l,a,r,i,t,y){
-            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "vad9jplnw2");
-    </script>
+    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
 
 </head>
 
 <body>
     <div id="pixel-background"></div>
     <div class="container">
-        <header class="site-header">
-            <a class="brand" href="{{ url_for('index') }}">AgeCalc <span>2026</span></a>
-            <nav class="nav-links">
-                <a href="{{ url_for('age') }}">만나이</a>
-                <a href="{{ url_for('dog') }}">강아지 나이</a>
-                <a href="{{ url_for('cat') }}">고양이 나이</a>
-                <a href="{{ url_for('baby_months') }}">아이 개월 수</a>
-                <a href="{{ url_for('parent_child') }}">부모·자녀</a>
-            </nav>
-        </header>
+        {% include 'partials/header.html' %}
         <h1>만나이 계산기</h1>
         <div style="text-align: center;margin-bottom: 2rem;">나의 양력 / 음력 만나이 알아보기</div>
         <form class="age-form" id="age-form" action="{{ url_for('age') }}" method="post" autocomplete="off">
@@ -551,30 +502,7 @@
 
 
         <!-- 푸터 -->
-        <footer class="footer">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>연락처</h4>
-                    <p>문의: ldg6153@gmail.com</p>
-                    <p>
-                        <a href="{{ url_for('privacy') }}"
-                            style="color: #667eea; text-decoration: none; margin-right: 10px;">개인정보처리방침</a>
-                        <span style="color: #ccc;">|</span>
-                        <a href="{{ url_for('terms') }}"
-                            style="color: #667eea; text-decoration: none; margin-left: 10px;">이용약관</a>
-                        <span style="color: #ccc;">|</span>
-                        <a href="{{ url_for('guide') }}"
-                            style="color: #667eea; text-decoration: none; margin-left: 10px;">나이 계산 가이드</a>
-                        <span style="color: #ccc;">|</span>
-                        <a href="{{ url_for('faq') }}"
-                            style="color: #667eea; text-decoration: none; margin-left: 10px;">자주 묻는 질문</a>
-                    </p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 AgeCalc. All rights reserved.</p>
-            </div>
-        </footer>
+        {% include 'partials/footer.html' %}
     </div>
     <!-- 쿠키 동의 배너 -->
     <div class="cookie-banner" id="cookie-banner">
@@ -594,64 +522,5 @@
 
     <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
 </body>
-
-
-<script>
-    /*
-    // Auto ads 로더 (동의 후 1회만)
-    function loadAutoAds(client) {
-        if (window.__adsLoaded) return;
-        window.__adsLoaded = true;
-
-        const s = document.createElement('script');
-        s.async = true;
-        s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`;
-        s.crossOrigin = "anonymous";
-        document.head.appendChild(s);
-    }
-    // (선택) 개인 데이터 축소 신호
-    function enableAdsDataRedaction() {
-        if (typeof gtag === 'function') {
-            gtag('set', 'ads_data_redaction', true);
-        }
-    }
-
-    // 기존 applyConsent 함수에 “동의 시 Auto ads 로드”만 추가
-    // (당신 파일에 이미 applyConsent가 있으니 아래 로직만 반영)
-    function applyConsent(state) {
-        const granted = v => ({
-            ad_storage: v, ad_user_data: v, ad_personalization: v, analytics_storage: v
-        });
-        if (typeof gtag === 'function') {
-            gtag('consent', 'update', state === 'accepted' ? granted('granted') : granted('denied'));
-        }
-        enableAdsDataRedaction();
-
-        if (state === 'accepted') {
-            loadAutoAds('ca-pub-7818333740838556'); // ← 당신 퍼블리셔 ID
-        }
-    }
-
-    (function () {
-        const banner = document.getElementById('cookie-banner');
-        const get = k => document.cookie.split('; ').find(r => r.startsWith(k + '='))?.split('=')[1];
-        const set = (k, v, d = 365) => {
-            const t = new Date(); t.setTime(t.getTime() + d * 864e5);
-            document.cookie = `${k}=${v};expires=${t.toUTCString()};path=/;SameSite=Lax`;
-        };
-
-        const consent = get('cookieConsent');
-        if (!consent && banner) banner.style.display = 'block';
-        else if (consent) applyConsent(consent);
-
-        document.getElementById('accept-cookies')?.addEventListener('click', () => {
-            set('cookieConsent', 'accepted'); if (banner) banner.style.display = 'none'; applyConsent('accepted');
-        });
-        document.getElementById('reject-cookies')?.addEventListener('click', () => {
-            set('cookieConsent', 'rejected'); if (banner) banner.style.display = 'none'; applyConsent('rejected');
-        });
-    })();
-    */
-</script>
 
 </html>

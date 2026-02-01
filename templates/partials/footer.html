@@ -1,0 +1,37 @@
+<footer class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>연락처</h4>
+                    <p>문의: ldg6153@gmail.com</p>
+                    <p>
+                        <a href="{{ url_for('privacy') }}"
+                            style="color: #667eea; text-decoration: none; margin-right: 10px;">개인정보처리방침</a>
+                        <span style="color: #ccc;">|</span>
+                        <a href="{{ url_for('terms') }}"
+                            style="color: #667eea; text-decoration: none; margin-left: 10px;">이용약관</a>
+                        <span style="color: #ccc;">|</span>
+                        <a href="{{ url_for('guide') }}"
+                            style="color: #667eea; text-decoration: none; margin-left: 10px;">나이 계산 가이드</a>
+                        <span style="color: #ccc;">|</span>
+                        <a href="{{ url_for('faq') }}"
+                            style="color: #667eea; text-decoration: none; margin-left: 10px;">자주 묻는 질문</a>
+                    </p>
+                </div>
+                <div class="footer-section footer-support">
+                    <h4>☕ 커피 한 잔 후원</h4>
+                    <div class="support-row">
+                        <div class="support-qr" aria-label="후원 QR 코드 영역">
+                            <img src="{{ url_for('static', filename='images/donationQR.svg') }}" alt="후원 QR 코드">
+                        </div>
+                        <div class="support-text">
+                            <p>도움이 되셨다면 커피 한 잔 후원으로 서버 유지에 힘을 보태주세요 🙏</p>
+                            <p>후원은 선택 사항이며, 후원 여부와 관계없이 모든 기능을 동일하게 이용하실 수 있습니다.</p>
+                            <a class="support-link" href="https://qr.kakaopay.com/FWrwwhb7C" target="_blank" rel="noopener noreferrer">모바일로 후원하기</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 AgeCalc. All rights reserved.</p>
+            </div>
+        </footer>

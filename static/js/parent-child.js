@@ -15,10 +15,12 @@ class ParentChildCalculator {
     }
 
     init() {
-        this.addParentLine();
-        this.addChildLine();
-        this.bindControls();
-        this.updateResult();
+        this.loadFromUrl().then(() => {
+            if (this.parents.length === 0) this.addParentLine();
+            if (this.children.length === 0) this.addChildLine();
+            this.bindControls();
+            this.updateResult();
+        });
     }
 
     bindControls() {
@@ -36,17 +38,30 @@ class ParentChildCalculator {
             }
             this.addChildLine();
         });
+
+        document.addEventListener('click', (e) => {
+            const target = e.target;
+            if (!(target instanceof HTMLElement)) return;
+            if (target.id === 'save-result-image') {
+                e.preventDefault();
+                this.saveResultAsImage();
+            }
+            if (target.id === 'copy-result-link') {
+                e.preventDefault();
+                this.copyLink();
+            }
+        });
     }
 
-    addParentLine() {
+    addParentLine(data = {}) {
         const id = `p${Date.now()}${Math.floor(Math.random() * 1000)}`;
-        this.parents.push({ id, role: '', y: '', m: '', d: '' });
+        this.parents.push({ id, role: data.role || '', y: data.y || '', m: data.m || '', d: data.d || '' });
         this.renderLines('parent');
     }
 
-    addChildLine() {
+    addChildLine(data = {}) {
         const id = `c${Date.now()}${Math.floor(Math.random() * 1000)}`;
-        this.children.push({ id, role: '', y: '', m: '', d: '' });
+        this.children.push({ id, role: data.role || '', y: data.y || '', m: data.m || '', d: data.d || '' });
         this.renderLines('child');
     }
 
@@ -221,6 +236,71 @@ class ParentChildCalculator {
         if (this.resultContainer) this.resultContainer.classList.remove('show');
     }
 
+    async buildShareLink() {
+        const params = new URLSearchParams();
+        if (typeof ShareCodec !== 'undefined') {
+            const payload = { parents: this.parents, children: this.children };
+            const encoded = await ShareCodec.encode(payload);
+            params.set('s', encoded);
+            return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+        }
+        this.parents.forEach((p, idx) => {
+            params.set(`p${idx + 1}r`, p.role);
+            params.set(`p${idx + 1}y`, p.y);
+            params.set(`p${idx + 1}m`, p.m);
+            params.set(`p${idx + 1}d`, p.d);
+        });
+        this.children.forEach((c, idx) => {
+            params.set(`c${idx + 1}r`, c.role);
+            params.set(`c${idx + 1}y`, c.y);
+            params.set(`c${idx + 1}m`, c.m);
+            params.set(`c${idx + 1}d`, c.d);
+        });
+        return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+    }
+
+    async loadFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const packed = params.get('s');
+        if (packed && typeof ShareCodec !== 'undefined') {
+            try {
+                const decoded = await ShareCodec.decode(packed);
+                const parents = Array.isArray(decoded.parents) ? decoded.parents : [];
+                const children = Array.isArray(decoded.children) ? decoded.children : [];
+                this.parents = [];
+                this.children = [];
+                parents.slice(0, this.maxParents).forEach(p => this.addParentLine(p));
+                children.slice(0, this.maxChildren).forEach(c => this.addChildLine(c));
+                return;
+            } catch {
+                // fallback below
+            }
+        }
+        const parents = [];
+        const children = [];
+
+        for (let i = 1; i <= this.maxParents; i += 1) {
+            const role = params.get(`p${i}r`);
+            const y = params.get(`p${i}y`);
+            const m = params.get(`p${i}m`);
+            const d = params.get(`p${i}d`);
+            if (role || y || m || d) parents.push({ role, y, m, d });
+        }
+
+        for (let i = 1; i <= this.maxChildren; i += 1) {
+            const role = params.get(`c${i}r`);
+            const y = params.get(`c${i}y`);
+            const m = params.get(`c${i}m`);
+            const d = params.get(`c${i}d`);
+            if (role || y || m || d) children.push({ role, y, m, d });
+        }
+
+        this.parents = [];
+        this.children = [];
+        parents.forEach(p => this.addParentLine(p));
+        children.forEach(c => this.addChildLine(c));
+    }
+
     async saveResultAsImage() {
         const content = document.getElementById('parent-child-result-content');
         if (!content || !content.innerHTML.trim()) return;
@@ -234,7 +314,8 @@ class ParentChildCalculator {
 
     async copyLink() {
         try {
-            await navigator.clipboard.writeText(window.location.href);
+            const link = await this.buildShareLink();
+            await navigator.clipboard.writeText(link);
             alert('링크가 복사되었습니다.');
         } catch {
             alert('링크 복사에 실패했습니다.');

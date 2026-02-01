@@ -38,6 +38,9 @@ Thumbs.db
 *.bak
 *.backup
 
+# Runtime data
+data/
+
 # Configuration files with sensitive data
 config.py
 secrets.py

@@ -687,22 +687,22 @@ class AgeCalculatorUI {
     /**
      * 공유하기 처리
      */
-    handleShare(shareType) {
+    async handleShare(shareType) {
         switch (shareType) {
             case 'kakao':
-                this.shareToKakao();
+                await this.shareToKakao();
                 break;
             case 'instagram':
-                this.shareToInstagram();
+                await this.shareToInstagram();
                 break;
             case 'facebook':
-                this.shareToFacebook();
+                await this.shareToFacebook();
                 break;
             case 'twitter':
-                this.shareToX();
+                await this.shareToX();
                 break;
             case 'copy':
-                this.copyToClipboard();
+                await this.copyToClipboard();
                 break;
         }
     }
@@ -710,9 +710,9 @@ class AgeCalculatorUI {
     /**
      * 카카오톡 공유
      */
-    shareToKakao() {
+    async shareToKakao() {
         const currentResult = this.getCurrentResult();
-        const shareUrl = this.generateShareUrl();
+        const shareUrl = await this.generateShareUrl();
 
         let text = '만 나이 계산기로 정확한 나이를 계산해보세요! 🎂';
         if (currentResult) {
@@ -735,8 +735,8 @@ class AgeCalculatorUI {
     /**
      * 페이스북 공유
      */
-    shareToFacebook() {
-        const shareUrl = this.generateShareUrl();
+    async shareToFacebook() {
+        const shareUrl = await this.generateShareUrl();
         const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
         window.open(facebookUrl, '_blank', 'width=600,height=400');
     }
@@ -744,9 +744,9 @@ class AgeCalculatorUI {
     /**
      * 인스타그램 공유
      */
-    shareToInstagram() {
+    async shareToInstagram() {
         const currentResult = this.getCurrentResult();
-        const shareUrl = this.generateShareUrl();
+        const shareUrl = await this.generateShareUrl();
 
         let text = '만 나이 계산기로 정확한 나이를 계산해보세요! 🎂';
         if (currentResult) {
@@ -795,9 +795,9 @@ class AgeCalculatorUI {
     /**
      * X (구 트위터) 공유
      */
-    shareToX() {
+    async shareToX() {
         const currentResult = this.getCurrentResult();
-        const shareUrl = this.generateShareUrl();
+        const shareUrl = await this.generateShareUrl();
 
         let text = '만 나이 계산기로 정확한 나이를 계산해보세요! 🎂';
         if (currentResult) {
@@ -811,7 +811,7 @@ class AgeCalculatorUI {
     /**
      * 링크 복사 (제목 옆 버튼용)
      */
-    copyLinkToClipboard() {
+    async copyLinkToClipboard() {
         // 먼저 결과가 있는지 확인
         const resultContainer = document.querySelector('.result');
         if (!resultContainer) {
@@ -819,7 +819,7 @@ class AgeCalculatorUI {
             return;
         }
 
-        const shareUrl = this.generateShareUrl();
+        const shareUrl = await this.generateShareUrl();
 
         navigator.clipboard.writeText(shareUrl).then(() => {
             // 버튼 시각적 피드백만 표시 (alert 없음)
@@ -984,8 +984,8 @@ class AgeCalculatorUI {
     /**
      * 클립보드 복사 (공유 버튼용)
      */
-    copyToClipboard() {
-        const shareUrl = this.generateShareUrl();
+    async copyToClipboard() {
+        const shareUrl = await this.generateShareUrl();
 
         navigator.clipboard.writeText(shareUrl).then(() => {
             // 복사 성공 메시지
@@ -1008,7 +1008,7 @@ class AgeCalculatorUI {
      * - 6자리 모드: birth_date=YYMMDD (예: 921002)
      * - 3필드 모드: 기존처럼 YYYY-MM-DD 유지 (백워드 호환)
      */
-    generateShareUrl() {
+    async generateShareUrl() {
         const baseUrl = window.location.origin + window.location.pathname;
         const params = new URLSearchParams();
 
@@ -1016,8 +1016,15 @@ class AgeCalculatorUI {
         if (this.birthInput) {
             const v = this.validateBirth6(this.birthInput.value);
             if (v.valid) {
-                // 6자리 그대로 사용
-                params.set('birth_date', v.digits); // 예: 921002
+                const calendarType = document.querySelector('input[name=\"calendar_type\"]:checked')?.value || 'solar';
+                const payload = { birth_date: v.digits, calendar_type: calendarType };
+                if (typeof ShareCodec !== 'undefined') {
+                    const encoded = await ShareCodec.encode(payload);
+                    params.set('s', encoded);
+                    return `${baseUrl}?${params.toString()}`;
+                }
+                params.set('birth_date', v.digits);
+                params.set('calendar_type', calendarType);
                 return `${baseUrl}?${params.toString()}`;
             }
         }
@@ -1047,6 +1054,28 @@ class AgeCalculatorUI {
      */
     async loadFromUrl() {
         const params = new URLSearchParams(window.location.search);
+        const packed = params.get("s");
+        if (packed && typeof ShareCodec !== 'undefined') {
+            try {
+                const decoded = await ShareCodec.decode(packed);
+                const q = decoded.birth_date;
+                const calendarType = decoded.calendar_type || 'solar';
+                const radio = document.querySelector(`input[name="calendar_type"][value="${calendarType}"]`);
+                if (radio) radio.checked = true;
+                if (!q) return;
+                if (this.birthInput) {
+                    const digits = q.replace(/\D/g, "");
+                    if (digits.length === 6) {
+                        this.birthInput.value = digits;
+                        this.checkAndCalculate6Digit();
+                        return;
+                    }
+                }
+            } catch {
+                // fallback below
+            }
+        }
+
         const q = params.get("birth_date");
         if (!q) return;
 
