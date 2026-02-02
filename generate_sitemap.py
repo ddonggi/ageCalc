@@ -11,121 +11,68 @@ from urllib.parse import urljoin
 
 def generate_sitemap(base_url="https://yourdomain.com"):
     """사이트맵 XML을 생성합니다."""
-    
-    # 현재 시간
     current_time = datetime.now().strftime("%Y-%m-%d")
-    
-    # 사이트맵 시작
-    sitemap = f"""<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-    
-    <!-- 메인 페이지 -->
-    <url>
-        <loc>{base_url}/</loc>
-        <lastmod>{current_time}</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>1.0</priority>
-    </url>
 
-    <!-- 나이 계산 페이지 -->
-    <url>
-        <loc>{base_url}/age</loc>
-        <lastmod>{current_time}</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.9</priority>
-    </url>
+    page_entries = [
+        ("/", "weekly", "1.0"),
+        ("/age", "weekly", "0.9"),
+        ("/dog", "monthly", "0.8"),
+        ("/cat", "monthly", "0.8"),
+        ("/baby-months", "monthly", "0.8"),
+        ("/parent-child", "monthly", "0.8"),
+        ("/guide", "monthly", "0.8"),
+        ("/faq", "monthly", "0.8"),
+        ("/privacy", "monthly", "0.8"),
+        ("/terms", "monthly", "0.8"),
+        ("/minigames", "monthly", "0.7"),
+        ("/minigames/snake", "monthly", "0.7"),
+    ]
 
-    <!-- 반려동물 나이 계산 페이지 -->
-    <url>
-        <loc>{base_url}/dog</loc>
-        <lastmod>{current_time}</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>{base_url}/cat</loc>
-        <lastmod>{current_time}</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
+    static_entries = [
+        ("/static/css/style.css", "monthly", "0.3"),
+        ("/static/js/age-calculator.js", "monthly", "0.3"),
+        ("/static/images/og-image.png", "yearly", "0.2"),
+        ("/favicon.ico", "yearly", "0.1"),
+        ("/apple-touch-icon.png", "yearly", "0.1"),
+    ]
 
-    <!-- 아기 개월 수 계산 페이지 -->
-    <url>
-        <loc>{base_url}/baby-months</loc>
-        <lastmod>{current_time}</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
+    lines = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
+        '        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"',
+        '        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9',
+        '        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">',
+        "",
+    ]
 
-    <!-- 안내 페이지 -->
-    <url>
-        <loc>{base_url}/guide</loc>
-        <lastmod>{current_time}</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>{base_url}/faq</loc>
-        <lastmod>{current_time}</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>{base_url}/privacy</loc>
-        <lastmod>{current_time}</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>{base_url}/terms</loc>
-        <lastmod>{current_time}</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    
-    <!-- 정적 리소스 -->
-    <url>
-        <loc>{base_url}/static/css/style.css</loc>
-        <lastmod>{current_time}</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.3</priority>
-    </url>
-    
-    <url>
-        <loc>{base_url}/static/js/age-calculator.js</loc>
-        <lastmod>{current_time}</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.3</priority>
-    </url>
-    
-    <!-- 이미지 리소스 (있는 경우) -->
-    <url>
-        <loc>{base_url}/static/images/og-image.png</loc>
-        <lastmod>{current_time}</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.2</priority>
-    </url>
-    
-    <url>
-        <loc>{base_url}/favicon.ico</loc>
-        <lastmod>{current_time}</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.1</priority>
-    </url>
-    
-    <url>
-        <loc>{base_url}/apple-touch-icon.png</loc>
-        <lastmod>{current_time}</lastmod>
-        <changefreq>yearly</changefreq>
-        <priority>0.1</priority>
-    </url>
-    
-</urlset>"""
-    
-    return sitemap
+    for path, changefreq, priority in page_entries:
+        lines.extend(
+            [
+                "    <url>",
+                f"        <loc>{base_url}{path}</loc>",
+                f"        <lastmod>{current_time}</lastmod>",
+                f"        <changefreq>{changefreq}</changefreq>",
+                f"        <priority>{priority}</priority>",
+                "    </url>",
+                "",
+            ]
+        )
+
+    for path, changefreq, priority in static_entries:
+        lines.extend(
+            [
+                "    <url>",
+                f"        <loc>{base_url}{path}</loc>",
+                f"        <lastmod>{current_time}</lastmod>",
+                f"        <changefreq>{changefreq}</changefreq>",
+                f"        <priority>{priority}</priority>",
+                "    </url>",
+                "",
+            ]
+        )
+
+    lines.append("</urlset>")
+    return "\n".join(lines)
 
 def save_sitemap(sitemap_content, filename="sitemap.xml"):
     """사이트맵을 파일로 저장합니다."""

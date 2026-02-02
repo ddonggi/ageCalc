@@ -38,12 +38,7 @@
     <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
     <link rel="apple-touch-icon" sizes="180x180"
         href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
-    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
-
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7818333740838556"
-        crossorigin="anonymous"></script>
-
-    <!-- 성능 최적화(선연결) -->
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />    <!-- 성능 최적화(선연결) -->
     <!-- <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin /> -->
     <!-- <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin /> -->
 
@@ -90,9 +85,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
     <!-- CSS-->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
@@ -109,6 +102,7 @@
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
 
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    {% include 'partials/adsense.html' %}
 
 </head>
 
