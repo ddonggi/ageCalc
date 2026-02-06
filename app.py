@@ -29,11 +29,11 @@ def add_security_headers(response):
     nonce = getattr(g, "csp_nonce", "")
     csp = (
         "default-src 'self'; "
-        "img-src 'self' data:; "
+        "img-src 'self' data: https://c.clarity.ms; "
         "font-src 'self' https://fonts.gstatic.com; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-        f"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com https://www.clarity.ms; "
-        "connect-src 'self' https://www.google-analytics.com https://www.clarity.ms; "
+        f"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com https://www.clarity.ms https://scripts.clarity.ms https://pagead2.googlesyndication.com; "
+        "connect-src 'self' https://www.google-analytics.com https://www.clarity.ms https://c.clarity.ms; "
         "frame-ancestors 'none'; "
         "base-uri 'self'; "
         "form-action 'self'"

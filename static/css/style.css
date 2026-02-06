@@ -811,6 +811,15 @@ section {
 }
 
 @media (max-width: 600px) {
+    #pixel-background {
+        display: none;
+    }
+
+    .pixel-sticker,
+    .pixel-spark {
+        display: none;
+    }
+
     body.snake-page .nav-links {
         display: none;
     }
