@@ -912,9 +912,70 @@ section {
     align-items: center;
 }
 
-.role-select {
+.role-dropdown {
+    position: relative;
+}
+
+.role-btn {
     width: 100%;
     padding: 6px 28px 6px 8px;
+    border-radius: 6px;
+    border: 4px solid var(--border);
+    background: #ffffff;
+    color: var(--ink);
+    font-size: 16px;
+    box-shadow: 2px 2px 0 var(--border);
+    cursor: pointer;
+    text-align: left;
+}
+
+.role-btn::after {
+    content: '';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border-right: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+    transform: translateY(-60%) rotate(45deg);
+    pointer-events: none;
+}
+
+.role-menu {
+    list-style: none;
+    margin: 6px 0 0;
+    padding: 6px;
+    border: 4px solid var(--border);
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 3px 3px 0 var(--border);
+    position: absolute;
+    z-index: 10;
+    width: 100%;
+    display: none;
+}
+
+.role-dropdown.open .role-menu {
+    display: block;
+}
+
+.role-option {
+    width: 100%;
+    padding: 6px 8px;
+    border: none;
+    background: transparent;
+    color: var(--ink);
+    text-align: left;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.role-option:hover,
+.role-option:focus-visible {
+    background: var(--accent-1);
+    color: #ffffff;
+    outline: none;
 }
 
 .line-remove {

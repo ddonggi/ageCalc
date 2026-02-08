@@ -42,6 +42,9 @@ class ParentChildCalculator {
         document.addEventListener('click', (e) => {
             const target = e.target;
             if (!(target instanceof HTMLElement)) return;
+            if (!target.closest('.role-dropdown')) {
+                this.closeAllDropdowns();
+            }
             if (target.id === 'save-result-image') {
                 e.preventDefault();
                 this.saveResultAsImage();
@@ -55,13 +58,13 @@ class ParentChildCalculator {
 
     addParentLine(data = {}) {
         const id = `p${Date.now()}${Math.floor(Math.random() * 1000)}`;
-        this.parents.push({ id, role: data.role || '', y: data.y || '', m: data.m || '', d: data.d || '' });
+        this.parents.push({ id, role: data.role || '', birth: this.normalizeBirthValue(data) });
         this.renderLines('parent');
     }
 
     addChildLine(data = {}) {
         const id = `c${Date.now()}${Math.floor(Math.random() * 1000)}`;
-        this.children.push({ id, role: data.role || '', y: data.y || '', m: data.m || '', d: data.d || '' });
+        this.children.push({ id, role: data.role || '', birth: this.normalizeBirthValue(data) });
         this.renderLines('child');
     }
 
@@ -88,27 +91,53 @@ class ParentChildCalculator {
             const line = document.createElement('div');
             line.className = 'person-line';
             const roleOptions = kind === 'parent'
-                ? '<option value="" disabled selected>엄마/아빠 선택</option><option value="mother">엄마</option><option value="father">아빠</option>'
-                : '<option value="" disabled selected>딸/아들 선택</option><option value="daughter">딸</option><option value="son">아들</option>';
+                ? [
+                    { value: 'mother', label: '엄마' },
+                    { value: 'father', label: '아빠' }
+                ]
+                : [
+                    { value: 'daughter', label: '딸' },
+                    { value: 'son', label: '아들' }
+                ];
+            const defaultLabel = kind === 'parent' ? '엄마/아빠 선택' : '딸/아들 선택';
+            const selectedLabel = roleOptions.find(opt => opt.value === item.role)?.label || defaultLabel;
 
             line.innerHTML = `
-                <select class="role-select" data-kind="${kind}" data-id="${item.id}" required>
-                    ${roleOptions}
-                </select>
+                <div class="role-dropdown" data-kind="${kind}" data-id="${item.id}">
+                    <button type="button" class="role-btn" aria-expanded="false">${selectedLabel}</button>
+                    <ul class="role-menu" role="listbox" aria-label="${defaultLabel}">
+                        ${roleOptions.map(opt => `
+                            <li>
+                                <button type="button" class="role-option" data-value="${opt.value}">${opt.label}</button>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
                 <div class="date-inputs">
-                    <input type="number" data-kind="${kind}" data-id="${item.id}" data-field="y" min="1900" max="2100" placeholder="년" inputmode="numeric" value="${item.y}">
-                    <input type="number" data-kind="${kind}" data-id="${item.id}" data-field="m" min="1" max="12" placeholder="월" inputmode="numeric" value="${item.m}">
-                    <input type="number" data-kind="${kind}" data-id="${item.id}" data-field="d" min="1" max="31" placeholder="일" inputmode="numeric" value="${item.d}">
+                    <input type="text" data-kind="${kind}" data-id="${item.id}" data-field="birth" placeholder="921002" inputmode="numeric" pattern="[0-9]*" maxlength="6" value="${item.birth || ''}">
                 </div>
                 <button type="button" class="line-remove" title="삭제">-</button>
             `;
             container.appendChild(line);
 
-            const select = line.querySelector('select');
-            if (item.role) select.value = item.role;
-            select.addEventListener('change', (e) => {
-                item.role = e.target.value;
-                this.updateResult();
+            const dropdown = line.querySelector('.role-dropdown');
+            const button = line.querySelector('.role-btn');
+            const menu = line.querySelector('.role-menu');
+            button.addEventListener('click', () => {
+                const expanded = button.getAttribute('aria-expanded') === 'true';
+                this.closeAllDropdowns();
+                button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+                dropdown.classList.toggle('open', !expanded);
+            });
+            menu.querySelectorAll('.role-option').forEach(optionBtn => {
+                optionBtn.addEventListener('click', () => {
+                    const value = optionBtn.dataset.value;
+                    item.role = value;
+                    button.textContent = roleOptions.find(opt => opt.value === value)?.label || defaultLabel;
+                    button.setAttribute('aria-expanded', 'false');
+                    dropdown.classList.remove('open');
+                    this.updateResult();
+                });
             });
 
             line.querySelectorAll('input').forEach(input => {
@@ -122,14 +151,86 @@ class ParentChildCalculator {
             line.querySelector('.line-remove').addEventListener('click', () => this.removeLine(kind, item.id));
         });
     }
+    
+    closeAllDropdowns() {
+        document.querySelectorAll('.role-dropdown.open').forEach((node) => {
+            node.classList.remove('open');
+            const btn = node.querySelector('.role-btn');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+        });
+    }
 
-    parseDate(y, m, d) {
-        const yy = Number(y); const mm = Number(m); const dd = Number(d);
-        if (!yy || !mm || !dd) return null;
-        const date = new Date(yy, mm - 1, dd);
-        if (Number.isNaN(date.getTime())) return null;
-        if (date.getFullYear() !== yy || date.getMonth() !== mm - 1 || date.getDate() !== dd) return null;
-        return date;
+    normalizeBirthValue(data) {
+        if (!data) return '';
+        if (data.birth || data.b) {
+            const raw = data.birth || data.b;
+            const digits = this.digitsOnly(raw);
+            if (digits.length === 6) return digits;
+            if (digits.length === 8) {
+                return `${digits.slice(2, 4)}${digits.slice(4, 6)}${digits.slice(6, 8)}`;
+            }
+            return String(raw);
+        }
+        if (data.y && data.m && data.d) {
+            const yy = String(data.y).slice(-2).padStart(2, '0');
+            const mm = String(data.m).padStart(2, '0');
+            const dd = String(data.d).padStart(2, '0');
+            return `${yy}${mm}${dd}`;
+        }
+        return '';
+    }
+
+    digitsOnly(value) {
+        return String(value || '').replace(/\D/g, '');
+    }
+
+    convertYYtoYYYY(yy) {
+        const num = parseInt(yy, 10);
+        if (Number.isNaN(num)) return null;
+        const currentYY = new Date().getFullYear() % 100;
+        if (num <= currentYY) return 2000 + num;
+        return 1900 + num;
+    }
+
+    validateBirth6(raw) {
+        const digits = this.digitsOnly(raw);
+        if (digits.length !== 6) {
+            return { valid: false, msg: '생년월일 6자리(YYMMDD)를 입력해 주세요.' };
+        }
+
+        const yy = digits.slice(0, 2);
+        const mm = digits.slice(2, 4);
+        const dd = digits.slice(4, 6);
+
+        const year = this.convertYYtoYYYY(yy);
+        const month = parseInt(mm, 10);
+        const day = parseInt(dd, 10);
+
+        if (!year) {
+            return { valid: false, msg: '연도를 다시 확인해 주세요.' };
+        }
+        if (month < 1 || month > 12) {
+            return { valid: false, msg: '월은 1~12 사이여야 합니다.' };
+        }
+        if (day < 1 || day > 31) {
+            return { valid: false, msg: '일을 다시 확인해 주세요.' };
+        }
+
+        const date = new Date(year, month - 1, day);
+        if (
+            date.getFullYear() !== year ||
+            date.getMonth() + 1 !== month ||
+            date.getDate() !== day
+        ) {
+            return { valid: false, msg: '존재하지 않는 날짜입니다.' };
+        }
+
+        const now = new Date();
+        if (date > now) {
+            return { valid: false, msg: '미래 날짜는 입력할 수 없습니다.' };
+        }
+
+        return { valid: true, msg: '', date, digits };
     }
 
     calcAgeOn(date, birth) {
@@ -156,13 +257,15 @@ class ParentChildCalculator {
 
         for (const parent of this.parents) {
             if (!parent.role) return { error: '부모의 역할(엄마/아빠)을 선택해 주세요.' };
-            const parentBirth = this.parseDate(parent.y, parent.m, parent.d);
-            if (!parentBirth) return { error: '부모 생년월일을 모두 입력해 주세요.' };
+            const parentBirthCheck = this.validateBirth6(parent.birth);
+            if (!parentBirthCheck.valid) return { error: `부모 ${parentBirthCheck.msg}` };
+            const parentBirth = parentBirthCheck.date;
 
             for (const [idx, child] of this.children.entries()) {
                 if (!child.role) return { error: '자녀의 역할(딸/아들)을 선택해 주세요.' };
-                const childBirth = this.parseDate(child.y, child.m, child.d);
-                if (!childBirth) return { error: '자녀 생년월일을 모두 입력해 주세요.' };
+                const childBirthCheck = this.validateBirth6(child.birth);
+                if (!childBirthCheck.valid) return { error: `자녀 ${childBirthCheck.msg}` };
+                const childBirth = childBirthCheck.date;
                 if (childBirth <= parentBirth) {
                     return { error: '자녀 생년월일이 부모보다 빠를 수 없습니다.' };
                 }
@@ -246,15 +349,11 @@ class ParentChildCalculator {
         }
         this.parents.forEach((p, idx) => {
             params.set(`p${idx + 1}r`, p.role);
-            params.set(`p${idx + 1}y`, p.y);
-            params.set(`p${idx + 1}m`, p.m);
-            params.set(`p${idx + 1}d`, p.d);
+            params.set(`p${idx + 1}b`, this.digitsOnly(p.birth));
         });
         this.children.forEach((c, idx) => {
             params.set(`c${idx + 1}r`, c.role);
-            params.set(`c${idx + 1}y`, c.y);
-            params.set(`c${idx + 1}m`, c.m);
-            params.set(`c${idx + 1}d`, c.d);
+            params.set(`c${idx + 1}b`, this.digitsOnly(c.birth));
         });
         return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
     }
@@ -281,18 +380,20 @@ class ParentChildCalculator {
 
         for (let i = 1; i <= this.maxParents; i += 1) {
             const role = params.get(`p${i}r`);
+            const birth = params.get(`p${i}b`);
             const y = params.get(`p${i}y`);
             const m = params.get(`p${i}m`);
             const d = params.get(`p${i}d`);
-            if (role || y || m || d) parents.push({ role, y, m, d });
+            if (role || birth || y || m || d) parents.push({ role, birth, y, m, d });
         }
 
         for (let i = 1; i <= this.maxChildren; i += 1) {
             const role = params.get(`c${i}r`);
+            const birth = params.get(`c${i}b`);
             const y = params.get(`c${i}y`);
             const m = params.get(`c${i}m`);
             const d = params.get(`c${i}d`);
-            if (role || y || m || d) children.push({ role, y, m, d });
+            if (role || birth || y || m || d) children.push({ role, birth, y, m, d });
         }
 
         this.parents = [];
