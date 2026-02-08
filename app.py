@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, g
+from flask import Flask, render_template, request, jsonify, g, send_from_directory
 import json
 import os
 import threading
@@ -32,8 +32,8 @@ def add_security_headers(response):
         "img-src 'self' data: https://c.clarity.ms https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net; "
         "font-src 'self' https://fonts.gstatic.com; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-        f"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com https://www.clarity.ms https://scripts.clarity.ms https://pagead2.googlesyndication.com; "
-        "connect-src 'self' https://www.google-analytics.com https://www.clarity.ms https://c.clarity.ms https://ep1.adtrafficquality.google https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net; "
+        f"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com https://www.clarity.ms https://scripts.clarity.ms https://pagead2.googlesyndication.com https://ep2.adtrafficquality.google; "
+        "connect-src 'self' https://www.google-analytics.com https://www.clarity.ms https://c.clarity.ms https://i.clarity.ms https://ep1.adtrafficquality.google https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net; "
         "frame-src https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com; "
         "frame-ancestors 'none'; "
         "base-uri 'self'; "
@@ -78,6 +78,11 @@ def _month_key(ts):
 @app.get("/health") 
 def health(): 
     return {"ok": True}, 200
+
+
+@app.get("/favicon.ico")
+def favicon():
+    return send_from_directory(app.root_path, "favicon.ico")
 
 
 @app.get('/')
