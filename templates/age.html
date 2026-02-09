@@ -128,7 +128,7 @@
                 </div>
 
                 <div class="date-inputs">
-                    <input type="text" id="birth-input" name="birth-inputh" placeholder="921002" inputmode="numeric"
+                    <input type="text" id="birth-input" name="birth-input" placeholder="921002" inputmode="numeric"
                         pattern="[0-9]*" maxlength="6" required>
                 </div>
 
@@ -151,6 +151,38 @@
                 <li>정확한 만나이가 표시됩니다</li>
             </ul>
         </div>
+
+        <section aria-labelledby="age-basis" style="margin-top:40px">
+            <h2 id="age-basis">계산 기준과 입력 규칙</h2>
+            <p>
+                이 계산기는 생년월일(연·월·일)만으로 만나이를 산출합니다. 시·분·초와 타임존은 반영하지 않으며,
+                날짜 단위로만 계산하므로 해외 체류 중에도 “현지 날짜 기준”으로 결과가 표시됩니다.
+            </p>
+            <p>
+                음력 생일을 선택하면 내부적으로 양력으로 변환한 뒤 동일한 규칙으로 만나이를 계산합니다.
+                윤년(2월 29일) 출생의 경우 윤년이 아닌 해에는 관행적으로 2월 28일 또는 3월 1일 기준으로
+                간주하는 사례가 있으므로, 실제 행정 판단이 필요하다면 관계 기관 안내를 확인하세요.
+            </p>
+            <ul>
+                <li>입력 형식: 6자리 생년월일(예: 921002)</li>
+                <li>계산 기준: 생일이 지나야 +1, 생일 전이면 전년도 나이 유지</li>
+                <li>결과 용도: 일반 정보 제공(법적 효력 없음)</li>
+            </ul>
+        </section>
+
+        <section aria-labelledby="age-examples" style="margin-top:40px">
+            <h2 id="age-examples">예시로 보는 만나이</h2>
+            <p>
+                예를 들어 1992-10-02 출생이라면, 생일 전날까지는 전년도 나이가 유지되고,
+                생일이 지난 시점부터 만나이가 1살 증가합니다. 즉 “생일 기준으로 변하는 나이”가 만나이의 핵심입니다.
+            </p>
+            <ul>
+                <li>생일 전: 만 나이는 그대로 유지</li>
+                <li>생일 당일/이후: 만 나이 +1</li>
+                <li>연나이와 혼동 주의: 연나이는 생일과 무관하게 올해 기준으로 계산</li>
+            </ul>
+            <p class="small">마지막 기준 확인일: 2026-02-09</p>
+        </section>
 
         <!-- 연령별 주요 권리·제도 -->
         <div class="age-rights-section">
@@ -214,7 +246,7 @@
                     </div>
                     <ul>
                         <li>술·담배 구매 가능 (청소년보호법)</li>
-                        <li>성인 등급 콘텐츠 및 일부 성인 전용 시설 출입 가능/li>
+                        <li>성인 등급 콘텐츠 및 일부 성인 전용 시설 출입 가능</li>
                     </ul>
                 </div>
 
