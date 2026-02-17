@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <title>{{ post.title }} | AgeCalc 블로그</title>
+    <meta name="description" content="{{ post.excerpt or '' }}" />
+    <link rel="canonical" href="https://agecalc.cloud/blog/{{ post.slug }}" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="{{ post.title }}" />
+    <meta property="og:description" content="{{ post.excerpt or '' }}" />
+    <meta property="og:url" content="https://agecalc.cloud/blog/{{ post.slug }}" />
+    <meta property="og:image" content="{{ post.cover_image_url or url_for('static', filename='images/og-image.png', _external=True) }}" />
+
+    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M0RLS343N4"></script>
+    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    {% include 'partials/adsense.html' %}
+</head>
+
+<body>
+    <div id="pixel-background"></div>
+    <div class="container">
+        {% include 'partials/header.html' %}
+        <article class="blog-article">
+            <h1>{{ post.title }}</h1>
+            <p class="blog-date">
+                {% if post.published_at %}
+                {{ post.published_at.strftime('%Y-%m-%d %H:%M') }}
+                {% endif %}
+            </p>
+            {% if post.cover_image_url %}
+            <img class="blog-hero" src="{{ post.cover_image_url }}" alt="{{ post.title }}">
+            {% endif %}
+            <div class="blog-content">{{ post.content_html | safe }}</div>
+        </article>
+        <p style="margin-top: 20px;"><a href="{{ url_for('blog_list') }}">목록으로 돌아가기</a></p>
+        {% include 'partials/footer.html' %}
+    </div>
+
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>이 웹사이트는 쿠키를 사용하여 사용자 경험을 개선합니다. 계속 사용하시면 쿠키 사용에 동의하는 것으로 간주됩니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
+    <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
+</body>
+
+</html>

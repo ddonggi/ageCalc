@@ -89,6 +89,20 @@
     </url>
 
     <url>
+        <loc>https://agecalc.cloud/minigames/tictactoe</loc>
+        <lastmod>2026-02-03</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
+        <loc>https://agecalc.cloud/minigames/rps</loc>
+        <lastmod>2026-02-03</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <url>
         <loc>https://agecalc.cloud/static/css/style.css</loc>
         <lastmod>2026-02-03</lastmod>
         <changefreq>monthly</changefreq>

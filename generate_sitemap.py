@@ -26,6 +26,8 @@ def generate_sitemap(base_url="https://yourdomain.com"):
         ("/terms", "monthly", "0.8"),
         ("/minigames", "monthly", "0.7"),
         ("/minigames/snake", "monthly", "0.7"),
+        ("/minigames/tictactoe", "monthly", "0.7"),
+        ("/minigames/rps", "monthly", "0.7"),
     ]
 
     static_entries = [

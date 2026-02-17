@@ -13,6 +13,8 @@
     const pauseBtn = document.getElementById('snake-pause');
     const speedSelect = document.getElementById('snake-speed');
     const pad = document.querySelector('.game-pad');
+    const controlsEl = document.querySelector('.game-controls');
+    const tipEl = document.querySelector('.game-tip');
 
     const cellCount = 20;
     let gridSize = 16;
@@ -53,7 +55,12 @@
     const resizeCanvas = () => {
         const dpr = window.devicePixelRatio || 1;
         const maxSize = 480;
-        const displaySize = Math.min(canvas.parentElement?.clientWidth || 400, maxSize);
+        const parentWidth = canvas.parentElement?.clientWidth || 400;
+        const viewportHeight = window.visualViewport?.height || window.innerHeight;
+        const controlsHeight = (controlsEl?.offsetHeight || 0) + (pad?.offsetHeight || 0) + (tipEl?.offsetHeight || 0) + 24;
+        const canvasTop = canvas.getBoundingClientRect().top;
+        const maxByHeight = Math.max(200, Math.floor(viewportHeight - canvasTop - controlsHeight));
+        const displaySize = Math.min(parentWidth, maxByHeight, maxSize);
         gridSize = Math.max(12, Math.floor(displaySize / cellCount));
         boardSize = gridSize * cellCount;
         canvas.style.width = `${boardSize}px`;
@@ -545,6 +552,35 @@
         if (!btn) return;
         const dir = btn.dataset.dir;
         if (dir) setDirection(dir);
+    });
+
+    pad?.addEventListener('touchstart', (e) => {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        e.preventDefault();
+        const dir = btn.dataset.dir;
+        if (dir) setDirection(dir);
+    }, { passive: false });
+
+    pad?.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+    }, { passive: false });
+
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+        const now = Date.now();
+        if (now - lastTouchEnd < 300) {
+            e.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, { passive: false });
+
+    ['gesturestart', 'gesturechange', 'gestureend'].forEach((eventName) => {
+        document.addEventListener(eventName, (e) => e.preventDefault(), { passive: false });
     });
 
     window.addEventListener('resize', () => {

@@ -47,6 +47,65 @@ body.no-scroll {
     overflow: hidden;
 }
 
+body.snake-page {
+    min-height: 100dvh;
+    height: 100dvh;
+    padding: 10px;
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: manipulation;
+}
+
+body.snake-page .container {
+    width: min(760px, 100%);
+    height: 100%;
+    padding: 14px 14px 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+body.snake-page .site-header {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+}
+
+body.snake-page .brand {
+    font-size: 20px;
+}
+
+body.snake-page h1 {
+    font-size: clamp(18px, 4.8vw, 28px);
+    margin-bottom: 4px;
+}
+
+.snake-subtitle {
+    text-align: center;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+body.snake-page .mini-game {
+    flex: 1;
+    min-height: 0;
+    align-items: center;
+}
+
+body.snake-page .game-panel {
+    width: min(520px, 100%);
+    margin-inline: auto;
+}
+
+body.snake-page .footer,
+body.snake-page #scroll-top {
+    display: none;
+}
+
+body.snake-page #snake-canvas,
+body.snake-page .game-pad,
+body.snake-page .game-pad button {
+    touch-action: none;
+}
+
 #pixel-background {
     position: fixed;
     inset: 0;
@@ -824,17 +883,77 @@ section {
         display: none;
     }
 
+    body.snake-page {
+        padding: 8px;
+    }
+
+    body.snake-page .container {
+        padding: 10px;
+    }
+
+    body.snake-page .site-header {
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+    }
+
+    body.snake-page .brand {
+        gap: 6px;
+        font-size: 18px;
+    }
+
+    body.snake-page .brand span {
+        border-width: 2px;
+        padding: 1px 4px;
+    }
+
+    .snake-subtitle {
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
     .game-panel {
         padding: 12px;
+    }
+
+    body.snake-page .game-panel {
+        padding: 10px;
+    }
+
+    body.snake-page .game-stats {
+        margin-bottom: 8px;
+        font-size: 16px;
+    }
+
+    body.snake-page .badge-list {
+        gap: 4px;
     }
 
     .game-controls {
         align-items: stretch;
     }
 
+    body.snake-page .game-controls {
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    body.snake-page .game-btn {
+        border-width: 3px;
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+
+    body.snake-page .game-speed {
+        font-size: 14px;
+    }
+
     .game-pad>div {
         grid-template-columns: repeat(3, 64px);
         gap: 10px;
+    }
+
+    body.snake-page .game-pad {
+        margin: 10px 0 6px;
     }
 
     .game-pad button {
@@ -1006,6 +1125,86 @@ section {
     display: flex;
     gap: 8px;
     margin-bottom: 10px;
+}
+
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+}
+
+.blog-card {
+    border: 4px solid var(--border);
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 3px 3px 0 var(--border);
+    overflow: hidden;
+}
+
+.blog-card-link {
+    display: block;
+    text-decoration: none;
+    color: var(--ink);
+    padding: 10px;
+}
+
+.blog-thumb {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border: 3px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.blog-date {
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+}
+
+.blog-excerpt {
+    line-height: 1.4;
+}
+
+.pagination {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.page-btn {
+    text-decoration: none;
+    color: var(--ink);
+    border: 3px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 2px 2px 0 var(--border);
+    background: #fff1f8;
+    padding: 4px 10px;
+}
+
+.page-current {
+    font-weight: 700;
+}
+
+.blog-article {
+    border: 4px solid var(--border);
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 3px 3px 0 var(--border);
+    padding: 16px;
+}
+
+.blog-hero {
+    width: 100%;
+    border: 3px solid var(--border);
+    border-radius: 8px;
+    margin: 10px 0 14px;
+}
+
+.blog-content {
+    line-height: 1.5;
 }
 
 .calendar-toggle input[type="radio"] {

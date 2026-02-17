@@ -1,0 +1,66 @@
+.ttt-subtitle {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.ttt-panel {
+    width: min(480px, 100%);
+    margin-inline: auto;
+}
+
+.ttt-status {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 14px;
+    color: var(--ink);
+}
+
+.ttt-board {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.ttt-cell {
+    aspect-ratio: 1 / 1;
+    border: 3px solid var(--border);
+    background: #fff8df;
+    color: var(--ink);
+    font-family: "Press Start 2P", monospace;
+    font-size: clamp(28px, 6vw, 44px);
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--border);
+    transition: transform 0.1s steps(1, end), background-color 0.15s steps(1, end);
+}
+
+.ttt-cell:hover {
+    background: #fff1f8;
+}
+
+.ttt-cell:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+}
+
+.ttt-cell:focus-visible {
+    outline: 3px dashed var(--accent-2);
+    outline-offset: 3px;
+}
+
+.ttt-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 680px) {
+    .ttt-status {
+        font-size: 24px;
+    }
+
+    .ttt-cell {
+        font-size: clamp(24px, 9vw, 40px);
+    }
+}

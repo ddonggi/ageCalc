@@ -1,14 +1,19 @@
-from flask import Flask, render_template, request, jsonify, g, send_from_directory
+import math
+from flask import Flask, render_template, request, jsonify, g, send_from_directory, abort
 import json
 import os
 import threading
 from datetime import datetime
 import secrets
 from controllers.age_controller import AgeController
+from db import SessionLocal, close_db_session, init_db
+from models.blog_models import GeneratedPost
 
 app = Flask(__name__)
 _score_lock = threading.Lock()
 _score_file = os.path.join(app.root_path, "data", "snake_scores.json")
+os.makedirs(os.path.dirname(_score_file), exist_ok=True)
+init_db()
 
 @app.before_request
 def set_csp_nonce():
@@ -17,6 +22,11 @@ def set_csp_nonce():
 @app.context_processor
 def inject_csp_nonce():
     return {"csp_nonce": getattr(g, "csp_nonce", "")}
+
+
+@app.teardown_appcontext
+def cleanup_session(exception=None):
+    close_db_session(exception)
 
 @app.after_request
 def add_security_headers(response):
@@ -189,6 +199,46 @@ def parent_child():
     """부모·자녀 나이 관계 계산 페이지"""
     return render_template('parent-child.html')
 
+
+@app.route('/blog')
+def blog_list():
+    page = request.args.get('page', default=1, type=int)
+    page = max(page, 1)
+    per_page = 8
+    session = SessionLocal()
+
+    base_query = (
+        session.query(GeneratedPost)
+        .filter(GeneratedPost.status == "published")
+        .order_by(GeneratedPost.published_at.desc(), GeneratedPost.id.desc())
+    )
+    total = base_query.count()
+    total_pages = max(1, math.ceil(total / per_page)) if total else 1
+    if page > total_pages:
+        page = total_pages
+
+    posts = base_query.offset((page - 1) * per_page).limit(per_page).all()
+    return render_template(
+        'blog-list.html',
+        posts=posts,
+        page=page,
+        total_pages=total_pages,
+        total=total
+    )
+
+
+@app.route('/blog/<slug>')
+def blog_detail(slug):
+    session = SessionLocal()
+    post = (
+        session.query(GeneratedPost)
+        .filter(GeneratedPost.slug == slug, GeneratedPost.status == "published")
+        .first()
+    )
+    if post is None:
+        abort(404)
+    return render_template('blog-detail.html', post=post)
+
 @app.route('/minigames')
 def minigames():
     """미니게임 모음 페이지"""
@@ -198,6 +248,16 @@ def minigames():
 def snake_game():
     """스네이크 게임 페이지"""
     return render_template('snake.html')
+
+@app.route('/minigames/tictactoe')
+def tictactoe_game():
+    """틱택토 게임 페이지"""
+    return render_template('tictactoe.html')
+
+@app.route('/minigames/rps')
+def rps_game():
+    """가위바위보 게임 페이지"""
+    return render_template('rps.html')
 
 
 
