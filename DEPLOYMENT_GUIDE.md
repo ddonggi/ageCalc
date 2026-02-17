@@ -1,200 +1,197 @@
-# 🚀 만 나이 계산기 배포 가이드
+# AgeCalc 배포 가이드 (AWS EC2 + Nginx + Gunicorn + MySQL)
 
-## 📋 배포 전 필수 설정
+이 문서는 **현재 프로젝트 소스 기준**으로 작성되었습니다.
 
-### 1. 구글 애드센스 설정
-```html
-<!-- HTML에서 다음 부분을 실제 값으로 교체 -->
-data-ad-client="ca-pub-YOUR_PUBLISHER_ID"  <!-- 실제 Publisher ID로 교체 -->
-data-ad-slot="YOUR_AD_SLOT_ID"             <!-- 실제 Ad Slot ID로 교체 -->
-```
+## 1. 배포 아키텍처
+- OS: Ubuntu LTS (EC2)
+- App: Flask (`app.py`)
+- WSGI: Gunicorn (unix socket: `/run/agecalc/agecalc.sock`)
+- Reverse Proxy: Nginx (`nginx/agecalc.conf` 기반)
+- DB: MySQL (EC2 로컬 설치 기준)
 
-**설정 방법:**
-1. [Google AdSense](https://www.google.com/adsense) 가입
-2. 사이트 승인 후 Publisher ID 발급
-3. 광고 단위 생성 후 Ad Slot ID 발급
-4. HTML 코드에 실제 값 입력
+## 2. 서버 준비
 
-### 2. 구글 애널리틱스 설정
-```html
-<!-- HTML에서 다음 부분을 실제 값으로 교체 -->
-gtag('config', 'GA_MEASUREMENT_ID');  <!-- 실제 GA ID로 교체 -->
-```
+### 2.1 EC2 생성
+- 인스턴스: `t3a.small` 이상 권장
+- 보안그룹 인바운드
+  - `22` (관리자 IP만)
+  - `80`, `443` (전체)
+  - 같은 서버에서 MySQL 사용 시 `3306`은 열지 않음
 
-**설정 방법:**
-1. [Google Analytics](https://analytics.google.com/) 계정 생성
-2. 속성 생성 후 측정 ID 발급
-3. HTML 코드에 실제 측정 ID 입력
-
-### 3. 구글 검색 콘솔 인증
-```html
-<!-- HTML에서 다음 부분을 실제 값으로 교체 -->
-<meta name="google-site-verification" content="YOUR_VERIFICATION_CODE" />
-```
-
-**설정 방법:**
-1. [Google Search Console](https://search.google.com/search-console) 접속
-2. 도메인 추가 후 인증 코드 발급
-3. HTML 코드에 실제 인증 코드 입력
-
-### 4. 네이버 웹마스터 도구 인증
-```html
-<!-- HTML에서 다음 부분을 실제 값으로 교체 -->
-<meta name="naver-site-verification" content="YOUR_NAVER_VERIFICATION_CODE" />
-```
-
-**설정 방법:**
-1. [네이버 서치어드바이저](https://searchadvisor.naver.com/) 접속
-2. 사이트 등록 후 인증 코드 발급
-3. HTML 코드에 실제 인증 코드 입력
-
-## 🌐 도메인 설정
-
-### 1. robots.txt 수정
-```txt
-# robots.txt에서 실제 도메인으로 교체
-Sitemap: https://yourdomain.com/sitemap.xml
-```
-
-### 2. sitemap.xml 수정
-```xml
-<!-- sitemap.xml에서 실제 도메인으로 교체 -->
-<loc>https://yourdomain.com/</loc>
-<loc>https://yourdomain.com/static/css/style.css</loc>
-<loc>https://yourdomain.com/static/js/age-calculator.js</loc>
-```
-
-### 3. 사이트맵 자동 생성
+### 2.2 접속 및 기본 패키지
 ```bash
-python generate_sitemap.py
-# 도메인 입력 후 자동으로 sitemap.xml 생성
+ssh -i <KEY.pem> ubuntu@<EC2_PUBLIC_IP>
+sudo apt-get update
+sudo apt-get install -y nginx git curl htop bzip2 tar ca-certificates
 ```
 
-## 🔒 보안 및 성능 최적화
+## 3. 앱 배치
 
-### 1. HTTPS 설정
-- SSL 인증서 설치 필수
-- 모든 HTTP 요청을 HTTPS로 리다이렉트
-
-### 2. 캐싱 설정
-```nginx
-# nginx.conf 예시
-location ~* \.(css|js|png|jpg|jpeg|gif|ico|svg)$ {
-    expires 1y;
-    add_header Cache-Control "public, immutable";
-}
-```
-
-### 3. 압축 설정
-```nginx
-# nginx.conf 예시
-gzip on;
-gzip_vary on;
-gzip_min_length 1024;
-gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
-```
-
-## 📱 모바일 최적화
-
-### 1. 반응형 이미지
-- `og-image.png`: 1200x630px (소셜 미디어 공유용)
-- `favicon.ico`: 16x16, 32x32px
-- `apple-touch-icon.png`: 180x180px
-
-### 2. 메타 뷰포트
-```html
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-```
-
-## 🚀 배포 단계
-
-### 1. 코드 최적화
+### 3.1 앱 사용자/디렉터리
 ```bash
-# 불필요한 파일 제거
-rm -rf __pycache__/
-rm -rf .git/
-rm -rf .vscode/
+sudo adduser --disabled-password --gecos "" agecalc
+sudo mkdir -p /srv/apps
+sudo chown -R agecalc:agecalc /srv/apps
 ```
 
-### 2. 환경 변수 설정
+### 3.2 코드 배치
+- 리포지토리를 `/srv/apps/agecalc`에 배치
+- 예시
 ```bash
-# .env 파일 생성
-FLASK_ENV=production
-FLASK_DEBUG=False
-SECRET_KEY=your_secret_key_here
+cd /srv/apps
+git clone <REPO_URL> agecalc
+sudo chown -R agecalc:agecalc /srv/apps/agecalc
 ```
 
-### 3. 서버 업로드
+## 4. Python 런타임/의존성
+
+### 4.1 (권장) micromamba 사용
 ```bash
-# 파일 업로드
-scp -r ageCalc/ user@your-server:/var/www/
+curl -L https://micro.mamba.pm/api/micromamba/linux-64/latest \
+  | sudo tar -xvj -C /usr/local/bin --strip-components=1 bin/micromamba
 ```
 
-### 4. 서버 설정
+### 4.2 환경 생성 및 패키지 설치
 ```bash
-# 권한 설정
-chmod 755 /var/www/ageCalc
-chmod 644 /var/www/ageCalc/*.py
-chmod 644 /var/www/ageCalc/static/css/*.css
-chmod 644 /var/www/ageCalc/static/js/*.js
+sudo -iu agecalc
+cd /srv/apps/agecalc
+micromamba create -y -p /srv/apps/agecalc/.micromamba/envs/agecalc -f environment.yml
+/srv/apps/agecalc/.micromamba/envs/agecalc/bin/pip install -r requirements.txt
 ```
 
-## 📊 모니터링 및 유지보수
+## 5. MySQL 직접 설치 (EC2 동일 서버)
 
-### 1. 로그 모니터링
+### 5.1 설치/시작
 ```bash
-# Flask 로그 확인
-tail -f /var/log/flask/agecalc.log
-
-# nginx 로그 확인
-tail -f /var/log/nginx/access.log
-tail -f /var/log/nginx/error.log
+sudo apt update
+sudo apt install -y mysql-server
+sudo systemctl enable mysql
+sudo systemctl start mysql
+sudo systemctl status mysql
 ```
 
-### 2. 성능 모니터링
-- Google PageSpeed Insights
-- GTmetrix
-- WebPageTest
+### 5.2 초기 보안
+```bash
+sudo mysql_secure_installation
+```
+권장:
+- Remove anonymous users: `Y`
+- Disallow root login remotely: `Y`
+- Remove test database: `Y`
+- Reload privilege tables: `Y`
 
-### 3. 정기 업데이트
-- 사이트맵 자동 생성 스케줄링
-- 로그 파일 로테이션
-- 보안 업데이트 적용
+### 5.3 DB/계정 생성
+```bash
+sudo mysql
+```
+```sql
+CREATE DATABASE IF NOT EXISTS agecalc
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
 
-## 🔧 문제 해결
+CREATE USER IF NOT EXISTS 'agecalc_user'@'localhost'
+  IDENTIFIED BY 'CHANGE_ME_STRONG_PASSWORD';
 
-### 1. 광고가 표시되지 않는 경우
-- AdSense 계정 상태 확인
-- 사이트 승인 상태 확인
-- 광고 차단기 비활성화 확인
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX
+  ON agecalc.* TO 'agecalc_user'@'localhost';
 
-### 2. 애널리틱스가 작동하지 않는 경우
-- GA 측정 ID 확인
-- 쿠키 동의 상태 확인
-- 네트워크 연결 상태 확인
+FLUSH PRIVILEGES;
+EXIT;
+```
 
-### 3. SEO 성능 저하
-- 사이트맵 제출 상태 확인
-- robots.txt 설정 확인
-- 메타 태그 유효성 검사
+### 5.4 연결 확인
+```bash
+mysql -u agecalc_user -p -h 127.0.0.1 -D agecalc -e "SELECT NOW() AS now_time;"
+```
 
-## 📞 지원 및 문의
+## 6. systemd 서비스 등록 (Gunicorn)
 
-배포 관련 문제가 발생하면 다음을 확인하세요:
-1. 로그 파일 확인
-2. 브라우저 개발자 도구 확인
-3. 서버 상태 확인
-4. 도메인 DNS 설정 확인
+`/etc/systemd/system/agecalc.service`
+```ini
+[Unit]
+Description=Gunicorn (agecalc)
+After=network.target
 
----
+[Service]
+User=agecalc
+Group=www-data
+WorkingDirectory=/srv/apps/agecalc
+Environment="PATH=/srv/apps/agecalc/.micromamba/envs/agecalc/bin"
+Environment="DATABASE_URL=mysql+pymysql://agecalc_user:CHANGE_ME_STRONG_PASSWORD@127.0.0.1:3306/agecalc?charset=utf8mb4"
+RuntimeDirectory=agecalc
+RuntimeDirectoryMode=0755
+ExecStart=/srv/apps/agecalc/.micromamba/envs/agecalc/bin/gunicorn app:app \
+  --bind unix:/run/agecalc/agecalc.sock \
+  --workers 2 --threads 2 --timeout 30 --keep-alive 5
+Restart=always
 
-**🚀 성공적인 배포를 위한 체크리스트:**
-- [ ] 구글 애드센스 설정 완료
-- [ ] 구글 애널리틱스 설정 완료
-- [ ] 구글 검색 콘솔 인증 완료
-- [ ] 네이버 웹마스터 도구 인증 완료
-- [ ] 도메인 설정 완료
-- [ ] HTTPS 설정 완료
-- [ ] 사이트맵 생성 및 제출 완료
-- [ ] 성능 테스트 완료
-- [ ] 모바일 최적화 확인 완료
+[Install]
+WantedBy=multi-user.target
+```
+
+적용:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now agecalc
+sudo systemctl status agecalc
+```
+
+## 7. Nginx 설정
+
+프로젝트의 `nginx/agecalc.conf`를 서버 설정으로 반영합니다.
+
+```bash
+sudo cp /srv/apps/agecalc/nginx/agecalc.conf /etc/nginx/conf.d/agecalc.conf
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+체크:
+```bash
+curl --unix-socket /run/agecalc/agecalc.sock http://localhost/health
+curl -I https://<YOUR_DOMAIN>/health
+```
+
+## 8. SSL (Let's Encrypt)
+```bash
+sudo snap install core
+sudo snap refresh core
+sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+sudo certbot --nginx -d <YOUR_DOMAIN> -d www.<YOUR_DOMAIN>
+```
+
+## 9. 배포 후 검증
+- 앱 헬스체크: `/health` 응답 `200`
+- 정적 파일: `/static/...` 정상 로드
+- 블로그 목록: `/blog` 접근 가능
+- 블로그 상세: `/blog/<slug>` 접근 가능
+- DB 테이블 확인:
+```bash
+mysql -u agecalc_user -p -h 127.0.0.1 -D agecalc -e "SHOW TABLES;"
+```
+예상 테이블:
+- `generated_posts`
+- `feed_sources`
+- `feed_items`
+- `post_sources`
+
+## 10. 문제 해결
+- `Access denied for user`
+  - 계정 host(`localhost`), 비밀번호, `DATABASE_URL` 확인
+- `Can't connect to MySQL server`
+  - `sudo systemctl status mysql`
+  - `ss -lntp | grep 3306`
+- Gunicorn 미기동
+  - `sudo journalctl -u agecalc -n 200 --no-pager`
+- Nginx 502
+  - 소켓 존재 확인: `/run/agecalc/agecalc.sock`
+  - `sudo nginx -t`
+
+## 11. 운영 체크리스트
+- [ ] 도메인 DNS 연결 완료
+- [ ] SSL 인증서 발급 완료
+- [ ] `agecalc.service` 정상 실행
+- [ ] MySQL 연결/권한 확인
+- [ ] 블로그/계산기/미니게임 라우트 점검
+- [ ] 로그 모니터링 설정
