@@ -75,22 +75,24 @@ sudo systemctl status mysql
 sudo mysql_secure_installation
 ```
 권장:
-- Remove anonymous users: `Y`
-- Disallow root login remotely: `Y`
-- Remove test database: `Y`
-- Reload privilege tables: `Y`
+  - VALIDATE PASSWORD component → N
+  - Remove anonymous users → Y
+  - Disallow root login remotely → Y
+  - Remove test database and access to it → Y
+  - Reload privilege tables now → Y
 
 ### 5.3 DB/계정 생성
 ```bash
 sudo mysql
 ```
+
 ```sql
 CREATE DATABASE IF NOT EXISTS agecalc
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
 CREATE USER IF NOT EXISTS 'agecalc_user'@'localhost'
-  IDENTIFIED BY 'CHANGE_ME_STRONG_PASSWORD';
+  IDENTIFIED BY 'CHANGE_ME_STRONG_PASSWORD'; -- 비밀번호
 
 GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX
   ON agecalc.* TO 'agecalc_user'@'localhost';

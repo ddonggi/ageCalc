@@ -244,6 +244,11 @@ def minigames():
     """미니게임 모음 페이지"""
     return render_template('minigames.html')
 
+@app.route('/minigames/guess')
+def guess_game():
+    """숫자 맞추기 게임 페이지"""
+    return render_template('guess.html')
+
 @app.route('/minigames/snake')
 def snake_game():
     """스네이크 게임 페이지"""

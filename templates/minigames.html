@@ -52,6 +52,19 @@
         <section>
             <h2>게임 선택</h2>
             <div class="age-rights-grid">
+                <a class="card-link" href="{{ url_for('guess_game') }}">
+                    <div class="age-right-item">
+                        <div class="age-header">
+                            <span class="age-number">🔢</span>
+                            <span class="age-unit">숫자 맞추기</span>
+                        </div>
+                        <ul>
+                            <li>1부터 100 사이 숫자 추리 게임</li>
+                            <li>입력할 때마다 Up/Down 힌트 제공</li>
+                            <li>시도 횟수 표시와 즉시 리셋 지원</li>
+                        </ul>
+                    </div>
+                </a>
                 <a class="card-link" href="{{ url_for('snake_game') }}">
                     <div class="age-right-item">
                         <div class="age-header">
