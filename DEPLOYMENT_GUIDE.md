@@ -186,7 +186,11 @@ mysql -u agecalc_user -p -h 127.0.0.1 -D agecalc -e "SHOW TABLES;"
   - `sudo journalctl -u agecalc -n 200 --no-pager`
 - Nginx 502
   - 소켓 존재 확인: `/run/agecalc/agecalc.sock`
+  - `sudo systemctl status agecalc --no-pager`
+  - `sudo journalctl -u agecalc -n 200 --no-pager`
+  - `curl --unix-socket /run/agecalc/agecalc.sock http://localhost/health`
   - `sudo nginx -t`
+  - `sudo tail -n 200 /var/log/nginx/error.log`
 
 ## 11. 운영 체크리스트
 - [ ] 도메인 DNS 연결 완료
