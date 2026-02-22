@@ -1,0 +1,17 @@
+[Unit]
+Description=AgeCalc RSS ingest and blog generation
+After=network-online.target mysql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=agecalc
+Group=www-data
+WorkingDirectory=/srv/apps/agecalc
+Environment="PATH=/srv/apps/agecalc/.micromamba/envs/agecalc/bin"
+Environment="DATABASE_URL=mysql+pymysql://agecalc_user:CHANGE_ME_STRONG_PASSWORD@127.0.0.1:3306/agecalc?charset=utf8mb4"
+Environment="OPENAI_API_KEY=YOUR_OPENAI_API_KEY"
+Environment="OPENAI_MODEL=gpt-4.1-mini"
+Environment="OLLAMA_URL=http://127.0.0.1:11434"
+Environment="OLLAMA_MODEL=mistral:latest"
+ExecStart=/srv/apps/agecalc/.micromamba/envs/agecalc/bin/python /srv/apps/agecalc/scripts/rss_blog_scheduler.py run --limit 3 --status draft --provider ollama --model mistral:latest

@@ -1,0 +1,12 @@
+[Unit]
+Description=Run AgeCalc RSS blog generation every 2 hours
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=2h
+Unit=agecalc-rss.service
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+

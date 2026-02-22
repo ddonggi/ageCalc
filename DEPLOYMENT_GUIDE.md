@@ -178,7 +178,57 @@ mysql -u agecalc_user -p -h 127.0.0.1 -D agecalc -e "SHOW TABLES;"
 - `feed_items`
 - `post_sources`
 
-## 10. 문제 해결
+## 10. RSS -> 블로그 자동 스케줄러 (systemd timer)
+
+### 10.1 RSS 소스 등록
+```bash
+sudo -iu agecalc
+cd /srv/apps/agecalc
+/srv/apps/agecalc/.micromamba/envs/agecalc/bin/python scripts/rss_blog_scheduler.py import-sources --file scripts/rss_sources.example.json
+/srv/apps/agecalc/.micromamba/envs/agecalc/bin/python scripts/rss_blog_scheduler.py list-sources
+exit
+```
+
+### 10.2 1회 실행 테스트
+```bash
+sudo -iu agecalc
+cd /srv/apps/agecalc
+export OPENAI_API_KEY="<YOUR_OPENAI_API_KEY>"
+
+# OpenAI 사용
+/srv/apps/agecalc/.micromamba/envs/agecalc/bin/python scripts/rss_blog_scheduler.py run --limit 2 --status draft --provider openai --model gpt-4.1-mini
+
+# Ollama 사용
+/srv/apps/agecalc/.micromamba/envs/agecalc/bin/python scripts/rss_blog_scheduler.py run --limit 2 --status draft --provider ollama --model mistral:latest
+
+# API 없이 fallback 템플릿 사용
+/srv/apps/agecalc/.micromamba/envs/agecalc/bin/python scripts/rss_blog_scheduler.py run --limit 2 --status draft --provider fallback
+exit
+```
+
+### 10.3 서비스/타이머 등록
+`systemd/agecalc-rss.service` 파일에서 아래 값 수정 후 적용:
+- `DATABASE_URL`
+- `OPENAI_API_KEY`
+- `--provider` (`openai` / `ollama` / `fallback`)
+- `--model` (provider에 맞는 모델)
+- 필요 시 `--status draft` -> `--status published`
+
+```bash
+sudo cp /srv/apps/agecalc/systemd/agecalc-rss.service /etc/systemd/system/agecalc-rss.service
+sudo cp /srv/apps/agecalc/systemd/agecalc-rss.timer /etc/systemd/system/agecalc-rss.timer
+sudo systemctl daemon-reload
+sudo systemctl enable --now agecalc-rss.timer
+sudo systemctl list-timers --all | grep agecalc-rss
+```
+
+수동 트리거:
+```bash
+sudo systemctl start agecalc-rss.service
+sudo journalctl -u agecalc-rss.service -n 200 --no-pager
+```
+
+## 11. 문제 해결
 - `Access denied for user`
   - 계정 host(`localhost`), 비밀번호, `DATABASE_URL` 확인
 - `Can't connect to MySQL server`
@@ -194,7 +244,7 @@ mysql -u agecalc_user -p -h 127.0.0.1 -D agecalc -e "SHOW TABLES;"
   - `sudo nginx -t`
   - `sudo tail -n 200 /var/log/nginx/error.log`
 
-## 11. 운영 체크리스트
+## 12. 운영 체크리스트
 - [ ] 도메인 DNS 연결 완료
 - [ ] SSL 인증서 발급 완료
 - [ ] `agecalc.service` 정상 실행

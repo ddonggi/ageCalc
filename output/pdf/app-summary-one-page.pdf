@@ -1,0 +1,120 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 2965 >>
+stream
+BT
+/F1 10 Tf
+1 0 0 1 54 0 Tm
+/F1 16 Tf
+1 0 0 1 54 770 Tm
+(AgeCalc App Summary \(One Page\)) Tj
+/F1 12 Tf
+1 0 0 1 54 744 Tm
+(What It Is) Tj
+/F1 10 Tf
+1 0 0 1 54 731 Tm
+(AgeCalc is a Flask web app for age-related calculators, mini-games, and blog pages.) Tj
+/F1 10 Tf
+1 0 0 1 54 718 Tm
+(It serves server-rendered pages with Jinja templates plus client-side JavaScript tools.) Tj
+/F1 12 Tf
+1 0 0 1 54 692 Tm
+(Who It Is For) Tj
+/F1 10 Tf
+1 0 0 1 54 679 Tm
+(Primary persona: Not found in repo \(no explicit persona document\).) Tj
+/F1 10 Tf
+1 0 0 1 54 666 Tm
+(Inferred from templates/content: Korean-language users who need practical age calculations.) Tj
+/F1 12 Tf
+1 0 0 1 54 640 Tm
+(What It Does \(Key Features\)) Tj
+/F1 10 Tf
+1 0 0 1 54 627 Tm
+(- Calculates international age from date input \(solar and lunar input support\).) Tj
+/F1 10 Tf
+1 0 0 1 54 614 Tm
+(- Provides pet age conversion pages for dogs and cats.) Tj
+/F1 10 Tf
+1 0 0 1 54 601 Tm
+(- Provides baby month-age and parent-child age relation calculators.) Tj
+/F1 10 Tf
+1 0 0 1 54 588 Tm
+(- Includes mini-games \(snake, tic-tac-toe, rock-paper-scissors, number guess\).) Tj
+/F1 10 Tf
+1 0 0 1 54 575 Tm
+(- Exposes blog list/detail pages with pagination for published posts.) Tj
+/F1 10 Tf
+1 0 0 1 54 562 Tm
+(- Tracks snake scores via a JSON file and returns daily ranking metadata.) Tj
+/F1 10 Tf
+1 0 0 1 54 549 Tm
+(- Adds security headers/CSP and includes analytics/ads integrations in templates.) Tj
+/F1 12 Tf
+1 0 0 1 54 523 Tm
+(How It Works \(Repo-Evidenced Architecture\)) Tj
+/F1 10 Tf
+1 0 0 1 54 510 Tm
+(- HTTP flow: Browser -> Flask routes in app.py -> Jinja templates/static JS/CSS -> response.) Tj
+/F1 10 Tf
+1 0 0 1 54 497 Tm
+(- Age logic: /age route -> AgeController -> AgeCalculator; lunar input converts via KoreanLunarCalendar.) Tj
+/F1 10 Tf
+1 0 0 1 54 484 Tm
+(- Data layer: SQLAlchemy engine/session in db.py; DATABASE_URL sets DB, default is SQLite data/app.db.) Tj
+/F1 10 Tf
+1 0 0 1 54 471 Tm
+(- Blog domain: models/blog_models.py defines FeedSource, FeedItem, GeneratedPost, PostSource tables.) Tj
+/F1 10 Tf
+1 0 0 1 54 458 Tm
+(- Background ingestion: scripts/rss_blog_scheduler.py fetches RSS/Atom and creates draft/published posts.) Tj
+/F1 10 Tf
+1 0 0 1 54 445 Tm
+(- Snake score service: /snake-score uses file-backed storage \(data/snake_scores.json\) with thread lock.) Tj
+/F1 12 Tf
+1 0 0 1 54 419 Tm
+(How To Run \(Minimal Getting Started\)) Tj
+/F1 10 Tf
+1 0 0 1 54 406 Tm
+(1. python3 -m venv .venv && source .venv/bin/activate) Tj
+/F1 10 Tf
+1 0 0 1 54 393 Tm
+(2. pip install -r requirements.txt) Tj
+/F1 10 Tf
+1 0 0 1 54 380 Tm
+(3. Optional DB override: export DATABASE_URL="mysql+pymysql://USER:PASSWORD@127.0.0.1:3306/agecalc?charset=utf8mb4") Tj
+/F1 10 Tf
+1 0 0 1 54 367 Tm
+(4. python app.py, then open http://localhost:8000) Tj
+/F1 9 Tf
+1 0 0 1 54 341 Tm
+(Source basis: readme.md, app.py, db.py, controllers/age_controller.py, models/blog_models.py, scripts/rss_blog_scheduler.py) Tj
+ET
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000121 00000 n 
+0000000247 00000 n 
+0000000317 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+3334
+%%EOF
