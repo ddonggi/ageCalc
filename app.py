@@ -264,6 +264,21 @@ def rps_game():
     """가위바위보 게임 페이지"""
     return render_template('rps.html')
 
+@app.route('/minigames/nim')
+def nim_game():
+    """님 게임 페이지"""
+    return render_template('nim.html')
+
+@app.route('/minigames/pong')
+def pong_game():
+    """퐁 게임 페이지"""
+    return render_template('pong.html')
+
+@app.route('/minigames/hangman')
+def hangman_game():
+    """행맨 게임 페이지"""
+    return render_template('hangman.html')
+
 
 
 @app.post("/snake-score")

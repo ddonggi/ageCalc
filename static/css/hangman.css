@@ -1,0 +1,63 @@
+.hangman-subtitle {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.hangman-panel {
+    width: min(560px, 100%);
+    margin-inline: auto;
+    text-align: center;
+}
+
+.hangman-word {
+    font-family: "Press Start 2P", monospace;
+    font-size: clamp(18px, 4.8vw, 28px);
+    letter-spacing: 4px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+    word-break: break-word;
+}
+
+.hangman-status {
+    min-height: 34px;
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.hangman-guesses {
+    min-height: 30px;
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: var(--ink-soft);
+}
+
+.hangman-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.hangman-form input {
+    width: 78px;
+    text-align: center;
+    text-transform: uppercase;
+    font-family: "Press Start 2P", monospace;
+    font-size: 20px;
+    padding: 10px 8px;
+}
+
+@media (max-width: 680px) {
+    .hangman-status {
+        font-size: 20px;
+    }
+
+    .hangman-guesses {
+        font-size: 18px;
+    }
+
+    .hangman-word {
+        letter-spacing: 3px;
+    }
+}

@@ -1,0 +1,47 @@
+.nim-subtitle {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.nim-panel {
+    width: min(560px, 100%);
+    margin-inline: auto;
+    text-align: center;
+}
+
+.nim-pile {
+    font-family: "Press Start 2P", monospace;
+    font-size: clamp(18px, 3.8vw, 24px);
+    color: var(--ink);
+    margin-bottom: 14px;
+    line-height: 1.5;
+}
+
+.nim-controls {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.nim-btn {
+    min-width: 120px;
+}
+
+.nim-status {
+    min-height: 34px;
+    font-size: 24px;
+    color: var(--ink);
+    line-height: 1.3;
+}
+
+@media (max-width: 680px) {
+    .nim-status {
+        font-size: 20px;
+    }
+
+    .nim-btn {
+        min-width: 108px;
+    }
+}

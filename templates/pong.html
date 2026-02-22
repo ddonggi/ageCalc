@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <meta name="google-adsense-account" content="ca-pub-7818333740838556">
+
+    <title>퐁 게임 | AgeCalc</title>
+    <meta name="description" content="패들로 공을 받아치는 클래식 퐁 미니게임입니다. AI와 점수 대결을 즐겨보세요." />
+    <link rel="canonical" href="https://agecalc.cloud/minigames/pong" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="퐁 게임 | AgeCalc" />
+    <meta property="og:description" content="레트로 아케이드 퐁 미니게임" />
+    <meta property="og:url" content="https://agecalc.cloud/minigames/pong" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
+    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pong.css') }}" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M0RLS343N4"></script>
+    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    {% include 'partials/adsense.html' %}
+</head>
+
+<body>
+    <div id="pixel-background"></div>
+    <div class="container">
+        {% include 'partials/header.html' %}
+
+        <h1>퐁 게임</h1>
+        <p class="pong-subtitle">키보드 또는 모바일 버튼으로 패들을 움직여 공을 받아치세요.</p>
+
+        <section class="mini-game">
+            <div class="game-panel pong-panel" aria-live="polite">
+                <div class="pong-score" id="pong-score">플레이어 0 - 0 AI</div>
+                <canvas id="pong-canvas" width="480" height="300" aria-label="퐁 게임 코트"></canvas>
+                <div class="pong-controls">
+                    <button type="button" class="game-btn" id="pong-toggle">시작</button>
+                    <button type="button" class="game-btn" id="pong-reset">리셋</button>
+                </div>
+                <div class="pong-touch-controls">
+                    <button type="button" class="game-btn" id="pong-up">위</button>
+                    <button type="button" class="game-btn" id="pong-down">아래</button>
+                </div>
+                <p class="game-tip">키보드: W/S 또는 ↑/↓, 스페이스바로 시작·일시정지</p>
+            </div>
+        </section>
+
+        {% include 'partials/footer.html' %}
+    </div>
+
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>이 웹사이트는 쿠키를 사용하여 사용자 경험을 개선합니다. 계속 사용하시면 쿠키 사용에 동의하는 것으로 간주됩니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/pong-game.js') }}" defer></script>
+
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
+        ↑
+    </button>
+    <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
+</body>
+
+</html>
