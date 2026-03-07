@@ -7,6 +7,7 @@ import os
 import re
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
@@ -70,8 +71,16 @@ def _parse_date(value: str | None) -> datetime | None:
 
 
 def _fetch(url: str, timeout: int = DEFAULT_TIMEOUT) -> bytes:
+    # Accept IRI-like input (e.g., Korean query) and normalize to ASCII URL.
+    parsed = urllib.parse.urlsplit(url.strip())
+    netloc = parsed.netloc.encode("idna").decode("ascii")
+    path = urllib.parse.quote(parsed.path, safe="/%:@")
+    query = urllib.parse.quote_plus(parsed.query, safe="=&%:+,;@()!$'*-._~")
+    fragment = urllib.parse.quote(parsed.fragment, safe="%!$&'()*+,;=:@/?-._~")
+    normalized_url = urllib.parse.urlunsplit((parsed.scheme, netloc, path, query, fragment))
+
     req = urllib.request.Request(
-        url,
+        normalized_url,
         headers={
             "User-Agent": "agecalc-rss-bot/1.0 (+https://agecalc.cloud)",
             "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
