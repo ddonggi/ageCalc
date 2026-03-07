@@ -10,6 +10,7 @@ instance/
 
 # Environment
 .env
+.env.local
 .venv/
 venv/
 ENV/
