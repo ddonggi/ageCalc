@@ -1,0 +1,48 @@
+.connect4-subtitle {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.connect4-panel {
+    width: min(620px, 100%);
+    margin-inline: auto;
+    text-align: center;
+}
+
+.connect4-status {
+    min-height: 30px;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.connect4-board {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    background: var(--ink);
+    border: 3px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.connect4-cell {
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: #fff7cc;
+    cursor: pointer;
+}
+
+.connect4-cell[data-value="R"] {
+    background: #ff6f6f;
+}
+
+.connect4-cell[data-value="Y"] {
+    background: #ffd166;
+}
+
+.connect4-controls {
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+}

@@ -1,0 +1,40 @@
+.lightsout-subtitle {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.lightsout-panel {
+    width: min(500px, 100%);
+    margin-inline: auto;
+    text-align: center;
+}
+
+.lightsout-status {
+    min-height: 30px;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.lightsout-board {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+.lightsout-cell {
+    aspect-ratio: 1 / 1;
+    border: 3px solid var(--border);
+    background: #ddd4c0;
+    box-shadow: 2px 2px 0 var(--border);
+    cursor: pointer;
+}
+
+.lightsout-cell.on {
+    background: #ffd166;
+}
+
+.lightsout-controls {
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+}

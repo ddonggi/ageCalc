@@ -1,0 +1,51 @@
+.simon-subtitle {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.simon-panel {
+    width: min(520px, 100%);
+    margin-inline: auto;
+    text-align: center;
+}
+
+.simon-status {
+    min-height: 30px;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.simon-pad {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    width: min(320px, 100%);
+    margin: 0 auto 10px;
+}
+
+.simon-btn {
+    aspect-ratio: 1 / 1;
+    border: 3px solid var(--border);
+    box-shadow: 2px 2px 0 var(--border);
+    cursor: pointer;
+}
+
+.simon-btn.active {
+    filter: brightness(1.3);
+}
+
+.simon-green { background: #9fcf9f; }
+.simon-red { background: #d88f8f; }
+.simon-yellow { background: #f2d28a; }
+.simon-blue { background: #9fb7d8; }
+
+.simon-controls {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.simon-score {
+    margin-top: 8px;
+    font-size: 20px;
+}

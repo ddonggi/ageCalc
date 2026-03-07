@@ -143,6 +143,71 @@
                         </ul>
                     </div>
                 </a>
+                <a class="card-link" href="{{ url_for('memory_game') }}">
+                    <div class="age-right-item">
+                        <div class="age-header">
+                            <span class="age-number">🃏</span>
+                            <span class="age-unit">메모리 매치</span>
+                        </div>
+                        <ul>
+                            <li>카드를 뒤집어 같은 짝을 찾는 기억력 게임</li>
+                            <li>총 이동 횟수로 기록을 겨뤄볼 수 있음</li>
+                            <li>짧은 시간 집중력 훈련에 적합</li>
+                        </ul>
+                    </div>
+                </a>
+                <a class="card-link" href="{{ url_for('connect4_game') }}">
+                    <div class="age-right-item">
+                        <div class="age-header">
+                            <span class="age-number">🔴</span>
+                            <span class="age-unit">커넥트4</span>
+                        </div>
+                        <ul>
+                            <li>7x6 보드에 디스크를 떨어뜨리는 전략 게임</li>
+                            <li>가로·세로·대각선 4개를 먼저 만들면 승리</li>
+                            <li>2인 턴제로 빠르게 한 판 가능</li>
+                        </ul>
+                    </div>
+                </a>
+                <a class="card-link" href="{{ url_for('lightsout_game') }}">
+                    <div class="age-right-item">
+                        <div class="age-header">
+                            <span class="age-number">💡</span>
+                            <span class="age-unit">라이츠아웃</span>
+                        </div>
+                        <ul>
+                            <li>타일과 인접 타일이 함께 토글되는 퍼즐</li>
+                            <li>모든 불을 끄면 클리어</li>
+                            <li>최소 이동 수를 노리는 최적화 플레이 가능</li>
+                        </ul>
+                    </div>
+                </a>
+                <a class="card-link" href="{{ url_for('minesweeper_game') }}">
+                    <div class="age-right-item">
+                        <div class="age-header">
+                            <span class="age-number">💣</span>
+                            <span class="age-unit">지뢰찾기</span>
+                        </div>
+                        <ul>
+                            <li>안전한 칸을 모두 열면 승리하는 퍼즐</li>
+                            <li>우클릭(모바일 길게 터치 대체)으로 깃발 표시</li>
+                            <li>숫자 힌트로 지뢰 위치를 추론</li>
+                        </ul>
+                    </div>
+                </a>
+                <a class="card-link" href="{{ url_for('simon_game') }}">
+                    <div class="age-right-item">
+                        <div class="age-header">
+                            <span class="age-number">🎵</span>
+                            <span class="age-unit">사이먼</span>
+                        </div>
+                        <ul>
+                            <li>빛나는 순서를 기억해 따라 누르는 게임</li>
+                            <li>라운드가 올라갈수록 시퀀스 길이 증가</li>
+                            <li>기억력과 반응 속도 훈련에 적합</li>
+                        </ul>
+                    </div>
+                </a>
             </div>
         </section>
 

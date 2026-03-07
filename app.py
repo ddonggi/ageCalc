@@ -279,6 +279,31 @@ def hangman_game():
     """행맨 게임 페이지"""
     return render_template('hangman.html')
 
+@app.route('/minigames/memory')
+def memory_game():
+    """메모리 매치 게임 페이지"""
+    return render_template('memory.html')
+
+@app.route('/minigames/connect4')
+def connect4_game():
+    """커넥트4 게임 페이지"""
+    return render_template('connect4.html')
+
+@app.route('/minigames/lightsout')
+def lightsout_game():
+    """라이츠아웃 게임 페이지"""
+    return render_template('lightsout.html')
+
+@app.route('/minigames/minesweeper')
+def minesweeper_game():
+    """지뢰찾기 게임 페이지"""
+    return render_template('minesweeper.html')
+
+@app.route('/minigames/simon')
+def simon_game():
+    """사이먼 게임 페이지"""
+    return render_template('simon.html')
+
 
 
 @app.post("/snake-score")

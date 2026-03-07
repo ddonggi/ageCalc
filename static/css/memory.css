@@ -1,0 +1,48 @@
+.memory-subtitle {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.memory-panel {
+    width: min(560px, 100%);
+    margin-inline: auto;
+    text-align: center;
+}
+
+.memory-status {
+    min-height: 30px;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.memory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.memory-card {
+    aspect-ratio: 1 / 1;
+    border: 3px solid var(--border);
+    background: #fff8df;
+    box-shadow: 2px 2px 0 var(--border);
+    font-family: "Press Start 2P", monospace;
+    font-size: clamp(18px, 4vw, 28px);
+    cursor: pointer;
+}
+
+.memory-card.revealed,
+.memory-card.matched {
+    background: #ffffff;
+}
+
+.memory-controls {
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+}
+
+.memory-moves {
+    margin-top: 8px;
+    font-size: 20px;
+}
