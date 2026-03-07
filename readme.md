@@ -70,6 +70,21 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### 1-1) 마이크로맘바 환경(운영 서버)
+서버에서 `python` 명령이 없을 수 있으므로 `micromamba` 환경을 활성화한 뒤 실행합니다.
+
+```bash
+source /srv/apps/agecalc/.micromamba/etc/profile.d/micromamba.sh
+micromamba activate agecalc
+python --version
+```
+
+또는 활성화 없이 환경의 파이썬 바이너리를 직접 사용합니다.
+
+```bash
+/srv/apps/agecalc/.micromamba/envs/agecalc/bin/python --version
+```
+
 ### 2) DB 설정
 - 기본값: `DATABASE_URL` 미설정 시 SQLite(`data/app.db`) 사용
 - MySQL 사용 시:
@@ -102,4 +117,11 @@ export OPENAI_API_KEY="<YOUR_OPENAI_API_KEY>"
 python scripts/rss_blog_scheduler.py run --limit 2 --status draft --provider openai --model gpt-4.1-mini
 python scripts/rss_blog_scheduler.py run --limit 2 --status draft --provider ollama --model mistral:latest
 python scripts/rss_blog_scheduler.py run --limit 2 --status draft --provider fallback
+```
+
+- 마이크로맘바 환경에서 1회 실행:
+```bash
+source /srv/apps/agecalc/.micromamba/etc/profile.d/micromamba.sh
+micromamba activate agecalc
+python scripts/rss_blog_scheduler.py run --limit 2 --status draft --provider openai --model gpt-4.1-mini
 ```

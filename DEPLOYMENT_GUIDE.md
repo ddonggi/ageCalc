@@ -206,7 +206,7 @@ export OPENAI_API_KEY="<YOUR_OPENAI_API_KEY>"
 exit
 ```
 
-### 10.3 서비스/타이머 등록
+`### 10.3 서비스/타이머 등록
 `systemd/agecalc-rss.service` 파일에서 아래 값 수정 후 적용:
 - `DATABASE_URL`
 - `OPENAI_API_KEY`

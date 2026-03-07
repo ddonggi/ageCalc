@@ -1,0 +1,62 @@
+[
+  {
+    "name": "KR - 만나이/건강",
+    "rss_url": "https://news.google.com/rss/search?q=만나이+건강&hl=ko&gl=KR&ceid=KR:ko",
+    "site_url": "https://news.google.com/"
+  },
+  {
+    "name": "KR - 나이계산/건강정보",
+    "rss_url": "https://news.google.com/rss/search?q=나이+계산+건강&hl=ko&gl=KR&ceid=KR:ko",
+    "site_url": "https://news.google.com/"
+  },
+  {
+    "name": "KR - 노화/장수 연구",
+    "rss_url": "https://news.google.com/rss/search?q=노화+건강+장수+연구&hl=ko&gl=KR&ceid=KR:ko",
+    "site_url": "https://news.google.com/"
+  },
+  {
+    "name": "KR - 시니어 건강",
+    "rss_url": "https://news.google.com/rss/search?q=시니어+건강+질환+예방&hl=ko&gl=KR&ceid=KR:ko",
+    "site_url": "https://news.google.com/"
+  },
+  {
+    "name": "KR - 반려동물 건강/수명",
+    "rss_url": "https://news.google.com/rss/search?q=반려동물+건강+수명&hl=ko&gl=KR&ceid=KR:ko",
+    "site_url": "https://news.google.com/"
+  },
+  {
+    "name": "KR - 강아지 고양이 나이/건강",
+    "rss_url": "https://news.google.com/rss/search?q=강아지+고양이+나이+건강&hl=ko&gl=KR&ceid=KR:ko",
+    "site_url": "https://news.google.com/"
+  },
+  {
+    "name": "KR - 아기 개월수/성장발달",
+    "rss_url": "https://news.google.com/rss/search?q=아기+개월수+성장+발달&hl=ko&gl=KR&ceid=KR:ko",
+    "site_url": "https://news.google.com/"
+  },
+  {
+    "name": "KR - 영유아 건강",
+    "rss_url": "https://news.google.com/rss/search?q=영유아+건강+수면+수유&hl=ko&gl=KR&ceid=KR:ko",
+    "site_url": "https://news.google.com/"
+  },
+  {
+    "name": "EN - Healthy Aging Research",
+    "rss_url": "https://news.google.com/rss/search?q=healthy+aging+research&hl=en-US&gl=US&ceid=US:en",
+    "site_url": "https://news.google.com/"
+  },
+  {
+    "name": "EN - Pet Health Longevity",
+    "rss_url": "https://news.google.com/rss/search?q=pet+health+longevity&hl=en-US&gl=US&ceid=US:en",
+    "site_url": "https://news.google.com/"
+  },
+  {
+    "name": "EN - Child Development Health",
+    "rss_url": "https://news.google.com/rss/search?q=child+development+milestones+health&hl=en-US&gl=US&ceid=US:en",
+    "site_url": "https://news.google.com/"
+  },
+  {
+    "name": "EN - Preventive Health Lifestyle",
+    "rss_url": "https://news.google.com/rss/search?q=preventive+health+lifestyle&hl=en-US&gl=US&ceid=US:en",
+    "site_url": "https://news.google.com/"
+  }
+]

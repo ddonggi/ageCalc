@@ -11,6 +11,7 @@ instance/
 # Environment
 .env
 .env.local
+.env.openai.local
 .venv/
 venv/
 ENV/
