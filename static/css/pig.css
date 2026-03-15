@@ -1,0 +1,8 @@
+.game-sub{ text-align:center; margin-bottom:14px; }
+.pig-panel{ width:min(560px,100%); margin-inline:auto; text-align:center; }
+.game-status{ min-height:30px; font-size:20px; margin-bottom:10px; }
+.pig-scores{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:10px; }
+.pig-score-item{ border:3px solid var(--border); background:#fff8df; padding:8px; font-size:20px; }
+.pig-turn{ margin-bottom:8px; font-size:20px; }
+.pig-die{ width:84px; height:84px; margin:0 auto 8px; border:3px solid var(--border); background:#fff; display:grid; place-items:center; font-size:36px; }
+.pig-turn-total{ font-size:20px; margin-bottom:10px; }

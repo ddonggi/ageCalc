@@ -1,0 +1,7 @@
+.game-sub{ text-align:center; margin-bottom:14px; }
+.card-panel{ width:min(640px,100%); margin-inline:auto; }
+.game-status{ min-height:30px; font-size:20px; margin-bottom:10px; text-align:center; }
+.hand{ border:3px solid var(--border); background:#fff8df; padding:10px; margin-bottom:10px; }
+.hand h3{ margin-bottom:6px; }
+.cards{ display:flex; flex-wrap:wrap; gap:6px; min-height:26px; }
+.score{ margin-top:6px; font-size:18px; }

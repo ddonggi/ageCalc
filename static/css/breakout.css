@@ -1,0 +1,4 @@
+.game-sub{ text-align:center; margin-bottom:14px; }
+.breakout-panel{ width:min(620px,100%); margin-inline:auto; text-align:center; }
+.game-status{ min-height:30px; font-size:20px; margin-bottom:10px; }
+#breakout-canvas{ display:block; margin:0 auto; max-width:100%; height:auto; border:3px solid var(--border); background:#fff7cc; }

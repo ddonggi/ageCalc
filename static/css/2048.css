@@ -1,0 +1,5 @@
+.game-sub{ text-align:center; margin-bottom:14px; }
+.puzzle-panel{ width:min(520px,100%); margin-inline:auto; text-align:center; }
+.game-status{ min-height:30px; font-size:22px; margin-bottom:10px; }
+.board-2048{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; background:var(--ink); padding:10px; border:3px solid var(--border); border-radius:8px; }
+.tile-2048{ background:#fff7cc; border:2px solid var(--border); height:72px; display:grid; place-items:center; font-family:"Press Start 2P", monospace; font-size:18px; }

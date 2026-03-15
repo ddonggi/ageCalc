@@ -1,0 +1,11 @@
+.game-sub{ text-align:center; margin-bottom:14px; }
+.hanoi-panel{ width:min(680px,100%); margin-inline:auto; text-align:center; }
+.game-status{ min-height:30px; font-size:20px; margin-bottom:10px; }
+.hanoi-board{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:10px 0; }
+.hanoi-peg{ position:relative; height:190px; border:3px solid var(--border); background:#fff8df; cursor:pointer; }
+.hanoi-rod{ position:absolute; width:8px; height:120px; background:var(--ink); left:50%; transform:translateX(-50%); bottom:28px; }
+.hanoi-base{ position:absolute; height:8px; background:var(--ink); left:10px; right:10px; bottom:16px; }
+.hanoi-stack{ position:absolute; left:0; right:0; bottom:24px; display:flex; flex-direction:column-reverse; align-items:center; gap:4px; pointer-events:none; }
+.hanoi-disk{ height:18px; border:2px solid var(--border); background:#f2d28a; }
+.hanoi-disk.selected{ background:#ffb86b; }
+.hanoi-moves{ font-size:20px; margin-top:8px; }
