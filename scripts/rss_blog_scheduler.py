@@ -182,6 +182,12 @@ def _content_hash(item: dict[str, Any]) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+def _story_identity_key(source_id: int, title: str, published_at: datetime | None) -> tuple[int, str, datetime] | None:
+    if published_at is None:
+        return None
+    return (source_id, _normalize_space(title).casefold(), published_at)
+
+
 def _extract_output_text(resp_json: dict[str, Any]) -> str:
     if isinstance(resp_json.get("output_text"), str) and resp_json["output_text"].strip():
         return resp_json["output_text"].strip()
@@ -302,24 +308,69 @@ def _generate_fallback(feed_item: FeedItem) -> tuple[str, str, str]:
 
 
 def upsert_feed_items(session, source: FeedSource, parsed_items: list[dict[str, Any]]) -> int:
-    created = 0
+    normalized_rows: list[dict[str, Any]] = []
+    candidate_urls: set[str] = set()
+
     for item in parsed_items:
         url = (item.get("url") or "").strip()
         title = _normalize_space(item.get("title") or "")
         if not url or not title:
             continue
-        existing = session.scalar(select(FeedItem).where(FeedItem.original_url == url))
-        if existing:
+        normalized_rows.append(
+            {
+                "url": url,
+                "title": title,
+                "published_at": item.get("published_at"),
+                "summary": item.get("summary") or "",
+                "content": item.get("content") or "",
+                "content_hash": _content_hash(item),
+            }
+        )
+        candidate_urls.add(url)
+
+    existing_urls: set[str] = set()
+    if candidate_urls:
+        existing_urls = set(
+            session.scalars(select(FeedItem.original_url).where(FeedItem.original_url.in_(candidate_urls))).all()
+        )
+
+    candidate_titles = {row["title"] for row in normalized_rows if row["published_at"] is not None}
+    existing_story_keys: set[tuple[int, str, datetime]] = set()
+    if candidate_titles:
+        existing_rows = session.execute(
+            select(FeedItem.original_title, FeedItem.published_at)
+            .where(FeedItem.source_id == source.id)
+            .where(FeedItem.original_title.in_(candidate_titles))
+            .where(FeedItem.published_at.is_not(None))
+        ).all()
+        existing_story_keys = {
+            key
+            for title, published_at in existing_rows
+            if (key := _story_identity_key(source.id, title, published_at)) is not None
+        }
+
+    created = 0
+    seen_urls: set[str] = set()
+    seen_story_keys: set[tuple[int, str, datetime]] = set()
+    for row in normalized_rows:
+        url = row["url"]
+        story_key = _story_identity_key(source.id, row["title"], row["published_at"])
+        if url in existing_urls or url in seen_urls:
             continue
+        if story_key is not None and (story_key in existing_story_keys or story_key in seen_story_keys):
+            continue
+        seen_urls.add(url)
+        if story_key is not None:
+            seen_story_keys.add(story_key)
         session.add(
             FeedItem(
                 source_id=source.id,
-                original_title=title[:255],
+                original_title=row["title"][:255],
                 original_url=url[:500],
-                published_at=item.get("published_at"),
-                summary=(item.get("summary") or "")[:100000],
-                content=(item.get("content") or "")[:200000],
-                content_hash=_content_hash(item),
+                published_at=row["published_at"],
+                summary=row["summary"][:100000],
+                content=row["content"][:200000],
+                content_hash=row["content_hash"],
                 status="new",
             )
         )
@@ -364,6 +415,28 @@ def create_posts(
     created_count = 0
 
     for item in feed_items:
+        story_exists_q = (
+            select(GeneratedPost.id)
+            .join(PostSource, PostSource.generated_post_id == GeneratedPost.id)
+            .join(FeedItem, FeedItem.id == PostSource.feed_item_id)
+            .where(FeedItem.source_id == item.source_id)
+            .where(FeedItem.original_title == item.original_title)
+        )
+        if item.published_at is not None:
+            story_exists_q = story_exists_q.where(FeedItem.published_at == item.published_at)
+
+        existing_post_id = session.scalar(story_exists_q.limit(1))
+        if existing_post_id is not None:
+            item.status = "used"
+            if not dry_run:
+                session.commit()
+            else:
+                session.rollback()
+            print(
+                f"[post] skipped source={item.original_url} reason=duplicate-story existing_post_id={existing_post_id}"
+            )
+            continue
+
         post_title = ""
         excerpt = ""
         content_html = ""
