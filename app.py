@@ -304,6 +304,31 @@ def simon_game():
     """사이먼 게임 페이지"""
     return render_template('simon.html')
 
+@app.route('/minigames/2048')
+def game_2048():
+    """2048 게임 페이지"""
+    return render_template('2048.html')
+
+@app.route('/minigames/blackjack')
+def blackjack_game():
+    """블랙잭 게임 페이지"""
+    return render_template('blackjack.html')
+
+@app.route('/minigames/breakout')
+def breakout_game():
+    """브레이크아웃 게임 페이지"""
+    return render_template('breakout.html')
+
+@app.route('/minigames/hanoi')
+def hanoi_game():
+    """하노이 게임 페이지"""
+    return render_template('hanoi.html')
+
+@app.route('/minigames/pig')
+def pig_game():
+    """피그 다이스 게임 페이지"""
+    return render_template('pig.html')
+
 
 
 @app.post("/snake-score")
