@@ -34,15 +34,29 @@
     {% include 'partials/adsense.html' %}
 </head>
 
-<body>
+<body class="blog-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
-        <h1>블로그</h1>
-        <div style="text-align: center;margin-bottom: 2rem;">최신 글 {{ total }}개</div>
+
+        <section class="hero-band blog-hero-band">
+            <div class="hero-copy">
+                <p class="eyebrow">Editorial Notes</p>
+                <h1>블로그</h1>
+                <p class="page-intro">
+                    계산기에서 끝나지 않는 배경 설명과 생활 맥락을 읽기 좋은 형식으로 정리합니다.
+                    현재 게시된 글은 {{ total }}개입니다.
+                </p>
+            </div>
+        </section>
 
         {% if posts %}
-        <section class="blog-grid">
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>최신 글</h2>
+                <p class="section-intro">간결한 요약과 함께 필요한 글로 바로 들어갈 수 있게 구성했습니다.</p>
+            </div>
+            <div class="blog-grid">
             {% for post in posts %}
             <article class="blog-card">
                 <a class="blog-card-link" href="{{ url_for('blog_detail', slug=post.slug) }}">
@@ -59,6 +73,7 @@
                 </a>
             </article>
             {% endfor %}
+            </div>
         </section>
 
         <nav class="pagination" aria-label="블로그 페이지 이동">
@@ -92,7 +107,6 @@
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
-    <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
 </body>
 
 </html>

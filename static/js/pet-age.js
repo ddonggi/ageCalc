@@ -24,8 +24,14 @@ class PetAgeCalculator {
 
     bindEvents() {
         ['input', 'change'].forEach(evt => {
-            this.yearsInput.addEventListener(evt, () => this.updateResult());
-            this.monthsInput.addEventListener(evt, () => this.updateResult());
+            this.yearsInput.addEventListener(evt, () => {
+                this.normalizeInputs();
+                this.updateResult();
+            });
+            this.monthsInput.addEventListener(evt, () => {
+                this.normalizeInputs();
+                this.updateResult();
+            });
         });
 
         this.sizeRadios.forEach(radio => {
@@ -36,6 +42,19 @@ class PetAgeCalculator {
         });
 
         this.updateSizeUI();
+    }
+
+    normalizeInputs() {
+        this.limitDigits(this.yearsInput, 2);
+        this.limitDigits(this.monthsInput, 2);
+    }
+
+    limitDigits(input, maxLength) {
+        if (!input) return;
+        const digits = String(input.value || '').replace(/\D/g, '').slice(0, maxLength);
+        if (input.value !== digits) {
+            input.value = digits;
+        }
     }
 
     getAgeInYears() {

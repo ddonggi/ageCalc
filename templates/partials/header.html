@@ -1,10 +1,17 @@
 <header class="site-header">
-    <a class="brand" href="{{ url_for('index') }}">AgeCalc <span>2026</span></a>
-    <nav class="nav-links">
+    <div class="brand-lockup">
+        <a class="brand" href="{{ url_for('index') }}">
+            <span class="brand-word">AgeCalc</span>
+            <span class="brand-tag">2026</span>
+        </a>
+        <p class="brand-note">생활 기준을 읽는 계산 도구와 설명형 콘텐츠</p>
+    </div>
+    <nav class="nav-links" aria-label="주요 메뉴">
         <a href="{{ url_for('age') }}">만나이</a>
         <a href="{{ url_for('dog') }}">강아지 나이</a>
         <a href="{{ url_for('cat') }}">고양이 나이</a>
         <a href="{{ url_for('baby_months') }}">아이 개월 수</a>
+        <a href="{{ url_for('d_day') }}">기념일 계산</a>
         <a href="{{ url_for('parent_child') }}">부모·자녀</a>
         <a href="{{ url_for('blog_list') }}">블로그</a>
         <a href="{{ url_for('minigames') }}">미니게임</a>

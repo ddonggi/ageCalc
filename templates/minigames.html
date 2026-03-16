@@ -41,16 +41,41 @@
 
 </head>
 
-<body>
+<body class="games-hub-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <h1>미니게임</h1>
-        <div style="text-align: center;margin-bottom: 2rem;">짧은 휴식 시간, 픽셀 감성으로 즐겨보세요</div>
+        <section class="hero-band play-shell">
+            <div class="hero-copy">
+                <p class="eyebrow">Play Sub-brand</p>
+                <h1>짧게 쉬어갈 때도 완성도 있게</h1>
+                <p class="page-intro">
+                    AgeCalc의 미니게임은 사이트 전체 브랜드를 유지하되, 더 대담한 컬러와 조금 더 빠른 리듬으로 설계한
+                    플레이 공간입니다.
+                </p>
+            </div>
+            <div class="hero-metrics play-signals" aria-label="플레이 특징">
+                <article class="metric-card">
+                    <span class="metric-value">Quick</span>
+                    <span class="metric-label">짧은 한 판 중심</span>
+                </article>
+                <article class="metric-card">
+                    <span class="metric-value">Touch</span>
+                    <span class="metric-label">모바일 조작 대응</span>
+                </article>
+                <article class="metric-card">
+                    <span class="metric-value">Arcade</span>
+                    <span class="metric-label">가볍고 선명한 플레이 감각</span>
+                </article>
+            </div>
+        </section>
 
-        <section>
-            <h2>게임 선택</h2>
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>게임 선택</h2>
+                <p class="section-intro">전략, 퍼즐, 반응 속도, 추리처럼 다른 리듬의 게임을 한곳에 모았습니다.</p>
+            </div>
             <div class="age-rights-grid">
                 <a class="card-link" href="{{ url_for('guess_game') }}">
                     <div class="age-right-item">
@@ -295,7 +320,6 @@
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
         ↑
     </button>
-    <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
 </body>
 
 </html>

@@ -194,6 +194,11 @@ def baby_months():
     """아기 개월 수 계산 페이지"""
     return render_template('baby-months.html')
 
+@app.route('/d-day')
+def d_day():
+    """기념일/D-Day 계산 페이지"""
+    return render_template('d-day.html')
+
 @app.route('/parent-child')
 def parent_child():
     """부모·자녀 나이 관계 계산 페이지"""

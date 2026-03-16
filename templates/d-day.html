@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <meta name="google-adsense-account" content="ca-pub-7818333740838556">
+
+    <title>기념일 계산기 | AgeCalc</title>
+    <meta name="description" content="다가오는 기념일까지 남은 일수와 지난 기념일로부터 경과한 날짜를 계산하는 D-Day 계산기입니다." />
+    <link rel="canonical" href="https://agecalc.cloud/d-day" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="기념일 계산기 | AgeCalc" />
+    <meta property="og:description" content="D-Day와 경과 일수를 한 화면에서 확인하세요." />
+    <meta property="og:url" content="https://agecalc.cloud/d-day" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
+    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M0RLS343N4"></script>
+    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    {% include 'partials/adsense.html' %}
+</head>
+
+<body class="anniversary-page">
+    <div id="pixel-background"></div>
+    <div class="container">
+        {% include 'partials/header.html' %}
+
+        <section class="hero-band">
+            <div class="hero-copy">
+                <p class="eyebrow">Date Counter</p>
+                <h1>기념일 계산기</h1>
+                <p class="page-intro">
+                    다가오는 날짜까지 얼마나 남았는지, 혹은 중요한 순간으로부터 얼마나 지났는지를
+                    D-Day 형식과 함께 한 번에 확인할 수 있습니다.
+                </p>
+            </div>
+            <div class="hero-metrics" aria-label="계산 예시">
+                <article class="metric-card">
+                    <span class="metric-value">D-100</span>
+                    <span class="metric-label">다가오는 일정까지 남은 일수</span>
+                </article>
+                <article class="metric-card">
+                    <span class="metric-value">D+365</span>
+                    <span class="metric-label">지난 기념일로부터 경과한 시간</span>
+                </article>
+                <article class="metric-card">
+                    <span class="metric-value">Today</span>
+                    <span class="metric-label">바로 오늘인 일정도 즉시 확인</span>
+                </article>
+            </div>
+        </section>
+
+        <form class="age-form" id="dday-form" autocomplete="off">
+            <div class="form-split">
+                <div class="field-stack">
+                    <h3>기념일 이름</h3>
+                    <input type="text" id="dday-label" maxlength="40" placeholder="예: 결혼기념일, 시험일, 여행 출발일">
+                    <small class="small">이름은 결과 카드 제목에만 사용됩니다.</small>
+                </div>
+                <div class="field-stack">
+                    <h3>계산 방식</h3>
+                    <div class="calendar-toggle-container">
+                        <div class="calendar-toggle">
+                            <input type="radio" id="mode-until" name="dday-mode" value="until" checked>
+                            <label for="mode-until">다가오는 날</label>
+                            <input type="radio" id="mode-since" name="dday-mode" value="since">
+                            <label for="mode-since">지난 날부터</label>
+                        </div>
+                    </div>
+                    <small class="small">필요에 따라 남은 일수와 경과 일수를 전환해 볼 수 있습니다.</small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <h3>기준 날짜</h3>
+                <div class="date-inputs">
+                    <input type="text" id="dday-year" placeholder="년" inputmode="numeric" pattern="[0-9]*" maxlength="4" required>
+                    <input type="text" id="dday-month" placeholder="월" inputmode="numeric" pattern="[0-9]*" maxlength="2" required>
+                    <input type="text" id="dday-day" placeholder="일" inputmode="numeric" pattern="[0-9]*" maxlength="2" required>
+                </div>
+                <small id="dday-error" class="error-msg" aria-live="polite"></small>
+            </div>
+        </form>
+
+        <div class="result-container" id="dday-result-container">
+            <h2>계산 결과</h2>
+            <div id="dday-result-content"></div>
+        </div>
+
+        <section class="section-shell section-card-grid">
+            <article class="section-card">
+                <p class="eyebrow">How It Works</p>
+                <h2>계산 방식</h2>
+                <ul>
+                    <li>오늘 날짜와 입력한 날짜를 날짜 단위로 비교합니다.</li>
+                    <li>다가오는 일정은 D-Day 형식으로, 지난 일정은 경과 일수 기준으로 표시합니다.</li>
+                    <li>결과는 오늘 제외 기준이며, 동일 날짜는 D-Day로 표시합니다.</li>
+                </ul>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">Use Cases</p>
+                <h2>이럴 때 유용합니다</h2>
+                <ul>
+                    <li>시험, 입사, 여행, 공연 같은 다가오는 일정 정리</li>
+                    <li>연애, 결혼, 프로젝트 시작일 등 지난 날짜 추적</li>
+                    <li>선물 준비나 일정 관리용 기준 날짜 메모</li>
+                </ul>
+            </article>
+        </section>
+
+        {% include 'partials/footer.html' %}
+    </div>
+
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>이 웹사이트는 쿠키를 사용하여 사용자 경험을 개선합니다. 계속 사용하시면 쿠키 사용에 동의하는 것으로 간주됩니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/d-day.js') }}" defer></script>
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
+</body>
+
+</html>

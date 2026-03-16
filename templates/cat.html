@@ -51,8 +51,8 @@
             <div class="form-group">
                 <h3>고양이 나이를 입력하세요</h3>
                 <div class="date-inputs">
-                    <input type="number" id="pet-years" min="0" max="30" placeholder="년" inputmode="numeric" required>
-                    <input type="number" id="pet-months" min="0" max="11" placeholder="개월" inputmode="numeric">
+                    <input type="text" id="pet-years" placeholder="년" inputmode="numeric" pattern="[0-9]*" maxlength="2" required>
+                    <input type="text" id="pet-months" placeholder="개월" inputmode="numeric" pattern="[0-9]*" maxlength="2">
                 </div>
                 <small id="pet-error" class="error-msg" aria-live="polite"></small>
             </div>

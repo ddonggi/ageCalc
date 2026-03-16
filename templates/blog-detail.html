@@ -34,23 +34,37 @@
     {% include 'partials/adsense.html' %}
 </head>
 
-<body>
+<body class="blog-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
+        <a class="back-link" href="{{ url_for('blog_list') }}">블로그 목록으로 돌아가기</a>
         <article class="blog-article">
-            <h1>{{ post.title }}</h1>
-            <p class="blog-date">
-                {% if post.published_at %}
-                {{ post.published_at.strftime('%Y-%m-%d %H:%M') }}
+            <header class="article-header">
+                <p class="eyebrow">AgeCalc Editorial</p>
+                <h1>{{ post.title }}</h1>
+                <p class="blog-date">
+                    {% if post.published_at %}
+                    {{ post.published_at.strftime('%Y-%m-%d %H:%M') }}
+                    {% endif %}
+                </p>
+                {% if post.excerpt %}
+                <p class="page-intro article-intro">{{ post.excerpt }}</p>
                 {% endif %}
-            </p>
+            </header>
             {% if post.cover_image_url %}
             <img class="blog-hero" src="{{ post.cover_image_url }}" alt="{{ post.title }}">
             {% endif %}
             <div class="blog-content">{{ post.content_html | safe }}</div>
+            <section class="article-tools">
+                <p class="eyebrow">Try A Tool</p>
+                <div class="footer-links article-links">
+                    <a href="{{ url_for('age') }}">만나이 계산기</a>
+                    <a href="{{ url_for('baby_months') }}">아이 개월 수 계산기</a>
+                    <a href="{{ url_for('dog') }}">강아지 나이 계산기</a>
+                </div>
+            </section>
         </article>
-        <p style="margin-top: 20px;"><a href="{{ url_for('blog_list') }}">목록으로 돌아가기</a></p>
         {% include 'partials/footer.html' %}
     </div>
 
@@ -67,7 +81,6 @@
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
-    <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
 </body>
 
 </html>

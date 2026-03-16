@@ -15,19 +15,54 @@ class BabyMonthsCalculator {
 
     bindEvents() {
         ['input', 'change'].forEach(evt => {
-            this.yearInput.addEventListener(evt, () => this.updateResult());
-            this.monthInput.addEventListener(evt, () => this.updateResult());
-            this.dayInput.addEventListener(evt, () => this.updateResult());
+            this.yearInput.addEventListener(evt, () => {
+                this.normalizeInputs();
+                this.updateResult();
+            });
+            this.monthInput.addEventListener(evt, () => {
+                this.normalizeInputs();
+                this.updateResult();
+            });
+            this.dayInput.addEventListener(evt, () => {
+                this.normalizeInputs();
+                this.updateResult();
+            });
         });
     }
 
+    normalizeInputs() {
+        this.limitDigits(this.yearInput, 4);
+        this.limitDigits(this.monthInput, 2);
+        this.limitDigits(this.dayInput, 2);
+    }
+
+    limitDigits(input, maxLength) {
+        if (!input) return;
+        const digits = String(input.value || '').replace(/\D/g, '').slice(0, maxLength);
+        if (input.value !== digits) {
+            input.value = digits;
+        }
+    }
+
     validate() {
-        const y = Number(this.yearInput.value || 0);
-        const m = Number(this.monthInput.value || 0);
-        const d = Number(this.dayInput.value || 0);
+        const yearText = String(this.yearInput.value || '');
+        const monthText = String(this.monthInput.value || '');
+        const dayText = String(this.dayInput.value || '');
+        const y = Number(yearText || 0);
+        const m = Number(monthText || 0);
+        const d = Number(dayText || 0);
 
         if (!y || !m || !d) {
             return { valid: false, msg: '출생일을 모두 입력해 주세요.' };
+        }
+        if (yearText.length !== 4) {
+            return { valid: false, msg: '연도는 4자리로 입력해 주세요.' };
+        }
+        if (monthText.length !== 2) {
+            return { valid: false, msg: '월은 2자리로 입력해 주세요.' };
+        }
+        if (dayText.length !== 2) {
+            return { valid: false, msg: '일은 2자리로 입력해 주세요.' };
         }
         if (m < 1 || m > 12) {
             return { valid: false, msg: '월은 1~12 사이로 입력해 주세요.' };
@@ -36,7 +71,12 @@ class BabyMonthsCalculator {
             return { valid: false, msg: '일은 1~31 사이로 입력해 주세요.' };
         }
         const birth = new Date(y, m - 1, d);
-        if (Number.isNaN(birth.getTime())) {
+        if (
+            Number.isNaN(birth.getTime()) ||
+            birth.getFullYear() !== y ||
+            birth.getMonth() !== m - 1 ||
+            birth.getDate() !== d
+        ) {
             return { valid: false, msg: '올바른 날짜를 입력해 주세요.' };
         }
         return { valid: true, birth };

@@ -40,7 +40,7 @@
 
 </head>
 
-<body>
+<body class="parent-child-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
@@ -52,7 +52,7 @@
             <div class="form-group">
                 <h3>부모</h3>
                 <div class="line-actions">
-                    <button type="button" class="btn btn-primary" id="add-parent-line">+</button>
+                    <button type="button" class="btn btn-primary line-add-btn" id="add-parent-line">부모 추가</button>
                 </div>
                 <div id="parent-lines" class="line-group"></div>
             </div>
@@ -60,7 +60,7 @@
             <div class="form-group" style="margin-top: 16px;">
                 <h3>자녀</h3>
                 <div class="line-actions">
-                    <button type="button" class="btn btn-primary" id="add-child-line">+</button>
+                    <button type="button" class="btn btn-primary line-add-btn" id="add-child-line">자녀 추가</button>
                 </div>
                 <div id="child-lines" class="line-group"></div>
                 <small id="parent-child-error" class="error-msg" aria-live="polite"></small>
