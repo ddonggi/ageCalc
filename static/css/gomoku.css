@@ -1,0 +1,50 @@
+.gomoku-subtitle {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.gomoku-panel {
+    width: min(760px, 100%);
+    margin-inline: auto;
+    text-align: center;
+}
+
+.gomoku-status {
+    min-height: 30px;
+    margin-bottom: 10px;
+    font-size: 22px;
+}
+
+.gomoku-board {
+    display: grid;
+    grid-template-columns: repeat(15, 1fr);
+    gap: 4px;
+    margin: 0 auto 12px;
+    width: min(100%, 620px);
+}
+
+.gomoku-cell {
+    aspect-ratio: 1 / 1;
+    border: 1px solid var(--border);
+    background: #f5e6c8;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+}
+
+.gomoku-cell:disabled {
+    cursor: not-allowed;
+    background: #ead8b7;
+}
+
+.gomoku-controls {
+    display: flex;
+    justify-content: center;
+}
+
+@media (max-width: 680px) {
+    .gomoku-status {
+        font-size: 20px;
+    }
+}

@@ -1,0 +1,49 @@
+.reversi-subtitle {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.reversi-panel {
+    width: min(620px, 100%);
+    margin-inline: auto;
+    text-align: center;
+}
+
+.reversi-legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 8px;
+    font-size: 18px;
+}
+
+.reversi-status {
+    min-height: 44px;
+    margin-bottom: 12px;
+    font-size: 20px;
+}
+
+.reversi-board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.reversi-cell {
+    aspect-ratio: 1 / 1;
+    border: 2px solid var(--border);
+    background: #f7efe0;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.reversi-cell:disabled {
+    cursor: not-allowed;
+    background: #eee4d1;
+}
+
+.reversi-controls {
+    display: flex;
+    justify-content: center;
+}

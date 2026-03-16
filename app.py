@@ -334,6 +334,16 @@ def pig_game():
     """피그 다이스 게임 페이지"""
     return render_template('pig.html')
 
+@app.route('/minigames/gomoku')
+def gomoku_game():
+    """오목 게임 페이지"""
+    return render_template('gomoku.html')
+
+@app.route('/minigames/reversi')
+def reversi_game():
+    """리버시 게임 페이지"""
+    return render_template('reversi.html')
+
 
 
 @app.post("/snake-score")
