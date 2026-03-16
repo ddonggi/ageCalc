@@ -4,6 +4,7 @@ import hashlib
 import html
 import json
 import os
+from pathlib import Path
 import re
 import sys
 import urllib.error
@@ -15,6 +16,12 @@ from email.utils import parsedate_to_datetime
 from typing import Any
 
 from sqlalchemy import select
+
+# Allow running via `python /path/to/scripts/rss_blog_scheduler.py`
+# without requiring the project root on PYTHONPATH.
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from db import SessionLocal, init_db
 from models.blog_models import FeedItem, FeedSource, GeneratedPost, PostSource
@@ -408,7 +415,7 @@ def create_posts(
     q = (
         select(FeedItem)
         .where(FeedItem.status == "new")
-        .order_by(FeedItem.published_at.desc().nullslast(), FeedItem.id.desc())
+        .order_by(FeedItem.published_at.is_(None), FeedItem.published_at.desc(), FeedItem.id.desc())
         .limit(limit)
     )
     feed_items = session.scalars(q).all()
