@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import base64
 import hashlib
 import html
 import json
@@ -17,7 +18,7 @@ from email.utils import parsedate_to_datetime
 from email.message import EmailMessage
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import or_, select
 
 # Allow running via `python /path/to/scripts/rss_blog_scheduler.py`
 # without requiring the project root on PYTHONPATH.
@@ -57,7 +58,31 @@ DEFAULT_TIMEOUT = 15
 DEFAULT_MODEL = "gpt-4.1-mini"
 DEFAULT_OLLAMA_MODEL = "mistral:latest"
 DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
+DEFAULT_OPENAI_IMAGE_MODEL = "gpt-image-1"
+DEFAULT_IMAGE_SIZE = "1536x1024"
+DEFAULT_IMAGE_COUNT = 1
+DEFAULT_IMAGE_QUALITY = "medium"
 DEFAULT_SMTP_PORT = 25
+IMAGE_OUTPUT_DIR = PROJECT_ROOT / "static" / "generated" / "blog-covers"
+PROMPTS_DIR = PROJECT_ROOT / "prompts"
+DEFAULT_BLOG_COVER_PROMPT = """
+한국어 건강/육아 정보 블로그용 커버 이미지를 제작해.
+
+목표:
+- 따뜻하고 신뢰감 있는 에디토리얼 일러스트 스타일
+- 텍스트가 이미지 안에 들어가지 않게
+- 썸네일과 블로그 커버로 쓰기 좋은 16:9 느낌의 안정적인 구도
+- 과장 광고 느낌, 선정적 표현, 자극적 대비 금지
+- 의료/육아 주제라도 불안감을 과도하게 자극하지 않게
+
+이미지 방향:
+- 블로그 메인 커버로 사용할 이미지 1장을 생성한다.
+- 16:9 비율에 어울리는 안정적인 구도로 구성한다.
+
+주제 제목: {title}
+요약: {excerpt}
+본문 핵심: {body}
+""".strip()
 
 
 def _env_bool(name: str, default: bool = False) -> bool:
@@ -67,12 +92,26 @@ def _env_bool(name: str, default: bool = False) -> bool:
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _env_int(name: str, default: int) -> int:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return int(value.strip())
+
+
 def _strip_tags(text: str) -> str:
     return re.sub(r"<[^>]+>", "", text or "").strip()
 
 
 def _normalize_space(text: str) -> str:
     return re.sub(r"\s+", " ", (text or "")).strip()
+
+
+def _load_prompt_template(name: str, fallback: str) -> str:
+    path = PROMPTS_DIR / name
+    if not path.exists():
+        return fallback
+    return path.read_text(encoding="utf-8").strip() or fallback
 
 
 def _slugify(text: str) -> str:
@@ -264,6 +303,12 @@ def _build_generation_prompt(feed_item: FeedItem) -> str:
 """.strip()
 
 
+def _build_image_prompt(title: str, excerpt: str, content_html: str) -> str:
+    body = _normalize_space(_strip_tags(content_html))[:1200]
+    template = _load_prompt_template("blog_cover_image_prompt.txt", DEFAULT_BLOG_COVER_PROMPT)
+    return template.format(title=title, excerpt=excerpt, body=body)
+
+
 def _parse_generated_json(text: str) -> tuple[str, str, str]:
     data = json.loads(text)
     title = _normalize_space(data.get("title", ""))
@@ -275,6 +320,24 @@ def _parse_generated_json(text: str) -> tuple[str, str, str]:
     if not excerpt:
         excerpt = _normalize_space(_strip_tags(content_html))[:180]
     return title, excerpt, content_html
+
+
+def _save_cover_bytes(data: bytes, ext: str, slug: str, suffix: str) -> str:
+    IMAGE_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    filename = f"{slug[:120]}-{suffix}{ext}"
+    path = IMAGE_OUTPUT_DIR / filename
+    path.write_bytes(data)
+    return f"/static/generated/blog-covers/{filename}"
+
+
+def _cleanup_generated_images(image_urls: list[str]) -> None:
+    for image_url in image_urls:
+        if not image_url.startswith("/static/generated/"):
+            continue
+        try:
+            (PROJECT_ROOT / image_url.lstrip("/")).unlink(missing_ok=True)
+        except OSError:
+            pass
 
 
 def _send_review_email(post: GeneratedPost) -> None:
@@ -356,6 +419,51 @@ def _generate_with_openai(feed_item: FeedItem, model: str) -> tuple[str, str, st
         raise RuntimeError("OpenAI response was empty")
 
     return _parse_generated_json(text)
+
+
+def _generate_cover_with_openai(title: str, excerpt: str, content_html: str, slug: str) -> list[str]:
+    api_key = os.getenv("OPENAI_API_KEY", "").strip()
+    if not api_key:
+        return []
+
+    body = {
+        "model": os.getenv("OPENAI_IMAGE_MODEL", DEFAULT_OPENAI_IMAGE_MODEL),
+        "prompt": _build_image_prompt(title, excerpt, content_html),
+        "size": os.getenv("OPENAI_IMAGE_SIZE", DEFAULT_IMAGE_SIZE),
+        "n": _env_int("OPENAI_IMAGE_COUNT", DEFAULT_IMAGE_COUNT),
+        "quality": os.getenv("OPENAI_IMAGE_QUALITY", DEFAULT_IMAGE_QUALITY),
+    }
+    req = urllib.request.Request(
+        "https://api.openai.com/v1/images/generations",
+        data=json.dumps(body).encode("utf-8"),
+        method="POST",
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+    )
+    with urllib.request.urlopen(req, timeout=90) as resp:
+        payload = json.loads(resp.read().decode("utf-8"))
+
+    image_urls: list[str] = []
+    for idx, item in enumerate(payload.get("data", []), start=1):
+        image_data = item.get("b64_json") or ""
+        if not image_data:
+            continue
+        image_bytes = base64.b64decode(image_data)
+        image_urls.append(_save_cover_bytes(image_bytes, ".png", slug, f"openai-{idx}"))
+    return image_urls
+
+
+def _inject_inline_images(content_html: str, image_urls: list[str]) -> str:
+    if len(image_urls) < 2:
+        return content_html
+    if "blog-inline-figure" in content_html:
+        return content_html
+    first_inline = (
+        f'<figure class="blog-inline-figure"><img src="{image_urls[1]}" alt="" loading="lazy"></figure>'
+    )
+    return re.sub(r"</p>", f"</p>{first_inline}", content_html, count=1, flags=re.IGNORECASE)
 
 
 def _generate_with_ollama(feed_item: FeedItem, model: str, base_url: str) -> tuple[str, str, str]:
@@ -554,13 +662,22 @@ def create_posts(
             post_title, excerpt, content_html = _generate_fallback(item)
 
         slug = _unique_slug(session, post_title)
+        image_urls: list[str] = []
+        if provider == "openai":
+            try:
+                image_urls = _generate_cover_with_openai(post_title, excerpt, content_html, slug)
+            except Exception as exc:  # noqa: BLE001
+                print(f"[image] openai failed for {item.original_url}: {exc}", file=sys.stderr)
+        cover_image_url = image_urls[0] if image_urls else None
+        if image_urls:
+            content_html = _inject_inline_images(content_html, image_urls)
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         post = GeneratedPost(
             slug=slug,
             title=post_title[:255],
             excerpt=excerpt[:500],
             content_html=content_html,
-            cover_image_url=None,
+            cover_image_url=cover_image_url,
             status=status,
             published_at=now if status == "published" else None,
         )
@@ -578,8 +695,12 @@ def create_posts(
         item.status = "used"
         created_count += 1
 
-        print(f"[post] created slug={slug} source={item.original_url} mode={used_mode}")
+        print(
+            f"[post] created slug={slug} source={item.original_url} mode={used_mode} "
+            f"image_count={len(image_urls)} cover={cover_image_url or 'none'}"
+        )
         if dry_run:
+            _cleanup_generated_images(image_urls)
             session.rollback()
             return created_count
         session.commit()
@@ -590,6 +711,51 @@ def create_posts(
                 print(f"[notify] review email failed for post_id={post.id}: {exc}", file=sys.stderr)
 
     return created_count
+
+
+def backfill_post_covers(session, limit: int, status: str, dry_run: bool) -> int:
+    q = select(GeneratedPost).where(
+        or_(GeneratedPost.cover_image_url.is_(None), GeneratedPost.cover_image_url == "")
+    )
+    if status != "all":
+        q = q.where(GeneratedPost.status == status)
+    q = q.order_by(GeneratedPost.created_at.desc(), GeneratedPost.id.desc()).limit(limit)
+    posts = session.scalars(q).all()
+    updated_count = 0
+
+    for post in posts:
+        image_urls: list[str] = []
+        try:
+            image_urls = _generate_cover_with_openai(post.title, post.excerpt or "", post.content_html, post.slug)
+        except Exception as exc:  # noqa: BLE001
+            print(f"[backfill] image failed for post_id={post.id} slug={post.slug}: {exc}", file=sys.stderr)
+            continue
+
+        if not image_urls:
+            print(f"[backfill] skipped post_id={post.id} slug={post.slug} reason=no-image")
+            continue
+
+        cover_image_url = image_urls[0]
+        if dry_run:
+            print(
+                f"[backfill] would-update post_id={post.id} slug={post.slug} "
+                f"image_count={len(image_urls)} cover={cover_image_url}"
+            )
+            _cleanup_generated_images(image_urls)
+            continue
+
+        post.cover_image_url = cover_image_url
+        post.content_html = _inject_inline_images(post.content_html, image_urls)
+        session.commit()
+        updated_count += 1
+        print(
+            f"[backfill] updated post_id={post.id} slug={post.slug} "
+            f"image_count={len(image_urls)} cover={cover_image_url}"
+        )
+
+    if dry_run:
+        session.rollback()
+    return updated_count
 
 
 def cmd_list_sources() -> int:
@@ -683,6 +849,25 @@ def cmd_run(
         session.close()
 
 
+def cmd_backfill_covers(limit: int, status: str, dry_run: bool) -> int:
+    init_db()
+    session = SessionLocal()
+    try:
+        updated_posts = backfill_post_covers(
+            session=session,
+            limit=limit,
+            status=status,
+            dry_run=dry_run,
+        )
+        print(
+            f"[done] backfill_covers updated_posts={updated_posts} "
+            f"status={status} dry_run={dry_run}"
+        )
+        return 0
+    finally:
+        session.close()
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="AgeCalc RSS -> blog scheduler")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -706,6 +891,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_run.add_argument("--ollama-url", default=os.getenv("OLLAMA_URL", DEFAULT_OLLAMA_URL))
     p_run.add_argument("--no-openai", action="store_true", help="Deprecated: same as --provider fallback")
     p_run.add_argument("--dry-run", action="store_true")
+
+    p_backfill = sub.add_parser("backfill-covers", help="Generate missing cover images for existing posts")
+    p_backfill.add_argument("--limit", type=int, default=20, help="Max posts to update per run")
+    p_backfill.add_argument("--status", choices=["draft", "published", "all"], default="all")
+    p_backfill.add_argument("--dry-run", action="store_true")
     return p
 
 
@@ -729,6 +919,12 @@ def main() -> int:
             provider=provider,
             model=model,
             ollama_url=args.ollama_url,
+            dry_run=args.dry_run,
+        )
+    if args.cmd == "backfill-covers":
+        return cmd_backfill_covers(
+            limit=max(1, args.limit),
+            status=args.status,
             dry_run=args.dry_run,
         )
     return 1

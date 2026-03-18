@@ -121,6 +121,8 @@ python scripts/rss_blog_scheduler.py run --limit 2 --status draft --provider fal
 
 - `scripts/rss_blog_scheduler.py`는 프로젝트 루트의 `.env.rss`를 자동으로 읽습니다.
 - `BLOG_BASE_URL`, `BLOG_REVIEW_TOKEN`, `BLOG_DRAFT_PASSWORD`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM_EMAIL`, `SMTP_TO_EMAIL`가 설정되어 있으면 draft 생성 후 검토 메일을 보내고 draft 목록 접근 비밀번호도 환경변수로 관리합니다.
+- `--provider openai`로 실행하면 커버 이미지를 생성해 `static/generated/blog-covers/`에 저장하고 `cover_image_url`에 연결합니다. 필요하면 `OPENAI_IMAGE_MODEL`, `OPENAI_IMAGE_SIZE`, `OPENAI_IMAGE_COUNT`, `OPENAI_IMAGE_QUALITY`로 조정할 수 있습니다.
+- 기존 글의 누락된 커버를 채우려면 `python scripts/rss_blog_scheduler.py backfill-covers --limit 20`를 실행하면 됩니다. 먼저 확인만 하려면 `--dry-run`을 붙이면 됩니다.
 
 - 마이크로맘바 환경에서 1회 실행:
 ```bash
