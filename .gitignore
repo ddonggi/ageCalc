@@ -10,11 +10,13 @@ instance/
 
 # Environment
 .env
+.env.rss
 .env.local
 .env.openai.local
 .venv/
 venv/
 ENV/
+.micromamba/
 
 # IDE
 .vscode/
@@ -42,6 +44,7 @@ Thumbs.db
 
 # Runtime data
 data/
+static/generated/
 
 # Configuration files with sensitive data
 config.py

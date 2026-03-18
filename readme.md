@@ -119,6 +119,9 @@ python scripts/rss_blog_scheduler.py run --limit 2 --status draft --provider oll
 python scripts/rss_blog_scheduler.py run --limit 2 --status draft --provider fallback
 ```
 
+- `scripts/rss_blog_scheduler.py`는 프로젝트 루트의 `.env.rss`를 자동으로 읽습니다.
+- `BLOG_BASE_URL`, `BLOG_REVIEW_TOKEN`, `BLOG_DRAFT_PASSWORD`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM_EMAIL`, `SMTP_TO_EMAIL`가 설정되어 있으면 draft 생성 후 검토 메일을 보내고 draft 목록 접근 비밀번호도 환경변수로 관리합니다.
+
 - 마이크로맘바 환경에서 1회 실행:
 ```bash
 source /srv/apps/agecalc/.micromamba/etc/profile.d/micromamba.sh

@@ -5,15 +5,21 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-    <title>{{ post.title }} | AgeCalc 블로그</title>
+    <title>{% if review_mode %}[검토] {% elif draft_mode %}[초안] {% endif %}{{ post.title }} | AgeCalc 블로그</title>
     <meta name="description" content="{{ post.excerpt or '' }}" />
+    {% if review_mode or draft_mode %}
+    <meta name="robots" content="noindex,nofollow" />
+    {% else %}
     <link rel="canonical" href="https://agecalc.cloud/blog/{{ post.slug }}" />
+    {% endif %}
 
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="AgeCalc" />
     <meta property="og:title" content="{{ post.title }}" />
     <meta property="og:description" content="{{ post.excerpt or '' }}" />
+    {% if not review_mode and not draft_mode %}
     <meta property="og:url" content="https://agecalc.cloud/blog/{{ post.slug }}" />
+    {% endif %}
     <meta property="og:image" content="{{ post.cover_image_url or url_for('static', filename='images/og-image.png', _external=True) }}" />
 
     <link rel="icon" href="/favicon.ico">
@@ -38,14 +44,30 @@
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
+        {% if draft_mode %}
+        <a class="back-link" href="{{ url_for('blog_drafts') }}">초안 목록으로 돌아가기</a>
+        {% else %}
         <a class="back-link" href="{{ url_for('blog_list') }}">블로그 목록으로 돌아가기</a>
+        {% endif %}
         <article class="blog-article">
             <header class="article-header">
                 <p class="eyebrow">AgeCalc Editorial</p>
                 <h1>{{ post.title }}</h1>
+                {% if review_mode %}
+                <p class="blog-date">검토 모드 · 현재 상태: {{ post.status }}</p>
+                {% elif draft_mode %}
+                <p class="blog-date">초안 모드 · 현재 상태: {{ post.status }}</p>
+                {% endif %}
+                {% if review_mode %}
+                <form method="post" action="{{ url_for('blog_review_approve', post_id=post.id, token=review_token) }}" style="margin: 0 0 16px;">
+                    <button type="submit" class="page-btn">이 글 승인 후 공개</button>
+                </form>
+                {% endif %}
                 <p class="blog-date">
                     {% if post.published_at %}
                     {{ post.published_at.strftime('%Y-%m-%d %H:%M') }}
+                    {% elif post.created_at %}
+                    {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}
                     {% endif %}
                 </p>
                 {% if post.excerpt %}

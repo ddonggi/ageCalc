@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import re
+import smtplib
 import sys
 import urllib.error
 import urllib.parse
@@ -13,6 +14,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
+from email.message import EmailMessage
 from typing import Any
 
 from sqlalchemy import select
@@ -23,6 +25,30 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+ENV_FILE = PROJECT_ROOT / ".env.rss"
+
+
+def _load_env_file(path: Path) -> None:
+    if not path.exists():
+        return
+
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+
+        key, value = line.split("=", 1)
+        key = key.strip()
+        if key.startswith("export "):
+            key = key[7:].strip()
+        if not key or key in os.environ:
+            continue
+
+        os.environ[key] = value.strip().strip('"').strip("'")
+
+
+_load_env_file(ENV_FILE)
+
 from db import SessionLocal, init_db
 from models.blog_models import FeedItem, FeedSource, GeneratedPost, PostSource
 
@@ -31,6 +57,14 @@ DEFAULT_TIMEOUT = 15
 DEFAULT_MODEL = "gpt-4.1-mini"
 DEFAULT_OLLAMA_MODEL = "mistral:latest"
 DEFAULT_OLLAMA_URL = "http://127.0.0.1:11434"
+DEFAULT_SMTP_PORT = 25
+
+
+def _env_bool(name: str, default: bool = False) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
 def _strip_tags(text: str) -> str:
@@ -241,6 +275,58 @@ def _parse_generated_json(text: str) -> tuple[str, str, str]:
     if not excerpt:
         excerpt = _normalize_space(_strip_tags(content_html))[:180]
     return title, excerpt, content_html
+
+
+def _send_review_email(post: GeneratedPost) -> None:
+    smtp_host = os.getenv("SMTP_HOST", "").strip()
+    smtp_to = os.getenv("SMTP_TO_EMAIL", "").strip()
+    review_token = (os.getenv("BLOG_REVIEW_TOKEN", "") or "").strip()
+    base_url = (os.getenv("BLOG_BASE_URL", "https://agecalc.cloud") or "").rstrip("/")
+    if not smtp_host or not smtp_to or not review_token:
+        return
+
+    try:
+        smtp_port = int(os.getenv("SMTP_PORT", str(DEFAULT_SMTP_PORT)).strip())
+    except ValueError as exc:
+        raise RuntimeError("SMTP_PORT must be an integer") from exc
+
+    smtp_username = os.getenv("SMTP_USERNAME", "").strip()
+    smtp_password = os.getenv("SMTP_PASSWORD", "").strip()
+    smtp_from = (os.getenv("SMTP_FROM_EMAIL", smtp_username or smtp_to) or "").strip()
+    use_tls = _env_bool("SMTP_USE_TLS", default=True)
+    review_url = f"{base_url}/blog/review/{post.id}?token={urllib.parse.quote(review_token)}"
+    approve_url = f"{base_url}/blog/review/{post.id}/approve?token={urllib.parse.quote(review_token)}"
+
+    msg = EmailMessage()
+    msg["Subject"] = f"[AgeCalc] 블로그 초안 검토 필요: {post.title}"
+    msg["From"] = smtp_from
+    msg["To"] = smtp_to
+    msg.set_content(
+        "\n".join(
+            [
+                "새 블로그 초안이 생성되었습니다.",
+                "",
+                f"제목: {post.title}",
+                f"초안 ID: {post.id}",
+                f"상태: {post.status}",
+                "",
+                f"검토 페이지: {review_url}",
+                f"즉시 승인: {approve_url}",
+            ]
+        )
+    )
+
+    with smtplib.SMTP(smtp_host, smtp_port, timeout=20) as client:
+        client.ehlo()
+        if use_tls:
+            client.starttls()
+            client.ehlo()
+        if smtp_password and not smtp_username:
+            raise RuntimeError("SMTP_USERNAME is required when SMTP_PASSWORD is set")
+        if smtp_username:
+            client.login(smtp_username, smtp_password)
+        client.send_message(msg)
+    print(f"[notify] sent review email for post_id={post.id}")
 
 
 def _generate_with_openai(feed_item: FeedItem, model: str) -> tuple[str, str, str]:
@@ -468,7 +554,7 @@ def create_posts(
             post_title, excerpt, content_html = _generate_fallback(item)
 
         slug = _unique_slug(session, post_title)
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc).replace(tzinfo=None)
         post = GeneratedPost(
             slug=slug,
             title=post_title[:255],
@@ -497,6 +583,11 @@ def create_posts(
             session.rollback()
             return created_count
         session.commit()
+        if status == "draft":
+            try:
+                _send_review_email(post)
+            except Exception as exc:  # noqa: BLE001
+                print(f"[notify] review email failed for post_id={post.id}: {exc}", file=sys.stderr)
 
     return created_count
 

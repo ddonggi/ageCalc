@@ -1,19 +1,49 @@
 import math
-from flask import Flask, render_template, request, jsonify, g, send_from_directory, abort
+from flask import Flask, render_template, request, jsonify, g, send_from_directory, abort, redirect, session, url_for
 import json
 import os
 import threading
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 import secrets
 from controllers.age_controller import AgeController
 from db import SessionLocal, close_db_session, init_db
 from models.blog_models import GeneratedPost
 
+PROJECT_ROOT = Path(__file__).resolve().parent
+ENV_FILE = PROJECT_ROOT / ".env.rss"
+
+
+def _load_env_file(path: Path) -> None:
+    if not path.exists():
+        return
+
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+
+        key, value = line.split("=", 1)
+        key = key.strip()
+        if key.startswith("export "):
+            key = key[7:].strip()
+        if not key or key in os.environ:
+            continue
+
+        os.environ[key] = value.strip().strip('"').strip("'")
+
+
+_load_env_file(ENV_FILE)
+
 app = Flask(__name__)
+app.secret_key = os.getenv("FLASK_SECRET_KEY") or os.getenv("BLOG_REVIEW_TOKEN") or "agecalc-drafts-v1"
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=8)
 _score_lock = threading.Lock()
 _score_file = os.path.join(app.root_path, "data", "snake_scores.json")
 os.makedirs(os.path.dirname(_score_file), exist_ok=True)
 init_db()
+
+BLOG_DRAFT_ACCESS_SESSION_KEY = "blog_draft_access"
 
 @app.before_request
 def set_csp_nonce():
@@ -93,6 +123,22 @@ def health():
 @app.get("/favicon.ico")
 def favicon():
     return send_from_directory(app.root_path, "favicon.ico")
+
+
+def _review_token_is_valid(token: str) -> bool:
+    expected = (os.getenv("BLOG_REVIEW_TOKEN", "") or "").strip()
+    provided = (token or "").strip()
+    return bool(expected) and secrets.compare_digest(expected, provided)
+
+
+def _draft_password_is_valid(password: str) -> bool:
+    expected = (os.getenv("BLOG_DRAFT_PASSWORD", "") or "").strip()
+    provided = (password or "").strip()
+    return bool(expected) and secrets.compare_digest(expected, provided)
+
+
+def _draft_access_granted() -> bool:
+    return bool(session.get(BLOG_DRAFT_ACCESS_SESSION_KEY))
 
 
 @app.get('/')
@@ -242,7 +288,99 @@ def blog_detail(slug):
     )
     if post is None:
         abort(404)
-    return render_template('blog-detail.html', post=post)
+    return render_template('blog-detail.html', post=post, draft_mode=False, review_mode=False)
+
+
+@app.route('/blog/drafts', methods=['GET', 'POST'])
+def blog_drafts():
+    error = None
+
+    if request.method == 'POST':
+        if _draft_password_is_valid(request.form.get('password', '')):
+            session.permanent = True
+            session[BLOG_DRAFT_ACCESS_SESSION_KEY] = True
+            return redirect(url_for('blog_drafts'))
+        error = '비밀번호가 올바르지 않습니다.'
+
+    if not _draft_access_granted():
+        return render_template(
+            'blog-drafts.html',
+            access_granted=False,
+            error=error,
+            posts=[],
+        )
+
+    db_session = SessionLocal()
+    posts = (
+        db_session.query(GeneratedPost)
+        .filter(GeneratedPost.status == "draft")
+        .order_by(GeneratedPost.created_at.desc(), GeneratedPost.id.desc())
+        .all()
+    )
+    return render_template(
+        'blog-drafts.html',
+        access_granted=True,
+        error=None,
+        posts=posts,
+    )
+
+
+@app.post('/blog/drafts/logout')
+def blog_drafts_logout():
+    session.pop(BLOG_DRAFT_ACCESS_SESSION_KEY, None)
+    return redirect(url_for('blog_drafts'))
+
+
+@app.route('/blog/drafts/<slug>')
+def blog_draft_detail(slug):
+    if not _draft_access_granted():
+        return redirect(url_for('blog_drafts'))
+
+    db_session = SessionLocal()
+    post = (
+        db_session.query(GeneratedPost)
+        .filter(GeneratedPost.slug == slug, GeneratedPost.status == "draft")
+        .first()
+    )
+    if post is None:
+        abort(404)
+    return render_template('blog-detail.html', post=post, draft_mode=True, review_mode=False)
+
+
+@app.route('/blog/review/<int:post_id>')
+def blog_review(post_id):
+    token = request.args.get("token", "")
+    if not _review_token_is_valid(token):
+        abort(403)
+
+    db_session = SessionLocal()
+    post = db_session.query(GeneratedPost).filter(GeneratedPost.id == post_id).first()
+    if post is None:
+        abort(404)
+    return render_template(
+        'blog-detail.html',
+        post=post,
+        draft_mode=False,
+        review_mode=True,
+        review_token=token,
+    )
+
+
+@app.post('/blog/review/<int:post_id>/approve')
+def blog_review_approve(post_id):
+    token = request.args.get("token", "")
+    if not _review_token_is_valid(token):
+        abort(403)
+
+    db_session = SessionLocal()
+    post = db_session.query(GeneratedPost).filter(GeneratedPost.id == post_id).first()
+    if post is None:
+        abort(404)
+    if post.status != "published":
+        post.status = "published"
+        post.published_at = datetime.now(timezone.utc).replace(tzinfo=None)
+        db_session.commit()
+    return redirect(url_for('blog_detail', slug=post.slug))
 
 @app.route('/minigames')
 def minigames():

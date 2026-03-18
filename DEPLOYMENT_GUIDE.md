@@ -206,6 +206,8 @@ export OPENAI_API_KEY="<YOUR_OPENAI_API_KEY>"
 exit
 ```
 
+스케줄러와 앱은 `/srv/apps/agecalc/.env.rss`를 자동으로 읽습니다. `BLOG_BASE_URL`, `BLOG_REVIEW_TOKEN`, `BLOG_DRAFT_PASSWORD`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_FROM_EMAIL`, `SMTP_TO_EMAIL`가 있으면 draft 생성 후 검토 메일을 발송하고 draft 접근 비밀번호도 환경변수로 관리합니다.
+
 `### 10.3 서비스/타이머 등록
 `systemd/agecalc-rss.service` 파일에서 아래 값 수정 후 적용:
 - `DATABASE_URL`
