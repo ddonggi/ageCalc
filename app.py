@@ -1,5 +1,5 @@
 import math
-from flask import Flask, render_template, request, jsonify, g, send_from_directory, abort, redirect, session, url_for
+from flask import Flask, Response, render_template, request, jsonify, g, send_from_directory, abort, redirect, session, url_for
 import json
 import os
 import threading
@@ -44,6 +44,41 @@ os.makedirs(os.path.dirname(_score_file), exist_ok=True)
 init_db()
 
 BLOG_DRAFT_ACCESS_SESSION_KEY = "blog_draft_access"
+SITE_BASE_URL = (os.getenv("BLOG_BASE_URL", "https://agecalc.cloud") or "https://agecalc.cloud").rstrip("/")
+PUBLIC_SITEMAP_ENDPOINTS = [
+    "index",
+    "age",
+    "privacy",
+    "terms",
+    "guide",
+    "faq",
+    "dog",
+    "cat",
+    "baby_months",
+    "d_day",
+    "parent_child",
+    "blog_list",
+    "minigames",
+    "guess_game",
+    "snake_game",
+    "tictactoe_game",
+    "rps_game",
+    "nim_game",
+    "pong_game",
+    "hangman_game",
+    "memory_game",
+    "connect4_game",
+    "lightsout_game",
+    "minesweeper_game",
+    "simon_game",
+    "game_2048",
+    "blackjack_game",
+    "breakout_game",
+    "hanoi_game",
+    "pig_game",
+    "gomoku_game",
+    "reversi_game",
+]
 
 @app.before_request
 def set_csp_nonce():
@@ -139,6 +174,61 @@ def _draft_password_is_valid(password: str) -> bool:
 
 def _draft_access_granted() -> bool:
     return bool(session.get(BLOG_DRAFT_ACCESS_SESSION_KEY))
+
+
+def _format_sitemap_lastmod(value: datetime | None) -> str | None:
+    if value is None:
+        return None
+    return value.date().isoformat()
+
+
+def _absolute_url_for(endpoint: str, **values) -> str:
+    return f"{SITE_BASE_URL}{url_for(endpoint, **values)}"
+
+
+def _build_sitemap_entry(loc: str, lastmod: str | None = None) -> str:
+    if lastmod:
+        return f"  <url><loc>{loc}</loc><lastmod>{lastmod}</lastmod></url>"
+    return f"  <url><loc>{loc}</loc></url>"
+
+
+@app.get("/sitemap.xml")
+def sitemap():
+    db_session = SessionLocal()
+    try:
+        posts = (
+            db_session.query(GeneratedPost)
+            .filter(GeneratedPost.status == "published")
+            .order_by(GeneratedPost.published_at.desc(), GeneratedPost.id.desc())
+            .all()
+        )
+
+        newest_post_dt = next(
+            (
+                post.published_at or post.updated_at or post.created_at
+                for post in posts
+                if post.published_at or post.updated_at or post.created_at
+            ),
+            None,
+        )
+        entries = []
+        for endpoint in PUBLIC_SITEMAP_ENDPOINTS:
+            lastmod = _format_sitemap_lastmod(newest_post_dt) if endpoint == "blog_list" else None
+            entries.append(_build_sitemap_entry(_absolute_url_for(endpoint), lastmod))
+
+        for post in posts:
+            lastmod = _format_sitemap_lastmod(post.updated_at or post.published_at or post.created_at)
+            entries.append(_build_sitemap_entry(_absolute_url_for("blog_detail", slug=post.slug), lastmod))
+    finally:
+        db_session.close()
+
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{chr(10).join(entries)}\n"
+        "</urlset>\n"
+    )
+    return Response(xml, mimetype="application/xml")
 
 
 @app.get('/')
