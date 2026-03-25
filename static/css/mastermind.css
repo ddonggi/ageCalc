@@ -1,0 +1,93 @@
+.mastermind-subtitle {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.mastermind-panel {
+    width: min(620px, 100%);
+    margin-inline: auto;
+}
+
+.mastermind-status {
+    min-height: 24px;
+    margin-bottom: 12px;
+    text-align: center;
+    font-size: 20px;
+}
+
+.mastermind-palette,
+.mastermind-slots {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.mastermind-palette {
+    grid-template-columns: repeat(6, 1fr);
+}
+
+.mastermind-slots {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.mastermind-color-btn,
+.mastermind-slot {
+    border: 3px solid var(--border);
+    border-radius: 999px;
+    aspect-ratio: 1 / 1;
+    background: #f7efe0;
+}
+
+.mastermind-color-btn {
+    cursor: pointer;
+}
+
+.mastermind-controls {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.mastermind-history {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.mastermind-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    align-items: center;
+    border: 3px solid var(--border);
+    padding: 8px 10px;
+    background: #fdf5e8;
+}
+
+.mastermind-pegs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    width: 120px;
+}
+
+.mastermind-peg {
+    border: 2px solid var(--border);
+    border-radius: 999px;
+    aspect-ratio: 1 / 1;
+    background: #f7efe0;
+}
+
+.mastermind-feedback {
+    font-size: 18px;
+}
+
+.mastermind-secret {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 18px;
+}

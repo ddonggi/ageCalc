@@ -43,7 +43,7 @@
         if (roll === 1) { turnTotal = 0; setStatus('컴퓨터가 1을 굴렸습니다.'); playerTurn = true; updateUI(); return; }
         turnTotal += roll;
         if (cpuTotal + turnTotal >= targetScore) { cpuTotal += turnTotal; endGame('컴퓨터 승리'); return; }
-        if (turnTotal >= 12) { cpuTotal += turnTotal; turnTotal = 0; playerTurn = true; setStatus('컴퓨터가 Hold 했습니다.'); updateUI(); return; }
+        if (turnTotal >= 12) { cpuTotal += turnTotal; turnTotal = 0; playerTurn = true; setStatus('컴퓨터가 점수를 저장했습니다.'); updateUI(); return; }
         updateUI(); window.setTimeout(cpuTurn, 700);
     };
     const newGame = () => { playerTotal = 0; cpuTotal = 0; turnTotal = 0; playerTurn = true; inGame = true; dieEl.textContent = '-'; setStatus('주사위를 굴려 시작하세요.'); updateUI(); };

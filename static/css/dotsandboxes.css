@@ -1,0 +1,40 @@
+.dab-subtitle {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.dab-panel {
+    width: min(620px, 100%);
+    margin-inline: auto;
+    text-align: center;
+}
+
+.dab-legend {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    font-size: 16px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.dab-status {
+    min-height: 44px;
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+#dab-board {
+    width: min(90vw, 460px);
+    height: min(90vw, 460px);
+    border: 3px solid var(--border);
+    background: #fdf7ec;
+    display: block;
+    margin: 0 auto 12px;
+    touch-action: none;
+}
+
+.dab-controls {
+    display: flex;
+    justify-content: center;
+}

@@ -1,0 +1,59 @@
+.war-subtitle {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.war-panel {
+    width: min(620px, 100%);
+    margin-inline: auto;
+    text-align: center;
+}
+
+.war-board {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.war-card-slot {
+    border: 3px solid var(--border);
+    background: #f7f0e4;
+    padding: 16px;
+    min-height: 90px;
+    display: grid;
+    place-items: center;
+    font-size: 28px;
+}
+
+.war-label {
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+.war-controls {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 10px 0 6px;
+}
+
+.war-status {
+    min-height: 24px;
+    margin: 8px 0;
+    font-size: 20px;
+}
+
+.war-counts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    font-size: 16px;
+    margin-top: 6px;
+}
+
+.war-pile {
+    font-size: 16px;
+    margin-top: 8px;
+}

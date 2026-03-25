@@ -78,6 +78,10 @@ PUBLIC_SITEMAP_ENDPOINTS = [
     "pig_game",
     "gomoku_game",
     "reversi_game",
+    "dotsandboxes_game",
+    "mancala_game",
+    "mastermind_game",
+    "war_game",
 ]
 
 @app.before_request
@@ -571,6 +575,26 @@ def gomoku_game():
 def reversi_game():
     """리버시 게임 페이지"""
     return render_template('reversi.html')
+
+@app.route('/minigames/dotsandboxes')
+def dotsandboxes_game():
+    """점 잇기 게임 페이지"""
+    return render_template('dotsandboxes.html')
+
+@app.route('/minigames/mancala')
+def mancala_game():
+    """만칼라 게임 페이지"""
+    return render_template('mancala.html')
+
+@app.route('/minigames/mastermind')
+def mastermind_game():
+    """마스터마인드 게임 페이지"""
+    return render_template('mastermind.html')
+
+@app.route('/minigames/war')
+def war_game():
+    """카드 전쟁 게임 페이지"""
+    return render_template('war.html')
 
 
 

@@ -20,7 +20,7 @@
     const shuffleDeck = () => { deck = []; suits.forEach((s) => ranks.forEach((r) => deck.push({ suit: s, label: r.label, value: r.value }))); for (let i = deck.length - 1; i > 0; i -= 1) { const j = Math.floor(Math.random() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; } };
     const drawCard = () => { if (!deck.length) shuffleDeck(); return deck.pop(); };
     const handValue = (hand) => { let total = 0, aces = 0; hand.forEach((c) => { total += c.value; if (c.label === 'A') aces += 1; }); while (total > 21 && aces > 0) { total -= 10; aces -= 1; } return total; };
-    const renderHand = (el, hand, hideSecond) => { el.innerHTML = ''; hand.forEach((card, idx) => { const c = document.createElement('div'); c.textContent = hideSecond && idx === 1 ? '[hidden]' : `${card.label}${card.suit}`; el.appendChild(c); }); };
+    const renderHand = (el, hand, hideSecond) => { el.innerHTML = ''; hand.forEach((card, idx) => { const c = document.createElement('div'); c.textContent = hideSecond && idx === 1 ? '[숨김]' : `${card.label}${card.suit}`; el.appendChild(c); }); };
     const updateScores = () => { playerScoreEl.textContent = `점수: ${handValue(playerHand)}`; dealerScoreEl.textContent = revealDealer ? `점수: ${handValue(dealerHand)}` : '점수: ?'; };
     const setControls = () => { dealBtn.disabled = inRound; hitBtn.disabled = !inRound; standBtn.disabled = !inRound; };
     const render = () => { renderHand(dealerCardsEl, dealerHand, !revealDealer); renderHand(playerCardsEl, playerHand, false); updateScores(); setControls(); };
@@ -35,10 +35,10 @@
         else setStatus('무승부');
         render();
     };
-    const startRound = () => { shuffleDeck(); dealerHand = [drawCard(), drawCard()]; playerHand = [drawCard(), drawCard()]; inRound = true; revealDealer = false; setStatus('내 차례입니다.'); render(); if (handValue(playerHand) === 21) endRound(); };
+    const startRound = () => { shuffleDeck(); dealerHand = [drawCard(), drawCard()]; playerHand = [drawCard(), drawCard()]; inRound = true; revealDealer = false; setStatus('내 차례입니다. 한 장 더 받을지 선택하세요.'); render(); if (handValue(playerHand) === 21) endRound(); };
     dealBtn.addEventListener('click', () => { if (!inRound) startRound(); });
     hitBtn.addEventListener('click', () => { if (!inRound) return; playerHand.push(drawCard()); if (handValue(playerHand) > 21) endRound(); else render(); });
     standBtn.addEventListener('click', () => { if (inRound) endRound(); });
-    newBtn.addEventListener('click', () => { dealerHand = []; playerHand = []; inRound = false; revealDealer = false; setStatus('Deal 버튼으로 시작하세요.'); render(); });
+    newBtn.addEventListener('click', () => { dealerHand = []; playerHand = []; inRound = false; revealDealer = false; setStatus('카드 나누기 버튼으로 시작하세요.'); render(); });
     render();
 })();

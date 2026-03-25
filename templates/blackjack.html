@@ -35,10 +35,10 @@
         <h1>블랙잭</h1>
         <p class="game-sub">21에 더 가까운 점수를 만들어 딜러를 이기세요.</p>
         <section class="mini-game"><div class="game-panel card-panel" aria-live="polite">
-            <div class="game-status" id="bj-status">Deal 버튼으로 시작하세요.</div>
+            <div class="game-status" id="bj-status">카드 나누기 버튼으로 시작하세요.</div>
             <section class="hand"><h3>딜러</h3><div class="cards" id="bj-dealer-cards"></div><div class="score" id="bj-dealer-score">점수: ?</div></section>
-            <section class="hand"><h3>플레이어</h3><div class="cards" id="bj-player-cards"></div><div class="score" id="bj-player-score">점수: 0</div></section>
-            <div class="game-controls"><button class="game-btn" id="bj-deal" type="button">Deal</button><button class="game-btn" id="bj-hit" type="button" disabled>Hit</button><button class="game-btn" id="bj-stand" type="button" disabled>Stand</button><button class="game-btn" id="bj-new" type="button">New</button></div>
+            <section class="hand"><h3>나</h3><div class="cards" id="bj-player-cards"></div><div class="score" id="bj-player-score">점수: 0</div></section>
+            <div class="game-controls"><button class="game-btn" id="bj-deal" type="button">카드 나누기</button><button class="game-btn" id="bj-hit" type="button" disabled>한 장 더</button><button class="game-btn" id="bj-stand" type="button" disabled>멈추기</button><button class="game-btn" id="bj-new" type="button">새 게임</button></div>
         </div></section>
         {% include 'partials/footer.html' %}
     </div>
