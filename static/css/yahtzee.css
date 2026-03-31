@@ -1,0 +1,93 @@
+.yahtzee-subtitle {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.yahtzee-panel {
+    width: min(760px, 100%);
+    margin-inline: auto;
+    text-align: center;
+}
+
+.yahtzee-status {
+    min-height: 48px;
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.yahtzee-meta {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+.yahtzee-dice {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    width: min(92vw, 460px);
+    margin: 0 auto 14px;
+}
+
+.yahtzee-die {
+    border: 3px solid var(--border);
+    background: linear-gradient(180deg, #fff9e6 0%, #e8f0ff 100%);
+    color: #1d2430;
+    padding: 16px 0;
+    font-size: clamp(24px, 5vw, 34px);
+    cursor: pointer;
+}
+
+.yahtzee-die.locked {
+    background: linear-gradient(180deg, #ffe4a3 0%, #f59e0b 100%);
+}
+
+.yahtzee-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+}
+
+.yahtzee-sheet {
+    display: grid;
+    gap: 8px;
+}
+
+.yahtzee-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+    border: 3px solid var(--border);
+    background: linear-gradient(180deg, #fff7e7 0%, #f7ead3 100%);
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 18px;
+}
+
+.yahtzee-row:disabled {
+    opacity: 0.72;
+}
+
+.yahtzee-totals {
+    display: grid;
+    gap: 6px;
+    margin-top: 14px;
+    font-size: 18px;
+    text-align: left;
+}
+
+@media (max-width: 560px) {
+    .yahtzee-dice {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .yahtzee-row {
+        font-size: 16px;
+    }
+}

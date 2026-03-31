@@ -48,6 +48,11 @@ def generate_sitemap(base_url="https://yourdomain.com"):
         ("/minigames/mancala", "monthly", "0.7"),
         ("/minigames/mastermind", "monthly", "0.7"),
         ("/minigames/war", "monthly", "0.7"),
+        ("/minigames/battleship", "monthly", "0.7"),
+        ("/minigames/checkers", "monthly", "0.7"),
+        ("/minigames/fifteen", "monthly", "0.7"),
+        ("/minigames/pegsolitaire", "monthly", "0.7"),
+        ("/minigames/yahtzee", "monthly", "0.7"),
     ]
 
     static_entries = [

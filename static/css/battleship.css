@@ -1,0 +1,61 @@
+.bs-subtitle {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.bs-panel {
+    width: min(620px, 100%);
+    margin-inline: auto;
+    text-align: center;
+}
+
+.bs-status {
+    min-height: 44px;
+    margin-bottom: 12px;
+    font-size: 20px;
+}
+
+.bs-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    width: min(92vw, 420px);
+    margin: 0 auto 14px;
+}
+
+.bs-cell {
+    aspect-ratio: 1 / 1;
+    border: 3px solid var(--border);
+    background: linear-gradient(180deg, #b9ebff 0%, #6cc3f0 100%);
+    color: #16324f;
+    font-size: clamp(22px, 4vw, 28px);
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.bs-cell:hover:not(:disabled) {
+    transform: translateY(-2px);
+    filter: brightness(1.03);
+}
+
+.bs-cell.hit {
+    background: linear-gradient(180deg, #ffd56a 0%, #f59e0b 100%);
+}
+
+.bs-cell.miss {
+    background: linear-gradient(180deg, #d7e6ef 0%, #a6b7c4 100%);
+}
+
+.bs-meta {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+.bs-controls {
+    display: flex;
+    justify-content: center;
+}

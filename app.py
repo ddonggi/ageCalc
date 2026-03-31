@@ -94,6 +94,11 @@ PUBLIC_SITEMAP_ENDPOINTS = [
     "mancala_game",
     "mastermind_game",
     "war_game",
+    "battleship_game",
+    "checkers_game",
+    "fifteen_game",
+    "pegsolitaire_game",
+    "yahtzee_game",
 ]
 
 @app.before_request
@@ -626,6 +631,31 @@ def mastermind_game():
 def war_game():
     """카드 전쟁 게임 페이지"""
     return render_template('war.html')
+
+@app.route('/minigames/battleship')
+def battleship_game():
+    """해전 게임 페이지"""
+    return render_template('battleship.html')
+
+@app.route('/minigames/checkers')
+def checkers_game():
+    """체커 게임 페이지"""
+    return render_template('checkers.html')
+
+@app.route('/minigames/fifteen')
+def fifteen_game():
+    """15 퍼즐 게임 페이지"""
+    return render_template('fifteen.html')
+
+@app.route('/minigames/pegsolitaire')
+def pegsolitaire_game():
+    """페그 솔리테어 게임 페이지"""
+    return render_template('pegsolitaire.html')
+
+@app.route('/minigames/yahtzee')
+def yahtzee_game():
+    """야추 게임 페이지"""
+    return render_template('yahtzee.html')
 
 
 

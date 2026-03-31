@@ -1,15 +1,15 @@
 (() => {
     const words = [
-        'COMET',
-        'ORBIT',
-        'ROCKET',
-        'GALAXY',
-        'ASTRAL',
-        'PILOT',
-        'PLANET',
-        'METEOR',
-        'COSMOS',
-        'VOYAGE'
+        '우주선',
+        '별빛',
+        '노을',
+        '은하수',
+        '바람',
+        '고양이',
+        '파도',
+        '모험',
+        '다람쥐',
+        '행성'
     ];
 
     const wordEl = document.getElementById('hangman-word');
@@ -32,8 +32,7 @@
     };
 
     const renderWord = () => {
-        const text = secret
-            .split('')
+        const text = Array.from(secret)
             .map((ch) => (revealed.has(ch) ? ch : '_'))
             .join(' ');
         wordEl.textContent = text;
@@ -53,7 +52,7 @@
     };
 
     const checkWin = () => {
-        for (const ch of secret) {
+        for (const ch of Array.from(secret)) {
             if (!revealed.has(ch)) return false;
         }
         return true;
@@ -66,7 +65,7 @@
         remaining = 6;
         gameOver = false;
         renderWord();
-        setStatus('알파벳을 입력해 단어를 맞춰보세요.');
+        setStatus('한글 글자를 입력해 단어를 맞춰보세요.');
         renderGuesses();
         updateControls();
         input.value = '';
@@ -75,8 +74,8 @@
 
     const handleGuess = (letter) => {
         if (gameOver) return;
-        if (!/^[A-Z]$/.test(letter)) {
-            setStatus('A-Z 알파벳 한 글자만 입력할 수 있습니다.');
+        if (!/^[가-힣]$/.test(letter)) {
+            setStatus('한글 글자 한 개만 입력할 수 있습니다.');
             return;
         }
 
@@ -111,7 +110,7 @@
 
     form.addEventListener('submit', (event) => {
         event.preventDefault();
-        const letter = input.value.trim().toUpperCase();
+        const letter = input.value.trim();
         input.value = '';
         handleGuess(letter);
     });

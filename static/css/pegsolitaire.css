@@ -1,0 +1,70 @@
+.peg-subtitle {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.peg-panel {
+    width: min(720px, 100%);
+    margin-inline: auto;
+    text-align: center;
+}
+
+.peg-status {
+    min-height: 48px;
+    margin-bottom: 12px;
+    font-size: 20px;
+}
+
+.peg-board {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    width: min(92vw, 430px);
+    margin: 0 auto 14px;
+}
+
+.peg-hole {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    border: 3px solid var(--border);
+    background: #f0ead8;
+    cursor: pointer;
+}
+
+.peg-hole.invalid {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.peg-hole.empty {
+    background: #fffdf7;
+}
+
+.peg-hole.selected {
+    box-shadow: 0 0 0 4px #ffe17b inset;
+}
+
+.peg-hole.peg::after {
+    content: "";
+    position: absolute;
+    width: 58%;
+    height: 58%;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle at 30% 30%, #ffd6a0 0%, #cf7a32 45%, #93501d 100%);
+    border: 3px solid var(--border);
+    box-sizing: border-box;
+}
+
+.peg-controls {
+    display: flex;
+    justify-content: center;
+}
+
+.peg-moves {
+    margin-top: 12px;
+    font-size: 18px;
+}

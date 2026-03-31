@@ -492,7 +492,7 @@
             ctx.fillStyle = colors.border;
             ctx.font = '14px "Press Start 2P", monospace';
             ctx.textAlign = 'center';
-            ctx.fillText('PAUSED', boardSize / 2, boardSize / 2 + 6);
+            ctx.fillText('일시정지', boardSize / 2, boardSize / 2 + 6);
         }
 
         if (over) {
@@ -501,7 +501,7 @@
             ctx.fillStyle = colors.border;
             ctx.font = '16px "Press Start 2P", monospace';
             ctx.textAlign = 'center';
-            ctx.fillText('GAME OVER', boardSize / 2, boardSize / 2 + 6);
+            ctx.fillText('게임 종료', boardSize / 2, boardSize / 2 + 6);
             const stage = getStage();
             ctx.font = '12px "Press Start 2P", monospace';
             ctx.fillText(`나의 등급 : ${stage.label}`, boardSize / 2, boardSize / 2 + 22);

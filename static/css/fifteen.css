@@ -1,0 +1,53 @@
+.fifteen-subtitle {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.fifteen-panel {
+    width: min(520px, 100%);
+    margin-inline: auto;
+    text-align: center;
+}
+
+.fifteen-status {
+    min-height: 40px;
+    margin-bottom: 12px;
+    font-size: 20px;
+}
+
+.fifteen-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    width: min(92vw, 360px);
+    margin: 0 auto 14px;
+}
+
+.fifteen-cell {
+    aspect-ratio: 1 / 1;
+    border: 3px solid var(--border);
+    background: linear-gradient(180deg, #fef4d0 0%, #f4b860 100%);
+    color: #3d2208;
+    font-size: clamp(24px, 6vw, 34px);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.fifteen-cell:hover:not(.blank):not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.fifteen-cell.blank {
+    background: linear-gradient(180deg, #e7efe5 0%, #c2d8c6 100%);
+    cursor: default;
+}
+
+.fifteen-controls {
+    display: flex;
+    justify-content: center;
+}
+
+.fifteen-moves {
+    margin-top: 12px;
+    font-size: 18px;
+}

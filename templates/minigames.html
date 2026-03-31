@@ -162,7 +162,7 @@
                             <span class="age-unit">행맨</span>
                         </div>
                         <ul>
-                            <li>알파벳 한 글자씩 단어를 맞추는 퍼즐</li>
+                            <li>한글 글자를 하나씩 맞춰 단어를 완성하는 퍼즐</li>
                             <li>오답 6번 전까지 정답을 완성해야 승리</li>
                             <li>새 단어 버튼으로 바로 다음 판 시작</li>
                         </ul>
@@ -373,6 +373,71 @@
                             <li>서로 한 장씩 뒤집어 높은 카드가 승리</li>
                             <li>동점이면 전쟁이 이어지는 단순 규칙 카드게임</li>
                             <li>짧은 템포로 가볍게 즐기기 좋음</li>
+                        </ul>
+                    </div>
+                </a>
+                <a class="card-link" href="{{ url_for('battleship_game') }}">
+                    <div class="age-right-item">
+                        <div class="age-header">
+                            <span class="age-number">🚢</span>
+                            <span class="age-unit">해전</span>
+                        </div>
+                        <ul>
+                            <li>5x5 보드에 숨은 함선을 추리해 찾아내는 게임</li>
+                            <li>명중과 빗나감 정보를 바탕으로 다음 칸을 읽어야 함</li>
+                            <li>짧은 턴 안에 전체 함선을 침몰시키는 것이 목표</li>
+                        </ul>
+                    </div>
+                </a>
+                <a class="card-link" href="{{ url_for('checkers_game') }}">
+                    <div class="age-right-item">
+                        <div class="age-header">
+                            <span class="age-number">🔴</span>
+                            <span class="age-unit">체커</span>
+                        </div>
+                        <ul>
+                            <li>대각선 이동과 점프로 상대 말을 잡는 보드게임</li>
+                            <li>잡을 수 있는 말이 있다면 반드시 점프해야 함</li>
+                            <li>왕 승급 이후 이동 폭이 넓어지는 전략 게임</li>
+                        </ul>
+                    </div>
+                </a>
+                <a class="card-link" href="{{ url_for('fifteen_game') }}">
+                    <div class="age-right-item">
+                        <div class="age-header">
+                            <span class="age-number">1️⃣</span>
+                            <span class="age-unit">15 퍼즐</span>
+                        </div>
+                        <ul>
+                            <li>빈칸을 이용해 숫자 타일을 순서대로 맞추는 퍼즐</li>
+                            <li>한 칸씩 밀어가며 최소 이동을 노릴 수 있음</li>
+                            <li>짧은 시간 집중력 훈련에 적합</li>
+                        </ul>
+                    </div>
+                </a>
+                <a class="card-link" href="{{ url_for('pegsolitaire_game') }}">
+                    <div class="age-right-item">
+                        <div class="age-header">
+                            <span class="age-number">📍</span>
+                            <span class="age-unit">페그 솔리테어</span>
+                        </div>
+                        <ul>
+                            <li>핀을 하나씩 점프해 제거하는 클래식 퍼즐</li>
+                            <li>마지막에 핀 하나만 남기면 클리어</li>
+                            <li>끝수 계산과 경로 계획이 중요한 게임</li>
+                        </ul>
+                    </div>
+                </a>
+                <a class="card-link" href="{{ url_for('yahtzee_game') }}">
+                    <div class="age-right-item">
+                        <div class="age-header">
+                            <span class="age-number">🎲</span>
+                            <span class="age-unit">야추</span>
+                        </div>
+                        <ul>
+                            <li>주사위를 굴린 뒤 가장 유리한 점수 칸을 선택</li>
+                            <li>고정 기능으로 원하는 조합을 노릴 수 있음</li>
+                            <li>13라운드 합산으로 총점을 겨루는 게임</li>
                         </ul>
                     </div>
                 </a>
