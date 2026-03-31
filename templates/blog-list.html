@@ -66,7 +66,7 @@
                     <h3>{{ post.title }}</h3>
                     <p class="blog-date">
                         {% if post.published_at %}
-                        {{ post.published_at.strftime('%Y-%m-%d') }}
+                        {{ post.published_at | blog_datetime('%Y-%m-%d') }}
                         {% endif %}
                     </p>
                     <p class="blog-excerpt">{{ post.excerpt or '' }}</p>

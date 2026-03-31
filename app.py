@@ -6,6 +6,7 @@ import threading
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import secrets
+from zoneinfo import ZoneInfo
 from controllers.age_controller import AgeController
 from db import SessionLocal, close_db_session, init_db
 from models.blog_models import GeneratedPost
@@ -34,6 +35,17 @@ def _load_env_file(path: Path) -> None:
 
 
 _load_env_file(ENV_FILE)
+
+
+def _load_blog_timezone():
+    tz_name = (os.getenv("BLOG_TIMEZONE", "Asia/Seoul") or "Asia/Seoul").strip()
+    try:
+        return ZoneInfo(tz_name)
+    except Exception:
+        return timezone(timedelta(hours=9), name="KST")
+
+
+BLOG_TIMEZONE = _load_blog_timezone()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY") or os.getenv("BLOG_REVIEW_TOKEN") or "agecalc-drafts-v1"
@@ -180,10 +192,29 @@ def _draft_access_granted() -> bool:
     return bool(session.get(BLOG_DRAFT_ACCESS_SESSION_KEY))
 
 
+def _as_blog_localtime(value: datetime | None) -> datetime | None:
+    if value is None:
+        return None
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.astimezone(BLOG_TIMEZONE)
+
+
+@app.template_filter("blog_datetime")
+def blog_datetime(value: datetime | None, fmt: str = "%Y-%m-%d %H:%M") -> str:
+    local_dt = _as_blog_localtime(value)
+    if local_dt is None:
+        return ""
+    return local_dt.strftime(fmt)
+
+
 def _format_sitemap_lastmod(value: datetime | None) -> str | None:
     if value is None:
         return None
-    return value.date().isoformat()
+    local_dt = _as_blog_localtime(value)
+    if local_dt is None:
+        return None
+    return local_dt.date().isoformat()
 
 
 def _absolute_url_for(endpoint: str, **values) -> str:

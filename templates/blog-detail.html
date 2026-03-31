@@ -65,9 +65,9 @@
                 {% endif %}
                 <p class="blog-date">
                     {% if post.published_at %}
-                    {{ post.published_at.strftime('%Y-%m-%d %H:%M') }}
+                    {{ post.published_at | blog_datetime('%Y-%m-%d %H:%M') }}
                     {% elif post.created_at %}
-                    {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    {{ post.created_at | blog_datetime('%Y-%m-%d %H:%M') }}
                     {% endif %}
                 </p>
                 {% if post.excerpt %}
