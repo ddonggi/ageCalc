@@ -82,14 +82,25 @@ class BabyMonthsCalculator {
         return { valid: true, birth };
     }
 
+    getToday() {
+        const now = new Date();
+        return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    }
+
     calculateMonths(birth) {
-        const today = new Date();
+        const today = this.getToday();
         let months = (today.getFullYear() - birth.getFullYear()) * 12;
         months += today.getMonth() - birth.getMonth();
         if (today.getDate() < birth.getDate()) {
             months -= 1;
         }
         return Math.max(0, months);
+    }
+
+    calculateTotalDays(birth) {
+        const today = this.getToday();
+        const diffMs = today.getTime() - birth.getTime();
+        return Math.max(0, Math.floor(diffMs / 86400000));
     }
 
     updateResult() {
@@ -102,6 +113,7 @@ class BabyMonthsCalculator {
 
         this.showError('');
         const months = this.calculateMonths(v.birth);
+        const totalDays = this.calculateTotalDays(v.birth);
         const years = Math.floor(months / 12);
         const remain = months % 12;
         const vaccineTips = this.getVaccineTips(months);
@@ -111,7 +123,7 @@ class BabyMonthsCalculator {
             <div class="result success">
                 <p class="message">현재 개월 수</p>
                 <div class="age-info">
-                    <p class="age"><span class="age-number">${months}개월</span></p>
+                    <p class="age"><span class="age-number">${months}개월</span> <span class="small">(${totalDays}일)</span></p>
                 </div>
                 <p class="small">${years}년 ${remain}개월</p>
                 <p class="small">* 예방접종/발달 단계 확인에 활용해 보세요.</p>
