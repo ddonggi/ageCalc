@@ -1,15 +1,18 @@
 <footer class="footer">
     <div class="footer-grid">
         <section class="footer-section footer-intro">
-            <p class="eyebrow">Age & Life Toolkit</p>
-            <h4>AgeCalc</h4>
-            <p>나이 계산, 생활 기준, 건강 맥락을 한 화면에서 이해할 수 있도록 정리한 도구와 읽을거리입니다.</p>
+            <p class="eyebrow">AgeCalc System</p>
+            <h4>한 화면에서 정렬된 생활 기준 도구</h4>
+            <p>AgeCalc는 계산기, 설명형 콘텐츠, 짧은 플레이 경험을 하나의 인터페이스 언어로 묶어 보여주는 생활 유틸리티 보드입니다.</p>
             <p class="footer-contact">문의: <a href="mailto:ldg6153@gmail.com">ldg6153@gmail.com</a></p>
         </section>
 
         <section class="footer-section">
-            <h4>안내</h4>
+            <h4>탐색</h4>
             <div class="footer-links">
+                <a href="{{ url_for('age') }}">대표 계산기</a>
+                <a href="{{ url_for('blog_list') }}">블로그</a>
+                <a href="{{ url_for('minigames') }}">미니게임</a>
                 <a href="{{ url_for('privacy') }}">개인정보처리방침</a>
                 <a href="{{ url_for('terms') }}">이용약관</a>
                 <a href="{{ url_for('guide') }}">나이 계산 가이드</a>
@@ -18,7 +21,7 @@
         </section>
 
         <section class="footer-section footer-support">
-            <h4>☕ 커피 한 잔 후원</h4>
+            <h4>운영 지원</h4>
             <div class="support-row">
                 <div class="support-qr" aria-label="후원 QR 코드 영역">
                     <img src="{{ url_for('static', filename='images/donationQR.svg') }}" alt="후원 QR 코드">

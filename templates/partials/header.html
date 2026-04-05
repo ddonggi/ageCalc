@@ -1,8 +1,11 @@
 <header class="site-header">
-    <div class="brand-lockup">
+    <div class="brand-block">
         <a class="brand" href="{{ url_for('index') }}">
-            <span class="brand-word">AgeCalc</span>
-            <span class="brand-tag">2026</span>
+            <span class="brand-mark" aria-hidden="true"></span>
+            <span class="brand-lockup">
+                <span class="brand-word">AgeCalc</span>
+                <span class="brand-tag">Life Utility Board</span>
+            </span>
         </a>
         <p class="brand-note">생활 기준을 읽는 계산 도구와 설명형 콘텐츠</p>
     </div>
@@ -16,4 +19,5 @@
         <a href="{{ url_for('blog_list') }}">블로그</a>
         <a href="{{ url_for('minigames') }}">미니게임</a>
     </nav>
+    <a class="header-cta" href="{{ url_for('age') }}">대표 계산기</a>
 </header>
