@@ -54,17 +54,47 @@
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <section class="hero-band">
+        <section class="hero-band hero-command-board">
             <div class="hero-copy">
-                <p class="eyebrow">Age &amp; Life Toolkit</p>
-                <h1>나이 계산을 넘어, 삶의 기준을 읽는 도구 모음</h1>
+                <p class="eyebrow">Hero Command Board</p>
+                <h1>삶의 기준을 읽는 도구를 한 보드에 정렬합니다</h1>
                 <p class="page-intro">
-                    만나이, 반려동물 나이, 아이 개월 수처럼 자주 찾는 계산을 빠르게 끝내고,
-                    바로 이해할 수 있도록 설명과 맥락까지 함께 제공합니다.
+                    AgeCalc는 계산만 빠르게 끝내는 유틸리티가 아니라, 결과를 이해하는 데 필요한 맥락까지
+                    함께 묶어 보여주는 생활 도구 보드입니다. 계산기, 설명형 글, 짧게 쉬어갈 플레이 모듈이
+                    하나의 시스템처럼 연결됩니다.
                 </p>
                 <div class="hero-actions">
                     <a class="btn btn-primary" href="{{ url_for('age') }}">대표 계산기 시작</a>
                     <a class="btn btn-secondary" href="{{ url_for('blog_list') }}">설명형 글 보기</a>
+                </div>
+            </div>
+            <div class="hero-command" aria-label="핵심 모듈 미리보기">
+                <article class="command-panel command-panel-primary">
+                    <p class="command-label">Command Surface</p>
+                    <h2>계산, 읽기, 탐색을 같은 리듬으로 이어주는 첫 화면</h2>
+                    <p>대표 계산기부터 블로그와 미니게임까지 모듈 단위로 정리해, 한 번에 분위기와 구조가 함께 읽히도록 설계했습니다.</p>
+                </article>
+                <div class="command-grid">
+                    <article class="command-panel">
+                        <p class="command-label">Core Tools</p>
+                        <strong>6</strong>
+                        <span>핵심 계산기 모듈</span>
+                    </article>
+                    <article class="command-panel">
+                        <p class="command-label">Reading</p>
+                        <strong>Guide</strong>
+                        <span>배경 설명과 해석</span>
+                    </article>
+                    <article class="command-panel">
+                        <p class="command-label">Signals</p>
+                        <strong>Trust</strong>
+                        <span>기준일·정책 안내</span>
+                    </article>
+                    <article class="command-panel">
+                        <p class="command-label">Play</p>
+                        <strong>Arcade</strong>
+                        <span>짧은 쉬어가기 모듈</span>
+                    </article>
                 </div>
             </div>
         </section>
@@ -186,6 +216,19 @@
                     <li>정책·제도 정보는 공식 기관의 최신 지침 우선</li>
                     <li>의학적·행정적 판단은 관계 기관 또는 전문가 확인 권장</li>
                     <li>마지막 기준 확인일: 2026-02-09</li>
+                </ul>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">Across Surfaces</p>
+                <h2>도구, 블로그, 미니게임을 한 디자인 시스템으로 묶습니다</h2>
+                <p>
+                    첫 화면만 강한 랜딩으로 만들지 않고, 내부 페이지에서도 같은 카드 리듬과 정보 계층을 유지해
+                    사이트 전체가 하나의 제품처럼 보이게 합니다.
+                </p>
+                <ul>
+                    <li>계산기: 입력과 결과를 더 또렷한 모듈로 정리</li>
+                    <li>블로그: 설명형 카드와 읽기 흐름 강화</li>
+                    <li>미니게임: 같은 브랜드 안의 플레이 서브보드로 확장</li>
                 </ul>
             </article>
         </section>
