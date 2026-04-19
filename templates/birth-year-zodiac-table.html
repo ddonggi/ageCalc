@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <title>출생연도별 띠표 | AgeCalc</title>
+    <meta name="description" content="출생연도별 띠와 현재 기준 나이를 함께 확인할 수 있는 출생연도별 띠표입니다." />
+    <link rel="canonical" href="https://agecalc.cloud/birth-year-zodiac-table" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="출생연도별 띠표 | AgeCalc" />
+    <meta property="og:description" content="12간지 기준으로 출생연도별 띠와 연나이, 만나이 범위를 한눈에 볼 수 있습니다." />
+    <meta property="og:url" content="https://agecalc.cloud/birth-year-zodiac-table" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
+    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    {% include 'partials/adsense.html' %}
+</head>
+
+<body>
+    <div id="pixel-background"></div>
+    <div class="container">
+        {% include 'partials/header.html' %}
+
+        <section class="hero-band">
+            <div class="hero-copy">
+                <p class="eyebrow">12간지 안내</p>
+                <h1>출생연도별 띠표</h1>
+                <p class="page-intro">
+                    출생연도만 선택하면 어떤 띠인지와 현재 기준 연나이, 만나이 범위를 함께 확인할 수 있습니다.
+                    띠는 12간지 순환으로 계산하며, 말띠, 용띠처럼 자주 찾는 연도도 예시로 함께 정리했습니다.
+                </p>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="#zodiac-search">출생연도 선택</a>
+                    <a class="btn btn-secondary" href="{{ url_for('birth_year_age_table') }}">출생년도별 나이표 보기</a>
+                </div>
+            </div>
+            <div class="hero-metrics" aria-label="띠 정보">
+                <article class="metric-card">
+                    <span class="metric-value">12간지</span>
+                    <span class="metric-label">출생연도 기준 순환</span>
+                </article>
+                <article class="metric-card">
+                    <span class="metric-value">띠</span>
+                    <span class="metric-label">쥐띠부터 돼지띠까지</span>
+                </article>
+                <article class="metric-card">
+                    <span class="metric-value">말띠</span>
+                    <span class="metric-label">대표 예시도 함께 제공</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2 id="zodiac-search">출생연도 선택</h2>
+                <p class="section-intro">찾고 싶은 연도를 고르면 해당 연도의 띠와 나이 정보를 바로 요약해 보여드립니다.</p>
+            </div>
+            <form class="age-form birth-year-form" method="get" action="{{ url_for('birth_year_zodiac_table') }}">
+                <div class="form-group">
+                    <div class="date-inputs">
+                        <select name="year" aria-label="출생연도 선택">
+                            <option value="">출생연도를 선택하세요</option>
+                            {% for year in year_options %}
+                            <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}년생</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" type="submit">띠표 보기</button>
+                        {% if selected_year %}
+                        <a class="btn btn-secondary" href="{{ url_for('birth_year_zodiac_table') }}">선택 해제</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        {% if selected_row %}
+        <section class="section-shell section-card-grid">
+            <article class="section-card birth-year-summary">
+                <p class="eyebrow">선택한 출생연도</p>
+                <h2>{{ selected_row.label }}</h2>
+                <p>{{ selected_row.detail }}</p>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <strong>띠</strong>
+                        <span>{{ selected_row.zodiac_label }}</span>
+                    </div>
+                    <div class="summary-card">
+                        <strong>연나이</strong>
+                        <span>{{ selected_row.annual_age }}</span>
+                    </div>
+                    <div class="summary-card">
+                        <strong>만나이 범위</strong>
+                        <span>{{ selected_row.man_age_range }}</span>
+                    </div>
+                </div>
+            </article>
+        </section>
+        {% endif %}
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>예시로 보는 띠</h2>
+                <p class="section-intro">많이 찾는 출생연도를 예시로 먼저 정리했습니다.</p>
+            </div>
+            <div class="section-card-grid">
+                {% for example in examples %}
+                <article class="section-card">
+                    <p class="eyebrow">{{ example.label }}</p>
+                    <h2>{{ example.zodiac_label }}</h2>
+                    <p>{{ example.detail }}</p>
+                    <p class="small">{{ example.annual_age }} / {{ example.man_age_range }}</p>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>{{ current_year }}년 기준 출생연도별 띠표</h2>
+                <p class="section-intro">출생연도와 띠, 현재 기준 나이를 한 표로 정리했습니다.</p>
+            </div>
+            <div class="data-table-wrap">
+                <table class="data-table birth-year-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">출생연도</th>
+                            <th scope="col">띠</th>
+                            <th scope="col">연나이</th>
+                            <th scope="col">만나이 범위</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in zodiac_rows %}
+                        <tr{% if row.is_selected %} class="is-selected"{% endif %}>
+                            <td>{{ row.label }}</td>
+                            <td>{{ row.zodiac_label }}</td>
+                            <td>{{ row.annual_age }}</td>
+                            <td>{{ row.man_age_range }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="section-shell section-card-grid">
+            <article class="section-card">
+                <p class="eyebrow">같이 보기</p>
+                <h2>연관 페이지</h2>
+                <div class="footer-links">
+                    <a href="{{ url_for('birth_year_age_table') }}">출생년도별 나이표</a>
+                    <a href="{{ url_for('age_comparison_table') }}">만나이·연나이 비교표</a>
+                    <a href="{{ url_for('annual_age_calculator') }}">연나이 계산기</a>
+                    <a href="{{ url_for('references') }}">계산 기준과 참고 자료</a>
+                </div>
+            </article>
+        </section>
+
+        {% include 'partials/footer.html' %}
+    </div>
+
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 동의 여부는 아래에서 선택할 수 있으며, 거부해도 주요 기능은 그대로 이용할 수 있습니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
+</body>
+
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <title>운영 원칙 | AgeCalc</title>
+    <meta name="description" content="AgeCalc의 콘텐츠 운영 원칙, 편집 기준, 출처 사용 방식과 문의 방법을 안내합니다." />
+    <link rel="canonical" href="https://agecalc.cloud/about" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="운영 원칙 | AgeCalc" />
+    <meta property="og:description" content="AgeCalc의 콘텐츠 운영 원칙과 편집 기준" />
+    <meta property="og:url" content="https://agecalc.cloud/about" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
+    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    {% include 'partials/adsense.html' %}
+</head>
+
+<body>
+    <div id="pixel-background"></div>
+    <div class="container">
+        {% include 'partials/header.html' %}
+
+        <section class="hero-band">
+            <div class="hero-copy">
+                <p class="eyebrow">운영 기준</p>
+                <h1>콘텐츠 운영 원칙</h1>
+                <p class="page-intro">
+                    AgeCalc는 계산 결과만 보여주는 사이트가 아니라, 계산 기준과 해석에 필요한 설명 글까지 함께 제공하는
+                    생활 정보 서비스를 지향합니다.
+                </p>
+            </div>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>편집 기준</h2>
+                <p class="section-intro">자동 수집 원문을 그대로 옮기지 않고, 한국어 독자가 이해하기 쉬운 설명 글로 다시 정리합니다.</p>
+            </div>
+            <div class="age-rights-grid">
+                <article class="age-right-item">
+                    <div class="age-header">
+                        <span class="age-number">1</span>
+                        <span class="age-unit">콘텐츠 운영 원칙</span>
+                    </div>
+                    <ul>
+                        <li>원문을 직역하거나 단순 요약한 글은 공개하지 않습니다.</li>
+                        <li>계산기와 연결되는 활용 맥락이 분명한 설명 글만 공개합니다.</li>
+                        <li>정책·제도 정보는 공식 기관 안내를 우선 확인하도록 안내합니다.</li>
+                    </ul>
+                </article>
+                <article class="age-right-item">
+                    <div class="age-header">
+                        <span class="age-number">2</span>
+                        <span class="age-unit">출처 사용 방식</span>
+                    </div>
+                    <ul>
+                        <li>모든 공개 글에는 참고한 자료 또는 출처 링크를 함께 표기합니다.</li>
+                        <li>연구·정책·보도자료는 핵심 사실을 교차 확인한 뒤 이해하기 쉬운 글로 다시 씁니다.</li>
+                        <li>과장되거나 불안감을 조장하는 표현은 지양합니다.</li>
+                    </ul>
+                </article>
+                <article class="age-right-item">
+                    <div class="age-header">
+                        <span class="age-number">3</span>
+                        <span class="age-unit">문의 및 수정</span>
+                    </div>
+                    <ul>
+                        <li>문의: <a href="mailto:{{ contact_email }}">{{ contact_email }}</a></li>
+                        <li>오류 제보가 접수되면 검토 후 글을 수정하거나 비공개 처리합니다.</li>
+                        <li>주요 수정이 있는 글은 최종 수정일을 표시합니다.</li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>추가 안내 보기</h2>
+                <p class="section-intro">운영 주체, 문의 방법, 계산 기준을 함께 확인할 수 있는 보조 안내 페이지입니다.</p>
+            </div>
+            <p class="page-intro" style="margin: 0; display: flex; flex-wrap: wrap; gap: 0.75rem;">
+                <a class="btn btn-secondary" href="{{ url_for('contact') }}">문의 및 운영자 안내 보기</a>
+                <a class="btn btn-secondary" href="{{ url_for('references') }}">계산 기준과 참고 자료 보기</a>
+            </p>
+        </section>
+
+        {% include 'partials/footer.html' %}
+    </div>
+
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 동의 여부는 아래에서 선택할 수 있으며, 거부해도 주요 기능은 그대로 이용할 수 있습니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
+</body>
+
+</html>

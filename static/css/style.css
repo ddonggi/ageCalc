@@ -814,6 +814,57 @@ input.error {
     min-height: 180px;
 }
 
+.birth-year-form {
+    align-items: end;
+}
+
+.birth-year-summary {
+    background:
+        radial-gradient(circle at top right, rgba(58, 184, 255, 0.12), transparent 24%),
+        rgba(255, 255, 255, 0.86);
+}
+
+.data-table-wrap {
+    overflow-x: auto;
+    padding: 4px;
+    border-radius: calc(var(--radius-lg) - 4px);
+    background: rgba(255, 255, 255, 0.68);
+    border: 1px solid rgba(18, 36, 59, 0.08);
+    box-shadow: var(--shadow-soft);
+}
+
+.data-table {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    color: var(--text);
+}
+
+.data-table th,
+.data-table td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(18, 36, 59, 0.08);
+}
+
+.data-table th {
+    font-size: 0.92rem;
+    color: var(--muted);
+    background: rgba(18, 36, 59, 0.04);
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tbody tr.is-selected {
+    background: rgba(58, 184, 255, 0.1);
+}
+
+.data-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.76);
+}
+
 .loading-message {
     display: grid;
     gap: 10px;
@@ -901,6 +952,31 @@ input.error {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.summary-card {
+    display: grid;
+    gap: 6px;
+    padding: 14px 16px;
+    border-radius: var(--radius-sm);
+    background: rgba(18, 36, 59, 0.05);
+    border: 1px solid rgba(18, 36, 59, 0.08);
+}
+
+.summary-card strong {
+    color: var(--muted);
+    font-size: 0.92rem;
+}
+
+.summary-card span {
+    font-weight: 700;
+    color: var(--text);
 }
 
 .share-icon {

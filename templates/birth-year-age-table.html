@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <title>출생년도별 나이표 | AgeCalc</title>
+    <meta name="description" content="출생년도만 선택하면 현재 기준 연나이와 만나이 범위, 띠, 세대명을 한눈에 확인할 수 있는 출생년도별 나이표입니다." />
+    <link rel="canonical" href="https://agecalc.cloud/birth-year-age-table" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="출생년도별 나이표 | AgeCalc" />
+    <meta property="og:description" content="출생년도별 연나이, 만나이 범위, 띠, 세대명을 한 장에서 확인할 수 있습니다." />
+    <meta property="og:url" content="https://agecalc.cloud/birth-year-age-table" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
+    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    {% include 'partials/adsense.html' %}
+</head>
+
+<body>
+    <div id="pixel-background"></div>
+    <div class="container">
+        {% include 'partials/header.html' %}
+
+        <section class="hero-band">
+            <div class="hero-copy">
+                <p class="eyebrow">빠른 조회</p>
+                <h1>출생년도별 나이표</h1>
+                <p class="page-intro">
+                    출생년도만 선택하면 {{ current_year }}년 기준 연나이와 만나이 범위, 띠, 세대명을 바로 확인할 수 있습니다.
+                    생일 정보가 없으므로 만나이는 단일 숫자 대신 생일 전후를 함께 안내합니다.
+                </p>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="#birth-year-search">연도 바로 찾기</a>
+                    <a class="btn btn-secondary" href="{{ url_for('age') }}">만나이 계산기 열기</a>
+                </div>
+            </div>
+            <div class="hero-metrics" aria-label="표시 정보">
+                <article class="metric-card">
+                    <span class="metric-value">연나이</span>
+                    <span class="metric-label">{{ current_year }}년 기준 계산</span>
+                </article>
+                <article class="metric-card">
+                    <span class="metric-value">만나이</span>
+                    <span class="metric-label">생일 전후 범위 안내</span>
+                </article>
+                <article class="metric-card">
+                    <span class="metric-value">띠·세대명</span>
+                    <span class="metric-label">보조 정보 함께 제공</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2 id="birth-year-search">출생년도 선택</h2>
+                <p class="section-intro">찾고 싶은 연도를 먼저 고르면 표 안에서 바로 강조해 보여드립니다.</p>
+            </div>
+            <form class="age-form birth-year-form" method="get" action="{{ url_for('birth_year_age_table') }}">
+                <div class="form-group">
+                    <div class="date-inputs">
+                        <select name="year" aria-label="출생년도 선택">
+                            <option value="">출생년도를 선택하세요</option>
+                            {% for year in year_options %}
+                            <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}년생</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" type="submit">나이표 보기</button>
+                        {% if selected_year %}
+                        <a class="btn btn-secondary" href="{{ url_for('birth_year_age_table') }}">선택 해제</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        {% if selected_row %}
+        <section class="section-shell section-card-grid">
+            <article class="section-card birth-year-summary">
+                <p class="eyebrow">선택한 연도</p>
+                <h2>{{ selected_row.label }} 나이 안내</h2>
+                <p>{{ selected_row.detail }}</p>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <strong>연나이</strong>
+                        <span>{{ selected_row.annual_age }}</span>
+                    </div>
+                    <div class="summary-card">
+                        <strong>만나이 범위</strong>
+                        <span>{{ selected_row.man_age_range }}</span>
+                    </div>
+                    <div class="summary-card">
+                        <strong>띠</strong>
+                        <span>{{ selected_row.zodiac }}</span>
+                    </div>
+                    <div class="summary-card">
+                        <strong>세대명</strong>
+                        <span>{{ selected_row.generation }}</span>
+                    </div>
+                </div>
+            </article>
+        </section>
+        {% endif %}
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>예시로 보는 출생년도</h2>
+                <p class="section-intro">많이 찾는 연도를 예시로 먼저 정리했습니다.</p>
+            </div>
+            <div class="section-card-grid">
+                {% for example in examples %}
+                <article class="section-card">
+                    <p class="eyebrow">{{ example.label }}</p>
+                    <h2>{{ example.annual_age }} / {{ example.man_age_range }}</h2>
+                    <p>{{ example.detail }}</p>
+                    <p class="small">띠: {{ example.zodiac }} · 세대명: {{ example.generation }}</p>
+                    <a class="btn btn-secondary" href="{{ url_for('birth_year_age_table', year=example.year) }}">이 연도 자세히 보기</a>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>{{ current_year }}년 기준 출생년도표</h2>
+                <p class="section-intro">출생년도 전체를 한 표로 정리했습니다. 선택한 연도는 강조 표시됩니다.</p>
+            </div>
+            <div class="data-table-wrap">
+                <table class="data-table birth-year-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">출생년도</th>
+                            <th scope="col">연나이</th>
+                            <th scope="col">만나이 범위</th>
+                            <th scope="col">띠</th>
+                            <th scope="col">세대명</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in birth_year_rows %}
+                        <tr{% if row.is_selected %} class="is-selected"{% endif %}>
+                            <td>{{ row.label }}</td>
+                            <td>{{ row.annual_age }}</td>
+                            <td>{{ row.man_age_range }}</td>
+                            <td>{{ row.zodiac }}</td>
+                            <td>{{ row.generation }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <p class="small">세대명은 넓게 쓰이는 구분을 참고용으로만 표시했습니다.</p>
+        </section>
+
+        <section class="section-shell section-card-grid">
+            <article class="section-card">
+                <p class="eyebrow">안내</p>
+                <h2>이 페이지를 보는 법</h2>
+                <ul>
+                    <li>연나이는 {{ current_year }}년에서 출생년도를 뺀 값입니다.</li>
+                    <li>만나이는 생일이 지났는지 여부를 모르기 때문에 범위로 안내합니다.</li>
+                    <li>정확한 만나이가 필요하면 생년월일을 넣는 계산기를 이용하는 편이 좋습니다.</li>
+                </ul>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">같이 보기</p>
+                <h2>정확한 계산이 필요할 때</h2>
+                <p>
+                    행정, 계약, 제출 서류처럼 정확한 기준일이 필요한 경우에는 출생년도 표보다
+                    생년월일을 입력하는 계산기가 더 적합합니다.
+                </p>
+                <div class="footer-links">
+                    <a href="{{ url_for('age') }}">만나이 계산기</a>
+                    <a href="{{ url_for('guide') }}">나이 계산 가이드</a>
+                    <a href="{{ url_for('faq') }}">자주 묻는 질문</a>
+                    <a href="{{ url_for('references') }}">계산 기준과 참고 자료</a>
+                </div>
+            </article>
+        </section>
+
+        {% include 'partials/footer.html' %}
+    </div>
+
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 동의 여부는 아래에서 선택할 수 있으며, 거부해도 주요 기능은 그대로 이용할 수 있습니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
+</body>
+
+</html>

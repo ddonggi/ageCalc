@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
     <title>부모·자녀 나이 관계 계산기 | AgeCalc</title>
-    <meta name="description" content="부모(부/모) 생년월일과 자녀 생년월일을 입력하면 출산 당시 나이, 현재 나이 차이, 환갑/칠순 시점의 자녀 나이를 계산합니다." />
+    <meta name="description" content="부모와 자녀의 생년월일을 입력하면 출산 당시 나이, 현재 나이 차이, 환갑·칠순 시점의 자녀 나이를 함께 계산합니다." />
 
     <link rel="canonical" href="https://agecalc.cloud/parent-child" />
 
@@ -33,7 +33,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M0RLS343N4"></script>
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
@@ -46,7 +45,7 @@
         {% include 'partials/header.html' %}
 
         <h1>부모·자녀 나이 관계 계산기</h1>
-        <div style="text-align: center;margin-bottom: 2rem;">부모(부/모)와 자녀의 나이 관계를 계산합니다</div>
+        <div style="text-align: center;margin-bottom: 2rem;">부모와 자녀의 나이 차이와 주요 시점을 함께 살펴볼 수 있습니다.</div>
 
         <form class="age-form" id="parent-child-form" autocomplete="off">
             <div class="form-group">
@@ -80,7 +79,7 @@
         </div>
 
         <section style="margin-top:40px">
-            <h2>설명</h2>
+            <h2>이 계산기로 알 수 있는 내용</h2>
             <ul>
                 <li>부모가 자녀를 낳았을 때의 나이를 계산합니다.</li>
                 <li>현재 부모·자녀의 나이 차이를 확인합니다.</li>
@@ -108,6 +107,10 @@
                 가족 행사 계획, 기념일 정리, 세대 간 나이 차이 계산에 유용합니다.
                 다만 법적·행정적 기준이 필요한 경우에는 관계 기관의 최신 안내를 확인하세요.
             </p>
+            <p>
+                가족 관계가 아니라 두 사람의 출생년도만 빠르게 비교하고 싶다면
+                <a href="{{ url_for('age_gap_calculator') }}">나이 차이 계산기</a>에서 간단히 확인할 수 있습니다.
+            </p>
             <p class="small">마지막 기준 확인일: 2026-02-09</p>
         </section>
 
@@ -117,7 +120,7 @@
     <!-- 쿠키 동의 배너 -->
     <div class="cookie-banner" id="cookie-banner">
         <div class="cookie-content">
-            <p>이 웹사이트는 쿠키를 사용하여 사용자 경험을 개선합니다. 계속 사용하시면 쿠키 사용에 동의하는 것으로 간주됩니다.</p>
+            <p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 동의 여부는 아래에서 선택할 수 있으며, 거부해도 주요 기능은 그대로 이용할 수 있습니다.</p>
             <div class="cookie-buttons">
                 <button id="accept-cookies" class="btn btn-primary">동의</button>
                 <button id="reject-cookies" class="btn btn-secondary">거부</button>

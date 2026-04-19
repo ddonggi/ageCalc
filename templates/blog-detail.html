@@ -34,7 +34,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M0RLS343N4"></script>
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
@@ -47,11 +46,11 @@
         {% if draft_mode %}
         <a class="back-link" href="{{ url_for('blog_drafts') }}">초안 목록으로 돌아가기</a>
         {% else %}
-        <a class="back-link" href="{{ url_for('blog_list') }}">블로그 목록으로 돌아가기</a>
+        <a class="back-link" href="{{ url_for('blog_list') }}">글 목록으로 돌아가기</a>
         {% endif %}
         <article class="blog-article">
             <header class="article-header">
-                <p class="eyebrow">AgeCalc Editorial</p>
+                <p class="eyebrow">해설 글</p>
                 <h1>{{ post.title }}</h1>
                 {% if review_mode %}
                 <p class="blog-date">검토 모드 · 현재 상태: {{ post.status }}</p>
@@ -70,6 +69,14 @@
                     {{ post.created_at | blog_datetime('%Y-%m-%d %H:%M') }}
                     {% endif %}
                 </p>
+                <div class="notice" style="margin-top: 16px;">
+                    <p><strong>작성</strong>: {{ author_name }}</p>
+                    {% if post.updated_at %}
+                    <p><strong>최종 수정</strong>: {{ post.updated_at | blog_datetime('%Y-%m-%d %H:%M') }}</p>
+                    {% endif %}
+                    <p><strong>편집 기준</strong>: <a href="{{ editorial_policy_url }}">운영 원칙 보기</a></p>
+                    <p><strong>문의 및 수정 요청</strong>: <a href="{{ url_for('contact') }}">문의 안내 페이지</a></p>
+                </div>
                 {% if post.excerpt %}
                 <p class="page-intro article-intro">{{ post.excerpt }}</p>
                 {% endif %}
@@ -78,8 +85,26 @@
             <img class="blog-hero" src="{{ post.cover_image_url }}" alt="{{ post.title }}">
             {% endif %}
             <div class="blog-content">{{ post.content_html | safe }}</div>
+            {% if post.sources %}
+            <section class="notice">
+                <h2>참고한 자료</h2>
+                <ul>
+                    {% for source in post.sources %}
+                    <li>
+                        <a href="{{ source.source_url }}" target="_blank" rel="noopener noreferrer nofollow">
+                            {{ source.source_name or source.source_url }}
+                        </a>
+                        {% if source.attribution_text %}
+                        <span> - {{ source.attribution_text }}</span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+            {% endif %}
             <section class="article-tools">
-                <p class="eyebrow">Try A Tool</p>
+                <p class="eyebrow">같이 읽어보기</p>
+                <h2>같이 보면 좋은 계산기</h2>
                 <div class="footer-links article-links">
                     <a href="{{ url_for('age') }}">만나이 계산기</a>
                     <a href="{{ url_for('baby_months') }}">아이 개월 수 계산기</a>
@@ -92,7 +117,7 @@
 
     <div class="cookie-banner" id="cookie-banner">
         <div class="cookie-content">
-            <p>이 웹사이트는 쿠키를 사용하여 사용자 경험을 개선합니다. 계속 사용하시면 쿠키 사용에 동의하는 것으로 간주됩니다.</p>
+            <p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 동의 여부는 아래에서 선택할 수 있으며, 거부해도 주요 기능은 그대로 이용할 수 있습니다.</p>
             <div class="cookie-buttons">
                 <button id="accept-cookies" class="btn btn-primary">동의</button>
                 <button id="reject-cookies" class="btn btn-secondary">거부</button>

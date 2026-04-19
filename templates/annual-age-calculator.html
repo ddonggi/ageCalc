@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <title>연나이 계산기 | AgeCalc</title>
+    <meta name="description" content="생년월일을 입력하면 생일과 관계없이 올해 기준 연나이를 바로 확인할 수 있는 연나이 계산기입니다." />
+    <link rel="canonical" href="https://agecalc.cloud/annual-age-calculator" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="연나이 계산기 | AgeCalc" />
+    <meta property="og:description" content="생일과 관계없이 올해 기준 연나이를 계산하고, 만나이와의 차이까지 함께 확인할 수 있습니다." />
+    <meta property="og:url" content="https://agecalc.cloud/annual-age-calculator" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
+    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    {% include 'partials/adsense.html' %}
+</head>
+
+<body>
+    <div id="pixel-background"></div>
+    <div class="container">
+        {% include 'partials/header.html' %}
+
+        <section class="hero-band">
+            <div class="hero-copy">
+                <p class="eyebrow">연도 기준 계산</p>
+                <h1>연나이 계산기</h1>
+                <p class="page-intro">
+                    생년월일을 입력하면 생일과 관계없이 올해 기준 연나이를 바로 확인할 수 있습니다.
+                    공적 기준은 만나이가 중심이지만, 학교·또래 비교나 연도 단위 안내에서는 연나이를 함께 찾는 경우가 많습니다.
+                </p>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="#annual-age-search">생년월일 입력</a>
+                    <a class="btn btn-secondary" href="{{ url_for('age') }}">만나이 계산기 보기</a>
+                </div>
+            </div>
+            <div class="hero-metrics" aria-label="연나이 정보">
+                <article class="metric-card">
+                    <span class="metric-value">올해 연나이</span>
+                    <span class="metric-label">{{ current_year }}년 기준 계산</span>
+                </article>
+                <article class="metric-card">
+                    <span class="metric-value">생일과 관계없이</span>
+                    <span class="metric-label">출생연도만으로 계산</span>
+                </article>
+                <article class="metric-card">
+                    <span class="metric-value">만나이와의 차이</span>
+                    <span class="metric-label">생일 전후 차이까지 함께 안내</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2 id="annual-age-search">생년월일 입력</h2>
+                <p class="section-intro">연나이는 월·일과 무관하지만, 같은 입력으로 만나이와의 차이를 함께 보기 쉽도록 생년월일 형식으로 입력받습니다.</p>
+            </div>
+            <form class="age-form" method="get" action="{{ url_for('annual_age_calculator') }}">
+                <div class="form-group">
+                    <div class="date-inputs">
+                        <input type="text" name="year" placeholder="년" inputmode="numeric" pattern="[0-9]*" maxlength="4" value="{{ year or '' }}" aria-label="출생 연도">
+                        <input type="text" name="month" placeholder="월" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="{{ month or '' }}" aria-label="출생 월">
+                        <input type="text" name="day" placeholder="일" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="{{ day or '' }}" aria-label="출생 일">
+                    </div>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" type="submit">연나이 계산</button>
+                        {% if year or month or day %}
+                        <a class="btn btn-secondary" href="{{ url_for('annual_age_calculator') }}">입력 지우기</a>
+                        {% endif %}
+                    </div>
+                    {% if invalid_date %}
+                    <small class="error-msg">입력한 생년월일을 다시 확인해 주세요. 존재하는 날짜만 계산할 수 있습니다.</small>
+                    {% endif %}
+                </div>
+            </form>
+        </section>
+
+        {% if selected_snapshot %}
+        <section class="section-shell section-card-grid">
+            <article class="section-card birth-year-summary">
+                <p class="eyebrow">선택한 생년월일</p>
+                <h2>{{ selected_snapshot.birth_date }} 기준 연나이 안내</h2>
+                <p>{{ selected_snapshot.detail }}</p>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <strong>생년월일</strong>
+                        <span>{{ selected_snapshot.birth_date }}</span>
+                    </div>
+                    <div class="summary-card">
+                        <strong>올해 연나이</strong>
+                        <span>{{ selected_snapshot.annual_age }}</span>
+                    </div>
+                    <div class="summary-card">
+                        <strong>만나이 범위</strong>
+                        <span>{{ selected_snapshot.man_age_range }}</span>
+                    </div>
+                </div>
+            </article>
+        </section>
+        {% endif %}
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>예시로 보는 연나이</h2>
+                <p class="section-intro">자주 비교하는 출생연도를 예시로 먼저 정리했습니다.</p>
+            </div>
+            <div class="section-card-grid">
+                {% for example in examples %}
+                <article class="section-card">
+                    <p class="eyebrow">{{ example.birth_date }}</p>
+                    <h2>{{ example.annual_age }}</h2>
+                    <p>{{ example.detail }}</p>
+                    <p class="small">만나이 범위: {{ example.man_age_range }}</p>
+                    <a class="btn btn-secondary" href="{{ url_for('annual_age_calculator', year=example.birth_date[:4], month=example.birth_date[5:7], day=example.birth_date[8:10]) }}">이 생년월일 자세히 보기</a>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="section-shell section-card-grid">
+            <article class="section-card">
+                <p class="eyebrow">계산 기준</p>
+                <h2>연나이는 어떻게 계산하나요?</h2>
+                <ul>
+                    <li>연나이는 생일과 관계없이 올해 연도에서 출생연도를 뺀 값으로 계산합니다.</li>
+                    <li>{{ current_year }}년 기준이라면 1992년생은 생일 전후와 무관하게 {{ current_year - 1992 }}세입니다.</li>
+                    <li>행정·법률·계약 기준처럼 정확한 공식 나이가 필요하면 만나이를 확인하는 편이 좋습니다.</li>
+                </ul>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">같이 보기</p>
+                <h2>관련 페이지</h2>
+                <div class="footer-links">
+                    <a href="{{ url_for('age') }}">만나이 계산기</a>
+                    <a href="{{ url_for('age_comparison_table') }}">만나이·연나이 비교표</a>
+                    <a href="{{ url_for('birth_year_age_table') }}">출생년도별 나이표</a>
+                    <a href="{{ url_for('age_gap_calculator') }}">나이 차이 계산기</a>
+                    <a href="{{ url_for('references') }}">계산 기준과 참고 자료</a>
+                </div>
+            </article>
+        </section>
+
+        {% include 'partials/footer.html' %}
+    </div>
+
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 동의 여부는 아래에서 선택할 수 있으며, 거부해도 주요 기능은 그대로 이용할 수 있습니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
+</body>
+
+</html>

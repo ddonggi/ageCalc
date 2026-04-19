@@ -19,6 +19,9 @@
     banner.querySelector('#accept-cookies')?.addEventListener('click', () => {
         setCookie('cookieConsent', 'accepted');
         banner.classList.remove('show');
+        if (window.AgeCalcTracking && typeof window.AgeCalcTracking.init === 'function') {
+            window.AgeCalcTracking.init();
+        }
     });
 
     banner.querySelector('#reject-cookies')?.addEventListener('click', () => {

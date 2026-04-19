@@ -65,6 +65,8 @@ DEFAULT_IMAGE_QUALITY = "medium"
 DEFAULT_SMTP_PORT = 25
 IMAGE_OUTPUT_DIR = PROJECT_ROOT / "static" / "generated" / "blog-covers"
 PROMPTS_DIR = PROJECT_ROOT / "prompts"
+MIN_GENERATED_BODY_CHARS = 450
+MIN_GENERATED_HEADINGS = 3
 DEFAULT_BLOG_COVER_PROMPT = """
 한국어 건강/육아 정보 블로그용 커버 이미지를 제작해.
 
@@ -281,22 +283,73 @@ def _extract_output_text(resp_json: dict[str, Any]) -> str:
     return "\n".join(chunks).strip()
 
 
+def _contains_korean(text: str) -> int:
+    return len(re.findall(r"[가-힣]", text or ""))
+
+
+def _contains_latin(text: str) -> int:
+    return len(re.findall(r"[A-Za-z]", text or ""))
+
+
+def _detect_source_language(feed_item: FeedItem) -> str:
+    sample = " ".join(
+        part for part in [feed_item.original_title, feed_item.summary or "", feed_item.content or ""] if part
+    )
+    korean_count = _contains_korean(sample)
+    latin_count = _contains_latin(sample)
+    if korean_count >= latin_count and korean_count >= 20:
+        return "ko"
+    if latin_count >= 20 and korean_count < 10:
+        return "en"
+    return "mixed"
+
+
 def _build_generation_prompt(feed_item: FeedItem) -> str:
+    source_language = _detect_source_language(feed_item)
+    language_instructions = (
+        """
+- 원문이 한국어인 경우에도 단순 요약이나 문장 치환으로 끝내지 말고, 한국어 독자를 위한 설명형 블로그 글로 재구성한다.
+- AgeCalc 독자가 이 주제를 왜 읽어야 하는지와, 계산기/생활 기준과 어떻게 연결되는지 1개 이상 설명한다.
+""".strip()
+        if source_language != "en"
+        else """
+- 영어 원문을 한국어 독자를 위한 설명형 블로그 글로 재창작한다.
+- 영어 제목을 직역하지 말고, 원문 문장 순서를 그대로 따라 쓰지 말고, 맥락을 이해한 뒤 자연스러운 한국어 기사형 해설로 다시 쓴다.
+- 고유명사, 기관명, 날짜, 수치 정보는 유지하되 번역체 문장을 피한다.
+- 한국 독자에게 왜 중요한지, AgeCalc 계산기나 생활 기준과 어떤 식으로 연결해 읽을 수 있는지 반드시 설명한다.
+""".strip()
+    )
     return f"""
-아래 원문 정보를 참고해서 한국어 블로그 글을 작성해.
+아래 원문 정보를 참고해서 한국어 독자를 위한 설명형 블로그 글을 작성해.
+당신의 목표는 원문을 번역하거나 요약하는 것이 아니라, 독립적인 한국어 설명 콘텐츠로 재창작하는 것이다.
 조건:
-- 제목 1개
+- 한국어 독자를 위한 설명형 블로그 글이어야 한다.
+- 제목 1개는 원문 제목을 번역하지 말고 새로 작성한다.
 - 서론 1문단, 본문 3~5개 소제목, 결론 1문단
+- 본문에 다음 내용을 반드시 포함한다:
+  1. 사건/연구/정책의 핵심 요약
+  2. 배경 설명 또는 맥락
+  3. 한국 독자에게 중요한 이유
+  4. AgeCalc 계산기 또는 생활 기준과 연결되는 활용 포인트
+  5. 해석 시 주의점 또는 한계
 - 사실 왜곡 금지, 출처 링크를 '참고 링크' 섹션에 1개 이상 포함
 - 과장 광고 문구 금지
+- 영어 원문이더라도 최종 결과는 자연스러운 한국어여야 한다.
+- "요약하면", "원문에 따르면" 같은 뉴스 브리핑체를 반복하지 않는다.
+- '계산기 활용 포인트' 또는 '생활 기준에서 볼 점' 같은 실용 섹션을 포함한다.
+- 본문은 최소 3개 이상의 소제목 구조를 가져야 한다.
+- JSON 외 다른 설명을 붙이지 않는다.
+{language_instructions}
 - 응답 형식(JSON):
   {{
     "title": "...",
     "excerpt": "...",
-    "content_html": "<h2>...</h2>..."
+    "content_html": "<h2>...</h2>...",
+    "editor_note": "편집 메모 한 줄"
   }}
 
 원문 제목: {feed_item.original_title}
+원문 언어 추정: {source_language}
 원문 링크: {feed_item.original_url}
 원문 요약: {feed_item.summary or ""}
 원문 본문 일부: {(feed_item.content or "")[:4000]}
@@ -319,6 +372,64 @@ def _parse_generated_json(text: str) -> tuple[str, str, str]:
         raise RuntimeError("response missing title/content_html")
     if not excerpt:
         excerpt = _normalize_space(_strip_tags(content_html))[:180]
+    return title, excerpt, content_html
+
+
+def _evaluate_generated_post(
+    feed_item: FeedItem,
+    title: str,
+    excerpt: str,
+    content_html: str,
+) -> tuple[bool, str]:
+    plain_text = _normalize_space(_strip_tags(content_html))
+    heading_count = len(re.findall(r"<h[23]\b", content_html, flags=re.IGNORECASE))
+    source_language = _detect_source_language(feed_item)
+    normalized_source_title = _normalize_space(feed_item.original_title).casefold()
+    normalized_generated_title = _normalize_space(title).casefold()
+
+    if len(plain_text) < MIN_GENERATED_BODY_CHARS:
+        return False, "재창작 본문 길이가 짧아 설명형 콘텐츠 기준에 미달합니다."
+
+    if heading_count < MIN_GENERATED_HEADINGS:
+        return False, "재창작 구조가 부족합니다."
+
+    if "참고 링크" not in content_html:
+        return False, "출처 섹션이 없어 재창작 검토 기준을 충족하지 못했습니다."
+
+    if not any(keyword in plain_text for keyword in ("AgeCalc", "계산기", "생활 기준", "활용 포인트")):
+        return False, "서비스 또는 계산기와 연결되는 활용 설명이 없습니다."
+
+    if source_language == "en":
+        if _contains_korean(plain_text) < 120:
+            return False, "영어 원문을 한국어 설명형 글로 충분히 재창작하지 못했습니다."
+        if (
+            normalized_source_title == normalized_generated_title
+            or normalized_source_title in normalized_generated_title
+            or normalized_generated_title in normalized_source_title
+        ):
+            return False, "원문 제목과 지나치게 유사해 재창작 기준에 미달합니다."
+
+    if excerpt and _normalize_space(excerpt).casefold() == normalized_source_title:
+        return False, "발췌문이 원문 제목 수준에 머물러 재창작 기준에 미달합니다."
+
+    return True, ""
+
+
+def _build_needs_review_post(feed_item: FeedItem, reason: str) -> tuple[str, str, str]:
+    safe_title = html.escape(_normalize_space(feed_item.original_title)[:200] or "원문 검토 필요")
+    safe_url = html.escape(feed_item.original_url)
+    safe_reason = html.escape(reason)
+    title = f"[검토 필요] {feed_item.original_title[:160]}".strip()
+    excerpt = "자동 초안 생성 품질 검토가 필요해 공개 가능한 설명형 글로 전환되지 않았습니다."
+    content_html = (
+        "<h2>자동 초안 생성 품질 검토 필요</h2>"
+        f"<p>{safe_reason}</p>"
+        "<h3>원문 정보</h3>"
+        f"<p><strong>원문 제목</strong>: {safe_title}</p>"
+        f'<p><a href="{safe_url}" rel="noopener noreferrer nofollow" target="_blank">원문 확인하기</a></p>'
+        "<h3>다음 작업</h3>"
+        "<p>한국어 독자를 위한 설명형 구조, 계산기 활용 포인트, 주의사항을 보강한 뒤 다시 검토하세요.</p>"
+    )
     return title, excerpt, content_html
 
 
@@ -486,28 +597,6 @@ def _generate_with_ollama(feed_item: FeedItem, model: str, base_url: str) -> tup
     return _parse_generated_json(text)
 
 
-def _generate_fallback(feed_item: FeedItem) -> tuple[str, str, str]:
-    title = _normalize_space(feed_item.original_title)
-    summary = _normalize_space(_strip_tags(feed_item.summary or ""))
-    content = _normalize_space(_strip_tags(feed_item.content or ""))
-
-    excerpt = (summary or content or title)[:180]
-    body_text = summary or content or "원문 내용을 확인해 주세요."
-    safe = html.escape(body_text)
-    safe_title = html.escape(title)
-    safe_url = html.escape(feed_item.original_url)
-
-    content_html = (
-        f"<h2>{safe_title}</h2>"
-        f"<p>{safe}</p>"
-        "<h3>핵심 내용</h3>"
-        f"<p>{safe}</p>"
-        "<h3>참고 링크</h3>"
-        f'<p><a href="{safe_url}" rel="noopener noreferrer nofollow" target="_blank">원문 보기</a></p>'
-    )
-    return title, excerpt, content_html
-
-
 def upsert_feed_items(session, source: FeedSource, parsed_items: list[dict[str, Any]]) -> int:
     normalized_rows: list[dict[str, Any]] = []
     candidate_urls: set[str] = set()
@@ -641,7 +730,9 @@ def create_posts(
         post_title = ""
         excerpt = ""
         content_html = ""
-        used_mode = "fallback"
+        used_mode = "needs-review"
+        failure_reason = ""
+        post_status = status
 
         if provider == "openai":
             try:
@@ -649,6 +740,7 @@ def create_posts(
                 used_mode = "openai"
             except Exception as exc:  # noqa: BLE001
                 print(f"[generate] openai failed for {item.original_url}: {exc}", file=sys.stderr)
+                failure_reason = f"자동 생성 실패: {exc}"
         elif provider == "ollama":
             try:
                 post_title, excerpt, content_html = _generate_with_ollama(
@@ -657,19 +749,31 @@ def create_posts(
                 used_mode = "ollama"
             except Exception as exc:  # noqa: BLE001
                 print(f"[generate] ollama failed for {item.original_url}: {exc}", file=sys.stderr)
+                failure_reason = f"자동 생성 실패: {exc}"
 
         if not content_html:
-            post_title, excerpt, content_html = _generate_fallback(item)
+            post_title, excerpt, content_html = _build_needs_review_post(
+                item,
+                failure_reason or "자동 생성 결과가 비어 있어 편집 검토가 필요합니다.",
+            )
+            post_status = "needs_review"
+
+        if post_status == status:
+            is_valid, validation_reason = _evaluate_generated_post(item, post_title, excerpt, content_html)
+            if not is_valid:
+                post_title, excerpt, content_html = _build_needs_review_post(item, validation_reason)
+                post_status = "needs_review"
+                used_mode = f"{used_mode}-quality-review"
 
         slug = _unique_slug(session, post_title)
         image_urls: list[str] = []
-        if provider == "openai":
+        if provider == "openai" and post_status == status:
             try:
                 image_urls = _generate_cover_with_openai(post_title, excerpt, content_html, slug)
             except Exception as exc:  # noqa: BLE001
                 print(f"[image] openai failed for {item.original_url}: {exc}", file=sys.stderr)
         cover_image_url = image_urls[0] if image_urls else None
-        if image_urls:
+        if image_urls and post_status == status:
             content_html = _inject_inline_images(content_html, image_urls)
         now = datetime.now(timezone.utc).replace(tzinfo=None)
         post = GeneratedPost(
@@ -678,8 +782,8 @@ def create_posts(
             excerpt=excerpt[:500],
             content_html=content_html,
             cover_image_url=cover_image_url,
-            status=status,
-            published_at=now if status == "published" else None,
+            status=post_status,
+            published_at=now if post_status == "published" else None,
         )
         session.add(post)
         session.flush()
@@ -704,7 +808,7 @@ def create_posts(
             session.rollback()
             return created_count
         session.commit()
-        if status == "draft":
+        if post.status == "draft":
             try:
                 _send_review_email(post)
             except Exception as exc:  # noqa: BLE001

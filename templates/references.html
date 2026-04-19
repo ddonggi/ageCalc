@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <title>계산 기준과 참고 자료 | AgeCalc</title>
+    <meta name="description" content="AgeCalc가 각 계산기를 어떤 기준으로 계산하는지, 어떤 자료를 참고하는지 한곳에서 정리한 안내 페이지입니다." />
+    <link rel="canonical" href="https://agecalc.cloud/references" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="계산 기준과 참고 자료 | AgeCalc" />
+    <meta property="og:description" content="만나이, 아이 개월 수, 반려동물 나이, 기념일 계산기의 기준과 참고 자료를 정리했습니다." />
+    <meta property="og:url" content="https://agecalc.cloud/references" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
+    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    {% include 'partials/adsense.html' %}
+</head>
+
+<body>
+    <div id="pixel-background"></div>
+    <div class="container">
+        {% include 'partials/header.html' %}
+
+        <section class="hero-band">
+            <div class="hero-copy">
+                <p class="eyebrow">기준 안내</p>
+                <h1>계산 기준과 참고 자료</h1>
+                <p class="page-intro">
+                    AgeCalc는 계산 결과만 보여주지 않고, 어떤 규칙으로 계산했는지와 어떤 자료를 참고했는지도
+                    함께 공개합니다. 각 계산기별 기준과 참고 자료를 한곳에서 확인하실 수 있습니다.
+                </p>
+            </div>
+        </section>
+
+        <section class="section-shell section-card-grid">
+            <article class="section-card">
+                <p class="eyebrow">공통 원칙</p>
+                <h2>날짜 기준으로 계산합니다</h2>
+                <p>
+                    대부분의 계산은 시각이 아니라 날짜를 기준으로 진행합니다. 생일 전후, 기준일 이전·이후처럼
+                    사용자가 바로 이해할 수 있는 날짜 규칙을 우선 적용합니다.
+                </p>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">입력 처리</p>
+                <h2>잘못된 입력은 먼저 걸러냅니다</h2>
+                <p>
+                    존재하지 않는 날짜, 미래 날짜, 월령 범위를 벗어난 값처럼 계산에 맞지 않는 입력은
+                    결과를 보여주기 전에 오류 메시지로 안내합니다.
+                </p>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">안내 범위</p>
+                <h2>결과는 참고용입니다</h2>
+                <p>
+                    정책·의학·행정 판단이 필요한 내용은 관계 기관이나 전문가 안내를 우선해야 합니다.
+                    AgeCalc의 계산 결과와 설명은 이해를 돕기 위한 일반 정보입니다.
+                </p>
+            </article>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>계산기별 기준</h2>
+                <p class="section-intro">각 도구가 어떤 방식으로 결과를 계산하는지 요약했습니다.</p>
+            </div>
+            <div class="age-rights-grid">
+                <article class="age-right-item">
+                    <div class="age-header">
+                        <span class="age-number">01</span>
+                        <span class="age-unit">만나이 계산기</span>
+                    </div>
+                    <ul>
+                        <li>생년월일과 오늘 날짜를 비교해, 생일이 지나지 않았으면 한 살을 빼는 방식으로 계산합니다.</li>
+                        <li>음력 입력은 양력으로 변환한 뒤 같은 규칙을 적용합니다.</li>
+                        <li>연령별 제도 안내는 공식 기관 링크를 참고용으로 함께 제공합니다.</li>
+                        <li><a href="{{ url_for('age') }}">만나이 계산기 바로가기</a></li>
+                    </ul>
+                </article>
+                <article class="age-right-item">
+                    <div class="age-header">
+                        <span class="age-number">02</span>
+                        <span class="age-unit">아이 개월 수 계산기</span>
+                    </div>
+                    <ul>
+                        <li>출생일과 오늘 날짜의 차이를 월 단위로 계산합니다.</li>
+                        <li>같은 달 안에서도 날짜 차이에 따라 개월 수가 달라질 수 있습니다.</li>
+                        <li>예방접종과 발달 정보는 공식 기관 안내를 참고 링크로 제공합니다.</li>
+                        <li><a href="{{ url_for('baby_months') }}">아이 개월 수 계산기 바로가기</a></li>
+                    </ul>
+                </article>
+                <article class="age-right-item">
+                    <div class="age-header">
+                        <span class="age-number">03</span>
+                        <span class="age-unit">강아지 나이 계산기</span>
+                    </div>
+                    <ul>
+                        <li>소형견, 중형견, 대형견, 초대형견으로 나눠 체형별 연령표를 적용합니다.</li>
+                        <li>첫해와 둘째 해의 성장 속도를 크게 반영하고, 이후에는 체형에 따라 완만하게 증가시킵니다.</li>
+                        <li>건강 상태와 견종 차이는 반영하지 않으므로 참고용으로만 봐야 합니다.</li>
+                        <li><a href="{{ url_for('dog') }}">강아지 나이 계산기 바로가기</a></li>
+                    </ul>
+                </article>
+                <article class="age-right-item">
+                    <div class="age-header">
+                        <span class="age-number">04</span>
+                        <span class="age-unit">고양이 나이 계산기</span>
+                    </div>
+                    <ul>
+                        <li>첫해 15세, 둘째 해 9세, 이후 해마다 4세를 더하는 일반적인 환산 방식을 사용합니다.</li>
+                        <li>품종, 생활 환경, 건강 상태에 따라 실제 체감 나이는 달라질 수 있습니다.</li>
+                        <li>의학적 판단이 필요한 경우에는 수의사 상담이 우선입니다.</li>
+                        <li><a href="{{ url_for('cat') }}">고양이 나이 계산기 바로가기</a></li>
+                    </ul>
+                </article>
+                <article class="age-right-item">
+                    <div class="age-header">
+                        <span class="age-number">05</span>
+                        <span class="age-unit">기념일 계산기</span>
+                    </div>
+                    <ul>
+                        <li>오늘 날짜와 입력한 날짜를 날짜 단위로 비교해 D-Day 또는 경과 일수를 계산합니다.</li>
+                        <li>같은 날짜면 D-Day로 표시하고, 기본적으로 오늘 제외 기준으로 일수를 계산합니다.</li>
+                        <li>일정 관리용 참고 도구로 설계되어 있으며 공휴일·업무일 계산은 포함하지 않습니다.</li>
+                        <li><a href="{{ url_for('d_day') }}">기념일 계산기 바로가기</a></li>
+                    </ul>
+                </article>
+                <article class="age-right-item">
+                    <div class="age-header">
+                        <span class="age-number">06</span>
+                        <span class="age-unit">부모·자녀 나이 관계 계산기</span>
+                    </div>
+                    <ul>
+                        <li>부모와 자녀의 생년월일을 각각 받아, 자녀 출생일 기준 부모 만나이를 계산합니다.</li>
+                        <li>환갑과 칠순은 부모 생일 기준으로 해당 나이가 되는 시점을 계산합니다.</li>
+                        <li>가족 행사나 세대 간 나이 차이를 보는 참고용 계산입니다.</li>
+                        <li><a href="{{ url_for('parent_child') }}">부모·자녀 계산기 바로가기</a></li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>참고 자료</h2>
+                <p class="section-intro">페이지별 설명을 정리할 때 함께 참고하는 대표 자료입니다.</p>
+            </div>
+            <div class="section-card-grid">
+                <article class="section-card">
+                    <p class="eyebrow">공적 기준</p>
+                    <h2>만나이와 제도 안내</h2>
+                    <ul>
+                        <li><a href="https://www.gov.kr/" target="_blank" rel="noopener noreferrer">정부24</a></li>
+                        <li><a href="https://www.moel.go.kr/" target="_blank" rel="noopener noreferrer">고용노동부</a></li>
+                        <li><a href="https://www.nec.go.kr/" target="_blank" rel="noopener noreferrer">중앙선거관리위원회</a></li>
+                        <li><a href="https://www.safedriving.or.kr/" target="_blank" rel="noopener noreferrer">도로교통공단 안전운전 통합민원</a></li>
+                    </ul>
+                </article>
+                <article class="section-card">
+                    <p class="eyebrow">영유아 정보</p>
+                    <h2>월령과 건강 정보</h2>
+                    <ul>
+                        <li><a href="https://nip.kdca.go.kr/" target="_blank" rel="noopener noreferrer">질병관리청 예방접종도우미</a></li>
+                        <li><a href="https://hi.nhis.or.kr/" target="_blank" rel="noopener noreferrer">국민건강보험공단 건강iN</a></li>
+                        <li><a href="https://www.childcare.go.kr/" target="_blank" rel="noopener noreferrer">아이사랑</a></li>
+                    </ul>
+                </article>
+                <article class="section-card">
+                    <p class="eyebrow">반려동물 안내</p>
+                    <h2>연령표 참고 자료</h2>
+                    <ul>
+                        <li><a href="https://www.almanac.com/dog-age-chart-dog-years-human-years" target="_blank" rel="noopener noreferrer">The Old Farmer's Almanac - Dog Age Chart</a></li>
+                        <li><a href="https://www.iams.com/cat/cat-articles/calculating-your-pets-age-cat-years" target="_blank" rel="noopener noreferrer">IAMS - Cat Years</a></li>
+                    </ul>
+                </article>
+            </div>
+            <p class="small">마지막 정리일: 2026-04-16</p>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>함께 보면 좋은 안내</h2>
+                <p class="section-intro">운영 기준과 문의 방법도 함께 확인하실 수 있습니다.</p>
+            </div>
+            <div class="footer-links">
+                <a href="{{ url_for('about') }}">운영 원칙</a>
+                <a href="{{ url_for('contact') }}">문의 및 운영자 안내</a>
+                <a href="{{ url_for('faq') }}">자주 묻는 질문</a>
+            </div>
+        </section>
+
+        {% include 'partials/footer.html' %}
+    </div>
+
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 동의 여부는 아래에서 선택할 수 있으며, 거부해도 주요 기능은 그대로 이용할 수 있습니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
+</body>
+
+</html>

@@ -57,9 +57,42 @@ init_db()
 
 BLOG_DRAFT_ACCESS_SESSION_KEY = "blog_draft_access"
 SITE_BASE_URL = (os.getenv("BLOG_BASE_URL", "https://agecalc.cloud") or "https://agecalc.cloud").rstrip("/")
+SITE_AUTHOR_NAME = os.getenv("SITE_AUTHOR_NAME", "AgeCalc 편집팀").strip() or "AgeCalc 편집팀"
+SITE_CONTACT_EMAIL = os.getenv("SITE_CONTACT_EMAIL", "ldg6153@gmail.com").strip() or "ldg6153@gmail.com"
+KOREAN_ZODIAC = ["원숭이", "닭", "개", "돼지", "쥐", "소", "호랑이", "토끼", "용", "뱀", "말", "양"]
+GENERATION_LABELS = [
+    ((1946, 1964), "베이비붐 세대"),
+    ((1965, 1980), "X세대"),
+    ((1981, 1996), "밀레니얼 세대"),
+    ((1997, 2012), "Z세대"),
+    ((2013, 2030), "알파 세대"),
+]
+DOG_HUMAN_AGE_TABLE = {
+    "small": [15, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80],
+    "medium": [15, 24, 28, 32, 36, 42, 47, 51, 56, 60, 65, 69, 74, 78, 83, 87],
+    "large": [15, 24, 28, 32, 36, 45, 50, 55, 61, 66, 72, 77, 82, 88, 93, 99],
+    "giant": [12, 22, 31, 38, 45, 49, 56, 64, 71, 79, 86, 93, 100, 107, 114, 121],
+}
 PUBLIC_SITEMAP_ENDPOINTS = [
     "index",
     "age",
+    "about",
+    "contact",
+    "references",
+    "birth_year_age_table",
+    "school_grade_calculator",
+    "school_entry_year_table",
+    "age_gap_calculator",
+    "hundred_day_calculator",
+    "baby_months_table",
+    "annual_age_calculator",
+    "age_comparison_table",
+    "grade_age_table",
+    "pet_age_table",
+    "korean_age_guide",
+    "pet_months_table",
+    "grade_birth_year_table",
+    "birth_year_zodiac_table",
     "privacy",
     "terms",
     "guide",
@@ -70,35 +103,6 @@ PUBLIC_SITEMAP_ENDPOINTS = [
     "d_day",
     "parent_child",
     "blog_list",
-    "minigames",
-    "guess_game",
-    "snake_game",
-    "tictactoe_game",
-    "rps_game",
-    "nim_game",
-    "pong_game",
-    "hangman_game",
-    "memory_game",
-    "connect4_game",
-    "lightsout_game",
-    "minesweeper_game",
-    "simon_game",
-    "game_2048",
-    "blackjack_game",
-    "breakout_game",
-    "hanoi_game",
-    "pig_game",
-    "gomoku_game",
-    "reversi_game",
-    "dotsandboxes_game",
-    "mancala_game",
-    "mastermind_game",
-    "war_game",
-    "battleship_game",
-    "checkers_game",
-    "fifteen_game",
-    "pegsolitaire_game",
-    "yahtzee_game",
 ]
 
 @app.before_request
@@ -107,7 +111,17 @@ def set_csp_nonce():
 
 @app.context_processor
 def inject_csp_nonce():
-    return {"csp_nonce": getattr(g, "csp_nonce", "")}
+    editorial_policy_url = "#"
+    try:
+        editorial_policy_url = url_for("about")
+    except RuntimeError:
+        pass
+    return {
+        "csp_nonce": getattr(g, "csp_nonce", ""),
+        "author_name": SITE_AUTHOR_NAME,
+        "contact_email": SITE_CONTACT_EMAIL,
+        "editorial_policy_url": editorial_policy_url,
+    }
 
 
 @app.teardown_appcontext
@@ -116,6 +130,8 @@ def cleanup_session(exception=None):
 
 @app.after_request
 def add_security_headers(response):
+    if request.path == "/minigames" or request.path.startswith("/minigames/"):
+        response.headers["X-Robots-Tag"] = "noindex, nofollow"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
@@ -232,6 +248,426 @@ def _build_sitemap_entry(loc: str, lastmod: str | None = None) -> str:
     return f"  <url><loc>{loc}</loc></url>"
 
 
+def _current_local_date():
+    return datetime.now(BLOG_TIMEZONE).date()
+
+
+def _generation_label(year: int) -> str:
+    for (start, end), label in GENERATION_LABELS:
+        if start <= year <= end:
+            return label
+    return "넓은 세대 구분 없음"
+
+
+def _birth_year_range_label(year: int, current_year: int) -> str:
+    annual_age = current_year - year
+    if annual_age <= 0:
+        return "만 0세"
+    return f"만 {annual_age - 1}~{annual_age}세"
+
+
+def _build_birth_year_snapshot(year: int, current_year: int) -> dict[str, object]:
+    annual_age = current_year - year
+    if annual_age <= 0:
+        detail = "올해 출생자는 현재 기준으로 만 0세입니다. 실제 출생일이 미래라면 아직 계산 대상이 아닐 수 있습니다."
+    else:
+        detail = f"생일이 지났다면 만 {annual_age}세, 아직 지나지 않았다면 만 {annual_age - 1}세입니다."
+
+    return {
+        "year": year,
+        "label": f"{year}년생",
+        "annual_age": f"{annual_age}세",
+        "man_age_range": _birth_year_range_label(year, current_year),
+        "detail": detail,
+        "zodiac": KOREAN_ZODIAC[year % 12],
+        "generation": _generation_label(year),
+    }
+
+
+def _current_school_year(today=None) -> int:
+    if today is None:
+        today = _current_local_date()
+    return today.year if today.month >= 3 else today.year - 1
+
+
+def _school_grade_label(birth_year: int, school_year: int) -> tuple[str, str]:
+    elementary_entry = birth_year + 7
+    diff = school_year - elementary_entry
+
+    if diff < 0:
+        if diff == -1:
+            return ("취학 전", f"{elementary_entry}학년도 초등학교 입학 예정")
+        return ("취학 전", f"{elementary_entry}학년도에 초등학교 입학 예정")
+    if diff <= 5:
+        return (f"초등학교 {diff + 1}학년", "현재 초등학생 단계")
+    if diff <= 8:
+        return (f"중학교 {diff - 5}학년", "현재 중학생 단계")
+    if diff <= 11:
+        return (f"고등학교 {diff - 8}학년", "현재 고등학생 단계")
+    if diff == 12:
+        return ("고등학교 졸업 이후", "대학 진학 또는 진로 선택 시기")
+    return ("고등학교 졸업 이후", "학교급 계산 범위 이후 단계")
+
+
+def _build_school_grade_snapshot(birth_year: int, school_year: int) -> dict[str, object]:
+    current_grade, note = _school_grade_label(birth_year, school_year)
+    elementary_entry = birth_year + 7
+    middle_entry = birth_year + 13
+    high_entry = birth_year + 16
+
+    return {
+        "year": birth_year,
+        "label": f"{birth_year}년생",
+        "current_grade": current_grade,
+        "note": note,
+        "elementary_entry": f"{elementary_entry}학년도",
+        "middle_entry": f"{middle_entry}학년도",
+        "high_entry": f"{high_entry}학년도",
+    }
+
+
+def _build_school_entry_snapshot(birth_year: int, school_year: int) -> dict[str, object]:
+    grade_snapshot = _build_school_grade_snapshot(birth_year, school_year)
+    current_grade = grade_snapshot["current_grade"]
+
+    if "취학 전" in current_grade:
+        status_note = f"현재는 {current_grade} 단계이며, 가장 가까운 입학 시점은 {grade_snapshot['elementary_entry']} 초등학교 입학입니다."
+    elif "초등학교" in current_grade:
+        status_note = f"현재는 {current_grade} 단계이며, 중학교 입학은 {grade_snapshot['middle_entry']}, 고등학교 입학은 {grade_snapshot['high_entry']}입니다."
+    elif "중학교" in current_grade:
+        status_note = f"현재는 {current_grade} 단계이며, 고등학교 입학은 {grade_snapshot['high_entry']}입니다."
+    else:
+        status_note = f"초등학교 입학은 {grade_snapshot['elementary_entry']}, 중학교 입학은 {grade_snapshot['middle_entry']}, 고등학교 입학은 {grade_snapshot['high_entry']}였습니다."
+
+    return {
+        "year": birth_year,
+        "label": grade_snapshot["label"],
+        "current_grade": current_grade,
+        "status_note": status_note,
+        "elementary_entry": grade_snapshot["elementary_entry"],
+        "middle_entry": grade_snapshot["middle_entry"],
+        "high_entry": grade_snapshot["high_entry"],
+    }
+
+
+def _build_grade_age_snapshot(stage: str, grade: int, school_year: int, current_year: int) -> dict[str, object]:
+    stage_map = {
+        "elementary": ("초등학교", 7),
+        "middle": ("중학교", 13),
+        "high": ("고등학교", 16),
+    }
+    school_label, offset = stage_map[stage]
+    birth_year = school_year - offset - (grade - 1)
+    annual_age = current_year - birth_year
+    man_age_range = _birth_year_range_label(birth_year, current_year)
+
+    note = f"{school_year}학년도 {school_label} {grade}학년은 보통 {birth_year}년생이 해당하며, 올해 기준 연나이는 {annual_age}세입니다."
+
+    return {
+        "stage": stage,
+        "grade": grade,
+        "label": f"{school_label} {grade}학년",
+        "birth_year_label": f"{birth_year}년생",
+        "annual_age": f"{annual_age}세",
+        "man_age_range": man_age_range,
+        "note": note,
+    }
+
+
+def _build_age_gap_snapshot(year_a: int, year_b: int) -> dict[str, object]:
+    older_year = min(year_a, year_b)
+    younger_year = max(year_a, year_b)
+    gap = younger_year - older_year
+
+    if gap == 0:
+        annual_gap = "0년 차이"
+        man_gap_range = "만 0세 차이"
+        detail = "같은 출생년도라서 연나이와 만나이 모두 같은 흐름으로 계산됩니다."
+    else:
+        annual_gap = f"{gap}년 차이"
+        lower = max(gap - 1, 0)
+        man_gap_range = f"만 {lower}~{gap}세 차이"
+        detail = f"연나이는 항상 {gap}세 차이이고, 만나이는 두 사람의 생일이 지났는지에 따라 {lower}~{gap}세 차이로 보일 수 있습니다."
+
+    return {
+        "year_a": year_a,
+        "year_b": year_b,
+        "older_year": older_year,
+        "younger_year": younger_year,
+        "pair_label": f"{older_year}년생과 {younger_year}년생",
+        "annual_gap": annual_gap,
+        "man_gap_range": man_gap_range,
+        "detail": detail,
+    }
+
+
+def _parse_calendar_date(year: int | None, month: int | None, day: int | None):
+    if year is None or month is None or day is None:
+        return None
+    try:
+        return datetime(year, month, day).date()
+    except ValueError:
+        return None
+
+
+def _format_calendar_date(value) -> str:
+    return value.strftime("%Y.%m.%d")
+
+
+def _build_hundred_day_snapshot(start_date, today=None) -> dict[str, object]:
+    if today is None:
+        today = _current_local_date()
+
+    hundredth_date = start_date + timedelta(days=99)
+    diff = (hundredth_date - today).days
+
+    if diff > 0:
+        status_label = f"D-{diff}"
+        status_note = f"100일째까지 {diff}일 남았습니다."
+    elif diff < 0:
+        status_label = f"D+{abs(diff)}"
+        status_note = f"100일째가 지난 지 {abs(diff)}일 되었습니다."
+    else:
+        status_label = "D-Day"
+        status_note = "바로 오늘이 100일째입니다."
+
+    elapsed = (today - start_date).days + 1
+    if elapsed < 1:
+        elapsed_label = "시작일 전"
+    else:
+        elapsed_label = f"{elapsed}일째"
+
+    return {
+        "start_date": _format_calendar_date(start_date),
+        "hundredth_date": _format_calendar_date(hundredth_date),
+        "status_label": status_label,
+        "status_note": status_note,
+        "elapsed_label": elapsed_label,
+        "detail": "시작일을 1일째로 계산해 99일을 더한 날짜를 100일째로 안내합니다.",
+    }
+
+
+def _build_annual_age_snapshot(birth_date, current_year: int) -> dict[str, object]:
+    birth_year = birth_date.year
+    annual_age = current_year - birth_year
+    man_age_range = _birth_year_range_label(birth_year, current_year)
+
+    return {
+        "birth_date": _format_calendar_date(birth_date),
+        "birth_year": birth_year,
+        "annual_age": f"{annual_age}세",
+        "man_age_range": man_age_range,
+        "detail": f"연나이는 생일과 관계없이 {current_year}년 - {birth_year}년으로 계산하므로 올해 기준 {annual_age}세입니다.",
+    }
+
+
+def _build_age_comparison_snapshot(birth_year: int, current_year: int) -> dict[str, object]:
+    annual_age = current_year - birth_year
+    man_age_range = _birth_year_range_label(birth_year, current_year)
+
+    if annual_age <= 0:
+        diff_note = "올해 출생자는 연나이와 만나이 모두 0세 기준으로 안내합니다."
+        gap_label = "차이 없음"
+    else:
+        diff_note = "연나이는 생일과 관계없이 고정되지만, 만나이는 생일 전후에 따라 1살 차이까지 생길 수 있습니다."
+        gap_label = "0~1살 차이"
+
+    return {
+        "birth_year": birth_year,
+        "label": f"{birth_year}년생",
+        "annual_age": f"{annual_age}세",
+        "man_age_range": man_age_range,
+        "gap_label": gap_label,
+        "diff_note": diff_note,
+    }
+
+
+def _dog_size_label(size: str) -> str:
+    return {
+        "small": "소형견",
+        "medium": "중형견",
+        "large": "대형견",
+        "giant": "초대형견",
+    }.get(size, "소형견")
+
+
+def _calc_dog_human_age(years: int, size: str) -> int:
+    table = DOG_HUMAN_AGE_TABLE.get(size, DOG_HUMAN_AGE_TABLE["small"])
+    if years <= 0:
+        return 0
+    if years <= len(table):
+        return table[years - 1]
+
+    last = table[-1]
+    prev = table[-2]
+    step = last - prev
+    return last + step * (years - len(table))
+
+
+def _calc_cat_human_age(years: int) -> int:
+    if years <= 0:
+        return 0
+    if years == 1:
+        return 15
+    if years == 2:
+        return 24
+    return 24 + 4 * (years - 2)
+
+
+def _build_pet_age_snapshot(pet: str, years: int, size: str = "small") -> dict[str, object]:
+    if pet == "cat":
+        human_age = _calc_cat_human_age(years)
+        label = f"고양이 {years}살"
+        detail = "고양이는 첫 해 15세, 둘째 해 24세, 이후에는 해마다 4세씩 더하는 기준으로 많이 안내합니다."
+        size_label = ""
+    else:
+        human_age = _calc_dog_human_age(years, size)
+        label = f"강아지 {years}살"
+        detail = f"강아지는 { _dog_size_label(size) } 기준 연령표를 적용해 사람 나이로 환산합니다."
+        size_label = _dog_size_label(size)
+
+    return {
+        "pet": pet,
+        "years": years,
+        "label": label,
+        "size": size,
+        "size_label": size_label,
+        "human_age": f"{human_age}세",
+        "detail": detail,
+    }
+
+
+def _calc_dog_human_age_precise(age_years: float, size: str) -> float:
+    table = DOG_HUMAN_AGE_TABLE.get(size, DOG_HUMAN_AGE_TABLE["small"])
+    if age_years <= 0:
+        return 0.0
+    if age_years <= 1:
+        return 15 * age_years
+    if age_years <= 2:
+        return 15 + (24 - 15) * (age_years - 1)
+
+    whole = math.floor(age_years)
+    frac = age_years - whole
+    last_index = len(table)
+
+    if whole >= last_index:
+        last = table[-1]
+        prev = table[-2] if len(table) > 1 else last
+        step = last - prev or 4
+        return last + step * (age_years - last_index)
+
+    base = table[max(whole - 1, 0)]
+    next_value = table[whole] if whole < len(table) else base
+    return base + (next_value - base) * frac
+
+
+def _calc_cat_human_age_precise(age_years: float) -> float:
+    if age_years <= 0:
+        return 0.0
+    if age_years <= 1:
+        return 15 * age_years
+    if age_years <= 2:
+        return 15 + 9 * (age_years - 1)
+    return 24 + 4 * (age_years - 2)
+
+
+def _build_pet_month_snapshot(pet: str, months: int, size: str = "small") -> dict[str, object]:
+    age_years = months / 12
+    age_text = _format_years_months(months)
+
+    if pet == "cat":
+        human_age_value = _calc_cat_human_age_precise(age_years)
+        label = f"고양이 {months}개월"
+        size_label = ""
+        detail = "고양이는 첫 2년의 성장 속도가 빨라 같은 6개월이라도 사람 나이로 보면 빠르게 커지는 편입니다."
+    else:
+        human_age_value = _calc_dog_human_age_precise(age_years, size)
+        label = f"강아지 {months}개월"
+        size_label = _dog_size_label(size)
+        detail = f"강아지는 {size_label} 기준으로 월령이 빠르게 올라가며, 생후 1년 안에서도 환산 차이가 크게 보일 수 있습니다."
+
+    rounded_human_age = max(0, round(human_age_value))
+    return {
+        "pet": pet,
+        "months": months,
+        "age_text": age_text,
+        "label": label,
+        "size": size,
+        "size_label": size_label,
+        "human_age": f"약 {rounded_human_age}세",
+        "detail": detail,
+    }
+
+
+def _short_school_label(stage: str, grade: int) -> str:
+    return {
+        "elementary": f"초{grade}",
+        "middle": f"중{grade}",
+        "high": f"고{grade}",
+    }[stage]
+
+
+def _build_grade_birth_year_snapshot(stage: str, grade: int, school_year: int, current_year: int) -> dict[str, object]:
+    snapshot = _build_grade_age_snapshot(stage, grade, school_year, current_year)
+    short_label = _short_school_label(stage, grade)
+    snapshot["short_label"] = short_label
+    snapshot["query_label"] = f"{short_label}은 몇 년생"
+    snapshot["school_year_label"] = f"{school_year}학년도"
+    snapshot["detail"] = f"{school_year}학년도 {snapshot['label']}은 보통 {snapshot['birth_year_label']}이 해당합니다."
+    return snapshot
+
+
+def _build_birth_year_zodiac_snapshot(year: int, current_year: int) -> dict[str, object]:
+    snapshot = _build_birth_year_snapshot(year, current_year)
+    zodiac_label = f"{snapshot['zodiac']}띠"
+    snapshot["zodiac_label"] = zodiac_label
+    snapshot["detail"] = f"{snapshot['label']}은 {zodiac_label}이며, {snapshot['detail']}"
+    return snapshot
+
+
+def _format_years_months(months: int) -> str:
+    years, remaining_months = divmod(months, 12)
+    if years == 0:
+        return f"{remaining_months}개월"
+    return f"{years}년 {remaining_months}개월"
+
+
+def _baby_stage_label(months: int) -> str:
+    if months <= 1:
+        return "신생아 시기"
+    if months <= 5:
+        return "초기 영아기"
+    if months <= 11:
+        return "활동이 늘어나는 시기"
+    if months <= 23:
+        return "돌 이후 영아기"
+    if months <= 35:
+        return "두돌 이후 유아기 초반"
+    return "세돌 전후 시기"
+
+
+def _build_baby_month_snapshot(months: int) -> dict[str, object]:
+    age_text = _format_years_months(months)
+    stage = _baby_stage_label(months)
+
+    if months == 0:
+        note = "출생 직후부터 한 달 전까지는 수유, 수면, 체중 변화처럼 기본 생활 리듬을 살피는 시기입니다."
+    elif months < 12:
+        note = "예방접종, 수면 변화, 이유식 시작·확장처럼 월령 기준으로 자주 확인하는 정보가 많은 구간입니다."
+    elif months < 24:
+        note = "돌 이후에는 걷기, 말문, 식사 리듬처럼 생활 변화가 커져 월령별 흐름을 함께 보는 데 도움이 됩니다."
+    else:
+        note = "두돌 이후에는 개월 수와 함께 연령대 표현도 같이 쓰는 경우가 많아, 1년 단위와 월 단위를 함께 확인하는 편이 좋습니다."
+
+    return {
+        "months": months,
+        "label": f"{months}개월",
+        "age_text": age_text,
+        "stage": stage,
+        "note": note,
+    }
+
+
 @app.get("/sitemap.xml")
 def sitemap():
     db_session = SessionLocal()
@@ -340,6 +776,535 @@ def privacy():
     """개인정보 처리 방침 페이지"""
     return render_template('privacy.html')
 
+@app.route('/about')
+def about():
+    """운영 및 편집 원칙 페이지"""
+    return render_template('about.html')
+
+@app.route('/contact')
+def contact():
+    """문의 및 운영자 안내 페이지"""
+    return render_template('contact.html')
+
+@app.route('/references')
+def references():
+    """계산 기준과 참고 자료 안내 페이지"""
+    return render_template('references.html')
+
+@app.route('/birth-year-age-table')
+def birth_year_age_table():
+    """출생년도별 나이표 안내 페이지"""
+    today = _current_local_date()
+    current_year = today.year
+    min_year = max(1900, current_year - 100)
+    max_year = current_year
+
+    selected_year = request.args.get('year', type=int)
+    if selected_year is not None and not (min_year <= selected_year <= max_year):
+        selected_year = None
+
+    rows = []
+    selected_row = None
+    for year in range(max_year, min_year - 1, -1):
+        row = _build_birth_year_snapshot(year, current_year)
+        row["is_selected"] = year == selected_year
+        rows.append(row)
+        if row["is_selected"]:
+            selected_row = row
+
+    example_years = [year for year in (1990, 2000, 2010) if min_year <= year <= max_year]
+    examples = [_build_birth_year_snapshot(year, current_year) for year in example_years]
+
+    return render_template(
+        'birth-year-age-table.html',
+        current_year=current_year,
+        selected_year=selected_year,
+        selected_row=selected_row,
+        birth_year_rows=rows,
+        year_options=range(max_year, min_year - 1, -1),
+        examples=examples,
+    )
+
+@app.route('/school-grade-calculator')
+def school_grade_calculator():
+    """출생년도 기준 학년 안내 페이지"""
+    today = _current_local_date()
+    school_year = _current_school_year(today)
+    current_year = today.year
+    min_year = max(1990, school_year - 19)
+    max_year = current_year
+
+    selected_year = request.args.get('year', type=int)
+    if selected_year is not None and not (1900 <= selected_year <= current_year):
+        selected_year = None
+
+    rows = []
+    selected_row = _build_school_grade_snapshot(selected_year, school_year) if selected_year else None
+    for year in range(max_year, min_year - 1, -1):
+        row = _build_school_grade_snapshot(year, school_year)
+        row["is_selected"] = year == selected_year
+        rows.append(row)
+
+    example_years = [year for year in (school_year - 7, school_year - 10, school_year - 13, school_year - 16) if 1900 <= year <= current_year]
+    examples = [_build_school_grade_snapshot(year, school_year) for year in example_years]
+
+    return render_template(
+        'school-grade-calculator.html',
+        school_year=school_year,
+        selected_year=selected_year,
+        selected_row=selected_row,
+        school_grade_rows=rows,
+        year_options=range(max_year, min_year - 1, -1),
+        examples=examples,
+    )
+
+
+@app.route('/school-entry-year-table')
+def school_entry_year_table():
+    """출생년도 기준 입학 학년도 안내 페이지"""
+    today = _current_local_date()
+    school_year = _current_school_year(today)
+    current_year = today.year
+    min_year = max(1990, school_year - 19)
+    max_year = current_year
+
+    selected_year = request.args.get('year', type=int)
+    if selected_year is not None and not (1900 <= selected_year <= current_year):
+        selected_year = None
+
+    rows = []
+    selected_row = _build_school_entry_snapshot(selected_year, school_year) if selected_year is not None else None
+    for year in range(max_year, min_year - 1, -1):
+        row = _build_school_entry_snapshot(year, school_year)
+        row["is_selected"] = year == selected_year
+        rows.append(row)
+
+    example_years = [year for year in (2017, 2018, 2019, 2020) if 1900 <= year <= current_year]
+    examples = [_build_school_entry_snapshot(year, school_year) for year in example_years]
+
+    return render_template(
+        'school-entry-year-table.html',
+        school_year=school_year,
+        selected_year=selected_year,
+        selected_row=selected_row,
+        school_entry_rows=rows,
+        year_options=range(max_year, min_year - 1, -1),
+        examples=examples,
+    )
+
+@app.route('/age-gap-calculator')
+def age_gap_calculator():
+    """출생년도 기준 나이 차이 안내 페이지"""
+    current_year = _current_local_date().year
+    min_year = max(1900, current_year - 100)
+    max_year = current_year
+
+    year_a = request.args.get('year_a', type=int)
+    year_b = request.args.get('year_b', type=int)
+
+    if year_a is not None and not (min_year <= year_a <= max_year):
+        year_a = None
+    if year_b is not None and not (min_year <= year_b <= max_year):
+        year_b = None
+
+    selected_gap = None
+    if year_a is not None and year_b is not None:
+        selected_gap = _build_age_gap_snapshot(year_a, year_b)
+
+    example_pairs = [(1990, 1995), (2000, 2002), (2010, 2015)]
+    examples = [
+        _build_age_gap_snapshot(a, b)
+        for a, b in example_pairs
+        if min_year <= a <= max_year and min_year <= b <= max_year
+    ]
+
+    gap_rows = []
+    for gap in range(0, 13):
+        if gap == 0:
+            note = "같은 출생년도라서 동갑인 경우입니다."
+            man_gap = "만 0세 차이"
+        else:
+            note = f"연나이는 {gap}세 차이이고, 만나이는 생일 전후에 따라 {gap - 1}~{gap}세 차이로 보일 수 있습니다."
+            man_gap = f"만 {gap - 1}~{gap}세 차이"
+        gap_rows.append({
+            "gap": f"{gap}년 차이",
+            "man_gap": man_gap,
+            "note": note,
+        })
+
+    return render_template(
+        'age-gap-calculator.html',
+        current_year=current_year,
+        year_options=range(max_year, min_year - 1, -1),
+        selected_year_a=year_a,
+        selected_year_b=year_b,
+        selected_gap=selected_gap,
+        examples=examples,
+        gap_rows=gap_rows,
+    )
+
+@app.route('/100-day-calculator')
+def hundred_day_calculator():
+    """시작일 기준 100일째 날짜 안내 페이지"""
+    today = _current_local_date()
+    current_year = today.year
+    min_year = 1900
+    max_year = current_year + 5
+
+    year = request.args.get('year', type=int)
+    month = request.args.get('month', type=int)
+    day = request.args.get('day', type=int)
+
+    selected_start_date = None
+    if year is not None and month is not None and day is not None and min_year <= year <= max_year:
+        selected_start_date = _parse_calendar_date(year, month, day)
+
+    selected_snapshot = _build_hundred_day_snapshot(selected_start_date, today) if selected_start_date else None
+    invalid_date = year is not None and month is not None and day is not None and selected_snapshot is None
+
+    example_inputs = [
+        ("커플 100일 예시", today - timedelta(days=30)),
+        ("아기 백일 예시", today - timedelta(days=99)),
+        ("프로젝트 회고 예시", today - timedelta(days=140)),
+    ]
+    examples = []
+    for title, start_date in example_inputs:
+        example = _build_hundred_day_snapshot(start_date, today)
+        example["title"] = title
+        examples.append(example)
+
+    return render_template(
+        '100-day-calculator.html',
+        today=today,
+        current_year=current_year,
+        selected_snapshot=selected_snapshot,
+        invalid_date=invalid_date,
+        year=year,
+        month=month,
+        day=day,
+        examples=examples,
+    )
+
+
+@app.route('/baby-months-table')
+def baby_months_table():
+    """생후 개월 수 기준 안내 페이지"""
+    selected_months = request.args.get('months', type=int)
+    if selected_months is not None and not (0 <= selected_months <= 36):
+        selected_months = None
+
+    month_rows = [_build_baby_month_snapshot(months) for months in range(0, 37)]
+    selected_row = _build_baby_month_snapshot(selected_months) if selected_months is not None else None
+    examples = [_build_baby_month_snapshot(months) for months in (6, 12, 18, 24, 36)]
+
+    return render_template(
+        'baby-months-table.html',
+        selected_months=selected_months,
+        selected_row=selected_row,
+        month_rows=month_rows,
+        month_options=range(0, 37),
+        examples=examples,
+    )
+
+
+@app.route('/annual-age-calculator')
+def annual_age_calculator():
+    """출생연도 기준 연나이 안내 페이지"""
+    today = _current_local_date()
+    current_year = today.year
+    min_year = 1900
+    max_year = current_year
+
+    year = request.args.get('year', type=int)
+    month = request.args.get('month', type=int)
+    day = request.args.get('day', type=int)
+
+    selected_birth_date = None
+    if year is not None and month is not None and day is not None and min_year <= year <= max_year:
+        selected_birth_date = _parse_calendar_date(year, month, day)
+
+    selected_snapshot = _build_annual_age_snapshot(selected_birth_date, current_year) if selected_birth_date else None
+    invalid_date = year is not None and month is not None and day is not None and selected_snapshot is None
+
+    example_dates = [
+        datetime(1990, 1, 1).date(),
+        datetime(2000, 6, 15).date(),
+        datetime(2010, 12, 31).date(),
+    ]
+    examples = [_build_annual_age_snapshot(example_date, current_year) for example_date in example_dates]
+
+    return render_template(
+        'annual-age-calculator.html',
+        current_year=current_year,
+        today=today,
+        selected_snapshot=selected_snapshot,
+        invalid_date=invalid_date,
+        year=year,
+        month=month,
+        day=day,
+        examples=examples,
+    )
+
+
+@app.route('/age-comparison-table')
+def age_comparison_table():
+    """만나이와 연나이 비교 안내 페이지"""
+    current_year = _current_local_date().year
+    min_year = max(1900, current_year - 100)
+    max_year = current_year
+
+    selected_year = request.args.get('year', type=int)
+    if selected_year is not None and not (min_year <= selected_year <= max_year):
+        selected_year = None
+
+    rows = []
+    selected_row = None
+    for year in range(max_year, min_year - 1, -1):
+        row = _build_age_comparison_snapshot(year, current_year)
+        row["is_selected"] = year == selected_year
+        rows.append(row)
+        if row["is_selected"]:
+            selected_row = row
+
+    example_years = [year for year in (1990, 1992, 2000, 2010) if min_year <= year <= max_year]
+    examples = [_build_age_comparison_snapshot(year, current_year) for year in example_years]
+
+    return render_template(
+        'age-comparison-table.html',
+        current_year=current_year,
+        selected_year=selected_year,
+        selected_row=selected_row,
+        comparison_rows=rows,
+        year_options=range(max_year, min_year - 1, -1),
+        examples=examples,
+    )
+
+
+@app.route('/grade-age-table')
+def grade_age_table():
+    """학년 기준 나이표 페이지"""
+    today = _current_local_date()
+    school_year = _current_school_year(today)
+    current_year = today.year
+
+    stage = request.args.get('stage', default='elementary', type=str)
+    grade = request.args.get('grade', type=int)
+
+    valid_stage_grades = {"elementary": 6, "middle": 3, "high": 3}
+    if stage not in valid_stage_grades:
+        stage = "elementary"
+    if grade is not None and not (1 <= grade <= valid_stage_grades[stage]):
+        grade = None
+
+    rows = []
+    for stage_key, max_grade in valid_stage_grades.items():
+        for grade_number in range(1, max_grade + 1):
+            row = _build_grade_age_snapshot(stage_key, grade_number, school_year, current_year)
+            row["is_selected"] = stage_key == stage and grade_number == grade
+            rows.append(row)
+
+    selected_row = _build_grade_age_snapshot(stage, grade, school_year, current_year) if grade is not None else None
+    examples = [
+        _build_grade_age_snapshot("elementary", 1, school_year, current_year),
+        _build_grade_age_snapshot("middle", 1, school_year, current_year),
+        _build_grade_age_snapshot("high", 1, school_year, current_year),
+    ]
+
+    return render_template(
+        'grade-age-table.html',
+        school_year=school_year,
+        selected_stage=stage,
+        selected_grade=grade,
+        selected_row=selected_row,
+        grade_rows=rows,
+        examples=examples,
+    )
+
+
+@app.route('/pet-age-table')
+def pet_age_table():
+    """반려동물 나이표 페이지"""
+    pet = request.args.get('pet', default='dog', type=str)
+    years = request.args.get('years', type=int)
+    size = request.args.get('size', default='small', type=str)
+
+    if pet not in {"dog", "cat"}:
+        pet = "dog"
+    if size not in DOG_HUMAN_AGE_TABLE:
+        size = "small"
+    if years is not None and not (1 <= years <= 20):
+        years = None
+
+    selected_row = _build_pet_age_snapshot(pet, years, size) if years is not None else None
+
+    dog_rows = []
+    for age in range(1, 17):
+        dog_rows.append({
+            "years_label": f"{age}살",
+            "small": f"{_calc_dog_human_age(age, 'small')}세",
+            "medium": f"{_calc_dog_human_age(age, 'medium')}세",
+            "large": f"{_calc_dog_human_age(age, 'large')}세",
+            "giant": f"{_calc_dog_human_age(age, 'giant')}세",
+        })
+
+    cat_rows = []
+    for age in range(1, 17):
+        cat_rows.append({
+            "years_label": f"{age}살",
+            "human_age": f"{_calc_cat_human_age(age)}세",
+        })
+
+    examples = [
+        _build_pet_age_snapshot("dog", 1, "small"),
+        _build_pet_age_snapshot("dog", 7, "large"),
+        _build_pet_age_snapshot("cat", 2),
+    ]
+
+    return render_template(
+        'pet-age-table.html',
+        pet=pet,
+        years=years,
+        size=size,
+        selected_row=selected_row,
+        dog_rows=dog_rows,
+        cat_rows=cat_rows,
+        examples=examples,
+    )
+
+
+@app.route('/korean-age-guide')
+def korean_age_guide():
+    """한국나이 폐지 이후 기준 정리 페이지"""
+    return render_template('korean-age-guide.html')
+
+
+@app.route('/pet-months-table')
+def pet_months_table():
+    """반려동물 월령표 페이지"""
+    pet = request.args.get('pet', default='dog', type=str)
+    months = request.args.get('months', type=int)
+    size = request.args.get('size', default='small', type=str)
+
+    if pet not in {"dog", "cat"}:
+        pet = "dog"
+    if size not in DOG_HUMAN_AGE_TABLE:
+        size = "small"
+    if months is not None and not (1 <= months <= 24):
+        months = None
+
+    selected_row = _build_pet_month_snapshot(pet, months, size) if months is not None else None
+
+    dog_rows = []
+    for month_value in range(1, 25):
+        dog_rows.append({
+            "months_label": f"{month_value}개월",
+            "age_text": _format_years_months(month_value),
+            "small": f"약 {round(_calc_dog_human_age_precise(month_value / 12, 'small'))}세",
+            "medium": f"약 {round(_calc_dog_human_age_precise(month_value / 12, 'medium'))}세",
+            "large": f"약 {round(_calc_dog_human_age_precise(month_value / 12, 'large'))}세",
+            "giant": f"약 {round(_calc_dog_human_age_precise(month_value / 12, 'giant'))}세",
+        })
+
+    cat_rows = []
+    for month_value in range(1, 25):
+        cat_rows.append({
+            "months_label": f"{month_value}개월",
+            "age_text": _format_years_months(month_value),
+            "human_age": f"약 {round(_calc_cat_human_age_precise(month_value / 12))}세",
+        })
+
+    examples = [
+        _build_pet_month_snapshot("dog", 3, "small"),
+        _build_pet_month_snapshot("dog", 12, "large"),
+        _build_pet_month_snapshot("cat", 6),
+    ]
+
+    return render_template(
+        'pet-months-table.html',
+        pet=pet,
+        months=months,
+        size=size,
+        selected_row=selected_row,
+        dog_rows=dog_rows,
+        cat_rows=cat_rows,
+        examples=examples,
+    )
+
+
+@app.route('/grade-birth-year-table')
+def grade_birth_year_table():
+    """학년별 출생연도표 페이지"""
+    today = _current_local_date()
+    school_year = _current_school_year(today)
+    current_year = today.year
+
+    stage = request.args.get('stage', default='elementary', type=str)
+    grade = request.args.get('grade', type=int)
+
+    valid_stage_grades = {"elementary": 6, "middle": 3, "high": 3}
+    if stage not in valid_stage_grades:
+        stage = "elementary"
+    if grade is not None and not (1 <= grade <= valid_stage_grades[stage]):
+        grade = None
+
+    rows = []
+    for stage_key, max_grade in valid_stage_grades.items():
+        for grade_number in range(1, max_grade + 1):
+            row = _build_grade_birth_year_snapshot(stage_key, grade_number, school_year, current_year)
+            row["is_selected"] = stage_key == stage and grade_number == grade
+            rows.append(row)
+
+    selected_row = _build_grade_birth_year_snapshot(stage, grade, school_year, current_year) if grade is not None else None
+    examples = [
+        _build_grade_birth_year_snapshot("elementary", 1, school_year, current_year),
+        _build_grade_birth_year_snapshot("middle", 1, school_year, current_year),
+        _build_grade_birth_year_snapshot("high", 1, school_year, current_year),
+    ]
+
+    return render_template(
+        'grade-birth-year-table.html',
+        school_year=school_year,
+        selected_stage=stage,
+        selected_grade=grade,
+        selected_row=selected_row,
+        grade_rows=rows,
+        examples=examples,
+    )
+
+
+@app.route('/birth-year-zodiac-table')
+def birth_year_zodiac_table():
+    """출생연도별 띠표 페이지"""
+    current_year = _current_local_date().year
+    min_year = max(1900, current_year - 100)
+    max_year = current_year
+
+    selected_year = request.args.get('year', type=int)
+    if selected_year is not None and not (min_year <= selected_year <= max_year):
+        selected_year = None
+
+    rows = []
+    selected_row = None
+    for year in range(max_year, min_year - 1, -1):
+        row = _build_birth_year_zodiac_snapshot(year, current_year)
+        row["is_selected"] = year == selected_year
+        rows.append(row)
+        if row["is_selected"]:
+            selected_row = row
+
+    example_years = [year for year in (1990, 2000, 2012, 2024) if min_year <= year <= max_year]
+    examples = [_build_birth_year_zodiac_snapshot(year, current_year) for year in example_years]
+
+    return render_template(
+        'birth-year-zodiac-table.html',
+        current_year=current_year,
+        selected_year=selected_year,
+        selected_row=selected_row,
+        zodiac_rows=rows,
+        year_options=range(max_year, min_year - 1, -1),
+        examples=examples,
+    )
+
 @app.route('/terms')
 def terms():
     """이용 약관 페이지"""
@@ -443,7 +1408,7 @@ def blog_drafts():
     db_session = SessionLocal()
     posts = (
         db_session.query(GeneratedPost)
-        .filter(GeneratedPost.status == "draft")
+        .filter(GeneratedPost.status.in_(["draft", "needs_review"]))
         .order_by(GeneratedPost.created_at.desc(), GeneratedPost.id.desc())
         .all()
     )
@@ -469,7 +1434,7 @@ def blog_draft_detail(slug):
     db_session = SessionLocal()
     post = (
         db_session.query(GeneratedPost)
-        .filter(GeneratedPost.slug == slug, GeneratedPost.status == "draft")
+        .filter(GeneratedPost.slug == slug, GeneratedPost.status.in_(["draft", "needs_review"]))
         .first()
     )
     if post is None:

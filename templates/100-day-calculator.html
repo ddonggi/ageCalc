@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <title>100일 계산기 | AgeCalc</title>
+    <meta name="description" content="시작일을 1일째로 계산해 100일째 날짜와 오늘 기준 상태를 바로 확인할 수 있는 100일 계산기입니다." />
+    <link rel="canonical" href="https://agecalc.cloud/100-day-calculator" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="100일 계산기 | AgeCalc" />
+    <meta property="og:description" content="커플 100일, 아기 백일, 프로젝트 시작일 기준 100일째 날짜를 한눈에 확인할 수 있습니다." />
+    <meta property="og:url" content="https://agecalc.cloud/100-day-calculator" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
+    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    {% include 'partials/adsense.html' %}
+</head>
+
+<body>
+    <div id="pixel-background"></div>
+    <div class="container">
+        {% include 'partials/header.html' %}
+
+        <section class="hero-band">
+            <div class="hero-copy">
+                <p class="eyebrow">기념일 빠른 계산</p>
+                <h1>100일 계산기</h1>
+                <p class="page-intro">
+                    시작일을 1일째로 계산해 100일째 날짜를 바로 확인할 수 있습니다.
+                    커플 100일, 아기 백일, 프로젝트 시작일처럼 시작일 포함 계산이 필요한 경우에 맞춘 안내 페이지입니다.
+                </p>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="#hundred-day-search">시작일 입력</a>
+                    <a class="btn btn-secondary" href="{{ url_for('d_day') }}">기념일 계산기 보기</a>
+                </div>
+            </div>
+            <div class="hero-metrics" aria-label="계산 안내">
+                <article class="metric-card">
+                    <span class="metric-value">시작일 포함</span>
+                    <span class="metric-label">시작일을 1일째로 계산</span>
+                </article>
+                <article class="metric-card">
+                    <span class="metric-value">+99일</span>
+                    <span class="metric-label">100일째 날짜 산출</span>
+                </article>
+                <article class="metric-card">
+                    <span class="metric-value">{{ today.strftime("%Y.%m.%d") }}</span>
+                    <span class="metric-label">오늘 기준 상태 함께 안내</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2 id="hundred-day-search">시작일 입력</h2>
+                <p class="section-intro">연도, 월, 일을 입력하면 100일째 날짜와 오늘 기준 상태를 바로 계산해 보여드립니다.</p>
+            </div>
+            <form class="age-form" method="get" action="{{ url_for('hundred_day_calculator') }}">
+                <div class="form-group">
+                    <div class="date-inputs">
+                        <input type="text" name="year" placeholder="년" inputmode="numeric" pattern="[0-9]*" maxlength="4" value="{{ year or '' }}" aria-label="시작 연도">
+                        <input type="text" name="month" placeholder="월" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="{{ month or '' }}" aria-label="시작 월">
+                        <input type="text" name="day" placeholder="일" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="{{ day or '' }}" aria-label="시작 일">
+                    </div>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" type="submit">100일 계산</button>
+                        {% if year or month or day %}
+                        <a class="btn btn-secondary" href="{{ url_for('hundred_day_calculator') }}">입력 지우기</a>
+                        {% endif %}
+                    </div>
+                    {% if invalid_date %}
+                    <small class="error-msg">입력한 날짜를 다시 확인해 주세요. 존재하는 날짜만 계산할 수 있습니다.</small>
+                    {% endif %}
+                </div>
+            </form>
+        </section>
+
+        {% if selected_snapshot %}
+        <section class="section-shell section-card-grid">
+            <article class="section-card birth-year-summary">
+                <p class="eyebrow">선택한 시작일</p>
+                <h2>{{ selected_snapshot.start_date }} 기준 100일 안내</h2>
+                <p>{{ selected_snapshot.detail }}</p>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <strong>시작일</strong>
+                        <span>{{ selected_snapshot.start_date }}</span>
+                    </div>
+                    <div class="summary-card">
+                        <strong>100일째 날짜</strong>
+                        <span>{{ selected_snapshot.hundredth_date }}</span>
+                    </div>
+                    <div class="summary-card">
+                        <strong>오늘 기준 상태</strong>
+                        <span>{{ selected_snapshot.status_label }}</span>
+                    </div>
+                    <div class="summary-card">
+                        <strong>현재 기준 경과</strong>
+                        <span>{{ selected_snapshot.elapsed_label }}</span>
+                    </div>
+                </div>
+                <p class="small">{{ selected_snapshot.status_note }}</p>
+            </article>
+        </section>
+        {% endif %}
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>예시로 보는 100일 계산</h2>
+                <p class="section-intro">자주 쓰는 상황을 예시로 먼저 정리했습니다.</p>
+            </div>
+            <div class="section-card-grid">
+                {% for example in examples %}
+                <article class="section-card">
+                    <p class="eyebrow">{{ example.title }}</p>
+                    <h2>{{ example.hundredth_date }}</h2>
+                    <p>{{ example.status_note }}</p>
+                    <p class="small">시작일 {{ example.start_date }} · 오늘 기준 {{ example.elapsed_label }}</p>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="section-shell section-card-grid">
+            <article class="section-card">
+                <p class="eyebrow">계산 기준</p>
+                <h2>어떻게 계산하나요?</h2>
+                <ul>
+                    <li>시작일을 1일째로 계산하므로 100일째 날짜는 시작일에 99일을 더해 구합니다.</li>
+                    <li>오늘 기준 상태는 100일째 날짜와 오늘 날짜를 비교해 D-Day 형식으로 보여줍니다.</li>
+                    <li>기념일 계산기와 달리 이 페이지는 100일 기준 확인에만 집중한 안내 페이지입니다.</li>
+                </ul>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">같이 보기</p>
+                <h2>함께 보면 좋은 페이지</h2>
+                <div class="footer-links">
+                    <a href="{{ url_for('d_day') }}">기념일 계산기</a>
+                    <a href="{{ url_for('baby_months') }}">아이 개월 수 계산기</a>
+                    <a href="{{ url_for('references') }}">계산 기준과 참고 자료</a>
+                    <a href="{{ url_for('faq') }}">자주 묻는 질문</a>
+                </div>
+            </article>
+        </section>
+
+        {% include 'partials/footer.html' %}
+    </div>
+
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 동의 여부는 아래에서 선택할 수 있으며, 거부해도 주요 기능은 그대로 이용할 수 있습니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
+</body>
+
+</html>

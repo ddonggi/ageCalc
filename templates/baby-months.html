@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
     <title>아이 개월 수 계산기 | AgeCalc</title>
-    <meta name="description" content="출생일을 입력하면 우리 아이의 현재 개월 수를 바로 확인할 수 있는 아이 개월 수 계산기입니다." />
+    <meta name="description" content="출생일만 입력하면 현재 개월 수를 바로 확인할 수 있는 아이 개월 수 계산기입니다." />
 
     <link rel="canonical" href="https://agecalc.cloud/baby-months" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="AgeCalc" />
     <meta property="og:title" content="아이 개월 수 계산기 | AgeCalc" />
-    <meta property="og:description" content="출생일 → 현재 개월 수를 간편하게 계산해 보세요." />
+    <meta property="og:description" content="출생일만 입력하면 현재 개월 수를 바로 계산할 수 있습니다." />
     <meta property="og:url" content="https://agecalc.cloud/baby-months" />
     <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
@@ -32,7 +32,6 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-M0RLS343N4"></script>
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
 
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
@@ -46,7 +45,7 @@
         {% include 'partials/header.html' %}
 
         <h1>아이 개월 수 계산기</h1>
-        <div style="text-align: center;margin-bottom: 2rem;">“우리 아이는 몇 개월?”</div>
+        <div style="text-align: center;margin-bottom: 2rem;">출생일만 입력하면 현재 개월 수를 바로 확인할 수 있습니다.</div>
 
         <form class="age-form" id="baby-months-form" autocomplete="off">
             <div class="form-group">
@@ -66,7 +65,7 @@
         </div>
 
         <section style="margin-top:40px">
-            <h2>설명</h2>
+            <h2>이 계산기로 알 수 있는 내용</h2>
             <ul>
                 <li>출생일 기준으로 현재 개월 수를 계산합니다.</li>
                 <li>예방접종 일정, 발달 단계 확인에 활용할 수 있습니다.</li>
@@ -105,6 +104,14 @@
                 <li>활용: 예방접종 일정, 발달 체크, 생활 리듬 점검</li>
                 <li>주의: 의료적 판단은 전문가 상담 권장</li>
             </ul>
+            <p>
+                학령기 자녀의 현재 학년이 궁금하다면
+                <a href="{{ url_for('school_grade_calculator') }}">학년 계산기</a>에서 출생년도 기준으로 바로 확인할 수 있습니다.
+            </p>
+            <p>
+                생후 6개월, 12개월, 18개월처럼 자주 찾는 월령을 표로 바로 보고 싶다면
+                <a href="{{ url_for('baby_months_table') }}">개월수 계산표</a>를 함께 활용해 보세요.
+            </p>
             <p class="small">마지막 기준 확인일: 2026-02-09</p>
         </section>
 
@@ -114,7 +121,7 @@
     <!-- 쿠키 동의 배너 -->
     <div class="cookie-banner" id="cookie-banner">
         <div class="cookie-content">
-            <p>이 웹사이트는 쿠키를 사용하여 사용자 경험을 개선합니다. 계속 사용하시면 쿠키 사용에 동의하는 것으로 간주됩니다.</p>
+            <p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 동의 여부는 아래에서 선택할 수 있으며, 거부해도 주요 기능은 그대로 이용할 수 있습니다.</p>
             <div class="cookie-buttons">
                 <button id="accept-cookies" class="btn btn-primary">동의</button>
                 <button id="reject-cookies" class="btn btn-secondary">거부</button>

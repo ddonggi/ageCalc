@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <title>입학년도 계산표 | AgeCalc</title>
+    <meta name="description" content="출생년도만 선택하면 초등학교 입학년도, 중학교 입학년도, 고등학교 입학년도를 바로 확인할 수 있는 입학년도 계산표입니다." />
+    <link rel="canonical" href="https://agecalc.cloud/school-entry-year-table" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="입학년도 계산표 | AgeCalc" />
+    <meta property="og:description" content="출생년도 기준 초등학교·중학교·고등학교 입학 학년도를 한눈에 확인할 수 있습니다." />
+    <meta property="og:url" content="https://agecalc.cloud/school-entry-year-table" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
+    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    {% include 'partials/adsense.html' %}
+</head>
+
+<body>
+    <div id="pixel-background"></div>
+    <div class="container">
+        {% include 'partials/header.html' %}
+
+        <section class="hero-band">
+            <div class="hero-copy">
+                <p class="eyebrow">취학 일정 빠른 안내</p>
+                <h1>입학년도 계산표</h1>
+                <p class="page-intro">
+                    출생년도만 선택하면 초등학교 입학년도, 중학교 입학년도, 고등학교 입학년도를 바로 확인할 수 있습니다.
+                    현재 학년보다 입학 시점을 먼저 찾는 경우에 맞춰, 출생년도 기준 학년도만 간단히 정리한 페이지입니다.
+                </p>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="#school-entry-search">출생년도 선택</a>
+                    <a class="btn btn-secondary" href="{{ url_for('school_grade_calculator') }}">학년 계산기 보기</a>
+                </div>
+            </div>
+            <div class="hero-metrics" aria-label="입학 정보">
+                <article class="metric-card">
+                    <span class="metric-value">초등학교 입학년도</span>
+                    <span class="metric-label">출생년도 + 7학년도</span>
+                </article>
+                <article class="metric-card">
+                    <span class="metric-value">중학교 입학년도</span>
+                    <span class="metric-label">일반 진급 기준 안내</span>
+                </article>
+                <article class="metric-card">
+                    <span class="metric-value">고등학교 입학년도</span>
+                    <span class="metric-label">{{ school_year }}학년도 기준으로 함께 확인</span>
+                </article>
+            </div>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2 id="school-entry-search">출생년도 선택</h2>
+                <p class="section-intro">출생년도를 고르면 해당 연도의 입학 시점을 바로 요약해 보여드립니다.</p>
+            </div>
+            <form class="age-form birth-year-form" method="get" action="{{ url_for('school_entry_year_table') }}">
+                <div class="form-group">
+                    <div class="date-inputs">
+                        <select name="year" aria-label="출생년도 선택">
+                            <option value="">출생년도를 선택하세요</option>
+                            {% for year in year_options %}
+                            <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}년생</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" type="submit">입학년도 보기</button>
+                        {% if selected_year %}
+                        <a class="btn btn-secondary" href="{{ url_for('school_entry_year_table') }}">선택 해제</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        {% if selected_row %}
+        <section class="section-shell section-card-grid">
+            <article class="section-card birth-year-summary">
+                <p class="eyebrow">선택한 출생년도</p>
+                <h2>{{ selected_row.label }} 입학년도 안내</h2>
+                <p>{{ selected_row.status_note }}</p>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <strong>초등학교 입학년도</strong>
+                        <span>{{ selected_row.elementary_entry }}</span>
+                    </div>
+                    <div class="summary-card">
+                        <strong>중학교 입학년도</strong>
+                        <span>{{ selected_row.middle_entry }}</span>
+                    </div>
+                    <div class="summary-card">
+                        <strong>고등학교 입학년도</strong>
+                        <span>{{ selected_row.high_entry }}</span>
+                    </div>
+                    <div class="summary-card">
+                        <strong>현재 학년</strong>
+                        <span>{{ selected_row.current_grade }}</span>
+                    </div>
+                </div>
+            </article>
+        </section>
+        {% endif %}
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>예시로 보는 입학 시점</h2>
+                <p class="section-intro">자주 찾는 출생년도 예시를 먼저 정리했습니다.</p>
+            </div>
+            <div class="section-card-grid">
+                {% for example in examples %}
+                <article class="section-card">
+                    <p class="eyebrow">{{ example.label }}</p>
+                    <h2>{{ example.elementary_entry }}</h2>
+                    <p>{{ example.status_note }}</p>
+                    <p class="small">중학교 {{ example.middle_entry }} · 고등학교 {{ example.high_entry }}</p>
+                    <a class="btn btn-secondary" href="{{ url_for('school_entry_year_table', year=example.year) }}">이 출생년도 자세히 보기</a>
+                </article>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>출생년도별 입학년도표</h2>
+                <p class="section-intro">최근 출생년도를 기준으로 초등학교, 중학교, 고등학교 입학 학년도를 표로 정리했습니다.</p>
+            </div>
+            <div class="data-table-wrap">
+                <table class="data-table birth-year-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">출생년도</th>
+                            <th scope="col">초등학교 입학년도</th>
+                            <th scope="col">중학교 입학년도</th>
+                            <th scope="col">고등학교 입학년도</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in school_entry_rows %}
+                        <tr{% if row.is_selected %} class="is-selected"{% endif %}>
+                            <td>{{ row.label }}</td>
+                            <td>{{ row.elementary_entry }}</td>
+                            <td>{{ row.middle_entry }}</td>
+                            <td>{{ row.high_entry }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <p class="small">조기입학, 입학유예, 학제 변경 같은 예외는 반영하지 않은 일반 안내입니다.</p>
+        </section>
+
+        <section class="section-shell section-card-grid">
+            <article class="section-card">
+                <p class="eyebrow">계산 기준</p>
+                <h2>어떻게 계산하나요?</h2>
+                <ul>
+                    <li>초등학교 입학년도는 일반적으로 출생년도 + 7학년도 기준으로 계산합니다.</li>
+                    <li>중학교와 고등학교 입학년도는 일반적인 진급 흐름을 기준으로 이어서 계산합니다.</li>
+                    <li>정확한 학적 판단이 필요하면 학교 또는 교육청 안내를 함께 확인하는 편이 좋습니다.</li>
+                </ul>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">같이 보기</p>
+                <h2>함께 보면 좋은 페이지</h2>
+                <div class="footer-links">
+                    <a href="{{ url_for('school_grade_calculator') }}">학년 계산기</a>
+                    <a href="{{ url_for('baby_months') }}">아이 개월 수 계산기</a>
+                    <a href="{{ url_for('birth_year_age_table') }}">출생년도별 나이표</a>
+                    <a href="{{ url_for('references') }}">계산 기준과 참고 자료</a>
+                </div>
+            </article>
+        </section>
+
+        {% include 'partials/footer.html' %}
+    </div>
+
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 동의 여부는 아래에서 선택할 수 있으며, 거부해도 주요 기능은 그대로 이용할 수 있습니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
+</body>
+
+</html>
