@@ -73,6 +73,88 @@ DOG_HUMAN_AGE_TABLE = {
     "large": [15, 24, 28, 32, 36, 45, 50, 55, 61, 66, 72, 77, 82, 88, 93, 99],
     "giant": [12, 22, 31, 38, 45, 49, 56, 64, 71, 79, 86, 93, 100, 107, 114, 121],
 }
+SITE_NAVIGATION = [
+    {
+        "key": "calculators",
+        "label": "계산기",
+        "eyebrow": "직접 계산",
+        "description": "입력값을 넣고 바로 결과를 확인하는 핵심 계산기입니다.",
+        "links": [
+            {"endpoint": "age", "label": "만나이", "summary": "생년월일로 만 나이를 바로 계산합니다."},
+            {"endpoint": "dog", "label": "강아지 나이", "summary": "반려견 나이를 사람 기준으로 환산합니다."},
+            {"endpoint": "cat", "label": "고양이 나이", "summary": "반려묘 나이를 사람 기준으로 환산합니다."},
+            {"endpoint": "baby_months", "label": "아이 개월 수", "summary": "출생일 기준 현재 개월 수를 계산합니다."},
+            {"endpoint": "d_day", "label": "기념일 계산", "summary": "다가오는 날짜까지 남은 일수를 계산합니다."},
+            {"endpoint": "parent_child", "label": "부모·자녀", "summary": "부모와 자녀의 나이 차이와 주요 시점을 살펴봅니다."},
+        ],
+    },
+    {
+        "key": "reference",
+        "label": "표·비교",
+        "eyebrow": "빠른 확인",
+        "description": "연도, 학년, 월령처럼 자주 찾는 기준을 표와 비교형 페이지로 정리했습니다.",
+        "links": [
+            {"endpoint": "birth_year_age_table", "label": "출생년도별 나이표", "summary": "출생연도별 연나이와 만나이 범위를 확인합니다."},
+            {"endpoint": "school_grade_calculator", "label": "학년 계산기", "summary": "출생년도 기준 현재 학년과 입학 시점을 계산합니다."},
+            {"endpoint": "school_entry_year_table", "label": "입학년도 계산표", "summary": "초·중·고 입학 학년도를 한 번에 확인합니다."},
+            {"endpoint": "grade_age_table", "label": "학년 기준 나이표", "summary": "초1부터 고3까지 보통 나이를 표로 봅니다."},
+            {"endpoint": "grade_birth_year_table", "label": "학년별 출생연도표", "summary": "학년별 보통 출생연도를 빠르게 찾습니다."},
+            {"endpoint": "college_entry_year_calculator", "label": "대학 학번 나이", "summary": "25학번, 26학번의 보통 나이를 확인합니다."},
+            {"endpoint": "annual_age_calculator", "label": "연나이 계산기", "summary": "생일과 관계없이 올해 기준 연나이를 계산합니다."},
+            {"endpoint": "age_comparison_table", "label": "만나이·연나이 비교표", "summary": "만나이와 연나이 차이를 비교해 설명합니다."},
+            {"endpoint": "age_gap_calculator", "label": "나이 차이 계산기", "summary": "두 출생년도의 차이를 만나이 범위까지 비교합니다."},
+            {"endpoint": "hundred_day_calculator", "label": "100일 계산기", "summary": "시작일 기준 100일째 날짜와 현재 상태를 계산합니다."},
+            {"endpoint": "birthday_dday_calculator", "label": "생일 D-day", "summary": "다음 생일까지 남은 일수를 계산합니다."},
+            {"endpoint": "baby_months_table", "label": "개월수 계산표", "summary": "월령별 빠른 안내와 연 단위 환산을 함께 봅니다."},
+            {"endpoint": "pet_age_table", "label": "반려동물 나이표", "summary": "강아지·고양이 나이를 사람 기준으로 비교합니다."},
+            {"endpoint": "pet_months_table", "label": "반려동물 월령표", "summary": "강아지·고양이 월령 기준을 표로 정리합니다."},
+            {"endpoint": "birth_year_zodiac_table", "label": "출생연도별 띠표", "summary": "출생연도별 띠와 나이 범위를 함께 확인합니다."},
+        ],
+    },
+    {
+        "key": "guides",
+        "label": "안내",
+        "eyebrow": "기준 정리",
+        "description": "계산 기준, 참고 자료, 운영 정보와 정책 문서를 한곳에서 확인할 수 있습니다.",
+        "links": [
+            {"endpoint": "guide", "label": "나이 계산 가이드", "summary": "만나이, 연나이, 한국식 나이 차이를 설명합니다."},
+            {"endpoint": "faq", "label": "자주 묻는 질문", "summary": "자주 헷갈리는 계산 기준과 예외를 모았습니다."},
+            {"endpoint": "korean_age_guide", "label": "한국나이 기준 정리", "summary": "만 나이 통일 이후 기준과 예외를 정리했습니다."},
+            {"endpoint": "references", "label": "계산 기준", "summary": "각 계산기의 참고 자료와 기준을 한 번에 확인합니다."},
+            {"endpoint": "about", "label": "운영 원칙", "summary": "콘텐츠 작성 기준과 운영 원칙을 공개합니다."},
+            {"endpoint": "contact", "label": "문의", "summary": "운영자 안내와 수정 요청 경로를 확인합니다."},
+            {"endpoint": "privacy", "label": "개인정보처리방침", "summary": "데이터 처리와 쿠키 이용 방침을 안내합니다."},
+            {"endpoint": "terms", "label": "이용약관", "summary": "서비스 이용 시 알아둘 기준과 책임 범위를 안내합니다."},
+        ],
+    },
+]
+HOME_SECTION_CONFIG = {
+    "calculators": {
+        "section_label": "대표 계산기",
+        "title": "직접 입력해서 바로 계산하는 핵심 도구",
+        "intro": "가장 자주 찾는 입력형 계산기를 먼저 배치했습니다.",
+        "featured_limit": 6,
+    },
+    "reference": {
+        "section_label": "표·비교 모음",
+        "title": "표와 비교형 페이지로 기준을 빠르게 확인하세요",
+        "intro": "출생연도, 학년, 월령처럼 자주 찾는 기준을 표 중심으로 정리했습니다.",
+        "featured_limit": 6,
+    },
+    "guides": {
+        "section_label": "기준과 안내",
+        "title": "계산 기준과 운영 원칙을 함께 확인하세요",
+        "intro": "헷갈리기 쉬운 나이 기준, 참고 자료, 운영 정보를 한곳에 모았습니다.",
+        "featured_limit": 4,
+    },
+}
+FOOTER_POLICY_LINKS = [
+    {"endpoint": "about", "label": "운영 원칙"},
+    {"endpoint": "references", "label": "계산 기준"},
+    {"endpoint": "contact", "label": "문의"},
+    {"endpoint": "privacy", "label": "개인정보처리방침"},
+    {"endpoint": "terms", "label": "이용약관"},
+]
 PUBLIC_SITEMAP_ENDPOINTS = [
     "index",
     "age",
@@ -93,6 +175,8 @@ PUBLIC_SITEMAP_ENDPOINTS = [
     "pet_months_table",
     "grade_birth_year_table",
     "birth_year_zodiac_table",
+    "college_entry_year_calculator",
+    "birthday_dday_calculator",
     "privacy",
     "terms",
     "guide",
@@ -116,11 +200,36 @@ def inject_csp_nonce():
         editorial_policy_url = url_for("about")
     except RuntimeError:
         pass
+
+    site_navigation = []
+    home_navigation_sections = []
+    navigation_counts = {}
+
+    for group in SITE_NAVIGATION:
+        links = [dict(link) for link in group["links"]]
+        group_payload = dict(group)
+        group_payload["links"] = links
+        group_payload["endpoints"] = [link["endpoint"] for link in links]
+        site_navigation.append(group_payload)
+        navigation_counts[group["key"]] = len(links)
+
+        section_config = HOME_SECTION_CONFIG.get(group["key"])
+        if section_config:
+            section_payload = dict(section_config)
+            section_payload["key"] = group["key"]
+            section_payload["links"] = links[: section_config["featured_limit"]]
+            section_payload["more_links"] = links[section_config["featured_limit"] :]
+            home_navigation_sections.append(section_payload)
+
     return {
         "csp_nonce": getattr(g, "csp_nonce", ""),
         "author_name": SITE_AUTHOR_NAME,
         "contact_email": SITE_CONTACT_EMAIL,
         "editorial_policy_url": editorial_policy_url,
+        "site_navigation": site_navigation,
+        "home_navigation_sections": home_navigation_sections,
+        "footer_policy_links": FOOTER_POLICY_LINKS,
+        "navigation_counts": navigation_counts,
     }
 
 
@@ -447,6 +556,59 @@ def _build_hundred_day_snapshot(start_date, today=None) -> dict[str, object]:
     }
 
 
+def _parse_month_day(month: int | None, day: int | None):
+    if month is None or day is None:
+        return None
+    if not (1 <= month <= 12 and 1 <= day <= 31):
+        return None
+
+    validation_year = 2000 if month == 2 and day == 29 else 2001
+    try:
+        datetime(validation_year, month, day).date()
+    except ValueError:
+        return None
+    return month, day
+
+
+def _next_birthday_date(month: int, day: int, today):
+    year = today.year
+    while True:
+        try:
+            candidate = datetime(year, month, day).date()
+        except ValueError:
+            year += 1
+            continue
+
+        if candidate < today:
+            year += 1
+            continue
+        return candidate
+
+
+def _build_birthday_dday_snapshot(month: int, day: int, today=None) -> dict[str, object]:
+    if today is None:
+        today = _current_local_date()
+
+    next_birthday = _next_birthday_date(month, day, today)
+    days_until = (next_birthday - today).days
+
+    if days_until == 0:
+        status_label = "D-Day"
+        status_note = "바로 오늘이 생일입니다."
+    else:
+        status_label = f"D-{days_until}"
+        status_note = f"다음 생일까지 {days_until}일 남았습니다."
+
+    return {
+        "birthday_label": f"{month}월 {day}일",
+        "next_birthday_date": _format_calendar_date(next_birthday),
+        "status_label": status_label,
+        "status_note": status_note,
+        "days_until_label": f"{days_until}일",
+        "detail": "월과 일만 입력하면 오늘 기준으로 가장 가까운 다음 생일 날짜를 계산합니다.",
+    }
+
+
 def _build_annual_age_snapshot(birth_date, current_year: int) -> dict[str, object]:
     birth_year = birth_date.year
     annual_age = current_year - birth_year
@@ -623,6 +785,36 @@ def _build_birth_year_zodiac_snapshot(year: int, current_year: int) -> dict[str,
     snapshot["zodiac_label"] = zodiac_label
     snapshot["detail"] = f"{snapshot['label']}은 {zodiac_label}이며, {snapshot['detail']}"
     return snapshot
+
+
+def _format_college_cohort_label(entry_year: int) -> str:
+    return f"{entry_year % 100:02d}학번"
+
+
+def _build_college_entry_snapshot(entry_year: int, current_year: int) -> dict[str, object]:
+    birth_year = entry_year - 19
+    annual_age = current_year - birth_year
+    man_age_range = _birth_year_range_label(birth_year, current_year)
+    cohort_label = _format_college_cohort_label(entry_year)
+
+    if entry_year > current_year:
+        status_note = f"{cohort_label}은 아직 입학 전이거나 입학 준비 중인 시기로, 보통 {birth_year}년생 기준으로 안내합니다."
+    elif entry_year == current_year:
+        status_note = f"{cohort_label}은 올해 입학하는 신입생 기준이며, 보통 {birth_year}년생이 해당합니다."
+    else:
+        elapsed = current_year - entry_year
+        status_note = f"{cohort_label}은 입학 후 {elapsed}년차 기준으로 보통 {birth_year}년생이 해당합니다."
+
+    return {
+        "entry_year": entry_year,
+        "cohort_label": cohort_label,
+        "birth_year": birth_year,
+        "birth_year_label": f"{birth_year}년생",
+        "annual_age": f"{annual_age}세",
+        "man_age_range": man_age_range,
+        "detail": status_note,
+        "query_label": f"{cohort_label}은 보통 몇 년생",
+    }
 
 
 def _format_years_months(months: int) -> str:
@@ -1302,6 +1494,71 @@ def birth_year_zodiac_table():
         selected_row=selected_row,
         zodiac_rows=rows,
         year_options=range(max_year, min_year - 1, -1),
+        examples=examples,
+    )
+
+
+@app.route('/college-entry-year-calculator')
+def college_entry_year_calculator():
+    """대학 학번 나이 계산기 페이지"""
+    current_year = _current_local_date().year
+    min_entry_year = max(1990, current_year - 20)
+    max_entry_year = current_year + 1
+
+    selected_year = request.args.get('year', type=int)
+    if selected_year is not None and not (min_entry_year <= selected_year <= max_entry_year):
+        selected_year = None
+
+    rows = []
+    selected_row = None
+    for entry_year in range(max_entry_year, min_entry_year - 1, -1):
+        row = _build_college_entry_snapshot(entry_year, current_year)
+        row["is_selected"] = entry_year == selected_year
+        rows.append(row)
+        if row["is_selected"]:
+            selected_row = row
+
+    example_years = [year for year in (2024, 2025, 2026) if min_entry_year <= year <= max_entry_year]
+    examples = [_build_college_entry_snapshot(year, current_year) for year in example_years]
+
+    return render_template(
+        'college-entry-year-calculator.html',
+        current_year=current_year,
+        selected_year=selected_year,
+        selected_row=selected_row,
+        college_rows=rows,
+        year_options=range(max_entry_year, min_entry_year - 1, -1),
+        examples=examples,
+    )
+
+
+@app.route('/birthday-dday-calculator')
+def birthday_dday_calculator():
+    """생일 D-day 계산기 페이지"""
+    today = _current_local_date()
+    month = request.args.get('month', type=int)
+    day = request.args.get('day', type=int)
+
+    selected_month_day = _parse_month_day(month, day)
+    selected_snapshot = None
+    invalid_date = month is not None and day is not None and selected_month_day is None
+
+    if selected_month_day is not None:
+        selected_snapshot = _build_birthday_dday_snapshot(selected_month_day[0], selected_month_day[1], today)
+
+    example_inputs = [(1, 1), (5, 10), (12, 25)]
+    examples = [
+        _build_birthday_dday_snapshot(example_month, example_day, today)
+        for example_month, example_day in example_inputs
+    ]
+
+    return render_template(
+        'birthday-dday-calculator.html',
+        today=today,
+        month=month,
+        day=day,
+        selected_snapshot=selected_snapshot,
+        invalid_date=invalid_date,
         examples=examples,
     )
 

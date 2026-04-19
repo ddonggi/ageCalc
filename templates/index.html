@@ -7,13 +7,11 @@
 
     <meta name="google-adsense-account" content="ca-pub-7818333740838556">
 
-    <!-- 필수 SEO -->
     <title>나이 계산 도구 모음 | AgeCalc</title>
     <meta name="description" content="만나이, 연나이, 생년월일 기반의 다양한 나이 계산을 한 곳에서 제공합니다. 필요한 계산 페이지로 이동해 보세요." />
 
     <link rel="canonical" href="https://agecalc.cloud/" />
 
-    <!-- 소셜 미리보기 -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="AgeCalc" />
     <meta property="og:title" content="나이 계산 도구 모음 | AgeCalc" />
@@ -25,7 +23,6 @@
     <meta name="twitter:description" content="만나이, 연나이, 생년월일 기반의 다양한 나이 계산을 한 곳에서 제공합니다." />
     <meta name="twitter:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
-    <!-- 파비콘/매니페스트 -->
     <link rel="icon" href="/favicon.ico">
     <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
     <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
@@ -33,19 +30,14 @@
         href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
     <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
-    <!-- CSS-->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-    <!-- Google tag (gtag.js) -->
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
-
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
-
 </head>
 
 <body class="home-page">
@@ -56,11 +48,10 @@
         <section class="hero-band hero-command-board">
             <div class="hero-copy">
                 <p class="eyebrow">대표 안내</p>
-                <h1>필요한 계산과 설명을 한곳에서 확인하세요</h1>
+                <h1>필요한 계산과 기준을 카테고리별로 바로 이동하세요</h1>
                 <p class="page-intro">
-                    AgeCalc는 계산 결과만 보여주는 도구가 아니라, 결과를 이해하는 데 필요한 기준과 배경 설명까지
-                    함께 정리한 생활 정보 서비스입니다. 자주 쓰는 계산기와 관련 글을 한 흐름으로 묶어
-                    숫자만 보는 데서 끝나지 않도록 구성했습니다.
+                    AgeCalc는 생활 계산기와 기준 안내를 한 흐름으로 묶은 서비스입니다. 직접 계산하는 페이지,
+                    빠르게 비교하는 표, 기준을 설명하는 안내 문서를 나눠 배치해 필요한 정보로 곧바로 이동할 수 있게 했습니다.
                 </p>
                 <div class="hero-actions">
                     <a class="btn btn-primary" href="{{ url_for('age') }}">대표 계산기 시작</a>
@@ -69,395 +60,65 @@
             </div>
             <div class="hero-command" aria-label="핵심 정보 미리보기">
                 <article class="command-panel command-panel-primary">
-                    <p class="command-label">핵심 화면</p>
-                    <h2>자주 찾는 계산기와 안내 문서를 바로 살펴볼 수 있습니다</h2>
-                    <p>대표 계산기, 가이드, 자주 묻는 질문, 블로그 글을 한곳에 모아 필요한 정보로 빠르게 이동할 수 있게 정리했습니다.</p>
+                    <p class="command-label">탐색 구조</p>
+                    <h2>계산기, 표·비교, 안내를 같은 기준으로 정리했습니다</h2>
+                    <p>헤더 메가메뉴와 홈 섹션이 같은 구조를 쓰기 때문에 한 번 익히면 어디서든 필요한 페이지를 빠르게 찾을 수 있습니다.</p>
                 </article>
                 <div class="command-grid">
                     <article class="command-panel">
-                        <p class="command-label">대표 도구</p>
-                        <strong>19</strong>
-                        <span>자주 쓰는 계산기</span>
+                        <p class="command-label">계산기</p>
+                        <strong>{{ navigation_counts.calculators }}</strong>
+                        <span>입력형 핵심 도구</span>
                     </article>
                     <article class="command-panel">
-                        <p class="command-label">안내 문서</p>
-                        <strong>가이드</strong>
-                        <span>계산 기준과 배경 설명</span>
+                        <p class="command-label">표·비교</p>
+                        <strong>{{ navigation_counts.reference }}</strong>
+                        <span>빠른 확인 페이지</span>
                     </article>
                     <article class="command-panel">
-                        <p class="command-label">운영 정보</p>
-                        <strong>안내</strong>
-                        <span>기준일과 운영 원칙</span>
+                        <p class="command-label">안내</p>
+                        <strong>{{ navigation_counts.guides }}</strong>
+                        <span>기준과 운영 문서</span>
                     </article>
                 </div>
             </div>
         </section>
 
-        <section class="section-shell">
+        {% for section in home_navigation_sections %}
+        <section class="section-shell category-hub-section" id="section-{{ section.key }}">
             <div class="section-heading">
-                <h2>빠른 시작</h2>
-                <p class="section-intro">가장 자주 찾는 계산기부터 바로 진입할 수 있게 정리했습니다.</p>
+                <p class="eyebrow">{{ section.section_label }}</p>
+                <h2>{{ section.title }}</h2>
+                <p class="section-intro">{{ section.intro }}</p>
             </div>
-            <div class="age-rights-grid">
-                <a class="card-link" href="{{ url_for('age') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">만</span>
-                            <span class="age-unit">나이 계산</span>
-                        </div>
-                        <ul>
-                            <li>양력/음력 생일 입력 지원</li>
-                            <li>생일 전후 기준으로 만 나이 계산</li>
-                            <li>클릭하면 바로 계산 페이지로 이동</li>
-                        </ul>
-                    </div>
-                </a>
 
-                <a class="card-link" href="{{ url_for('dog') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">🐶</span>
-                            <span class="age-unit">강아지 나이</span>
-                        </div>
-                        <ul>
-                            <li>반려견 나이를 사람 나이로 환산</li>
-                            <li>간단 입력으로 빠른 계산</li>
-                            <li>클릭하면 바로 계산 페이지로 이동</li>
-                        </ul>
-                    </div>
+            <div class="hub-card-grid">
+                {% for link in section.links %}
+                <a class="hub-card-link" href="{{ url_for(link.endpoint) }}">
+                    <article class="hub-card">
+                        <strong>{{ link.label }}</strong>
+                        <p>{{ link.summary }}</p>
+                    </article>
                 </a>
-
-                <a class="card-link" href="{{ url_for('cat') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">🐱</span>
-                            <span class="age-unit">고양이 나이</span>
-                        </div>
-                        <ul>
-                            <li>반려묘 나이를 사람 나이로 환산</li>
-                            <li>간단 입력으로 빠른 계산</li>
-                            <li>클릭하면 바로 계산 페이지로 이동</li>
-                        </ul>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('baby_months') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">🍼</span>
-                            <span class="age-unit">아이 개월 수</span>
-                        </div>
-                        <ul>
-                            <li>“우리 아이는 몇 개월?” 바로 확인</li>
-                            <li>출생일 기준 현재 개월 수 계산</li>
-                            <li>클릭하면 계산 페이지로 이동</li>
-                        </ul>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('d_day') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">⏳</span>
-                            <span class="age-unit">기념일 계산</span>
-                        </div>
-                        <ul>
-                            <li>다가오는 날짜까지 남은 일수 확인</li>
-                            <li>지난 기념일로부터 경과 일수 계산</li>
-                            <li>D-Day와 날짜 기준을 함께 표시</li>
-                        </ul>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('parent_child') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">👨‍👩‍👧</span>
-                            <span class="age-unit">부모·자녀</span>
-                        </div>
-                        <ul>
-                            <li>출산 당시 부모 나이 계산</li>
-                            <li>현재 나이 차이 확인</li>
-                            <li>환갑·칠순 시점 자녀 나이</li>
-                        </ul>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('school_grade_calculator') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">🏫</span>
-                            <span class="age-unit">학년 계산</span>
-                        </div>
-                        <ul>
-                            <li>출생년도 기준 현재 학년 확인</li>
-                            <li>초·중·고 입학 학년도 안내</li>
-                            <li>취학 전인지 바로 확인</li>
-                        </ul>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('school_entry_year_table') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">📚</span>
-                            <span class="age-unit">입학년도 계산표</span>
-                        </div>
-                        <ul>
-                            <li>출생년도 기준 초등학교 입학년도 확인</li>
-                            <li>중학교·고등학교 입학년도까지 함께 안내</li>
-                            <li>입학 시점을 먼저 찾는 경우에 적합</li>
-                        </ul>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('age_gap_calculator') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">↔</span>
-                            <span class="age-unit">나이 차이</span>
-                        </div>
-                        <ul>
-                            <li>두 출생년도 비교</li>
-                            <li>연도 차이와 만나이 범위 확인</li>
-                            <li>가족·친구·커플 비교에 활용</li>
-                        </ul>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('hundred_day_calculator') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">💯</span>
-                            <span class="age-unit">100일 계산</span>
-                        </div>
-                        <ul>
-                            <li>시작일을 1일째로 계산</li>
-                            <li>100일째 날짜와 오늘 기준 상태 확인</li>
-                            <li>커플·아기 백일·프로젝트 일정에 활용</li>
-                        </ul>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('baby_months_table') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">📋</span>
-                            <span class="age-unit">개월수 계산표</span>
-                        </div>
-                        <ul>
-                            <li>생후 개월 수를 표로 빠르게 확인</li>
-                            <li>12개월 = 1년 0개월처럼 함께 표시</li>
-                            <li>월령별 빠른 안내를 한 화면에서 정리</li>
-                        </ul>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('annual_age_calculator') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">🗓</span>
-                            <span class="age-unit">연나이 계산기</span>
-                        </div>
-                        <ul>
-                            <li>생일과 관계없이 올해 기준 연나이 확인</li>
-                            <li>출생연도만으로 계산하는 방식 안내</li>
-                            <li>만나이와의 차이도 함께 확인</li>
-                        </ul>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('age_comparison_table') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">⚖</span>
-                            <span class="age-unit">나이 비교표</span>
-                        </div>
-                        <ul>
-                            <li>만나이와 연나이 차이를 한눈에 비교</li>
-                            <li>생일 전후 왜 다르게 보이는지 설명</li>
-                            <li>출생년도 기준으로 빠르게 확인</li>
-                        </ul>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('grade_age_table') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">🎒</span>
-                            <span class="age-unit">학년 기준 나이표</span>
-                        </div>
-                        <ul>
-                            <li>초1부터 고3까지 보통 나이 확인</li>
-                            <li>출생년도와 만나이 범위를 함께 안내</li>
-                            <li>학년 기준 검색 의도에 맞춘 표</li>
-                        </ul>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('pet_age_table') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">🐾</span>
-                            <span class="age-unit">반려동물 나이표</span>
-                        </div>
-                        <ul>
-                            <li>강아지·고양이 나이표 한 장 정리</li>
-                            <li>강아지는 체형별로 비교 가능</li>
-                            <li>사람 나이 환산 기준 빠른 확인</li>
-                        </ul>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('pet_months_table') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">🐕</span>
-                            <span class="age-unit">반려동물 월령표</span>
-                        </div>
-                        <ul>
-                            <li>강아지·고양이 월령 기준 빠른 확인</li>
-                            <li>생후 1개월부터 24개월까지 표로 정리</li>
-                            <li>어린 반려동물 성장 흐름 확인에 적합</li>
-                        </ul>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('grade_birth_year_table') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">🏷</span>
-                            <span class="age-unit">학년별 출생연도표</span>
-                        </div>
-                        <ul>
-                            <li>초1은 몇 년생인지 빠르게 확인</li>
-                            <li>중1·고1 보통 출생연도도 함께 안내</li>
-                            <li>학년 검색 의도에 맞춘 표 중심 페이지</li>
-                        </ul>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('birth_year_zodiac_table') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">🐲</span>
-                            <span class="age-unit">출생연도별 띠표</span>
-                        </div>
-                        <ul>
-                            <li>출생연도별 12간지와 띠 빠른 확인</li>
-                            <li>연나이와 만나이 범위도 함께 안내</li>
-                            <li>말띠·용띠처럼 자주 찾는 연도 대응</li>
-                        </ul>
-                    </div>
-                </a>
-
-                <a class="card-link" href="{{ url_for('korean_age_guide') }}">
-                    <div class="age-right-item">
-                        <div class="age-header">
-                            <span class="age-number">📘</span>
-                            <span class="age-unit">한국나이 기준 정리</span>
-                        </div>
-                        <ul>
-                            <li>만 나이 통일 이후 공식 기준 안내</li>
-                            <li>연 나이 예외와 행정 기준 정리</li>
-                            <li>공식 자료 기준으로 한 번에 확인</li>
-                        </ul>
-                    </div>
-                </a>
+                {% endfor %}
             </div>
-        </section>
 
-        <section class="section-shell section-card-grid">
-            <article class="section-card">
-                <p class="eyebrow">서비스 소개</p>
-                <h2>계산만 끝내지 않고, 결과의 기준까지 설명합니다</h2>
-                <p>
-                    AgeCalc는 결과 숫자만 빠르게 보여주는 곳이 아니라, 계산 기준과 해석까지 함께 정리하는
-                    생활 정보 사이트를 지향합니다.
-                </p>
-                <ul>
-                    <li>양력/음력 입력 지원으로 기준을 분명하게 계산</li>
-                    <li>예시, 주의사항, 참고 링크까지 함께 제공</li>
-                    <li>모바일에서도 읽기 쉬운 정보 구조 유지</li>
-                </ul>
-            </article>
-            <article class="section-card">
-                <p class="eyebrow">신뢰 안내</p>
-                <h2>데이터 처리와 신뢰</h2>
-                <p>
-                    입력값은 계산을 위해 서버로 전송되지만 저장하지 않습니다. 자세한 내용은
-                    <a href="{{ url_for('privacy') }}">개인정보처리방침</a>에서 확인할 수 있습니다.
-                </p>
-                <ul>
-                    <li>정책·제도 정보는 공식 기관의 최신 지침 우선</li>
-                    <li>의학적·행정적 판단은 관계 기관 또는 전문가 확인 권장</li>
-                    <li>마지막 기준 확인일: 2026-02-09</li>
-                </ul>
-            </article>
-            <article class="section-card">
-                <p class="eyebrow">정보 구성</p>
-                <h2>계산기와 안내 문서를 한 흐름으로 연결합니다</h2>
-                <p>
-                    첫 화면에서 계산기와 관련 글의 연결을 바로 보여주고, 내부 페이지에서도 같은 정보 구조를 유지해
-                    사이트 전체를 하나의 생활 정보 서비스처럼 읽을 수 있게 했습니다.
-                </p>
-                <ul>
-                    <li>계산기: 입력과 결과를 보기 쉽게 정리</li>
-                    <li>출생년도별 나이표: 연도만으로 빠르게 확인</li>
-                    <li>학년 계산기: 취학·진급 흐름 빠르게 확인</li>
-                    <li>입학년도 계산표: 학교 입학 시점 빠르게 확인</li>
-                    <li>나이 차이 계산기: 두 출생년도 비교</li>
-                    <li>연나이 계산기: 올해 기준 연도 나이 바로 확인</li>
-                    <li>나이 비교표: 만나이와 연나이 차이 설명</li>
-                    <li>학년 기준 나이표: 학교급별 보통 나이 확인</li>
-                    <li>반려동물 나이표: 강아지·고양이 환산표 확인</li>
-                    <li>반려동물 월령표: 어린 반려동물 개월 기준 안내</li>
-                    <li>학년별 출생연도표: 초1·중1·고1 출생연도 확인</li>
-                    <li>출생연도별 띠표: 12간지와 나이를 함께 확인</li>
-                    <li>한국나이 기준 정리: 만 나이 통일 이후 공식 기준 확인</li>
-                    <li>블로그: 이해를 돕는 설명 글 중심으로 구성</li>
-                    <li>정책 문서: 운영 원칙과 개인정보 처리 기준을 명확히 공개</li>
-                </ul>
-            </article>
+            {% if section.more_links %}
+            <div class="hub-more-links">
+                <p class="hub-more-label">같이 보면 좋은 페이지</p>
+                <div class="hub-link-list">
+                    {% for link in section.more_links %}
+                    <a href="{{ url_for(link.endpoint) }}">{{ link.label }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
         </section>
+        {% endfor %}
 
-        <section class="section-shell editorial-split">
-            <article class="section-card">
-                <p class="eyebrow">활용 장면</p>
-                <h2>이런 순간에 바로 쓰입니다</h2>
-                <ul>
-                    <li>행정·계약 기준의 만나이를 빠르게 확인할 때</li>
-                    <li>아이의 생일 전후로 개월 수와 만나이가 달라지는지 볼 때</li>
-                    <li>출생년도 기준으로 현재 학년과 입학 시점을 볼 때</li>
-                    <li>가족이나 친구와의 나이 차이를 빠르게 비교할 때</li>
-                    <li>반려견·반려묘의 사람 나이 환산이 필요할 때</li>
-                    <li>성장 체크, 예방접종, 생활 리듬 확인이 필요할 때</li>
-                </ul>
-            </article>
-            <article class="section-card">
-                <p class="eyebrow">이용 전 안내</p>
-                <h2>주의 안내</h2>
-                <p>
-                    본 서비스는 일반 정보 제공을 목적으로 하며, 법적 판단이나 행정 절차에는 관계 기관의 최신 지침을 우선해야 합니다.
-                    정책·제도는 변경될 수 있으므로 공식 안내를 확인하세요.
-                </p>
-                <p>
-                    만나이 계산 방식이나 반려동물 환산 기준이 궁금하다면 <a href="{{ url_for('faq') }}">FAQ</a>와
-                    <a href="{{ url_for('guide') }}">가이드</a>, <a href="{{ url_for('birth_year_age_table') }}">출생년도별 나이표</a>,
-                    <a href="{{ url_for('school_grade_calculator') }}">학년 계산기</a>, <a href="{{ url_for('school_entry_year_table') }}">입학년도 계산표</a>,
-                    <a href="{{ url_for('age_gap_calculator') }}">나이 차이 계산기</a>, <a href="{{ url_for('annual_age_calculator') }}">연나이 계산기</a>,
-                    <a href="{{ url_for('age_comparison_table') }}">만나이·연나이 비교표</a>, <a href="{{ url_for('grade_age_table') }}">학년 기준 나이표</a>,
-                    <a href="{{ url_for('pet_age_table') }}">반려동물 나이표</a>, <a href="{{ url_for('pet_months_table') }}">반려동물 월령표</a>,
-                    <a href="{{ url_for('grade_birth_year_table') }}">학년별 출생연도표</a>, <a href="{{ url_for('birth_year_zodiac_table') }}">출생연도별 띠표</a>,
-                    <a href="{{ url_for('korean_age_guide') }}">한국나이 기준 정리</a>에서 배경 설명을 확인할 수 있습니다.
-                </p>
-            </article>
-        </section>
-
-        <!-- 푸터 -->
         {% include 'partials/footer.html' %}
     </div>
-    <!-- 쿠키 동의 배너 -->
+
     <div class="cookie-banner" id="cookie-banner">
         <div class="cookie-content">
             <p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 동의 여부는 아래에서 선택할 수 있으며, 거부해도 주요 기능은 그대로 이용할 수 있습니다.</p>
@@ -471,7 +132,6 @@
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
 
-    <!-- 스크롤 상단 버튼 -->
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
         ↑
     </button>

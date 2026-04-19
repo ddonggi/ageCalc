@@ -1,9 +1,11 @@
 import unittest
+from datetime import datetime
 from types import SimpleNamespace
+from pathlib import Path
 
 from flask import render_template
 
-from app import app
+from app import app, _current_local_date
 
 
 class PublicPageTests(unittest.TestCase):
@@ -332,6 +334,57 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("1990년생", html)
         self.assertIn("말띠", html)
 
+    def test_college_entry_year_calculator_page_is_public(self):
+        client = app.test_client()
+        response = client.get("/college-entry-year-calculator")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn("대학 학번 나이 계산기", html)
+        self.assertIn("25학번은 보통 몇 년생", html)
+        self.assertIn("학번별 나이표", html)
+        self.assertIn("보통 출생연도", html)
+
+    def test_college_entry_year_calculator_highlights_selected_entry_year(self):
+        client = app.test_client()
+        response = client.get("/college-entry-year-calculator?year=2025")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn("선택한 학번", html)
+        self.assertIn("25학번", html)
+        self.assertIn("2006년생", html)
+        self.assertIn("만 19~20세", html)
+
+    def test_birthday_dday_calculator_page_is_public(self):
+        client = app.test_client()
+        response = client.get("/birthday-dday-calculator")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn("생일 D-day 계산기", html)
+        self.assertIn("생일까지 며칠 남았는지", html)
+        self.assertIn("다음 생일", html)
+        self.assertIn("생일 선택", html)
+
+    def test_birthday_dday_calculator_highlights_selected_birthday(self):
+        client = app.test_client()
+        response = client.get("/birthday-dday-calculator?month=5&day=10")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+
+        today = _current_local_date()
+        candidate_year = today.year
+        if (today.month, today.day) > (5, 10):
+            candidate_year += 1
+        expected_date = datetime(candidate_year, 5, 10).strftime("%Y.%m.%d")
+
+        self.assertIn("선택한 생일", html)
+        self.assertIn("5월 10일", html)
+        self.assertIn(expected_date, html)
+        self.assertIn("다음 생일", html)
+
     def test_home_page_removes_minigames_from_primary_navigation(self):
         client = app.test_client()
         response = client.get("/")
@@ -461,6 +514,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertNotIn("블로그 목록으로 돌아가기", html)
         self.assertNotIn("함께 보기", html)
         self.assertNotIn("운영 원칙과 편집 기준 보기", html)
+        self.assertNotIn("footer-links article-links", html)
 
     def test_age_page_uses_natural_korean_labels(self):
         client = app.test_client()
@@ -471,29 +525,58 @@ class PublicPageTests(unittest.TestCase):
         for phrase in ["Core Utility", "Dual", "Guide", "Policy", "설명형 결과 해석"]:
             self.assertNotIn(phrase, html)
 
-    def test_footer_uses_korean_copy(self):
+    def test_header_uses_category_navigation(self):
+        with app.test_request_context("/"):
+            html = render_template("partials/header.html")
+
+        self.assertIn("계산기", html)
+        self.assertIn("표·비교", html)
+        self.assertIn("안내", html)
+        self.assertIn("블로그", html)
+        self.assertIn("메뉴 열기", html)
+        self.assertIn("mega-nav", html)
+        self.assertIn("mega-menu-panel", html)
+        self.assertNotIn('class="nav-links"', html)
+
+    def test_home_page_uses_category_hub_sections(self):
         client = app.test_client()
         response = client.get("/")
 
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
+        self.assertIn("대표 계산기", html)
+        self.assertIn("표·비교 모음", html)
+        self.assertIn("기준과 안내", html)
+        self.assertIn("카테고리별로 바로 이동", html)
+        self.assertNotIn("빠른 시작", html)
+        self.assertNotIn("정보 구성", html)
+
+    def test_footer_is_trimmed_to_policy_links(self):
+        with app.test_request_context("/"):
+            html = render_template("partials/footer.html")
+
         self.assertNotIn("All rights reserved.", html)
         self.assertIn('href="/contact"', html)
         self.assertIn('href="/references"', html)
-        self.assertIn('href="/birth-year-age-table"', html)
-        self.assertIn('href="/school-grade-calculator"', html)
-        self.assertIn('href="/school-entry-year-table"', html)
-        self.assertIn('href="/age-gap-calculator"', html)
-        self.assertIn('href="/100-day-calculator"', html)
-        self.assertIn('href="/baby-months-table"', html)
-        self.assertIn('href="/annual-age-calculator"', html)
-        self.assertIn('href="/age-comparison-table"', html)
-        self.assertIn('href="/grade-age-table"', html)
-        self.assertIn('href="/pet-age-table"', html)
-        self.assertIn('href="/korean-age-guide"', html)
-        self.assertIn('href="/pet-months-table"', html)
-        self.assertIn('href="/grade-birth-year-table"', html)
-        self.assertIn('href="/birth-year-zodiac-table"', html)
+        self.assertIn('href="/about"', html)
+        self.assertIn('href="/privacy"', html)
+        self.assertIn('href="/terms"', html)
+        self.assertNotIn('href="/birth-year-age-table"', html)
+        self.assertNotIn('href="/school-grade-calculator"', html)
+        self.assertNotIn('href="/school-entry-year-table"', html)
+        self.assertNotIn('href="/age-gap-calculator"', html)
+        self.assertNotIn('href="/100-day-calculator"', html)
+        self.assertNotIn('href="/baby-months-table"', html)
+        self.assertNotIn('href="/annual-age-calculator"', html)
+        self.assertNotIn('href="/age-comparison-table"', html)
+        self.assertNotIn('href="/grade-age-table"', html)
+        self.assertNotIn('href="/pet-age-table"', html)
+        self.assertNotIn('href="/korean-age-guide"', html)
+        self.assertNotIn('href="/pet-months-table"', html)
+        self.assertNotIn('href="/grade-birth-year-table"', html)
+        self.assertNotIn('href="/birth-year-zodiac-table"', html)
+        self.assertNotIn('href="/college-entry-year-calculator"', html)
+        self.assertNotIn('href="/birthday-dday-calculator"', html)
 
     def test_about_links_to_contact_page(self):
         client = app.test_client()
@@ -624,7 +707,31 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("https://agecalc.cloud/pet-months-table", body)
         self.assertIn("https://agecalc.cloud/grade-birth-year-table", body)
         self.assertIn("https://agecalc.cloud/birth-year-zodiac-table", body)
+        self.assertIn("https://agecalc.cloud/college-entry-year-calculator", body)
+        self.assertIn("https://agecalc.cloud/birthday-dday-calculator", body)
         self.assertNotIn("/minigames", body)
+
+    def test_navigation_css_promotes_header_above_sections(self):
+        css = Path("static/css/style.css").read_text(encoding="utf-8")
+
+        self.assertIn(".site-header {", css)
+        self.assertIn("position: relative;", css)
+        self.assertIn("z-index: 80;", css)
+        self.assertIn(".mega-menu-panel {", css)
+        self.assertIn("z-index: 90;", css)
+
+    def test_home_hub_typography_has_explicit_scale_rules(self):
+        css = Path("static/css/style.css").read_text(encoding="utf-8")
+
+        self.assertIn(".section-heading h2 {", css)
+        self.assertIn(".hub-card strong {", css)
+        self.assertIn(".hub-more-label {", css)
+
+    def test_footer_link_styles_are_scoped_to_footer_only(self):
+        css = Path("static/css/style.css").read_text(encoding="utf-8")
+
+        self.assertIn(".footer .footer-links a {", css)
+        self.assertIn(".article-links a {", css)
 
 
 if __name__ == "__main__":

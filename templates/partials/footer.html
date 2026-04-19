@@ -1,5 +1,5 @@
 <footer class="footer">
-    <div class="footer-grid">
+    <div class="footer-grid footer-grid-compact">
         <section class="footer-section footer-intro">
             <p class="eyebrow">운영 안내</p>
             <h4>생활 계산기와 설명 글을 함께 제공합니다</h4>
@@ -7,32 +7,12 @@
             <p class="footer-contact">문의: <a href="mailto:{{ contact_email }}">{{ contact_email }}</a></p>
         </section>
 
-        <section class="footer-section">
-            <h4>탐색</h4>
-            <div class="footer-links">
-                <a href="{{ url_for('age') }}">대표 계산기</a>
-                <a href="{{ url_for('birth_year_age_table') }}">출생년도별 나이표</a>
-                <a href="{{ url_for('school_grade_calculator') }}">학년 계산기</a>
-                <a href="{{ url_for('school_entry_year_table') }}">입학년도 계산표</a>
-                <a href="{{ url_for('age_gap_calculator') }}">나이 차이 계산기</a>
-                <a href="{{ url_for('hundred_day_calculator') }}">100일 계산기</a>
-                <a href="{{ url_for('baby_months_table') }}">개월수 계산표</a>
-                <a href="{{ url_for('annual_age_calculator') }}">연나이 계산기</a>
-                <a href="{{ url_for('age_comparison_table') }}">만나이·연나이 비교표</a>
-                <a href="{{ url_for('grade_age_table') }}">학년 기준 나이표</a>
-                <a href="{{ url_for('pet_age_table') }}">반려동물 나이표</a>
-                <a href="{{ url_for('pet_months_table') }}">반려동물 월령표</a>
-                <a href="{{ url_for('grade_birth_year_table') }}">학년별 출생연도표</a>
-                <a href="{{ url_for('birth_year_zodiac_table') }}">출생연도별 띠표</a>
-                <a href="{{ url_for('korean_age_guide') }}">한국나이 기준 정리</a>
-                <a href="{{ url_for('blog_list') }}">블로그</a>
-                <a href="{{ url_for('about') }}">운영 원칙</a>
-                <a href="{{ url_for('references') }}">계산 기준</a>
-                <a href="{{ url_for('contact') }}">문의</a>
-                <a href="{{ url_for('privacy') }}">개인정보처리방침</a>
-                <a href="{{ url_for('terms') }}">이용약관</a>
-                <a href="{{ url_for('guide') }}">나이 계산 가이드</a>
-                <a href="{{ url_for('faq') }}">자주 묻는 질문</a>
+        <section class="footer-section footer-policies">
+            <h4>운영 및 정책</h4>
+            <div class="footer-links footer-links-compact">
+                {% for link in footer_policy_links %}
+                <a href="{{ url_for(link.endpoint) }}">{{ link.label }}</a>
+                {% endfor %}
             </div>
         </section>
 
