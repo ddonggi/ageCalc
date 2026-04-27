@@ -1,15 +1,22 @@
 User-agent: *
 Allow: /
+Allow: /ads.txt
 
 # 사이트맵 위치
 Sitemap: https://agecalc.cloud/sitemap.xml
 
-# 크롤링 지연 (선택사항)
-Crawl-delay: 1
-
 # 특정 디렉토리 차단 (필요시)
 # Disallow: /admin/
 # Disallow: /private/
+
+# 애드센스 검토 및 광고 크롤러 접근 허용
+User-agent: Mediapartners-Google
+Allow: /
+Allow: /ads.txt
+
+User-agent: Google-Display-Ads-Bot
+Allow: /
+Allow: /ads.txt
 
 # 이미지 크롤링 허용
 User-agent: Googlebot-Image

@@ -59,6 +59,11 @@ BLOG_DRAFT_ACCESS_SESSION_KEY = "blog_draft_access"
 SITE_BASE_URL = (os.getenv("BLOG_BASE_URL", "https://agecalc.cloud") or "https://agecalc.cloud").rstrip("/")
 SITE_AUTHOR_NAME = os.getenv("SITE_AUTHOR_NAME", "AgeCalc 편집팀").strip() or "AgeCalc 편집팀"
 SITE_CONTACT_EMAIL = os.getenv("SITE_CONTACT_EMAIL", "ldg6153@gmail.com").strip() or "ldg6153@gmail.com"
+ADSENSE_CLIENT_ID = os.getenv("ADSENSE_CLIENT_ID", "ca-pub-7818333740838556").strip()
+GOOGLE_SITE_VERIFICATION = os.getenv(
+    "GOOGLE_SITE_VERIFICATION",
+    "q0nvIaon9IVWNZZEQzTRCycYka7jIHuzYu-PwxxoKu8",
+).strip()
 KOREAN_ZODIAC = ["원숭이", "닭", "개", "돼지", "쥐", "소", "호랑이", "토끼", "용", "뱀", "말", "양"]
 GENERATION_LABELS = [
     ((1946, 1964), "베이비붐 세대"),
@@ -226,6 +231,9 @@ def inject_csp_nonce():
         "author_name": SITE_AUTHOR_NAME,
         "contact_email": SITE_CONTACT_EMAIL,
         "editorial_policy_url": editorial_policy_url,
+        "adsense_enabled": _adsense_is_enabled_for_path(request.path),
+        "adsense_client_id": ADSENSE_CLIENT_ID,
+        "google_site_verification": GOOGLE_SITE_VERIFICATION,
         "site_navigation": site_navigation,
         "home_navigation_sections": home_navigation_sections,
         "footer_policy_links": FOOTER_POLICY_LINKS,
@@ -349,6 +357,11 @@ def _format_sitemap_lastmod(value: datetime | None) -> str | None:
 
 def _absolute_url_for(endpoint: str, **values) -> str:
     return f"{SITE_BASE_URL}{url_for(endpoint, **values)}"
+
+
+def _adsense_is_enabled_for_path(path: str) -> bool:
+    excluded_prefixes = ("/minigames", "/blog/drafts", "/blog/review")
+    return not any(path == prefix or path.startswith(f"{prefix}/") for prefix in excluded_prefixes)
 
 
 def _build_sitemap_entry(loc: str, lastmod: str | None = None) -> str:

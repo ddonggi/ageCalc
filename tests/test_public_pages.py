@@ -3,9 +3,9 @@ from datetime import datetime
 from types import SimpleNamespace
 from pathlib import Path
 
-from flask import render_template
+from flask import render_template, url_for
 
-from app import app, _current_local_date
+from app import PUBLIC_SITEMAP_ENDPOINTS, app, _current_local_date
 
 
 class PublicPageTests(unittest.TestCase):
@@ -412,15 +412,68 @@ class PublicPageTests(unittest.TestCase):
         ]:
             self.assertNotIn(phrase, html)
 
-    def test_home_page_does_not_eager_load_external_tracking_scripts(self):
+    def test_public_sitemap_pages_render_adsense_approval_code(self):
         client = app.test_client()
-        response = client.get("/")
 
-        self.assertEqual(response.status_code, 200)
-        html = response.get_data(as_text=True)
-        self.assertNotIn("www.googletagmanager.com/gtag/js", html)
-        self.assertNotIn("pagead2.googlesyndication.com/pagead/js/adsbygoogle.js", html)
-        self.assertIn("tracking-config", html)
+        with app.test_request_context("/"):
+            paths = [url_for(endpoint) for endpoint in PUBLIC_SITEMAP_ENDPOINTS]
+
+        for path in paths:
+            with self.subTest(path=path):
+                response = client.get(path)
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                self.assertIn(
+                    '<meta name="google-adsense-account" content="ca-pub-7818333740838556">',
+                    html,
+                )
+                self.assertIn(
+                    "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7818333740838556",
+                    html,
+                )
+                self.assertIn("google-site-verification", html)
+                self.assertIn("tracking-config", html)
+                self.assertNotIn("www.googletagmanager.com/gtag/js", html)
+
+    def test_adsense_code_is_not_rendered_on_excluded_pages(self):
+        client = app.test_client()
+
+        for path in ["/minigames", "/minigames/guess", "/minigames/snake"]:
+            with self.subTest(path=path):
+                response = client.get(path)
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                self.assertNotIn("google-adsense-account", html)
+                self.assertNotIn("pagead/js/adsbygoogle.js", html)
+
+        post = SimpleNamespace(
+            id=1,
+            title="검토 글",
+            slug="review-post",
+            excerpt="요약",
+            cover_image_url=None,
+            content_html="<p>본문</p>",
+            published_at=None,
+            created_at=None,
+            updated_at=None,
+            status="needs_review",
+            sources=[],
+        )
+
+        for path, modes in [
+            ("/blog/drafts/review-post", {"draft_mode": True, "review_mode": False}),
+            ("/blog/review/1", {"draft_mode": False, "review_mode": True, "review_token": "token"}),
+        ]:
+            with self.subTest(path=path), app.test_request_context(path):
+                html = render_template(
+                    "blog-detail.html",
+                    post=post,
+                    author_name="AgeCalc 편집팀",
+                    editorial_policy_url="/about",
+                    **modes,
+                )
+                self.assertNotIn("google-adsense-account", html)
+                self.assertNotIn("pagead/js/adsbygoogle.js", html)
 
     def test_blog_detail_renders_author_policy_and_sources(self):
         post = SimpleNamespace(
@@ -458,6 +511,39 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("https://example.com/story", html)
         self.assertNotIn("AgeCalc Editorial", html)
         self.assertNotIn("Related Tools", html)
+
+    def test_blog_detail_hides_internal_generation_attribution(self):
+        post = SimpleNamespace(
+            title="테스트 글",
+            slug="test-post",
+            excerpt="요약",
+            cover_image_url=None,
+            content_html="<p>본문</p>",
+            published_at=None,
+            created_at=None,
+            updated_at=None,
+            status="published",
+            sources=[
+                SimpleNamespace(
+                    source_name="KR - 시니어 건강",
+                    source_url="https://news.google.com/rss/articles/example?oc=5",
+                    attribution_text="Generated from RSS (openai)",
+                )
+            ],
+        )
+
+        with app.test_request_context("/blog/test-post"):
+            html = render_template(
+                "blog-detail.html",
+                post=post,
+                draft_mode=False,
+                review_mode=False,
+                author_name="AgeCalc 편집팀",
+                editorial_policy_url="/about",
+            )
+
+        self.assertIn("KR - 시니어 건강", html)
+        self.assertNotIn("Generated from RSS", html)
 
     def test_blog_list_uses_natural_intro_copy(self):
         posts = [
@@ -732,6 +818,26 @@ class PublicPageTests(unittest.TestCase):
 
         self.assertIn(".footer .footer-links a {", css)
         self.assertIn(".article-links a {", css)
+
+    def test_robots_txt_allows_adsense_crawlers(self):
+        body = Path("static/robots.txt").read_text(encoding="utf-8")
+
+        self.assertIn("User-agent: Mediapartners-Google", body)
+        self.assertIn("User-agent: Google-Display-Ads-Bot", body)
+        self.assertIn("Allow: /ads.txt", body)
+        self.assertIn("Sitemap: https://agecalc.cloud/sitemap.xml", body)
+
+    def test_tracking_loader_does_not_insert_second_adsense_script(self):
+        body = Path("static/js/analytics.js").read_text(encoding="utf-8")
+
+        self.assertNotIn("pagead/js/adsbygoogle.js", body)
+        self.assertNotIn("ADSENSE_SCRIPT_ID", body)
+
+    def test_nginx_redirects_www_to_canonical_domain(self):
+        conf = Path("nginx/agecalc.conf").read_text(encoding="utf-8")
+
+        self.assertIn("server_name www.agecalc.cloud;", conf)
+        self.assertIn("return 301 https://agecalc.cloud$request_uri;", conf)
 
 
 if __name__ == "__main__":

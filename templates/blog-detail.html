@@ -94,7 +94,7 @@
                         <a href="{{ source.source_url }}" target="_blank" rel="noopener noreferrer nofollow">
                             {{ source.source_name or source.source_url }}
                         </a>
-                        {% if source.attribution_text %}
+                        {% if source.attribution_text and 'Generated from RSS' not in source.attribution_text %}
                         <span> - {{ source.attribution_text }}</span>
                         {% endif %}
                     </li>

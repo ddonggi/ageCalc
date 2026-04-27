@@ -793,7 +793,7 @@ def create_posts(
                 feed_item_id=item.id,
                 source_name=(item.source.name if item.source else "RSS"),
                 source_url=item.original_url,
-                attribution_text=f"Generated from RSS ({used_mode})",
+                attribution_text=None,
             )
         )
         item.status = "used"

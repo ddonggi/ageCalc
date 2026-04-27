@@ -1,7 +1,6 @@
 (function () {
     const CONFIG_ID = 'tracking-config';
     const GA_SCRIPT_ID = 'ga-loader';
-    const ADSENSE_SCRIPT_ID = 'adsense-loader';
     const CLARITY_SCRIPT_ID = 'clarity-loader';
 
     const getCookie = (key) =>
@@ -76,17 +75,6 @@
         })(window, document, "clarity", "script", projectId);
     };
 
-    const initAdsense = (clientId) => {
-        if (!clientId) {
-            return;
-        }
-        loadScriptOnce(
-            ADSENSE_SCRIPT_ID,
-            `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(clientId)}`,
-            () => {}
-        );
-    };
-
     const init = () => {
         if (window.__agecalcTrackingInitialized) {
             return;
@@ -109,9 +97,6 @@
         }
         if (config.clarity_project_id) {
             initClarity(config.clarity_project_id);
-        }
-        if (config.adsense_client) {
-            initAdsense(config.adsense_client);
         }
     };
 
