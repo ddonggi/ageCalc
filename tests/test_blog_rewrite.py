@@ -23,7 +23,7 @@ def _rich_rewritten_html():
         "<p>개별 상황에 따라 해석이 달라질 수 있으므로 참고용으로 활용해야 합니다.</p>"
         "<h2>참고 링크</h2>"
         '<p><a href="https://example.com/story">원문 보기</a></p>'
-    ) * 12
+    ) * 24
 
 
 class BlogRewriteTests(unittest.TestCase):
@@ -44,7 +44,8 @@ class BlogRewriteTests(unittest.TestCase):
 
         prompt = rewriter.build_rewrite_prompt(post, "https://example.com/story")
 
-        self.assertIn("1,800~2,400자", prompt)
+        self.assertIn("3,000~3,800자", prompt)
+        self.assertIn("최소 3,000자", prompt)
         self.assertIn("최소 5개", prompt)
         self.assertIn("AgeCalc 내부 계산기 링크", prompt)
         self.assertIn("번역이나 요약이 아니라", prompt)

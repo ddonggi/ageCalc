@@ -33,7 +33,7 @@ def _post(**overrides):
             "<h3>참고 링크</h3>"
             '<p><a href="https://example.com/story">원문 보기</a></p>'
         )
-        * 8,
+        * 16,
         "sources": [_source()],
     }
     defaults.update(overrides)
@@ -82,12 +82,36 @@ class AdsenseBlogReviewTests(unittest.TestCase):
                     "<h3>참고 링크</h3>"
                     '<p><a href="https://example.com/story">원문 보기</a></p>'
                 )
-                * 10,
+                * 20,
             )
         )
 
         self.assertFalse(result.keep)
         self.assertIn("missing_internal_link", result.critical_issue_codes)
+
+    def test_audit_flags_body_under_three_thousand_chars(self):
+        result = audit_post(
+            _post(
+                content_html=(
+                    "<h2>아이 개월 수를 보는 기준</h2>"
+                    "<p>AgeCalc 아이 개월 수 계산기는 생활 기준을 이해하는 데 도움이 됩니다.</p>"
+                    "<h2>가정에서 확인할 점</h2>"
+                    "<p>개월 수와 발달 기록을 함께 살펴보면 진료 상담 전에 상황을 정리할 수 있습니다.</p>"
+                    "<h2>계산기 활용 포인트</h2>"
+                    '<p><a href="/baby-months">아이 개월 수 계산기</a>로 날짜 기준을 먼저 확인합니다.</p>'
+                    "<h2>한국 독자가 볼 점</h2>"
+                    "<p>예방접종, 상담, 가족 기록처럼 생활 속 일정과 연결해 볼 수 있습니다.</p>"
+                    "<h2>주의할 점</h2>"
+                    "<p>의학적 판단은 전문가 상담이 우선이며 계산 결과는 참고용입니다.</p>"
+                    "<h3>참고 링크</h3>"
+                    '<p><a href="https://example.com/story">원문 보기</a></p>'
+                )
+                * 8,
+            )
+        )
+
+        self.assertFalse(result.keep)
+        self.assertIn("thin_body", result.critical_issue_codes)
 
     def test_audit_flags_missing_cover_when_required(self):
         result = audit_post(_post(cover_image_url=None), require_cover_image=True)

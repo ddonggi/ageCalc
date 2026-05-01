@@ -15,7 +15,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ENV_FILE = PROJECT_ROOT / ".env.rss"
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
-MIN_BODY_CHARS = 1600
+MIN_BODY_CHARS = 3000
 MIN_HEADINGS = 5
 SIMILAR_TITLE_THRESHOLD = 0.42
 AGECALC_INTERNAL_LINKS = (

@@ -64,11 +64,11 @@ DEFAULT_IMAGE_SIZE = "1536x1024"
 DEFAULT_IMAGE_COUNT = 1
 DEFAULT_IMAGE_QUALITY = "medium"
 DEFAULT_SMTP_PORT = 25
-DEFAULT_BLOG_MAX_OUTPUT_TOKENS = 5000
+DEFAULT_BLOG_MAX_OUTPUT_TOKENS = 7000
 IMAGE_OUTPUT_DIR = PROJECT_ROOT / "static" / "generated" / "blog-covers"
 PROMPTS_DIR = PROJECT_ROOT / "prompts"
-TARGET_GENERATED_BODY_RANGE = "1,800~2,400자"
-MIN_GENERATED_BODY_CHARS = 1600
+TARGET_GENERATED_BODY_RANGE = "3,000~3,800자"
+MIN_GENERATED_BODY_CHARS = 3000
 MIN_GENERATED_HEADINGS = 5
 AGECALC_INTERNAL_LINKS = (
     "/age",
@@ -502,7 +502,7 @@ def _build_generation_prompt(feed_item: FeedItem) -> str:
 - 한국어 독자를 위한 설명형 블로그 글이어야 한다.
 - 제목 1개는 원문 제목을 번역하지 말고 새로 작성한다.
 - 본문은 {TARGET_GENERATED_BODY_RANGE} 분량을 목표로 작성한다.
-- HTML 태그를 제외한 본문 텍스트만 최소 1,600자 이상이어야 한다.
+- HTML 태그를 제외한 본문 텍스트만 최소 {MIN_GENERATED_BODY_CHARS:,}자 이상이어야 한다.
 - 각 소제목 아래에는 2문단 이상을 두고, 각 문단은 2~4문장으로 충분히 설명한다.
 - 서론 1문단, 본문 최소 5개 소제목, 결론 1문단
 - 본문에 다음 내용을 반드시 포함한다:

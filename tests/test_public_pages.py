@@ -759,7 +759,7 @@ class PublicPageTests(unittest.TestCase):
             '<p><a href="/age">만 나이 계산기</a>로 날짜 기준을 먼저 확인하세요.</p>'
             "<h2>주의할 점과 한계</h2><p>개별 상황에 따라 해석이 달라질 수 있으므로 참고용으로 활용해야 합니다.</p>"
             "<h2>참고 링크</h2><p><a href=\"https://example.com/story\">원문 보기</a></p>"
-        ) * 12
+        ) * 24
         post = SimpleNamespace(
             id=1,
             title="초안 글",
@@ -825,7 +825,7 @@ class PublicPageTests(unittest.TestCase):
             '<p><a href="/age">만 나이 계산기</a>로 날짜 기준을 먼저 확인하세요.</p>'
             "<h2>주의할 점과 한계</h2><p>개별 상황에 따라 해석이 달라질 수 있으므로 참고용으로 활용해야 합니다.</p>"
             "<h2>참고 링크</h2><p><a href=\"https://example.com/story\">원문 보기</a></p>"
-        ) * 12
+        ) * 24
         post = SimpleNamespace(
             id=1,
             title="초안 글",

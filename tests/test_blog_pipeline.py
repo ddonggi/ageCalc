@@ -30,8 +30,8 @@ class BlogPipelineTests(unittest.TestCase):
         self.assertIn("직역하지 말고", prompt)
         self.assertIn("한국 독자", prompt)
         self.assertIn("계산기", prompt)
-        self.assertIn("1,800~2,400자", prompt)
-        self.assertIn("본문 텍스트만 최소 1,600자 이상", prompt)
+        self.assertIn("3,000~3,800자", prompt)
+        self.assertIn("본문 텍스트만 최소 3,000자 이상", prompt)
         self.assertIn("최소 5개", prompt)
         self.assertIn("/age", prompt)
 
@@ -59,7 +59,7 @@ class BlogPipelineTests(unittest.TestCase):
             "<h2>활용 포인트</h2><p>계산 결과를 해석할 때 도움이 되는 기준을 정리합니다.</p>"
             "<h2>주의할 점</h2><p>개별 상황에 따라 결과 해석이 달라질 수 있습니다.</p>"
             "<h2>참고 링크</h2><p><a href=\"https://example.com/story\">원문 보기</a></p>"
-        ) * 12
+        ) * 24
 
         ok, reason = scheduler._evaluate_generated_post(
             self._make_feed_item(original_title="아이 개월 수 계산과 생활 기준"),
@@ -79,7 +79,7 @@ class BlogPipelineTests(unittest.TestCase):
             "<h2>활용 포인트</h2><p><a href=\"/age\">만 나이 계산기</a>로 확인할 수 있습니다.</p>"
             "<h2>주의할 점</h2><p>개별 상황에 따라 결과 해석이 달라질 수 있습니다.</p>"
             "<h2>참고 링크</h2><p><a href=\"https://example.com/story\">원문 보기</a></p>"
-        ) * 12
+        ) * 24
 
         ok, reason = scheduler._evaluate_generated_post(
             self._make_feed_item(original_url="https://news.google.com/rss/articles/example?oc=5"),
@@ -187,7 +187,7 @@ class BlogPipelineTests(unittest.TestCase):
             "<p>의학적 판단은 전문가 상담이 우선이며 계산 결과는 참고용입니다.</p>"
             "<h3>참고 링크</h3>"
             '<p><a href="https://example.com/story">원문 보기</a></p>'
-        ) * 12
+        ) * 24
 
         with mock.patch.object(
             scheduler,
