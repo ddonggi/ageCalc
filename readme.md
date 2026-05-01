@@ -2,6 +2,11 @@
 
 Flask 기반 나이 계산기, 생활 기준표, 미니게임, RSS 블로그 자동화 웹 애플리케이션입니다.
 
+## 서비스 링크
+- Production: [https://agecalc.cloud](https://agecalc.cloud)
+- Health check: [https://agecalc.cloud/health](https://agecalc.cloud/health)
+- Sitemap: [https://agecalc.cloud/sitemap.xml](https://agecalc.cloud/sitemap.xml)
+
 ## 문서 안내
 - 배포/운영: [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
 - 블로그 DB 스키마: [BLOG_POSTS_SCHEMA.md](BLOG_POSTS_SCHEMA.md)
