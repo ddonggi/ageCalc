@@ -50,11 +50,18 @@ cd /srv/apps/agecalc
 /srv/apps/agecalc/.micromamba/envs/agecalc/bin/python scripts/rss_blog_scheduler.py run --limit 1 --status draft --provider openai --model gpt-4.1-mini
 ```
 
-`needs_review` 재작성:
+기존 글 일부를 보강해 `draft`로 전환:
 ```bash
 sudo -iu agecalc
 cd /srv/apps/agecalc
 /srv/apps/agecalc/.micromamba/envs/agecalc/bin/python scripts/rewrite_blog_posts.py --limit 5 --apply --model gpt-4.1-mini
+```
+
+전체 상태를 보강하고 통과 글을 자동 공개:
+```bash
+sudo -iu agecalc
+cd /srv/apps/agecalc
+/srv/apps/agecalc/.micromamba/envs/agecalc/bin/python scripts/rewrite_blog_posts.py --status all --all --attempts 2 --apply --publish-on-pass --demote-failed-published --model gpt-4.1-mini
 ```
 
 커버 이미지 누락 보정:
@@ -78,4 +85,4 @@ cd /srv/apps/agecalc
 4. 통과하면 `published`로 바꾸고 public 상세로 redirect합니다.
 5. 실패하면 오류 메시지를 표시하고 공개하지 않습니다.
 
-`needs_review` 글에는 공개 버튼이 없습니다. 먼저 재작성하거나 수동 보정해 `draft`로 전환해야 합니다.
+`needs_review` 글에는 공개 버튼이 없습니다. 먼저 재작성하거나 수동 보정해 `draft`로 전환해야 합니다. 대량 보강 스크립트에서 `--publish-on-pass`를 쓰면 검수 통과 글은 바로 `published`로 전환되고, 실패 글은 `needs_review`로 남습니다.

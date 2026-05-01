@@ -1043,6 +1043,10 @@ class PublicPageTests(unittest.TestCase):
         body = response.get_data(as_text=True)
         self.assertNotIn("https://agecalc.cloud/blog", body)
 
+    def test_sitemap_is_served_only_from_dynamic_route(self):
+        self.assertFalse(Path("static/sitemap.xml").exists())
+        self.assertFalse(Path("generate_sitemap.py").exists())
+
     def test_navigation_css_promotes_header_above_sections(self):
         css = Path("static/css/style.css").read_text(encoding="utf-8")
 

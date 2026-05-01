@@ -47,7 +47,7 @@ sequenceDiagram
 | `app.py` | Flask routes, navigation, sitemap, blog public/draft/review gates |
 | `models/blog_models.py` | RSS source/item, generated post, source mapping ORM models |
 | `scripts/rss_blog_scheduler.py` | RSS ingest, OpenAI generation, image generation, draft creation |
-| `scripts/rewrite_blog_posts.py` | `needs_review` 글을 재작성해 `draft` 후보로 전환 |
+| `scripts/rewrite_blog_posts.py` | 기존 블로그 글을 상태별로 재작성하고 검수 통과 시 `draft` 또는 `published`로 전환 |
 | `scripts/adsense_blog_review.py` | 공개 전 품질/정책 리스크 검사 |
 | `templates/` | Jinja2 page templates |
 | `static/` | CSS, JS, favicon, generated cover images |

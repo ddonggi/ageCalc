@@ -175,6 +175,11 @@ python scripts/rss_blog_scheduler.py backfill-covers --status draft --limit 2
 python scripts/rewrite_blog_posts.py --limit 5 --apply --model gpt-4.1-mini
 ```
 
+기존 전체 글을 보강하고 검수 통과 글을 자동 공개:
+```bash
+python scripts/rewrite_blog_posts.py --status all --all --attempts 2 --apply --publish-on-pass --demote-failed-published --model gpt-4.1-mini
+```
+
 ## 운영 메모
 - 앱과 스케줄러는 `/srv/apps/agecalc/.env.rss`를 공유합니다.
 - 민감 정보는 저장소에 커밋하지 않고 `.env.rss` 또는 systemd 환경 파일에서 관리합니다.

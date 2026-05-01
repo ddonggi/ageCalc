@@ -274,7 +274,7 @@ mysql -u agecalc_user -p -h 127.0.0.1 -D agecalc -e "SHOW TABLES;"
 - Gunicorn 미기동: `sudo journalctl -u agecalc.service -n 200 --no-pager`
 - Nginx 502: `/run/agecalc/agecalc.sock` 존재 여부와 `sudo nginx -t` 확인
 - RSS 생성 실패: `sudo journalctl -u agecalc-rss.service -n 200 --no-pager`
-- OpenAI 생성 결과가 짧음: `needs_review`로 저장되는 것이 정상입니다. `scripts/rewrite_blog_posts.py`로 재작성하거나 프롬프트/토큰 설정을 조정합니다.
+- OpenAI 생성 결과가 짧음: `needs_review`로 저장되는 것이 정상입니다. `scripts/rewrite_blog_posts.py --status all --all --attempts 2 --apply --publish-on-pass --demote-failed-published`로 기존 글을 보강하거나 프롬프트/토큰 설정을 조정합니다.
 - draft 공개 실패: `/blog/drafts/<slug>`의 오류 메시지에서 본문 길이, 대표 이미지, 출처, 내부 링크 누락 여부를 확인합니다.
 
 ## 13. 운영 체크리스트
