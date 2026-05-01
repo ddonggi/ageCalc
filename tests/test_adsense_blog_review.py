@@ -89,7 +89,7 @@ class AdsenseBlogReviewTests(unittest.TestCase):
         self.assertFalse(result.keep)
         self.assertIn("missing_internal_link", result.critical_issue_codes)
 
-    def test_audit_flags_body_under_three_thousand_chars(self):
+    def test_audit_flags_body_under_minimum_chars(self):
         result = audit_post(
             _post(
                 content_html=(

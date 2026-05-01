@@ -70,7 +70,8 @@ def build_rewrite_prompt(post: GeneratedPost, source_url: str) -> str:
 
 작성 기준:
 - 본문은 {scheduler.TARGET_GENERATED_BODY_RANGE} 분량을 목표로 한다.
-- HTML 태그를 제외한 본문 텍스트만 최소 {scheduler.MIN_GENERATED_BODY_CHARS:,}자 이상이어야 한다.
+- HTML 태그를 제외한 본문 텍스트는 최소 {scheduler.MIN_GENERATED_BODY_CHARS:,}자 이상이어야 한다.
+- 생성 단계에서는 한글 기준 {scheduler.PROMPT_TARGET_BODY_CHARS:,}자 이상을 목표로 한다.
 - 각 소제목 아래에는 2문단 이상을 두고, 각 문단은 2~4문장으로 충분히 설명한다.
 - 최소 5개 이상의 h2/h3 소제목을 사용한다.
 - 핵심 요약, 배경과 맥락, 한국 독자가 확인할 점, AgeCalc 활용 포인트, 주의할 점과 한계, 참고 링크를 포함한다.

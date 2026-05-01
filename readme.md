@@ -67,7 +67,7 @@ flowchart LR
 - `/blog/<slug>`: `published` 글 상세
 - `/blog/drafts`: 비밀번호 기반 초안/검토 목록
 - `/blog/drafts/<slug>`: 초안/검토 상세
-- `/blog/drafts/<slug>/publish`: `draft` 글 공개. 3,000자 이상, 대표 이미지, 출처, 내부 링크 등 검수 통과가 필요합니다.
+- `/blog/drafts/<slug>/publish`: `draft` 글 공개. 2,500자 이상, 대표 이미지, 출처, 내부 링크 등 검수 통과가 필요합니다.
 - `/blog/review/<id>`: 토큰 기반 검토 상세
 - `/blog/review/<id>/approve`: 토큰 기반 공개 승인
 
@@ -159,8 +159,8 @@ cd /srv/apps/agecalc
 ```
 
 현재 블로그 공개용 기준:
-- 본문 목표: HTML 제외 `3,000~3,800자`
-- 최소 본문 길이: HTML 제외 `3,000자`
+- 생성 목표: HTML 제외 한글 기준 `2,700자 이상`
+- 최소 본문 길이: HTML 제외 `2,500자`
 - 최소 소제목: `h2`/`h3` 5개
 - 필수 요소: 실제 원문 URL, AgeCalc 내부 계산기 링크, 대표 이미지
 - 실패 시: `draft`가 아니라 `needs_review`로 보관

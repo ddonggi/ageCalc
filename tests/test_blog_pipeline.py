@@ -30,10 +30,20 @@ class BlogPipelineTests(unittest.TestCase):
         self.assertIn("직역하지 말고", prompt)
         self.assertIn("한국 독자", prompt)
         self.assertIn("계산기", prompt)
-        self.assertIn("3,000~3,800자", prompt)
-        self.assertIn("본문 텍스트만 최소 3,000자 이상", prompt)
+        self.assertIn("2,700~3,500자", prompt)
+        self.assertIn("최소 2,500자 이상", prompt)
+        self.assertIn("한글 기준 2,700자 이상", prompt)
         self.assertIn("최소 5개", prompt)
         self.assertIn("/age", prompt)
+
+    def test_build_generation_prompt_includes_retry_feedback(self):
+        prompt = scheduler._build_generation_prompt(
+            self._make_feed_item(),
+            feedback="이전 생성 결과가 1,200자로 너무 짧았습니다.",
+        )
+
+        self.assertIn("이전 생성 결과가 1,200자로 너무 짧았습니다.", prompt)
+        self.assertIn("같은 문제가 반복되지 않게", prompt)
 
     def test_quality_gate_rejects_low_value_english_copy(self):
         ok, reason = scheduler._evaluate_generated_post(
@@ -152,6 +162,133 @@ class BlogPipelineTests(unittest.TestCase):
         self.assertEqual(post.status, "needs_review")
         self.assertIn("자동 초안 생성 품질 검토 필요", post.content_html)
         send_review_email.assert_not_called()
+
+    def test_create_posts_retries_short_openai_generation_before_review(self):
+        engine = create_engine("sqlite:///:memory:", future=True)
+        Session = sessionmaker(bind=engine, autocommit=False, autoflush=False, future=True)
+        Base.metadata.create_all(bind=engine)
+
+        session = Session()
+        source = FeedSource(name="KR Feed", rss_url="https://example.com/rss", site_url="https://example.com")
+        session.add(source)
+        session.flush()
+        session.add(
+            FeedItem(
+                source_id=source.id,
+                original_title="아이 개월 수 계산과 발달 기준을 함께 보는 방법",
+                original_url="https://example.com/story",
+                summary="아이 개월 수와 생활 기준을 함께 정리합니다.",
+                content="아이 개월 수와 생활 기준을 함께 정리합니다.",
+                status="new",
+            )
+        )
+        session.commit()
+
+        short_html = (
+            "<h2>핵심 요약</h2>"
+            '<p><a href="/baby-months">아이 개월 수 계산기</a>와 생활 기준을 함께 보는 짧은 글입니다.</p>'
+            "<h2>참고 링크</h2>"
+            '<p><a href="https://example.com/story">원문 보기</a></p>'
+        )
+        long_html = (
+            "<h2>아이 개월 수를 보는 기준</h2>"
+            "<p>AgeCalc 아이 개월 수 계산기는 생활 기준을 이해하는 데 도움이 됩니다.</p>"
+            "<h2>가정에서 확인할 점</h2>"
+            "<p>개월 수와 발달 기록을 함께 살펴보면 진료 상담 전에 상황을 정리할 수 있습니다.</p>"
+            "<h2>계산기 활용 포인트</h2>"
+            '<p><a href="/baby-months">아이 개월 수 계산기</a>로 날짜 기준을 먼저 확인하세요.</p>'
+            "<h2>한국 독자가 볼 점</h2>"
+            "<p>예방접종, 어린이집 상담, 가족 기록처럼 생활 속 일정과 함께 보면 좋습니다.</p>"
+            "<h2>주의할 점</h2>"
+            "<p>의학적 판단은 전문가 상담이 우선이며 계산 결과는 참고용입니다.</p>"
+            "<h3>참고 링크</h3>"
+            '<p><a href="https://example.com/story">원문 보기</a></p>'
+        ) * 24
+
+        with mock.patch.object(
+            scheduler,
+            "_generate_with_openai",
+            side_effect=[
+                ("짧은 초안", "요약", short_html),
+                ("아이 개월 수 계산과 발달 기준", "요약", long_html),
+            ],
+        ) as generate, mock.patch.object(
+            scheduler,
+            "_generate_cover_with_openai",
+            return_value=[],
+        ), mock.patch.object(
+            scheduler,
+            "_send_review_email",
+        ):
+            created = scheduler.create_posts(
+                session=session,
+                limit=1,
+                status="draft",
+                provider="openai",
+                model="gpt-4.1-mini",
+                ollama_url="http://127.0.0.1:11434",
+                dry_run=False,
+            )
+
+        self.assertEqual(created, 1)
+        self.assertEqual(2, generate.call_count)
+        self.assertTrue(generate.call_args_list[1].kwargs["feedback"])
+        post = session.query(GeneratedPost).one()
+        self.assertEqual("draft", post.status)
+        self.assertEqual("아이 개월 수 계산과 발달 기준", post.title)
+
+    def test_create_posts_preserves_failed_generated_candidate_for_review(self):
+        engine = create_engine("sqlite:///:memory:", future=True)
+        Session = sessionmaker(bind=engine, autocommit=False, autoflush=False, future=True)
+        Base.metadata.create_all(bind=engine)
+
+        session = Session()
+        source = FeedSource(name="KR Feed", rss_url="https://example.com/rss", site_url="https://example.com")
+        session.add(source)
+        session.flush()
+        session.add(
+            FeedItem(
+                source_id=source.id,
+                original_title="시니어 운동 교실과 생활 기준",
+                original_url="https://example.com/story",
+                summary="시니어 운동 교실 소식입니다.",
+                content="시니어 운동 교실 소식입니다.",
+                status="new",
+            )
+        )
+        session.commit()
+
+        short_html = (
+            "<h2>핵심 요약</h2>"
+            '<p><a href="/age">만 나이 계산기</a>와 생활 기준을 함께 보는 짧은 글입니다.</p>'
+            "<h2>참고 링크</h2>"
+            '<p><a href="https://example.com/story">원문 보기</a></p>'
+        )
+
+        with mock.patch.object(
+            scheduler,
+            "_generate_with_openai",
+            return_value=("시니어 운동 교실을 생활 기준과 함께 보는 방법", "요약", short_html),
+        ), mock.patch.object(
+            scheduler,
+            "_send_review_email",
+        ):
+            created = scheduler.create_posts(
+                session=session,
+                limit=1,
+                status="draft",
+                provider="openai",
+                model="gpt-4.1-mini",
+                ollama_url="http://127.0.0.1:11434",
+                dry_run=False,
+            )
+
+        self.assertEqual(created, 1)
+        post = session.query(GeneratedPost).one()
+        self.assertEqual("needs_review", post.status)
+        self.assertIn("생성된 후보 본문", post.content_html)
+        self.assertIn("시니어 운동 교실을 생활 기준과 함께 보는 방법", post.content_html)
+        self.assertIn("만 나이 계산기", post.content_html)
 
     def test_create_posts_uses_public_safe_source_attribution(self):
         engine = create_engine("sqlite:///:memory:", future=True)

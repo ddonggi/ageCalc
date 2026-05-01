@@ -65,10 +65,12 @@ DEFAULT_IMAGE_COUNT = 1
 DEFAULT_IMAGE_QUALITY = "medium"
 DEFAULT_SMTP_PORT = 25
 DEFAULT_BLOG_MAX_OUTPUT_TOKENS = 7000
+DEFAULT_BLOG_GENERATION_ATTEMPTS = 3
 IMAGE_OUTPUT_DIR = PROJECT_ROOT / "static" / "generated" / "blog-covers"
 PROMPTS_DIR = PROJECT_ROOT / "prompts"
-TARGET_GENERATED_BODY_RANGE = "3,000~3,800자"
-MIN_GENERATED_BODY_CHARS = 3000
+TARGET_GENERATED_BODY_RANGE = "2,700~3,500자"
+PROMPT_TARGET_BODY_CHARS = 2700
+MIN_GENERATED_BODY_CHARS = 2500
 MIN_GENERATED_HEADINGS = 5
 AGECALC_INTERNAL_LINKS = (
     "/age",
@@ -480,7 +482,7 @@ def _detect_source_language(feed_item: FeedItem) -> str:
     return "mixed"
 
 
-def _build_generation_prompt(feed_item: FeedItem) -> str:
+def _build_generation_prompt(feed_item: FeedItem, feedback: str = "") -> str:
     source_language = _detect_source_language(feed_item)
     language_instructions = (
         """
@@ -495,6 +497,16 @@ def _build_generation_prompt(feed_item: FeedItem) -> str:
 - 한국 독자에게 왜 중요한지, AgeCalc 계산기나 생활 기준과 어떤 식으로 연결해 읽을 수 있는지 반드시 설명한다.
 """.strip()
     )
+    feedback_instructions = (
+        f"""
+
+이전 생성 결과 검수 실패:
+- {feedback}
+- 같은 문제가 반복되지 않게 본문을 충분히 확장하고, 응답 직전에 HTML 태그를 제외한 실제 한글 본문 길이가 {PROMPT_TARGET_BODY_CHARS:,}자 이상인지 자체 점검한다.
+""".rstrip()
+        if feedback
+        else ""
+    )
     return f"""
 아래 원문 정보를 참고해서 한국어 독자를 위한 설명형 블로그 글을 작성해.
 당신의 목표는 원문을 번역하거나 요약하는 것이 아니라, 독립적인 한국어 설명 콘텐츠로 재창작하는 것이다.
@@ -502,8 +514,11 @@ def _build_generation_prompt(feed_item: FeedItem) -> str:
 - 한국어 독자를 위한 설명형 블로그 글이어야 한다.
 - 제목 1개는 원문 제목을 번역하지 말고 새로 작성한다.
 - 본문은 {TARGET_GENERATED_BODY_RANGE} 분량을 목표로 작성한다.
-- HTML 태그를 제외한 본문 텍스트만 최소 {MIN_GENERATED_BODY_CHARS:,}자 이상이어야 한다.
+- HTML 태그를 제외한 본문 텍스트는 공개 기준상 최소 {MIN_GENERATED_BODY_CHARS:,}자 이상이어야 한다.
+- 생성 단계에서는 한글 기준 {PROMPT_TARGET_BODY_CHARS:,}자 이상을 목표로 작성한다.
+- {MIN_GENERATED_BODY_CHARS:,}자 미만의 짧은 답변은 실패로 처리되므로, 부족하면 배경·생활 적용·주의점·계산기 활용 예시를 확장한다.
 - 각 소제목 아래에는 2문단 이상을 두고, 각 문단은 2~4문장으로 충분히 설명한다.
+- 전체 본문은 최소 12문단 이상으로 구성한다.
 - 서론 1문단, 본문 최소 5개 소제목, 결론 1문단
 - 본문에 다음 내용을 반드시 포함한다:
   1. 사건/연구/정책의 핵심 요약
@@ -521,6 +536,7 @@ def _build_generation_prompt(feed_item: FeedItem) -> str:
 - 본문은 최소 5개 이상의 소제목 구조를 가져야 한다.
 - JSON 외 다른 설명을 붙이지 않는다.
 {language_instructions}
+{feedback_instructions}
 - 응답 형식(JSON):
   {{
     "title": "...",
@@ -605,18 +621,46 @@ def _evaluate_generated_post(
     return True, ""
 
 
-def _build_needs_review_post(feed_item: FeedItem, reason: str) -> tuple[str, str, str]:
+def _build_generation_feedback(reason: str, title: str, excerpt: str, content_html: str) -> str:
+    plain_text = _normalize_space(_strip_tags(content_html))
+    heading_count = len(re.findall(r"<h[23]\b", content_html or "", flags=re.IGNORECASE))
+    return (
+        f"이전 생성 실패 사유: {reason} "
+        f"이전 본문 길이: {len(plain_text):,}자, 소제목 수: {heading_count}개. "
+        f"이전 제목: {title or '없음'}. 이전 요약: {excerpt or '없음'}."
+    )
+
+
+def _build_needs_review_post(
+    feed_item: FeedItem,
+    reason: str,
+    *,
+    candidate_title: str = "",
+    candidate_excerpt: str = "",
+    candidate_content_html: str = "",
+) -> tuple[str, str, str]:
     safe_title = html.escape(_normalize_space(feed_item.original_title)[:200] or "원문 검토 필요")
     safe_url = html.escape(feed_item.original_url)
     safe_reason = html.escape(reason)
     title = f"[검토 필요] {feed_item.original_title[:160]}".strip()
     excerpt = "자동 초안 생성 품질 검토가 필요해 공개 가능한 설명형 글로 전환되지 않았습니다."
+    candidate_block = ""
+    if candidate_content_html:
+        safe_candidate_title = html.escape(_normalize_space(candidate_title) or "제목 없음")
+        safe_candidate_excerpt = html.escape(_normalize_space(candidate_excerpt) or "요약 없음")
+        candidate_block = (
+            "<h3>생성된 후보 본문</h3>"
+            f"<p><strong>후보 제목</strong>: {safe_candidate_title}</p>"
+            f"<p><strong>후보 요약</strong>: {safe_candidate_excerpt}</p>"
+            f"{candidate_content_html}"
+        )
     content_html = (
         "<h2>자동 초안 생성 품질 검토 필요</h2>"
         f"<p>{safe_reason}</p>"
         "<h3>원문 정보</h3>"
         f"<p><strong>원문 제목</strong>: {safe_title}</p>"
         f'<p><a href="{safe_url}" rel="noopener noreferrer nofollow" target="_blank">원문 확인하기</a></p>'
+        f"{candidate_block}"
         "<h3>다음 작업</h3>"
         "<p>한국어 독자를 위한 설명형 구조, 계산기 활용 포인트, 주의사항을 보강한 뒤 다시 검토하세요.</p>"
     )
@@ -693,14 +737,14 @@ def _send_review_email(post: GeneratedPost) -> None:
     print(f"[notify] sent review email for post_id={post.id}")
 
 
-def _generate_with_openai(feed_item: FeedItem, model: str) -> tuple[str, str, str]:
+def _generate_with_openai(feed_item: FeedItem, model: str, feedback: str = "") -> tuple[str, str, str]:
     api_key = os.getenv("OPENAI_API_KEY", "").strip()
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY is not set")
 
     body = {
         "model": model,
-        "input": _build_generation_prompt(feed_item),
+        "input": _build_generation_prompt(feed_item, feedback=feedback),
         "max_output_tokens": _env_int("OPENAI_BLOG_MAX_OUTPUT_TOKENS", DEFAULT_BLOG_MAX_OUTPUT_TOKENS),
     }
     req = urllib.request.Request(
@@ -768,10 +812,15 @@ def _inject_inline_images(content_html: str, image_urls: list[str]) -> str:
     return re.sub(r"</p>", f"</p>{first_inline}", content_html, count=1, flags=re.IGNORECASE)
 
 
-def _generate_with_ollama(feed_item: FeedItem, model: str, base_url: str) -> tuple[str, str, str]:
+def _generate_with_ollama(
+    feed_item: FeedItem,
+    model: str,
+    base_url: str,
+    feedback: str = "",
+) -> tuple[str, str, str]:
     body = {
         "model": model,
-        "prompt": _build_generation_prompt(feed_item),
+        "prompt": _build_generation_prompt(feed_item, feedback=feedback),
         "stream": False,
     }
     req = urllib.request.Request(
@@ -923,6 +972,9 @@ def create_posts(
         content_html = ""
         used_mode = "needs-review"
         failure_reason = ""
+        candidate_title = ""
+        candidate_excerpt = ""
+        candidate_content_html = ""
         post_status = status
         effective_source_url = item.original_url
         generation_item = item
@@ -940,34 +992,90 @@ def create_posts(
                     content=item.content,
                 )
 
-        if not failure_reason and provider == "openai":
-            try:
-                post_title, excerpt, content_html = _generate_with_openai(generation_item, model=model)
-                used_mode = "openai"
-            except Exception as exc:  # noqa: BLE001
-                print(f"[generate] openai failed for {item.original_url}: {exc}", file=sys.stderr)
-                failure_reason = f"자동 생성 실패: {exc}"
-        elif not failure_reason and provider == "ollama":
-            try:
-                post_title, excerpt, content_html = _generate_with_ollama(
-                    generation_item, model=model, base_url=ollama_url
+        if not failure_reason and provider in {"openai", "ollama"}:
+            attempts = max(1, _env_int("BLOG_GENERATION_ATTEMPTS", DEFAULT_BLOG_GENERATION_ATTEMPTS))
+            feedback = ""
+            valid_generation = False
+            for attempt in range(1, attempts + 1):
+                try:
+                    if provider == "openai":
+                        post_title, excerpt, content_html = _generate_with_openai(
+                            generation_item,
+                            model=model,
+                            feedback=feedback,
+                        )
+                    else:
+                        post_title, excerpt, content_html = _generate_with_ollama(
+                            generation_item,
+                            model=model,
+                            base_url=ollama_url,
+                            feedback=feedback,
+                        )
+                    used_mode = provider
+                except Exception as exc:  # noqa: BLE001
+                    print(
+                        f"[generate] {provider} failed for {item.original_url} attempt={attempt}/{attempts}: {exc}",
+                        file=sys.stderr,
+                    )
+                    failure_reason = f"자동 생성 실패: {exc}"
+                    feedback = f"{failure_reason} JSON 형식을 유지하면서 다시 작성하세요."
+                    continue
+
+                candidate_title = post_title
+                candidate_excerpt = excerpt
+                candidate_content_html = content_html
+                is_valid, validation_reason = _evaluate_generated_post(
+                    generation_item,
+                    post_title,
+                    excerpt,
+                    content_html,
                 )
-                used_mode = "ollama"
-            except Exception as exc:  # noqa: BLE001
-                print(f"[generate] ollama failed for {item.original_url}: {exc}", file=sys.stderr)
-                failure_reason = f"자동 생성 실패: {exc}"
+                if is_valid:
+                    valid_generation = True
+                    failure_reason = ""
+                    break
+
+                plain_text = _normalize_space(_strip_tags(content_html))
+                heading_count = len(re.findall(r"<h[23]\b", content_html or "", flags=re.IGNORECASE))
+                print(
+                    f"[quality] {provider} rejected for {item.original_url} "
+                    f"attempt={attempt}/{attempts} chars={len(plain_text)} "
+                    f"headings={heading_count} reason={validation_reason}",
+                    file=sys.stderr,
+                )
+                failure_reason = validation_reason
+                feedback = _build_generation_feedback(validation_reason, post_title, excerpt, content_html)
+
+            if not valid_generation and content_html:
+                used_mode = f"{provider}-quality-review"
 
         if not content_html:
             post_title, excerpt, content_html = _build_needs_review_post(
-                item,
+                generation_item,
                 failure_reason or "자동 생성 결과가 비어 있어 편집 검토가 필요합니다.",
             )
             post_status = "needs_review"
 
-        if post_status == status:
+        if failure_reason and content_html and candidate_content_html:
+            post_title, excerpt, content_html = _build_needs_review_post(
+                generation_item,
+                failure_reason,
+                candidate_title=candidate_title,
+                candidate_excerpt=candidate_excerpt,
+                candidate_content_html=candidate_content_html,
+            )
+            post_status = "needs_review"
+
+        if post_status == status and provider not in {"openai", "ollama"}:
             is_valid, validation_reason = _evaluate_generated_post(generation_item, post_title, excerpt, content_html)
             if not is_valid:
-                post_title, excerpt, content_html = _build_needs_review_post(item, validation_reason)
+                post_title, excerpt, content_html = _build_needs_review_post(
+                    generation_item,
+                    validation_reason,
+                    candidate_title=post_title,
+                    candidate_excerpt=excerpt,
+                    candidate_content_html=content_html,
+                )
                 post_status = "needs_review"
                 used_mode = f"{used_mode}-quality-review"
 

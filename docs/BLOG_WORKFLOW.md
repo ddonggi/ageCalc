@@ -27,13 +27,13 @@ flowchart TD
 ## Status
 | Status | Meaning | Public Access |
 | --- | --- | --- |
-| `needs_review` | 원문 해석 실패, 자동 생성 실패, 3,000자 미만, 출처/내부 링크/구조 부족 등으로 공개 부적합 | 비공개 |
+| `needs_review` | 원문 해석 실패, 자동 생성 실패, 2,500자 미만, 출처/내부 링크/구조 부족 등으로 공개 부적합 | 비공개 |
 | `draft` | 자동 검수 기준을 통과한 공개 후보 | `/blog/drafts`에서 비밀번호 필요 |
 | `published` | 수동 공개 또는 토큰 승인까지 통과한 글 | `/blog/<slug>` |
 
 ## Current Quality Gates
-- HTML 태그 제외 본문 최소 `3,000자`
-- 생성 목표 `3,000~3,800자`
+- HTML 태그 제외 본문 최소 `2,500자`
+- 생성 목표 한글 기준 `2,700자 이상`
 - `h2`/`h3` 소제목 5개 이상
 - 실제 원문 URL 필요
 - Google News RSS redirect URL만 출처로 남으면 실패

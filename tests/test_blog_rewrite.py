@@ -44,8 +44,9 @@ class BlogRewriteTests(unittest.TestCase):
 
         prompt = rewriter.build_rewrite_prompt(post, "https://example.com/story")
 
-        self.assertIn("3,000~3,800자", prompt)
-        self.assertIn("최소 3,000자", prompt)
+        self.assertIn("2,700~3,500자", prompt)
+        self.assertIn("최소 2,500자", prompt)
+        self.assertIn("한글 기준 2,700자", prompt)
         self.assertIn("최소 5개", prompt)
         self.assertIn("AgeCalc 내부 계산기 링크", prompt)
         self.assertIn("번역이나 요약이 아니라", prompt)

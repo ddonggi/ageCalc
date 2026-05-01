@@ -233,8 +233,8 @@ sudo journalctl -u agecalc-rss.service -n 200 --no-pager
 ## 10. 블로그 공개 기준
 OpenAI가 생성하더라도 아래 기준을 통과하지 못하면 `draft`가 아니라 `needs_review`로 남습니다.
 
-- HTML 제외 본문 최소 `3,000자`
-- 목표 본문 길이 `3,000~3,800자`
+- HTML 제외 본문 최소 `2,500자`
+- 생성 목표 한글 기준 `2,700자 이상`
 - `h2`/`h3` 소제목 5개 이상
 - 실제 원문 URL 사용. Google News RSS 리디렉션 URL만 남으면 차단
 - AgeCalc 내부 계산기 링크 1개 이상

@@ -120,7 +120,7 @@ RSS에서 수집한 원문 후보입니다.
 - `generated_posts.status = "published"`인 글만 `/blog/<slug>`에서 공개됩니다.
 - `/blog/drafts`는 `draft`와 `needs_review`를 함께 보여주지만 비밀번호 세션이 필요합니다.
 - `draft` 공개 시 `scripts.adsense_blog_review.audit_post(..., require_cover_image=True)`를 통과해야 합니다.
-- 대표 이미지가 없거나, HTML 제외 본문이 3,000자 미만이거나, AgeCalc 내부 링크/출처가 없으면 공개되지 않습니다.
+- 대표 이미지가 없거나, HTML 제외 본문이 2,500자 미만이거나, AgeCalc 내부 링크/출처가 없으면 공개되지 않습니다.
 - 공개 글이 `BLOG_INDEX_MIN_POSTS` 기본값 3개 미만이면 `/blog`와 sitemap의 블로그 노출이 제한됩니다.
 
 ## SQLAlchemy 생성
