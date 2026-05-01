@@ -1,0 +1,16 @@
+flowchart TD
+    Timer[systemd timer<br/>09:00 / 12:00 / 19:00 KST] --> Run[rss_blog_scheduler.py run]
+    Run --> Fetch[RSS/Atom 수집]
+    Fetch --> Item{새 FeedItem?}
+    Item -- no --> Stop[종료]
+    Item -- yes --> Resolve[Google News URL이면 실제 원문 URL 해석]
+    Resolve --> Generate[OpenAI 한국어 재창작]
+    Generate --> Quality{품질 기준 통과?}
+    Quality -- no --> NeedsReview[needs_review 저장]
+    Quality -- yes --> Image[OpenAI 커버 이미지 생성]
+    Image --> Draft[draft 저장]
+    Draft --> Review[/blog/drafts에서 확인]
+    Review --> Publish{공개 버튼}
+    Publish --> Audit[AdSense audit]
+    Audit -->|통과| Published[published]
+    Audit -->|실패| DraftError[오류 표시 후 draft 유지]

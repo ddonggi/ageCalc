@@ -1,0 +1,14 @@
+flowchart TB
+    Browser[Browser / Crawlers] -->|HTTPS| Nginx[Nginx]
+    Nginx -->|proxy_pass unix socket| Gunicorn[Gunicorn workers]
+    Gunicorn --> Flask[Flask app.py]
+    Flask --> Templates[Jinja2 templates]
+    Flask --> Static[static assets]
+    Flask --> DB[(MySQL)]
+    Flask --> BlogAudit[AdSense blog audit]
+
+    Timer[systemd agecalc-rss.timer] --> Service[agecalc-rss.service]
+    Service --> Scheduler[rss_blog_scheduler.py]
+    Scheduler --> RSS[RSS / Google News]
+    Scheduler --> OpenAI[OpenAI Responses + Images]
+    Scheduler --> DB

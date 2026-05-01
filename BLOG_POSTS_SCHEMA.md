@@ -1,64 +1,127 @@
-# Blog Posts Schema (MySQL 8)
+# Blog Data Schema
 
-`agecalc` 데이터베이스에서 블로그 글 저장용 단일 테이블(`posts`) 스키마입니다.
-댓글 기능은 제외한 구조입니다.
+현재 블로그 자동화는 SQLAlchemy 모델 [models/blog_models.py](models/blog_models.py)를 기준으로 4개 테이블을 사용합니다.
 
-## Create Table SQL
+## ERD
+```mermaid
+erDiagram
+    feed_sources ||--o{ feed_items : has
+    feed_items ||--o{ post_sources : maps
+    generated_posts ||--o{ post_sources : cites
 
-```sql
-CREATE TABLE posts (
-  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  slug VARCHAR(180) NOT NULL,
-  title VARCHAR(255) NOT NULL,
-  excerpt VARCHAR(500) NULL,
-  content LONGTEXT NOT NULL,
-  content_format ENUM('html', 'markdown', 'text') NOT NULL DEFAULT 'html',
+    feed_sources {
+        int id PK
+        string name
+        string rss_url UK
+        string site_url
+        int is_active
+        datetime created_at
+    }
 
-  cover_image_url VARCHAR(1000) NULL,
-  cover_image_alt VARCHAR(255) NULL,
-  image_urls JSON NULL,
+    feed_items {
+        int id PK
+        int source_id FK
+        string original_title
+        string original_url UK
+        datetime published_at
+        text summary
+        text content
+        string content_hash
+        string status
+        datetime created_at
+    }
 
-  status ENUM('draft', 'published', 'archived') NOT NULL DEFAULT 'draft',
-  is_featured TINYINT(1) NOT NULL DEFAULT 0,
-  view_count BIGINT UNSIGNED NOT NULL DEFAULT 0,
+    generated_posts {
+        int id PK
+        string slug UK
+        string title
+        string excerpt
+        text content_html
+        string cover_image_url
+        string status
+        datetime published_at
+        datetime created_at
+        datetime updated_at
+    }
 
-  meta_title VARCHAR(255) NULL,
-  meta_description VARCHAR(320) NULL,
-
-  published_at DATETIME NULL,
-  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-  PRIMARY KEY (id),
-  UNIQUE KEY uq_posts_slug (slug),
-  KEY idx_posts_status_published_at (status, published_at),
-  KEY idx_posts_created_at (created_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    post_sources {
+        int id PK
+        int generated_post_id FK
+        int feed_item_id FK
+        string source_name
+        string source_url
+        string attribution_text
+    }
 ```
 
-## Column Notes
+## 테이블
+### `feed_sources`
+RSS/Atom 소스 목록입니다.
 
-- `slug`: URL 경로 식별자. 유니크 제약으로 중복 방지.
-- `content`: 본문 원문 저장(HTML/Markdown/Text).
-- `image_urls`: 본문 내 추가 이미지 URL 목록(JSON 배열).
-- `status`: 발행 상태(`draft`, `published`, `archived`).
-- `published_at`: 실제 공개 시각. 임시저장(draft)에서는 `NULL` 가능.
-- `meta_title`, `meta_description`: SEO 메타 정보.
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | Integer | Primary key |
+| `name` | String(120) | 소스 표시명 |
+| `rss_url` | String(500) | Unique, RSS/Atom URL |
+| `site_url` | String(500) | 원 사이트 URL |
+| `is_active` | Integer | 1이면 수집 대상 |
+| `created_at` | DateTime | 생성 시각 |
 
-## Example Insert
+### `feed_items`
+RSS에서 수집한 원문 후보입니다.
 
-```sql
-INSERT INTO posts (
-  slug, title, excerpt, content, content_format,
-  cover_image_url, status, published_at
-) VALUES (
-  'hello-agecalc-blog',
-  '첫 블로그 글',
-  '요약입니다.',
-  '<p>본문입니다.</p>',
-  'html',
-  'https://cdn.example.com/post1-cover.jpg',
-  'published',
-  NOW()
-);
-```
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | Integer | Primary key |
+| `source_id` | Integer | `feed_sources.id` |
+| `original_title` | String(255) | 원문 제목 |
+| `original_url` | String(500) | Unique, 원문 URL 또는 RSS URL |
+| `published_at` | DateTime | 원문 발행 시각 |
+| `summary` | Text | RSS 요약 |
+| `content` | Text | RSS 본문 일부 |
+| `content_hash` | String(64) | 중복 감지용 |
+| `status` | String(20) | `new`, `used` 등 |
+| `created_at` | DateTime | 수집 시각 |
+
+### `generated_posts`
+사이트에 표시되는 블로그 글입니다.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | Integer | Primary key |
+| `slug` | String(180) | Unique, `/blog/<slug>` 경로 |
+| `title` | String(255) | 글 제목 |
+| `excerpt` | String(500) | 목록/메타 요약 |
+| `content_html` | Text | 렌더링할 HTML 본문 |
+| `cover_image_url` | String(500) | 대표 이미지 URL |
+| `status` | String(20) | `needs_review`, `draft`, `published` |
+| `published_at` | DateTime | 공개 시각 |
+| `created_at` | DateTime | 생성 시각 |
+| `updated_at` | DateTime | 수정 시각 |
+
+상태 의미:
+- `needs_review`: 자동 생성 실패, 품질 기준 미달, 원문 URL 해석 실패 등으로 공개 불가
+- `draft`: 검수 기준을 통과한 공개 후보
+- `published`: 공개 페이지와 sitemap에 포함 가능한 글
+
+### `post_sources`
+생성 글과 원문 RSS item의 연결 테이블입니다.
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `id` | Integer | Primary key |
+| `generated_post_id` | Integer | `generated_posts.id` |
+| `feed_item_id` | Integer | `feed_items.id` |
+| `source_name` | String(120) | 출처명 |
+| `source_url` | String(500) | 실제 원문 URL |
+| `attribution_text` | String(255) | 내부 표식 제거 대상. 공개 글에서는 보통 `NULL` |
+
+## 공개 기준과 스키마 관계
+- `generated_posts.status = "published"`인 글만 `/blog/<slug>`에서 공개됩니다.
+- `/blog/drafts`는 `draft`와 `needs_review`를 함께 보여주지만 비밀번호 세션이 필요합니다.
+- `draft` 공개 시 `scripts.adsense_blog_review.audit_post(..., require_cover_image=True)`를 통과해야 합니다.
+- 대표 이미지가 없거나, HTML 제외 본문이 3,000자 미만이거나, AgeCalc 내부 링크/출처가 없으면 공개되지 않습니다.
+- 공개 글이 `BLOG_INDEX_MIN_POSTS` 기본값 3개 미만이면 `/blog`와 sitemap의 블로그 노출이 제한됩니다.
+
+## SQLAlchemy 생성
+테이블은 앱 시작 또는 스크립트 실행 시 `db.init_db()` / `Base.metadata.create_all()` 경로로 생성됩니다. 수동 SQL을 관리하기보다 [models/blog_models.py](models/blog_models.py)를 기준으로 확인하세요.
