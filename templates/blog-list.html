@@ -7,6 +7,9 @@
 
     <title>블로그 | AgeCalc</title>
     <meta name="description" content="AgeCalc 블로그에서 계산 기준과 생활 정보를 정리한 글을 확인하세요." />
+    {% if not blog_indexable %}
+    <meta name="robots" content="noindex,nofollow" />
+    {% endif %}
     <link rel="canonical" href="https://agecalc.cloud/blog" />
 
     <meta property="og:type" content="website" />

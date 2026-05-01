@@ -15,9 +15,24 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ENV_FILE = PROJECT_ROOT / ".env.rss"
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
-MIN_BODY_CHARS = 1200
-MIN_HEADINGS = 3
+MIN_BODY_CHARS = 1600
+MIN_HEADINGS = 5
 SIMILAR_TITLE_THRESHOLD = 0.42
+AGECALC_INTERNAL_LINKS = (
+    "/age",
+    "/d-day",
+    "/baby-months",
+    "/parent-child",
+    "/school-grade-calculator",
+    "/school-entry-year-table",
+    "/birth-year-age-table",
+    "/age-gap-calculator",
+    "/100-day-calculator",
+    "/birthday-dday-calculator",
+    "/baby-months-table",
+    "/pet-age-table",
+    "/pet-months-table",
+)
 
 RELATED_KEYWORDS = (
     "AgeCalc",
@@ -104,6 +119,20 @@ def _heading_count(content_html: str) -> int:
     return len(re.findall(r"<h[23]\b", content_html or "", flags=re.IGNORECASE))
 
 
+def _is_agecalc_internal_link(href: str) -> bool:
+    from urllib.parse import urlparse
+
+    parsed = urlparse(href or "")
+    if parsed.netloc and parsed.netloc not in {"agecalc.cloud", "www.agecalc.cloud"}:
+        return False
+    return parsed.path in AGECALC_INTERNAL_LINKS
+
+
+def _has_agecalc_internal_link(content_html: str) -> bool:
+    hrefs = re.findall(r"""href=["']([^"']+)["']""", content_html or "", flags=re.IGNORECASE)
+    return any(_is_agecalc_internal_link(href) for href in hrefs)
+
+
 def _sources(post: object) -> list[object]:
     return list(getattr(post, "sources", None) or [])
 
@@ -175,7 +204,10 @@ def audit_post(
         add_issue("missing_sources", "critical", "참고 자료가 없습니다.", 4)
 
     if "news.google.com/rss/articles" in source_text:
-        add_issue("google_news_redirect_source", "medium", "Google News RSS 리디렉션 URL만 출처로 남아 있습니다.", 1)
+        add_issue("google_news_redirect_source", "critical", "Google News RSS 리디렉션 URL만 출처로 남아 있습니다.", 4)
+
+    if not _has_agecalc_internal_link(content_html):
+        add_issue("missing_internal_link", "critical", "AgeCalc 내부 계산기 링크가 없습니다.", 4)
 
     if not any(keyword in body_text for keyword in RELATED_KEYWORDS):
         add_issue("weak_agecalc_relevance", "high", "AgeCalc 계산기나 생활 기준과의 연결이 약합니다.", 3)

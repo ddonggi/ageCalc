@@ -36,7 +36,9 @@
             </div>
         </div>
         {% endfor %}
+        {% if blog_public_indexable %}
         <a class="mega-nav-link{% if current_endpoint.startswith('blog') %} is-active{% endif %}" href="{{ url_for('blog_list') }}">블로그</a>
+        {% endif %}
     </nav>
 
     <div class="header-actions">
@@ -80,7 +82,9 @@
         {% endfor %}
     </div>
 
+    {% if blog_public_indexable %}
     <a class="mobile-nav-blog{% if current_endpoint.startswith('blog') %} is-active{% endif %}" href="{{ url_for('blog_list') }}">블로그</a>
+    {% endif %}
 </aside>
 
 <script src="{{ url_for('static', filename='js/navigation.js') }}" defer></script>

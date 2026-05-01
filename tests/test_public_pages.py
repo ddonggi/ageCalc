@@ -2,9 +2,11 @@ import unittest
 from datetime import datetime
 from types import SimpleNamespace
 from pathlib import Path
+from unittest import mock
 
 from flask import render_template, url_for
 
+import app as app_module
 from app import PUBLIC_SITEMAP_ENDPOINTS, app, _current_local_date
 
 
@@ -416,7 +418,7 @@ class PublicPageTests(unittest.TestCase):
         client = app.test_client()
 
         with app.test_request_context("/"):
-            paths = [url_for(endpoint) for endpoint in PUBLIC_SITEMAP_ENDPOINTS]
+            paths = [url_for(endpoint) for endpoint in PUBLIC_SITEMAP_ENDPOINTS if endpoint != "blog_list"]
 
         for path in paths:
             with self.subTest(path=path):
@@ -563,6 +565,7 @@ class PublicPageTests(unittest.TestCase):
                 total=1,
                 page=1,
                 total_pages=1,
+                blog_indexable=True,
             )
 
         self.assertIn("계산 결과를 이해하는 데 도움이 되는 배경 설명과 생활 정보를 글로 정리합니다.", html)
@@ -613,7 +616,7 @@ class PublicPageTests(unittest.TestCase):
 
     def test_header_uses_category_navigation(self):
         with app.test_request_context("/"):
-            html = render_template("partials/header.html")
+            html = render_template("partials/header.html", blog_public_indexable=True)
 
         self.assertIn("계산기", html)
         self.assertIn("표·비교", html)
@@ -623,6 +626,80 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("mega-nav", html)
         self.assertIn("mega-menu-panel", html)
         self.assertNotIn('class="nav-links"', html)
+
+    def test_header_hides_blog_when_public_blog_is_not_indexable(self):
+        with app.test_request_context("/"):
+            html = render_template("partials/header.html", blog_public_indexable=False)
+
+        self.assertNotIn('href="/blog"', html)
+        self.assertNotIn("mobile-nav-blog", html)
+
+    def test_blog_list_is_noindex_when_public_blog_is_not_indexable(self):
+        with app.test_request_context("/blog"):
+            html = render_template(
+                "blog-list.html",
+                posts=[],
+                total=0,
+                page=1,
+                total_pages=1,
+                blog_indexable=False,
+            )
+
+        self.assertIn('<meta name="robots" content="noindex,nofollow" />', html)
+        self.assertIn("아직 게시된 글이 없습니다.", html)
+
+    def test_blog_review_approval_blocks_posts_that_fail_adsense_audit(self):
+        class FakeQuery:
+            def __init__(self, post):
+                self.post = post
+
+            def filter(self, *args, **kwargs):
+                return self
+
+            def first(self):
+                return self.post
+
+        class FakeSession:
+            def __init__(self, post):
+                self.post = post
+                self.committed = False
+
+            def query(self, model):
+                return FakeQuery(self.post)
+
+            def commit(self):
+                self.committed = True
+
+        post = SimpleNamespace(
+            id=1,
+            title="검토 글",
+            slug="review-post",
+            excerpt="요약",
+            cover_image_url=None,
+            content_html="<h2>짧은 글</h2><p>AgeCalc 계산기와 연결합니다.</p>",
+            published_at=None,
+            created_at=None,
+            updated_at=None,
+            status="needs_review",
+            sources=[
+                SimpleNamespace(
+                    source_name="RSS",
+                    source_url="https://news.google.com/rss/articles/example?oc=5",
+                    attribution_text="Generated from RSS (openai)",
+                )
+            ],
+        )
+        fake_session = FakeSession(post)
+
+        with mock.patch.object(app_module, "_review_token_is_valid", return_value=True), mock.patch.object(
+            app_module, "SessionLocal", return_value=fake_session
+        ), mock.patch.object(app_module, "_published_blog_count", return_value=0):
+            response = app.test_client().post("/blog/review/1/approve?token=test")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual("needs_review", post.status)
+        self.assertFalse(fake_session.committed)
+        self.assertIn("공개할 수 없습니다", response.get_data(as_text=True))
 
     def test_home_page_uses_category_hub_sections(self):
         client = app.test_client()
@@ -796,6 +873,16 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("https://agecalc.cloud/college-entry-year-calculator", body)
         self.assertIn("https://agecalc.cloud/birthday-dday-calculator", body)
         self.assertNotIn("/minigames", body)
+
+    def test_dynamic_sitemap_excludes_blog_when_public_blog_is_not_indexable(self):
+        client = app.test_client()
+
+        with mock.patch.object(app_module, "_is_blog_public_indexable", return_value=False):
+            response = client.get("/sitemap.xml")
+
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+        self.assertNotIn("https://agecalc.cloud/blog", body)
 
     def test_navigation_css_promotes_header_above_sections(self):
         css = Path("static/css/style.css").read_text(encoding="utf-8")

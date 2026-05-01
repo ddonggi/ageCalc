@@ -30,6 +30,10 @@ class BlogPipelineTests(unittest.TestCase):
         self.assertIn("직역하지 말고", prompt)
         self.assertIn("한국 독자", prompt)
         self.assertIn("계산기", prompt)
+        self.assertIn("1,800~2,400자", prompt)
+        self.assertIn("본문 텍스트만 최소 1,600자 이상", prompt)
+        self.assertIn("최소 5개", prompt)
+        self.assertIn("/age", prompt)
 
     def test_quality_gate_rejects_low_value_english_copy(self):
         ok, reason = scheduler._evaluate_generated_post(
@@ -46,6 +50,63 @@ class BlogPipelineTests(unittest.TestCase):
 
         self.assertFalse(ok)
         self.assertIn("재창작", reason)
+
+    def test_quality_gate_rejects_missing_internal_calculator_link(self):
+        body = (
+            "<h2>핵심 요약</h2><p>AgeCalc 계산기와 생활 기준을 함께 살펴볼 수 있는 글입니다.</p>"
+            "<h2>배경 설명</h2><p>한국 독자에게 필요한 맥락을 충분히 다시 설명합니다.</p>"
+            "<h2>한국 독자가 확인할 점</h2><p>생활 일정과 나이 기준을 연결해 읽을 수 있습니다.</p>"
+            "<h2>활용 포인트</h2><p>계산 결과를 해석할 때 도움이 되는 기준을 정리합니다.</p>"
+            "<h2>주의할 점</h2><p>개별 상황에 따라 결과 해석이 달라질 수 있습니다.</p>"
+            "<h2>참고 링크</h2><p><a href=\"https://example.com/story\">원문 보기</a></p>"
+        ) * 12
+
+        ok, reason = scheduler._evaluate_generated_post(
+            self._make_feed_item(original_title="아이 개월 수 계산과 생활 기준"),
+            title="아이 개월 수 계산과 생활 기준을 함께 보는 방법",
+            excerpt="아이 개월 수 계산 결과를 생활 기준과 함께 해석하는 방법입니다.",
+            content_html=body,
+        )
+
+        self.assertFalse(ok)
+        self.assertIn("내부 계산기", reason)
+
+    def test_quality_gate_rejects_google_news_redirect_source(self):
+        body = (
+            "<h2>핵심 요약</h2><p>AgeCalc 계산기와 생활 기준을 함께 살펴볼 수 있는 글입니다.</p>"
+            "<h2>배경 설명</h2><p>한국 독자에게 필요한 맥락을 충분히 다시 설명합니다.</p>"
+            "<h2>한국 독자가 확인할 점</h2><p>생활 일정과 나이 기준을 연결해 읽을 수 있습니다.</p>"
+            "<h2>활용 포인트</h2><p><a href=\"/age\">만 나이 계산기</a>로 확인할 수 있습니다.</p>"
+            "<h2>주의할 점</h2><p>개별 상황에 따라 결과 해석이 달라질 수 있습니다.</p>"
+            "<h2>참고 링크</h2><p><a href=\"https://example.com/story\">원문 보기</a></p>"
+        ) * 12
+
+        ok, reason = scheduler._evaluate_generated_post(
+            self._make_feed_item(original_url="https://news.google.com/rss/articles/example?oc=5"),
+            title="나이 기준을 생활 일정과 함께 보는 방법",
+            excerpt="나이 계산 결과를 생활 일정과 함께 해석하는 방법입니다.",
+            content_html=body,
+        )
+
+        self.assertFalse(ok)
+        self.assertIn("원문 URL", reason)
+
+    def test_google_news_batchexecute_response_is_decoded(self):
+        response_text = (
+            ")]}'\n\n"
+            '[[["wrb.fr","Fbv4je","[\\"garturlres\\",\\"https://example.com/story?x=1&y=2\\",1]",null,null,null,"generic"]]]'
+        )
+
+        decoded = scheduler._decode_google_news_batchexecute_response(response_text)
+
+        self.assertEqual("https://example.com/story?x=1&y=2", decoded)
+
+    def test_google_news_article_id_is_extracted_from_rss_url(self):
+        article_id = scheduler._google_news_article_id(
+            "https://news.google.com/rss/articles/CBMiabc123?oc=5"
+        )
+
+        self.assertEqual("CBMiabc123", article_id)
 
     def test_create_posts_marks_generation_failures_as_needs_review(self):
         engine = create_engine("sqlite:///:memory:", future=True)
@@ -118,11 +179,15 @@ class BlogPipelineTests(unittest.TestCase):
             "<p>AgeCalc 아이 개월 수 계산기는 생활 기준을 이해하는 데 도움이 됩니다.</p>"
             "<h2>가정에서 확인할 점</h2>"
             "<p>개월 수와 발달 기록을 함께 살펴보면 진료 상담 전에 상황을 정리할 수 있습니다.</p>"
+            "<h2>계산기 활용 포인트</h2>"
+            '<p><a href="/baby-months">아이 개월 수 계산기</a>로 날짜 기준을 먼저 확인하세요.</p>'
+            "<h2>한국 독자가 볼 점</h2>"
+            "<p>예방접종, 어린이집 상담, 가족 기록처럼 생활 속 일정과 함께 보면 좋습니다.</p>"
             "<h2>주의할 점</h2>"
             "<p>의학적 판단은 전문가 상담이 우선이며 계산 결과는 참고용입니다.</p>"
             "<h3>참고 링크</h3>"
             '<p><a href="https://example.com/story">원문 보기</a></p>'
-        ) * 5
+        ) * 12
 
         with mock.patch.object(
             scheduler,

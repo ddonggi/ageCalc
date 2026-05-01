@@ -61,6 +61,16 @@
                 <form method="post" action="{{ url_for('blog_review_approve', post_id=post.id, token=review_token) }}" style="margin: 0 0 16px;">
                     <button type="submit" class="page-btn">이 글 승인 후 공개</button>
                 </form>
+                {% if review_errors %}
+                <div class="result error" style="margin-bottom: 16px;">
+                    <p class="message">아직 공개할 수 없습니다.</p>
+                    <ul>
+                        {% for error in review_errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
                 {% endif %}
                 <p class="blog-date">
                     {% if post.published_at %}

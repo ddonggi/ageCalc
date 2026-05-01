@@ -1,5 +1,5 @@
 import math
-from flask import Flask, Response, render_template, request, jsonify, g, send_from_directory, abort, redirect, session, url_for
+from flask import Flask, Response, render_template, request, jsonify, g, send_from_directory, abort, redirect, session, url_for, make_response
 import json
 import os
 import threading
@@ -10,6 +10,7 @@ from zoneinfo import ZoneInfo
 from controllers.age_controller import AgeController
 from db import SessionLocal, close_db_session, init_db
 from models.blog_models import GeneratedPost
+from scripts.adsense_blog_review import audit_post
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 ENV_FILE = PROJECT_ROOT / ".env.rss"
@@ -64,6 +65,7 @@ GOOGLE_SITE_VERIFICATION = os.getenv(
     "GOOGLE_SITE_VERIFICATION",
     "q0nvIaon9IVWNZZEQzTRCycYka7jIHuzYu-PwxxoKu8",
 ).strip()
+BLOG_INDEX_MIN_POSTS = int(os.getenv("BLOG_INDEX_MIN_POSTS", "3").strip() or "3")
 KOREAN_ZODIAC = ["원숭이", "닭", "개", "돼지", "쥐", "소", "호랑이", "토끼", "용", "뱀", "말", "양"]
 GENERATION_LABELS = [
     ((1946, 1964), "베이비붐 세대"),
@@ -209,6 +211,8 @@ def inject_csp_nonce():
     site_navigation = []
     home_navigation_sections = []
     navigation_counts = {}
+    blog_public_count = _published_blog_count()
+    blog_public_indexable = _is_blog_public_indexable(blog_public_count)
 
     for group in SITE_NAVIGATION:
         links = [dict(link) for link in group["links"]]
@@ -231,9 +235,14 @@ def inject_csp_nonce():
         "author_name": SITE_AUTHOR_NAME,
         "contact_email": SITE_CONTACT_EMAIL,
         "editorial_policy_url": editorial_policy_url,
-        "adsense_enabled": _adsense_is_enabled_for_path(request.path),
+        "adsense_enabled": _adsense_is_enabled_for_path(
+            request.path,
+            blog_public_indexable=blog_public_indexable,
+        ),
         "adsense_client_id": ADSENSE_CLIENT_ID,
         "google_site_verification": GOOGLE_SITE_VERIFICATION,
+        "blog_public_indexable": blog_public_indexable,
+        "blog_public_count": blog_public_count,
         "site_navigation": site_navigation,
         "home_navigation_sections": home_navigation_sections,
         "footer_policy_links": FOOTER_POLICY_LINKS,
@@ -359,9 +368,34 @@ def _absolute_url_for(endpoint: str, **values) -> str:
     return f"{SITE_BASE_URL}{url_for(endpoint, **values)}"
 
 
-def _adsense_is_enabled_for_path(path: str) -> bool:
+def _independent_db_session():
+    factory = getattr(SessionLocal, "session_factory", None)
+    return factory() if factory is not None else SessionLocal()
+
+
+def _published_blog_count() -> int:
+    db_session = _independent_db_session()
+    try:
+        return db_session.query(GeneratedPost).filter(GeneratedPost.status == "published").count()
+    finally:
+        db_session.close()
+
+
+def _is_blog_public_indexable(published_count: int | None = None) -> bool:
+    count = _published_blog_count() if published_count is None else published_count
+    return count >= BLOG_INDEX_MIN_POSTS
+
+
+def _adsense_is_enabled_for_path(path: str, *, blog_public_indexable: bool | None = None) -> bool:
     excluded_prefixes = ("/minigames", "/blog/drafts", "/blog/review")
-    return not any(path == prefix or path.startswith(f"{prefix}/") for prefix in excluded_prefixes)
+    if any(path == prefix or path.startswith(f"{prefix}/") for prefix in excluded_prefixes):
+        return False
+    if path == "/blog" or path.startswith("/blog/"):
+        if blog_public_indexable is None:
+            blog_public_indexable = _is_blog_public_indexable()
+        if not blog_public_indexable:
+            return False
+    return bool(ADSENSE_CLIENT_ID)
 
 
 def _build_sitemap_entry(loc: str, lastmod: str | None = None) -> str:
@@ -892,14 +926,18 @@ def sitemap():
             ),
             None,
         )
+        blog_public_indexable = _is_blog_public_indexable(len(posts))
         entries = []
         for endpoint in PUBLIC_SITEMAP_ENDPOINTS:
+            if endpoint == "blog_list" and not blog_public_indexable:
+                continue
             lastmod = _format_sitemap_lastmod(newest_post_dt) if endpoint == "blog_list" else None
             entries.append(_build_sitemap_entry(_absolute_url_for(endpoint), lastmod))
 
-        for post in posts:
-            lastmod = _format_sitemap_lastmod(post.updated_at or post.published_at or post.created_at)
-            entries.append(_build_sitemap_entry(_absolute_url_for("blog_detail", slug=post.slug), lastmod))
+        if blog_public_indexable:
+            for post in posts:
+                lastmod = _format_sitemap_lastmod(post.updated_at or post.published_at or post.created_at)
+                entries.append(_build_sitemap_entry(_absolute_url_for("blog_detail", slug=post.slug), lastmod))
     finally:
         db_session.close()
 
@@ -1634,13 +1672,18 @@ def blog_list():
         page = total_pages
 
     posts = base_query.offset((page - 1) * per_page).limit(per_page).all()
-    return render_template(
+    blog_indexable = _is_blog_public_indexable(total)
+    response = make_response(render_template(
         'blog-list.html',
         posts=posts,
         page=page,
         total_pages=total_pages,
-        total=total
-    )
+        total=total,
+        blog_indexable=blog_indexable,
+    ))
+    if not blog_indexable:
+        response.headers["X-Robots-Tag"] = "noindex, nofollow"
+    return response
 
 
 @app.route('/blog/<slug>')
@@ -1728,6 +1771,7 @@ def blog_review(post_id):
         draft_mode=False,
         review_mode=True,
         review_token=token,
+        review_errors=[],
     )
 
 
@@ -1741,6 +1785,20 @@ def blog_review_approve(post_id):
     post = db_session.query(GeneratedPost).filter(GeneratedPost.id == post_id).first()
     if post is None:
         abort(404)
+    audit_result = audit_post(post)
+    if not audit_result.keep:
+        review_errors = [issue.message for issue in audit_result.issues]
+        return (
+            render_template(
+                'blog-detail.html',
+                post=post,
+                draft_mode=False,
+                review_mode=True,
+                review_token=token,
+                review_errors=review_errors,
+            ),
+            400,
+        )
     if post.status != "published":
         post.status = "published"
         post.published_at = datetime.now(timezone.utc).replace(tzinfo=None)

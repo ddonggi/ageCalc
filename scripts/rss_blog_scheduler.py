@@ -16,6 +16,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from email.message import EmailMessage
+from types import SimpleNamespace
 from typing import Any
 
 from sqlalchemy import or_, select
@@ -63,10 +64,27 @@ DEFAULT_IMAGE_SIZE = "1536x1024"
 DEFAULT_IMAGE_COUNT = 1
 DEFAULT_IMAGE_QUALITY = "medium"
 DEFAULT_SMTP_PORT = 25
+DEFAULT_BLOG_MAX_OUTPUT_TOKENS = 5000
 IMAGE_OUTPUT_DIR = PROJECT_ROOT / "static" / "generated" / "blog-covers"
 PROMPTS_DIR = PROJECT_ROOT / "prompts"
-MIN_GENERATED_BODY_CHARS = 450
-MIN_GENERATED_HEADINGS = 3
+TARGET_GENERATED_BODY_RANGE = "1,800~2,400자"
+MIN_GENERATED_BODY_CHARS = 1600
+MIN_GENERATED_HEADINGS = 5
+AGECALC_INTERNAL_LINKS = (
+    "/age",
+    "/d-day",
+    "/baby-months",
+    "/parent-child",
+    "/school-grade-calculator",
+    "/school-entry-year-table",
+    "/birth-year-age-table",
+    "/age-gap-calculator",
+    "/100-day-calculator",
+    "/birthday-dday-calculator",
+    "/baby-months-table",
+    "/pet-age-table",
+    "/pet-months-table",
+)
 DEFAULT_BLOG_COVER_PROMPT = """
 한국어 건강/육아 정보 블로그용 커버 이미지를 제작해.
 
@@ -107,6 +125,164 @@ def _strip_tags(text: str) -> str:
 
 def _normalize_space(text: str) -> str:
     return re.sub(r"\s+", " ", (text or "")).strip()
+
+
+def _is_google_news_redirect_url(url: str) -> bool:
+    parsed = urllib.parse.urlparse(url or "")
+    return parsed.netloc == "news.google.com" and "/rss/articles/" in parsed.path
+
+
+def _google_news_article_id(url: str) -> str | None:
+    parsed = urllib.parse.urlparse(url or "")
+    if parsed.netloc != "news.google.com":
+        return None
+    parts = [part for part in parsed.path.split("/") if part]
+    for marker in ("articles", "read"):
+        if marker in parts:
+            index = parts.index(marker)
+            if index + 1 < len(parts):
+                return urllib.parse.unquote(parts[index + 1])
+    return None
+
+
+def _decode_google_news_batchexecute_response(text: str) -> str | None:
+    try:
+        payload_text = (text or "").split("\n\n", 1)[1]
+        rows = json.loads(payload_text)
+        for row in rows:
+            if (
+                isinstance(row, list)
+                and len(row) >= 3
+                and row[0] == "wrb.fr"
+                and row[1] == "Fbv4je"
+                and row[2]
+            ):
+                decoded_payload = json.loads(row[2])
+                if (
+                    isinstance(decoded_payload, list)
+                    and len(decoded_payload) >= 2
+                    and decoded_payload[0] == "garturlres"
+                ):
+                    return decoded_payload[1]
+    except (IndexError, TypeError, json.JSONDecodeError):
+        pass
+
+    patterns = (
+        r'\[\\"garturlres\\",\\"(?P<url>https?://.*?)(?<!\\)\\"',
+        r'\["garturlres","(?P<url>https?://.*?)(?<!\\)"',
+    )
+    for pattern in patterns:
+        match = re.search(pattern, text or "")
+        if not match:
+            continue
+        encoded_url = match.group("url").replace("\\/", "/")
+        try:
+            return json.loads(f'"{encoded_url}"')
+        except json.JSONDecodeError:
+            return encoded_url.replace('\\"', '"')
+    return None
+
+
+def _google_news_decoding_params(article_id: str, timeout: int = DEFAULT_TIMEOUT) -> tuple[str, str] | None:
+    for path in ("articles", "rss/articles"):
+        request = urllib.request.Request(
+            f"https://news.google.com/{path}/{article_id}",
+            headers={"User-Agent": "Mozilla/5.0 AgeCalcBot/1.0 (+https://agecalc.cloud/about)"},
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                text = response.read().decode("utf-8", "replace")
+        except (urllib.error.URLError, TimeoutError, ValueError):
+            continue
+
+        signature_match = re.search(r'data-n-a-sg="([^"]+)"', text)
+        timestamp_match = re.search(r'data-n-a-ts="([^"]+)"', text)
+        if signature_match and timestamp_match:
+            return signature_match.group(1), timestamp_match.group(1)
+    return None
+
+
+def _resolve_google_news_batchexecute(url: str, timeout: int = DEFAULT_TIMEOUT) -> str | None:
+    article_id = _google_news_article_id(url)
+    if not article_id:
+        return None
+    params = _google_news_decoding_params(article_id, timeout=timeout)
+    if not params:
+        return None
+    signature, timestamp = params
+
+    inner_payload = (
+        '["garturlreq",'
+        '[["X","X",["X","X"],null,null,1,1,"US:en",null,1,null,null,null,null,null,0,1],'
+        '"X","X",1,[1,1,1],1,1,null,0,0,null,0],'
+        f'"{article_id}",{timestamp},"{signature}"]'
+    )
+    request_payload = [[
+            [
+                "Fbv4je",
+                inner_payload,
+            ]
+    ]]
+    body = urllib.parse.urlencode(
+        {"f.req": json.dumps(request_payload, separators=(",", ":"), ensure_ascii=False)}
+    ).encode("utf-8")
+    request = urllib.request.Request(
+        "https://news.google.com/_/DotsSplashUi/data/batchexecute?rpcids=Fbv4je",
+        data=body,
+        method="POST",
+        headers={
+            "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
+            "Referer": "https://news.google.com/",
+            "User-Agent": "Mozilla/5.0 AgeCalcBot/1.0 (+https://agecalc.cloud/about)",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            text = response.read().decode("utf-8", "replace")
+    except (urllib.error.URLError, TimeoutError, ValueError):
+        return None
+
+    decoded_url = _decode_google_news_batchexecute_response(text)
+    if decoded_url and not _is_google_news_redirect_url(decoded_url):
+        return decoded_url
+    return None
+
+
+def _is_agecalc_internal_link(href: str) -> bool:
+    parsed = urllib.parse.urlparse(href or "")
+    if parsed.netloc and parsed.netloc not in {"agecalc.cloud", "www.agecalc.cloud"}:
+        return False
+    return parsed.path in AGECALC_INTERNAL_LINKS
+
+
+def _has_agecalc_internal_link(content_html: str) -> bool:
+    hrefs = re.findall(r"""href=["']([^"']+)["']""", content_html or "", flags=re.IGNORECASE)
+    return any(_is_agecalc_internal_link(href) for href in hrefs)
+
+
+def resolve_source_url(url: str, timeout: int = DEFAULT_TIMEOUT) -> str | None:
+    if not url:
+        return None
+    if not _is_google_news_redirect_url(url):
+        return url
+
+    decoded_url = _resolve_google_news_batchexecute(url, timeout=timeout)
+    if decoded_url:
+        return decoded_url
+
+    request = urllib.request.Request(
+        url,
+        headers={"User-Agent": "AgeCalcBot/1.0 (+https://agecalc.cloud/about)"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            final_url = response.geturl()
+    except (urllib.error.URLError, TimeoutError, ValueError):
+        return None
+
+    if final_url and not _is_google_news_redirect_url(final_url):
+        return final_url
+    return None
 
 
 def _load_prompt_template(name: str, fallback: str) -> str:
@@ -325,19 +501,24 @@ def _build_generation_prompt(feed_item: FeedItem) -> str:
 조건:
 - 한국어 독자를 위한 설명형 블로그 글이어야 한다.
 - 제목 1개는 원문 제목을 번역하지 말고 새로 작성한다.
-- 서론 1문단, 본문 3~5개 소제목, 결론 1문단
+- 본문은 {TARGET_GENERATED_BODY_RANGE} 분량을 목표로 작성한다.
+- HTML 태그를 제외한 본문 텍스트만 최소 1,600자 이상이어야 한다.
+- 각 소제목 아래에는 2문단 이상을 두고, 각 문단은 2~4문장으로 충분히 설명한다.
+- 서론 1문단, 본문 최소 5개 소제목, 결론 1문단
 - 본문에 다음 내용을 반드시 포함한다:
   1. 사건/연구/정책의 핵심 요약
   2. 배경 설명 또는 맥락
   3. 한국 독자에게 중요한 이유
   4. AgeCalc 계산기 또는 생활 기준과 연결되는 활용 포인트
   5. 해석 시 주의점 또는 한계
+- content_html 안에는 관련 있는 AgeCalc 내부 계산기 링크를 1개 이상 포함한다.
+- 사용할 수 있는 내부 링크: /age, /d-day, /baby-months, /parent-child, /school-grade-calculator, /school-entry-year-table, /birth-year-age-table, /age-gap-calculator, /100-day-calculator, /birthday-dday-calculator, /baby-months-table, /pet-age-table, /pet-months-table
 - 사실 왜곡 금지, 출처 링크를 '참고 링크' 섹션에 1개 이상 포함
 - 과장 광고 문구 금지
 - 영어 원문이더라도 최종 결과는 자연스러운 한국어여야 한다.
 - "요약하면", "원문에 따르면" 같은 뉴스 브리핑체를 반복하지 않는다.
 - '계산기 활용 포인트' 또는 '생활 기준에서 볼 점' 같은 실용 섹션을 포함한다.
-- 본문은 최소 3개 이상의 소제목 구조를 가져야 한다.
+- 본문은 최소 5개 이상의 소제목 구조를 가져야 한다.
 - JSON 외 다른 설명을 붙이지 않는다.
 {language_instructions}
 - 응답 형식(JSON):
@@ -387,6 +568,12 @@ def _evaluate_generated_post(
     normalized_source_title = _normalize_space(feed_item.original_title).casefold()
     normalized_generated_title = _normalize_space(title).casefold()
 
+    if "Generated from RSS" in content_html or "Generated from RSS" in plain_text:
+        return False, "내부 RSS 자동 생성 표식이 남아 있어 공개할 수 없습니다."
+
+    if _is_google_news_redirect_url(feed_item.original_url):
+        return False, "Google News RSS 리디렉션이 아닌 실제 원문 URL이 필요합니다."
+
     if len(plain_text) < MIN_GENERATED_BODY_CHARS:
         return False, "재창작 본문 길이가 짧아 설명형 콘텐츠 기준에 미달합니다."
 
@@ -395,6 +582,9 @@ def _evaluate_generated_post(
 
     if "참고 링크" not in content_html:
         return False, "출처 섹션이 없어 재창작 검토 기준을 충족하지 못했습니다."
+
+    if not _has_agecalc_internal_link(content_html):
+        return False, "AgeCalc 내부 계산기 링크가 없어 승인용 블로그 기준에 미달합니다."
 
     if not any(keyword in plain_text for keyword in ("AgeCalc", "계산기", "생활 기준", "활용 포인트")):
         return False, "서비스 또는 계산기와 연결되는 활용 설명이 없습니다."
@@ -511,6 +701,7 @@ def _generate_with_openai(feed_item: FeedItem, model: str) -> tuple[str, str, st
     body = {
         "model": model,
         "input": _build_generation_prompt(feed_item),
+        "max_output_tokens": _env_int("OPENAI_BLOG_MAX_OUTPUT_TOKENS", DEFAULT_BLOG_MAX_OUTPUT_TOKENS),
     }
     req = urllib.request.Request(
         "https://api.openai.com/v1/responses",
@@ -733,18 +924,33 @@ def create_posts(
         used_mode = "needs-review"
         failure_reason = ""
         post_status = status
+        effective_source_url = item.original_url
+        generation_item = item
 
-        if provider == "openai":
+        if _is_google_news_redirect_url(item.original_url):
+            resolved_source_url = resolve_source_url(item.original_url)
+            if not resolved_source_url:
+                failure_reason = "Google News RSS 리디렉션 URL을 실제 원문 URL로 해석하지 못했습니다."
+            else:
+                effective_source_url = resolved_source_url
+                generation_item = SimpleNamespace(
+                    original_title=item.original_title,
+                    original_url=resolved_source_url,
+                    summary=item.summary,
+                    content=item.content,
+                )
+
+        if not failure_reason and provider == "openai":
             try:
-                post_title, excerpt, content_html = _generate_with_openai(item, model=model)
+                post_title, excerpt, content_html = _generate_with_openai(generation_item, model=model)
                 used_mode = "openai"
             except Exception as exc:  # noqa: BLE001
                 print(f"[generate] openai failed for {item.original_url}: {exc}", file=sys.stderr)
                 failure_reason = f"자동 생성 실패: {exc}"
-        elif provider == "ollama":
+        elif not failure_reason and provider == "ollama":
             try:
                 post_title, excerpt, content_html = _generate_with_ollama(
-                    item, model=model, base_url=ollama_url
+                    generation_item, model=model, base_url=ollama_url
                 )
                 used_mode = "ollama"
             except Exception as exc:  # noqa: BLE001
@@ -759,7 +965,7 @@ def create_posts(
             post_status = "needs_review"
 
         if post_status == status:
-            is_valid, validation_reason = _evaluate_generated_post(item, post_title, excerpt, content_html)
+            is_valid, validation_reason = _evaluate_generated_post(generation_item, post_title, excerpt, content_html)
             if not is_valid:
                 post_title, excerpt, content_html = _build_needs_review_post(item, validation_reason)
                 post_status = "needs_review"
@@ -792,7 +998,7 @@ def create_posts(
                 generated_post_id=post.id,
                 feed_item_id=item.id,
                 source_name=(item.source.name if item.source else "RSS"),
-                source_url=item.original_url,
+                source_url=effective_source_url,
                 attribution_text=None,
             )
         )
