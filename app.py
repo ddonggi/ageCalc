@@ -1755,6 +1755,40 @@ def blog_draft_detail(slug):
     return render_template('blog-detail.html', post=post, draft_mode=True, review_mode=False)
 
 
+@app.post('/blog/drafts/<slug>/publish')
+def blog_draft_publish(slug):
+    if not _draft_access_granted():
+        return redirect(url_for('blog_drafts'))
+
+    db_session = SessionLocal()
+    post = (
+        db_session.query(GeneratedPost)
+        .filter(GeneratedPost.slug == slug, GeneratedPost.status == "draft")
+        .first()
+    )
+    if post is None:
+        abort(404)
+
+    audit_result = audit_post(post)
+    if not audit_result.keep:
+        draft_publish_errors = [issue.message for issue in audit_result.issues]
+        return (
+            render_template(
+                'blog-detail.html',
+                post=post,
+                draft_mode=True,
+                review_mode=False,
+                draft_publish_errors=draft_publish_errors,
+            ),
+            400,
+        )
+
+    post.status = "published"
+    post.published_at = datetime.now(timezone.utc).replace(tzinfo=None)
+    db_session.commit()
+    return redirect(url_for('blog_detail', slug=post.slug))
+
+
 @app.route('/blog/review/<int:post_id>')
 def blog_review(post_id):
     token = request.args.get("token", "")

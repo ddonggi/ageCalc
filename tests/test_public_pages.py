@@ -701,6 +701,100 @@ class PublicPageTests(unittest.TestCase):
         self.assertFalse(fake_session.committed)
         self.assertIn("공개할 수 없습니다", response.get_data(as_text=True))
 
+    def test_blog_draft_detail_renders_publish_button_for_draft(self):
+        post = SimpleNamespace(
+            id=1,
+            title="초안 글",
+            slug="draft-post",
+            excerpt="요약",
+            cover_image_url=None,
+            content_html="<p>본문</p>",
+            published_at=None,
+            created_at=None,
+            updated_at=None,
+            status="draft",
+            sources=[],
+        )
+
+        with app.test_request_context("/blog/drafts/draft-post"):
+            html = render_template(
+                "blog-detail.html",
+                post=post,
+                draft_mode=True,
+                review_mode=False,
+                author_name="AgeCalc 편집팀",
+                editorial_policy_url="/about",
+            )
+
+        self.assertIn("이 글 공개하기", html)
+        self.assertIn("/blog/drafts/draft-post/publish", html)
+
+    def test_blog_draft_publish_marks_audited_draft_as_published(self):
+        class FakeQuery:
+            def __init__(self, post):
+                self.post = post
+
+            def filter(self, *args, **kwargs):
+                return self
+
+            def first(self):
+                return self.post
+
+        class FakeSession:
+            def __init__(self, post):
+                self.post = post
+                self.committed = False
+
+            def query(self, model):
+                return FakeQuery(self.post)
+
+            def commit(self):
+                self.committed = True
+
+        content_html = (
+            "<h2>핵심 요약</h2><p>AgeCalc 계산기와 생활 기준을 함께 살펴보는 설명형 글입니다.</p>"
+            "<h2>배경과 맥락</h2><p>한국 독자가 이해하기 쉽도록 원문 내용을 다시 구성했습니다.</p>"
+            "<h2>한국 독자가 확인할 점</h2><p>생활 일정과 가족 기록에 맞춰 읽을 수 있습니다.</p>"
+            "<h2>AgeCalc 활용 포인트</h2>"
+            '<p><a href="/age">만 나이 계산기</a>로 날짜 기준을 먼저 확인하세요.</p>'
+            "<h2>주의할 점과 한계</h2><p>개별 상황에 따라 해석이 달라질 수 있으므로 참고용으로 활용해야 합니다.</p>"
+            "<h2>참고 링크</h2><p><a href=\"https://example.com/story\">원문 보기</a></p>"
+        ) * 12
+        post = SimpleNamespace(
+            id=1,
+            title="초안 글",
+            slug="draft-post",
+            excerpt="요약",
+            cover_image_url=None,
+            content_html=content_html,
+            published_at=None,
+            created_at=None,
+            updated_at=None,
+            status="draft",
+            sources=[
+                SimpleNamespace(
+                    source_name="Example",
+                    source_url="https://example.com/story",
+                    attribution_text=None,
+                )
+            ],
+        )
+        fake_session = FakeSession(post)
+        client = app.test_client()
+        with client.session_transaction() as flask_session:
+            flask_session[app_module.BLOG_DRAFT_ACCESS_SESSION_KEY] = True
+
+        with mock.patch.object(app_module, "SessionLocal", return_value=fake_session), mock.patch.object(
+            app_module, "_published_blog_count", return_value=0
+        ):
+            response = client.post("/blog/drafts/draft-post/publish")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual("published", post.status)
+        self.assertIsNotNone(post.published_at)
+        self.assertTrue(fake_session.committed)
+        self.assertIn("/blog/draft-post", response.headers["Location"])
+
     def test_home_page_uses_category_hub_sections(self):
         client = app.test_client()
         response = client.get("/")

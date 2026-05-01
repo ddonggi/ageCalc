@@ -57,6 +57,21 @@
                 {% elif draft_mode %}
                 <p class="blog-date">초안 모드 · 현재 상태: {{ post.status }}</p>
                 {% endif %}
+                {% if draft_mode and post.status == "draft" %}
+                <form method="post" action="{{ url_for('blog_draft_publish', slug=post.slug) }}" style="margin: 0 0 16px;">
+                    <button type="submit" class="page-btn">이 글 공개하기</button>
+                </form>
+                {% if draft_publish_errors %}
+                <div class="result error" style="margin-bottom: 16px;">
+                    <p class="message">아직 공개할 수 없습니다.</p>
+                    <ul>
+                        {% for error in draft_publish_errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                {% endif %}
                 {% if review_mode %}
                 <form method="post" action="{{ url_for('blog_review_approve', post_id=post.id, token=review_token) }}" style="margin: 0 0 16px;">
                     <button type="submit" class="page-btn">이 글 승인 후 공개</button>
