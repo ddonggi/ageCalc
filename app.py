@@ -1769,7 +1769,7 @@ def blog_draft_publish(slug):
     if post is None:
         abort(404)
 
-    audit_result = audit_post(post)
+    audit_result = audit_post(post, require_cover_image=True)
     if not audit_result.keep:
         draft_publish_errors = [issue.message for issue in audit_result.issues]
         return (
@@ -1819,7 +1819,7 @@ def blog_review_approve(post_id):
     post = db_session.query(GeneratedPost).filter(GeneratedPost.id == post_id).first()
     if post is None:
         abort(404)
-    audit_result = audit_post(post)
+    audit_result = audit_post(post, require_cover_image=True)
     if not audit_result.keep:
         review_errors = [issue.message for issue in audit_result.issues]
         return (

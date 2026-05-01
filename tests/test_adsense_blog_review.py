@@ -18,6 +18,7 @@ def _post(**overrides):
         "slug": "test-post",
         "title": "아이 개월 수 계산과 발달 기준을 함께 보는 방법",
         "excerpt": "요약",
+        "cover_image_url": "/static/generated/test-cover.png",
         "content_html": (
             "<h2>아이 개월 수를 보는 기준</h2>"
             "<p>AgeCalc 아이 개월 수 계산기는 생활 기준을 이해하는 데 도움이 됩니다.</p>"
@@ -87,6 +88,12 @@ class AdsenseBlogReviewTests(unittest.TestCase):
 
         self.assertFalse(result.keep)
         self.assertIn("missing_internal_link", result.critical_issue_codes)
+
+    def test_audit_flags_missing_cover_when_required(self):
+        result = audit_post(_post(cover_image_url=None), require_cover_image=True)
+
+        self.assertFalse(result.keep)
+        self.assertIn("missing_cover_image", result.critical_issue_codes)
 
     def test_audit_posts_flags_similar_title_cluster(self):
         posts = [

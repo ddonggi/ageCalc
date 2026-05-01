@@ -44,6 +44,7 @@ from scripts.adsense_blog_review import audit_post  # noqa: E402
 
 Generator = Callable[[str, str], tuple[str, str, str]]
 SourceResolver = Callable[[str], str | None]
+CoverGenerator = Callable[[str, str, str, str], list[str]]
 
 
 @dataclass(frozen=True)
@@ -170,15 +171,18 @@ def _apply_rewrite(
     session,
     post: GeneratedPost,
     *,
+    slug: str,
     title: str,
     excerpt: str,
     content_html: str,
+    cover_image_url: str,
     source_url: str,
 ) -> None:
     post.title = title[:255]
-    post.slug = _unique_slug_for_post(session, title, post.id)
+    post.slug = slug
     post.excerpt = excerpt[:500]
     post.content_html = content_html
+    post.cover_image_url = cover_image_url
     post.status = "draft"
     post.published_at = None
     for source in post.sources or []:
@@ -202,6 +206,7 @@ def rewrite_needs_review_posts(
     model: str,
     source_resolver: SourceResolver = scheduler.resolve_source_url,
     generator: Generator = _generate_with_openai,
+    cover_generator: CoverGenerator = scheduler._generate_cover_with_openai,
 ) -> int:
     changed = 0
     outcomes: list[RewriteOutcome] = []
@@ -228,13 +233,29 @@ def rewrite_needs_review_posts(
             outcomes.append(RewriteOutcome(post.id, title, False, validation_reason))
             continue
 
+        slug = _unique_slug_for_post(session, title, post.id)
+        cover_image_url = post.cover_image_url or ""
+        if apply and not cover_image_url:
+            try:
+                image_urls = cover_generator(title, excerpt, content_html, slug)
+            except Exception as exc:  # noqa: BLE001
+                outcomes.append(RewriteOutcome(post.id, title, False, f"cover_generation_failed:{exc}"))
+                continue
+            if not image_urls:
+                outcomes.append(RewriteOutcome(post.id, title, False, "cover_generation_failed:no_image"))
+                continue
+            cover_image_url = image_urls[0]
+            content_html = scheduler._inject_inline_images(content_html, image_urls)
+
         if apply:
             _apply_rewrite(
                 session,
                 post,
+                slug=slug,
                 title=title,
                 excerpt=excerpt,
                 content_html=content_html,
+                cover_image_url=cover_image_url,
                 source_url=resolved_url,
             )
         changed += 1

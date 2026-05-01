@@ -97,6 +97,9 @@ class BlogRewriteTests(unittest.TestCase):
                 "나이 계산 결과를 생활 일정과 함께 해석하는 방법입니다.",
                 _rich_rewritten_html(),
             ),
+            cover_generator=lambda title, excerpt, content_html, slug: [
+                f"/static/generated/{slug}-cover.png"
+            ],
         )
 
         session.refresh(post)
@@ -105,6 +108,7 @@ class BlogRewriteTests(unittest.TestCase):
         self.assertIsNone(post.published_at)
         self.assertEqual("https://example.com/story", post.sources[0].source_url)
         self.assertIsNone(post.sources[0].attribution_text)
+        self.assertTrue(post.cover_image_url.endswith("-cover.png"))
         self.assertNotIn("Generated from RSS", post.content_html)
 
     def test_rewrite_keeps_post_in_review_when_source_url_cannot_be_resolved(self):

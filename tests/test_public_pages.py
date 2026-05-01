@@ -765,7 +765,7 @@ class PublicPageTests(unittest.TestCase):
             title="초안 글",
             slug="draft-post",
             excerpt="요약",
-            cover_image_url=None,
+            cover_image_url="/static/generated/draft-post-cover.png",
             content_html=content_html,
             published_at=None,
             created_at=None,
@@ -794,6 +794,71 @@ class PublicPageTests(unittest.TestCase):
         self.assertIsNotNone(post.published_at)
         self.assertTrue(fake_session.committed)
         self.assertIn("/blog/draft-post", response.headers["Location"])
+
+    def test_blog_draft_publish_blocks_missing_cover_image(self):
+        class FakeQuery:
+            def __init__(self, post):
+                self.post = post
+
+            def filter(self, *args, **kwargs):
+                return self
+
+            def first(self):
+                return self.post
+
+        class FakeSession:
+            def __init__(self, post):
+                self.post = post
+                self.committed = False
+
+            def query(self, model):
+                return FakeQuery(self.post)
+
+            def commit(self):
+                self.committed = True
+
+        content_html = (
+            "<h2>핵심 요약</h2><p>AgeCalc 계산기와 생활 기준을 함께 살펴보는 설명형 글입니다.</p>"
+            "<h2>배경과 맥락</h2><p>한국 독자가 이해하기 쉽도록 원문 내용을 다시 구성했습니다.</p>"
+            "<h2>한국 독자가 확인할 점</h2><p>생활 일정과 가족 기록에 맞춰 읽을 수 있습니다.</p>"
+            "<h2>AgeCalc 활용 포인트</h2>"
+            '<p><a href="/age">만 나이 계산기</a>로 날짜 기준을 먼저 확인하세요.</p>'
+            "<h2>주의할 점과 한계</h2><p>개별 상황에 따라 해석이 달라질 수 있으므로 참고용으로 활용해야 합니다.</p>"
+            "<h2>참고 링크</h2><p><a href=\"https://example.com/story\">원문 보기</a></p>"
+        ) * 12
+        post = SimpleNamespace(
+            id=1,
+            title="초안 글",
+            slug="draft-post",
+            excerpt="요약",
+            cover_image_url=None,
+            content_html=content_html,
+            published_at=None,
+            created_at=None,
+            updated_at=None,
+            status="draft",
+            sources=[
+                SimpleNamespace(
+                    source_name="Example",
+                    source_url="https://example.com/story",
+                    attribution_text=None,
+                )
+            ],
+        )
+        fake_session = FakeSession(post)
+        client = app.test_client()
+        with client.session_transaction() as flask_session:
+            flask_session[app_module.BLOG_DRAFT_ACCESS_SESSION_KEY] = True
+
+        with mock.patch.object(app_module, "SessionLocal", return_value=fake_session), mock.patch.object(
+            app_module, "_published_blog_count", return_value=0
+        ):
+            response = client.post("/blog/drafts/draft-post/publish")
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual("draft", post.status)
+        self.assertFalse(fake_session.committed)
+        self.assertIn("대표 이미지가 없습니다", response.get_data(as_text=True))
 
     def test_home_page_uses_category_hub_sections(self):
         client = app.test_client()

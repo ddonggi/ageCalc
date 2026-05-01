@@ -177,6 +177,7 @@ def audit_post(
     *,
     similar_title_count: int = 0,
     min_body_chars: int = MIN_BODY_CHARS,
+    require_cover_image: bool = False,
 ) -> BlogAuditResult:
     content_html = getattr(post, "content_html", "") or ""
     title = getattr(post, "title", "") or ""
@@ -202,6 +203,9 @@ def audit_post(
 
     if not sources:
         add_issue("missing_sources", "critical", "참고 자료가 없습니다.", 4)
+
+    if require_cover_image and not (getattr(post, "cover_image_url", "") or "").strip():
+        add_issue("missing_cover_image", "critical", "대표 이미지가 없습니다.", 4)
 
     if "news.google.com/rss/articles" in source_text:
         add_issue("google_news_redirect_source", "critical", "Google News RSS 리디렉션 URL만 출처로 남아 있습니다.", 4)
