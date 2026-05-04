@@ -347,6 +347,18 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("학번별 나이표", html)
         self.assertIn("보통 출생연도", html)
 
+    def test_college_entry_year_calculator_answers_class_year_queries(self):
+        client = app.test_client()
+        response = client.get("/college-entry-year-calculator?year=2026")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn("26학번 몇년생", html)
+        self.assertIn("26학번은 보통 2007년생", html)
+        self.assertIn("2026학번 나이", html)
+        self.assertIn("학번은 입학연도와 같은 뜻인가요?", html)
+        self.assertIn("재수하면 학번과 출생연도가 달라지나요?", html)
+
     def test_college_entry_year_calculator_highlights_selected_entry_year(self):
         client = app.test_client()
         response = client.get("/college-entry-year-calculator?year=2025")
