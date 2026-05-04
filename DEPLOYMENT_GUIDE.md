@@ -258,6 +258,17 @@ https://agecalc.cloud/blog/drafts
 - `/blog/drafts`는 비밀번호 세션 필요
 - `/static/generated/blog-covers/` 이미지 파일 로드 가능
 
+애드센스 재검토 전 사전점검:
+```bash
+cd /srv/apps/agecalc
+set -a
+source .env.rss
+set +a
+/srv/apps/agecalc/.micromamba/envs/agecalc/bin/python scripts/adsense_preflight.py
+```
+
+이 명령은 사이트맵 공개 URL, `noindex`, 애드센스 코드, `robots.txt`, `ads.txt`, 미니게임/비공개 블로그 경로 노출 여부를 점검합니다. 로컬에서 환경 파일을 불러오지 않고 실행하면 SQLite fallback 기준으로 확인합니다.
+
 DB 테이블 확인:
 ```bash
 mysql -u agecalc_user -p -h 127.0.0.1 -D agecalc -e "SHOW TABLES;"
@@ -285,5 +296,6 @@ mysql -u agecalc_user -p -h 127.0.0.1 -D agecalc -e "SHOW TABLES;"
 - [ ] MySQL 연결/권한 확인
 - [ ] `.env.rss` 권한 `600`
 - [ ] 블로그 공개 전 draft 검수
+- [ ] `scripts/adsense_preflight.py` 통과
 - [ ] sitemap과 robots.txt 확인
 - [ ] 로그 모니터링 확인

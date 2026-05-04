@@ -94,7 +94,8 @@ agecalc/
 ├── scripts/
 │   ├── rss_blog_scheduler.py
 │   ├── rewrite_blog_posts.py
-│   └── adsense_blog_review.py
+│   ├── adsense_blog_review.py
+│   └── adsense_preflight.py
 ├── templates/
 ├── static/
 ├── systemd/
