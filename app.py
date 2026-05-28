@@ -1090,11 +1090,11 @@ def school_grade_calculator():
     today = _current_local_date()
     school_year = _current_school_year(today)
     current_year = today.year
-    min_year = max(1990, school_year - 19)
+    min_year = max(1900, current_year - 100)
     max_year = current_year
 
     selected_year = request.args.get('year', type=int)
-    if selected_year is not None and not (1900 <= selected_year <= current_year):
+    if selected_year is not None and not (min_year <= selected_year <= max_year):
         selected_year = None
 
     rows = []
@@ -1124,11 +1124,11 @@ def school_entry_year_table():
     today = _current_local_date()
     school_year = _current_school_year(today)
     current_year = today.year
-    min_year = max(1990, school_year - 19)
+    min_year = max(1900, current_year - 100)
     max_year = current_year
 
     selected_year = request.args.get('year', type=int)
-    if selected_year is not None and not (1900 <= selected_year <= current_year):
+    if selected_year is not None and not (min_year <= selected_year <= max_year):
         selected_year = None
 
     rows = []

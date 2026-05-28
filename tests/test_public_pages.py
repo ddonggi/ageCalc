@@ -91,6 +91,15 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("선택한 출생년도", html)
         self.assertIn("학년 안내", html)
 
+    def test_school_grade_calculator_includes_adult_birth_year_options(self):
+        client = app.test_client()
+        response = client.get("/school-grade-calculator?year=1990")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn('<option value="1990" selected>1990년생</option>', html)
+        self.assertIn("고등학교 졸업 이후", html)
+
     def test_school_entry_year_table_page_is_public(self):
         client = app.test_client()
         response = client.get("/school-entry-year-table")
@@ -111,6 +120,15 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("선택한 출생년도", html)
         self.assertIn("2018년생", html)
         self.assertIn("2025학년도", html)
+
+    def test_school_entry_year_table_includes_adult_birth_year_options(self):
+        client = app.test_client()
+        response = client.get("/school-entry-year-table?year=1990")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn('<option value="1990" selected>1990년생</option>', html)
+        self.assertIn("초등학교 입학은 1997학년도", html)
 
     def test_age_gap_calculator_page_is_public(self):
         client = app.test_client()
