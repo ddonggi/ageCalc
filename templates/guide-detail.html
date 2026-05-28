@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <title>{{ page.title }} | AgeCalc 가이드</title>
+    <meta name="description" content="{{ page.description }}" />
+    <link rel="canonical" href="https://agecalc.cloud/guides/{{ page.slug }}" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="{{ page.title }} | AgeCalc 가이드" />
+    <meta property="og:description" content="{{ page.description }}" />
+    <meta property="og:url" content="https://agecalc.cloud/guides/{{ page.slug }}" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{ page.title }} | AgeCalc 가이드" />
+    <meta name="twitter:description" content="{{ page.description }}" />
+    <meta name="twitter:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+
+    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-16x16.png') }}" sizes="16x16" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=life-calendar-20260505h" />
+    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    {% include 'partials/adsense.html' %}
+</head>
+
+<body class="guide-detail-page">
+    <div id="pixel-background"></div>
+    <div class="container">
+        {% include 'partials/header.html' %}
+
+        <article class="guide-article">
+            <header class="guide-article-header">
+                <p class="eyebrow">AgeCalc 기준 가이드</p>
+                <span class="guide-category-label">{{ page.category_label }}</span>
+                <h1>{{ page.title }}</h1>
+                <p class="page-intro">{{ page.intro }}</p>
+            </header>
+
+            <section class="guide-related-box" aria-label="관련 계산기">
+                <p class="eyebrow">관련 계산기</p>
+                <div class="article-links">
+                    {% for endpoint, label in page.related_links %}
+                    <a href="{{ url_for(endpoint) }}">{{ label }}</a>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <div class="guide-content">
+                {% for heading, paragraphs in page.sections %}
+                <section>
+                    <h2>{{ heading }}</h2>
+                    {% for paragraph in paragraphs %}
+                    <p>{{ paragraph }}</p>
+                    {% endfor %}
+                </section>
+                {% endfor %}
+            </div>
+
+            <section class="guide-faq">
+                <h2>자주 묻는 질문</h2>
+                {% for question, answer in page.faqs %}
+                <details>
+                    <summary>{{ question }}</summary>
+                    <p>{{ answer }}</p>
+                </details>
+                {% endfor %}
+            </section>
+        </article>
+
+        {% include 'partials/footer.html' %}
+    </div>
+
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 동의 여부는 아래에서 선택할 수 있으며, 거부해도 주요 기능은 그대로 이용할 수 있습니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
+</body>
+
+</html>

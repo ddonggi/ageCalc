@@ -8,6 +8,7 @@ from flask import render_template, url_for
 
 import app as app_module
 from app import PUBLIC_SITEMAP_ENDPOINTS, app, _current_local_date
+from content.guide_pages import GUIDE_CATEGORIES, GUIDE_SLUGS
 
 
 class PublicPageTests(unittest.TestCase):
@@ -449,6 +450,27 @@ class PublicPageTests(unittest.TestCase):
                 self.assertIn("tracking-config", html)
                 self.assertNotIn("www.googletagmanager.com/gtag/js", html)
 
+    def test_static_guide_pages_are_public_with_adsense_code(self):
+        client = app.test_client()
+
+        self.assertEqual(18, len(GUIDE_SLUGS))
+        self.assertEqual(len(GUIDE_SLUGS), len(set(GUIDE_SLUGS)))
+        self.assertTrue({"age", "school", "anniversary", "pet", "family"}.issubset(GUIDE_CATEGORIES))
+
+        for slug in GUIDE_SLUGS:
+            with self.subTest(slug=slug):
+                response = client.get(f"/guides/{slug}")
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                self.assertIn(f'<link rel="canonical" href="https://agecalc.cloud/guides/{slug}" />', html)
+                self.assertIn("<h1", html)
+                self.assertIn('name="description"', html)
+                self.assertIn("guide-category-label", html)
+                self.assertIn("관련 계산기", html)
+                self.assertIn("자주 묻는 질문", html)
+                self.assertIn("google-adsense-account", html)
+                self.assertNotIn("noindex", html)
+
     def test_adsense_code_is_not_rendered_on_excluded_pages(self):
         client = app.test_client()
 
@@ -659,6 +681,56 @@ class PublicPageTests(unittest.TestCase):
 
         self.assertIn('<meta name="robots" content="noindex,nofollow" />', html)
         self.assertIn("아직 게시된 글이 없습니다.", html)
+
+    def test_blog_routes_are_noindex_and_without_adsense_by_default(self):
+        class FakeQuery:
+            def __init__(self, post):
+                self.post = post
+
+            def filter(self, *args, **kwargs):
+                return self
+
+            def first(self):
+                return self.post
+
+        class FakeSession:
+            def __init__(self, post):
+                self.post = post
+
+            def query(self, model):
+                return FakeQuery(self.post)
+
+            def close(self):
+                pass
+
+        post = SimpleNamespace(
+            id=1,
+            title="승인 전 숨김 글",
+            slug="hidden-post",
+            excerpt="요약입니다.",
+            cover_image_url=None,
+            content_html="<h2>본문</h2><p>AgeCalc 계산기 안내입니다.</p>",
+            published_at=None,
+            created_at=None,
+            updated_at=None,
+            status="published",
+            sources=[],
+        )
+        client = app.test_client()
+
+        list_response = client.get("/blog")
+        self.assertEqual(list_response.status_code, 200)
+        self.assertEqual(list_response.headers.get("X-Robots-Tag"), "noindex, nofollow")
+        self.assertNotIn("google-adsense-account", list_response.get_data(as_text=True))
+
+        with mock.patch.object(app_module, "SessionLocal", return_value=FakeSession(post)):
+            detail_response = client.get("/blog/hidden-post")
+
+        self.assertEqual(detail_response.status_code, 200)
+        self.assertEqual(detail_response.headers.get("X-Robots-Tag"), "noindex, nofollow")
+        detail_html = detail_response.get_data(as_text=True)
+        self.assertIn('<meta name="robots" content="noindex,nofollow" />', detail_html)
+        self.assertNotIn("google-adsense-account", detail_html)
 
     def test_blog_review_approval_blocks_posts_that_fail_adsense_audit(self):
         class FakeQuery:
@@ -965,6 +1037,15 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("반려견 나이를 사람 기준으로 얼마나 되는지 쉽게 확인할 수 있습니다.", html)
         self.assertNotIn("반려견 나이를 사람 나이로 환산해 보세요", html)
 
+    def test_dog_page_uses_distinct_size_icons(self):
+        client = app.test_client()
+        response = client.get("/dog")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        for size in ("small", "medium", "large", "giant"):
+            self.assertIn(f"dog-size-icon dog-size-icon-{size}", html)
+
     def test_cat_page_uses_natural_intro_copy(self):
         client = app.test_client()
         response = client.get("/cat")
@@ -1045,6 +1126,16 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("https://agecalc.cloud/birthday-dday-calculator", body)
         self.assertNotIn("/minigames", body)
 
+    def test_dynamic_sitemap_includes_static_guides_and_excludes_blog_by_default(self):
+        client = app.test_client()
+        response = client.get("/sitemap.xml")
+
+        self.assertEqual(response.status_code, 200)
+        body = response.get_data(as_text=True)
+        for slug in GUIDE_SLUGS:
+            self.assertIn(f"https://agecalc.cloud/guides/{slug}", body)
+        self.assertNotIn("https://agecalc.cloud/blog", body)
+
     def test_dynamic_sitemap_excludes_blog_when_public_blog_is_not_indexable(self):
         client = app.test_client()
 
@@ -1058,6 +1149,9 @@ class PublicPageTests(unittest.TestCase):
     def test_sitemap_is_served_only_from_dynamic_route(self):
         self.assertFalse(Path("static/sitemap.xml").exists())
         self.assertFalse(Path("generate_sitemap.py").exists())
+
+    def test_default_og_image_asset_exists(self):
+        self.assertTrue(Path("static/images/og-image.png").exists())
 
     def test_navigation_css_promotes_header_above_sections(self):
         css = Path("static/css/style.css").read_text(encoding="utf-8")

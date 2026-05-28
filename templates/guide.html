@@ -22,7 +22,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=life-calendar-20260505h" />
 
     <!-- 파비콘/매니페스트 -->
     <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
@@ -114,6 +114,26 @@
 
             <h3>Q. 연나이는 어디에 쓰이나요?</h3>
             <p>A. 통계나 설문 등 일부 비공식 영역에서 참고용으로 쓰입니다.</p>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <p class="eyebrow">추천 가이드</p>
+                <h2>계산 기준을 더 자세히 보기</h2>
+                <p class="section-intro">나이, 학년, 기념일, 반려동물 나이를 실제 계산 예시와 함께 정리했습니다.</p>
+            </div>
+            <div class="hub-card-grid">
+                {% for guide_page in static_guide_pages %}
+                <a class="hub-card-link" href="{{ url_for('guide_detail', slug=guide_page.slug) }}">
+                    <article class="hub-card calendar-card calendar-card-{{ loop.index % 4 }}">
+                        <span class="hub-card-index">{{ "%02d"|format(loop.index) }}</span>
+                        <span class="guide-category-label">{{ guide_page.category_label }}</span>
+                        <strong>{{ guide_page.title }}</strong>
+                        <p>{{ guide_page.description }}</p>
+                    </article>
+                </a>
+                {% endfor %}
+            </div>
         </section>
 
         <section>

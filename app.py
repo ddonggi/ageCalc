@@ -8,6 +8,7 @@ from pathlib import Path
 import secrets
 from zoneinfo import ZoneInfo
 from controllers.age_controller import AgeController
+from content.guide_pages import GUIDE_PAGE_BY_SLUG, GUIDE_PAGES
 from db import SessionLocal, close_db_session, init_db
 from models.blog_models import GeneratedPost
 from scripts.adsense_blog_review import audit_post
@@ -66,6 +67,12 @@ GOOGLE_SITE_VERIFICATION = os.getenv(
     "q0nvIaon9IVWNZZEQzTRCycYka7jIHuzYu-PwxxoKu8",
 ).strip()
 BLOG_INDEX_MIN_POSTS = int(os.getenv("BLOG_INDEX_MIN_POSTS", "3").strip() or "3")
+BLOG_PUBLIC_INDEXING_ENABLED = (os.getenv("BLOG_PUBLIC_INDEXING_ENABLED", "false") or "false").strip().lower() in {
+    "1",
+    "true",
+    "yes",
+    "on",
+}
 KOREAN_ZODIAC = ["원숭이", "닭", "개", "돼지", "쥐", "소", "호랑이", "토끼", "용", "뱀", "말", "양"]
 GENERATION_LABELS = [
     ((1946, 1964), "베이비붐 세대"),
@@ -211,7 +218,7 @@ def inject_csp_nonce():
     site_navigation = []
     home_navigation_sections = []
     navigation_counts = {}
-    blog_public_count = _published_blog_count()
+    blog_public_count = _published_blog_count() if BLOG_PUBLIC_INDEXING_ENABLED else 0
     blog_public_indexable = _is_blog_public_indexable(blog_public_count)
 
     for group in SITE_NAVIGATION:
@@ -247,6 +254,7 @@ def inject_csp_nonce():
         "home_navigation_sections": home_navigation_sections,
         "footer_policy_links": FOOTER_POLICY_LINKS,
         "navigation_counts": navigation_counts,
+        "static_guide_pages": GUIDE_PAGES,
     }
 
 
@@ -382,6 +390,8 @@ def _published_blog_count() -> int:
 
 
 def _is_blog_public_indexable(published_count: int | None = None) -> bool:
+    if not BLOG_PUBLIC_INDEXING_ENABLED:
+        return False
     count = _published_blog_count() if published_count is None else published_count
     return count >= BLOG_INDEX_MIN_POSTS
 
@@ -911,12 +921,15 @@ def _build_baby_month_snapshot(months: int) -> dict[str, object]:
 def sitemap():
     db_session = SessionLocal()
     try:
-        posts = (
-            db_session.query(GeneratedPost)
-            .filter(GeneratedPost.status == "published")
-            .order_by(GeneratedPost.published_at.desc(), GeneratedPost.id.desc())
-            .all()
-        )
+        if BLOG_PUBLIC_INDEXING_ENABLED:
+            posts = (
+                db_session.query(GeneratedPost)
+                .filter(GeneratedPost.status == "published")
+                .order_by(GeneratedPost.published_at.desc(), GeneratedPost.id.desc())
+                .all()
+            )
+        else:
+            posts = []
 
         newest_post_dt = next(
             (
@@ -933,6 +946,9 @@ def sitemap():
                 continue
             lastmod = _format_sitemap_lastmod(newest_post_dt) if endpoint == "blog_list" else None
             entries.append(_build_sitemap_entry(_absolute_url_for(endpoint), lastmod))
+
+        for page in GUIDE_PAGES:
+            entries.append(_build_sitemap_entry(_absolute_url_for("guide_detail", slug=page["slug"])))
 
         if blog_public_indexable:
             for post in posts:
@@ -953,7 +969,7 @@ def sitemap():
 @app.get('/')
 def index():
     """메인 페이지 - 나이 계산 도구 안내"""
-    return render_template('index.html')
+    return render_template('index.html', today=_current_local_date())
 
 
 @app.route('/age', methods=['GET', 'POST'])
@@ -1623,6 +1639,14 @@ def guide():
     """가이드 페이지"""
     return render_template('guide.html')
 
+@app.route('/guides/<slug>')
+def guide_detail(slug):
+    """Static AdSense approval guide page."""
+    page = GUIDE_PAGE_BY_SLUG.get(slug)
+    if page is None:
+        abort(404)
+    return render_template('guide-detail.html', page=page)
+
 @app.route('/faq')
 def faq():
     """자주 묻는 질문 페이지"""
@@ -1696,7 +1720,19 @@ def blog_detail(slug):
     )
     if post is None:
         abort(404)
-    return render_template('blog-detail.html', post=post, draft_mode=False, review_mode=False)
+    blog_indexable = _is_blog_public_indexable()
+    response = make_response(
+        render_template(
+            'blog-detail.html',
+            post=post,
+            draft_mode=False,
+            review_mode=False,
+            blog_indexable=blog_indexable,
+        )
+    )
+    if not blog_indexable:
+        response.headers["X-Robots-Tag"] = "noindex, nofollow"
+    return response
 
 
 @app.route('/blog/drafts', methods=['GET', 'POST'])

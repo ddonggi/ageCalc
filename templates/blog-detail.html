@@ -7,7 +7,7 @@
 
     <title>{% if review_mode %}[검토] {% elif draft_mode %}[초안] {% endif %}{{ post.title }} | AgeCalc 블로그</title>
     <meta name="description" content="{{ post.excerpt or '' }}" />
-    {% if review_mode or draft_mode %}
+    {% if review_mode or draft_mode or blog_indexable is sameas false %}
     <meta name="robots" content="noindex,nofollow" />
     {% else %}
     <link rel="canonical" href="https://agecalc.cloud/blog/{{ post.slug }}" />
@@ -33,7 +33,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=life-calendar-20260505h" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
