@@ -74,3 +74,12 @@ class PostSource(Base):
 
     post: Mapped["GeneratedPost"] = relationship("GeneratedPost", back_populates="sources")
     feed_item: Mapped["FeedItem"] = relationship("FeedItem", back_populates="mapped_posts")
+
+
+class PageFeedback(Base):
+    __tablename__ = "page_feedback"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    page_path: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    vote: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False, index=True)

@@ -9,6 +9,7 @@ from flask import render_template, url_for
 import app as app_module
 from app import PUBLIC_SITEMAP_ENDPOINTS, app, _current_local_date
 from content.guide_pages import GUIDE_CATEGORIES, GUIDE_SLUGS
+from models.blog_models import PageFeedback
 
 
 class PublicPageTests(unittest.TestCase):
@@ -419,6 +420,64 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("5월 10일", html)
         self.assertIn(expected_date, html)
         self.assertIn("다음 생일", html)
+
+    def test_age_page_renders_feedback_widget(self):
+        client = app.test_client()
+        response = client.get("/age")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn("이 페이지가 도움이 됐나요?", html)
+        self.assertIn("도움됨", html)
+        self.assertIn("아쉬움", html)
+        self.assertIn('data-page-feedback="/age"', html)
+        self.assertIn("static/js/page-feedback.js", html)
+        self.assertLess(html.index("이 페이지가 도움이 됐나요?"), html.index('<footer class="footer">'))
+
+    def test_page_feedback_api_records_age_feedback(self):
+        class FakeSession:
+            def __init__(self):
+                self.added = None
+                self.committed = False
+                self.closed = False
+
+            def add(self, obj):
+                self.added = obj
+
+            def commit(self):
+                self.committed = True
+
+            def close(self):
+                self.closed = True
+
+        fake_session = FakeSession()
+
+        with mock.patch.object(app_module, "SessionLocal", return_value=fake_session):
+            response = app.test_client().post(
+                "/page-feedback",
+                json={"page_path": "/age", "vote": "helpful"},
+            )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual({"ok": True}, response.get_json())
+        self.assertIsInstance(fake_session.added, PageFeedback)
+        self.assertEqual("/age", fake_session.added.page_path)
+        self.assertEqual("helpful", fake_session.added.vote)
+        self.assertTrue(fake_session.committed)
+        self.assertTrue(fake_session.closed)
+
+    def test_page_feedback_api_rejects_invalid_payloads(self):
+        client = app.test_client()
+
+        for payload in [
+            {},
+            {"page_path": "/age", "vote": "spam"},
+            {"page_path": "/dog", "vote": "helpful"},
+        ]:
+            with self.subTest(payload=payload):
+                response = client.post("/page-feedback", json=payload)
+                self.assertEqual(response.status_code, 400)
+                self.assertEqual({"ok": False}, response.get_json())
 
     def test_home_page_removes_minigames_from_primary_navigation(self):
         client = app.test_client()
@@ -1072,6 +1131,17 @@ class PublicPageTests(unittest.TestCase):
         html = response.get_data(as_text=True)
         self.assertIn("<h1>개인정보처리방침</h1>", html)
         self.assertNotIn("개인정보 처리 방침", html)
+
+    def test_privacy_page_discloses_page_feedback_storage(self):
+        client = app.test_client()
+        response = client.get("/privacy")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn("페이지 품질 개선", html)
+        self.assertIn("페이지 경로", html)
+        self.assertIn("선택한 피드백", html)
+        self.assertIn("브라우저 저장소", html)
 
     def test_terms_page_uses_clearer_intro_copy(self):
         client = app.test_client()

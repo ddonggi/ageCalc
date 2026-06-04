@@ -555,6 +555,8 @@
         </section>
 
 
+        {% include 'partials/page-feedback.html' with context %}
+
         <!-- 푸터 -->
         {% include 'partials/footer.html' %}
     </div>
@@ -575,6 +577,7 @@
     </button>
 
     <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/page-feedback.js') }}" defer></script>
 </body>
 
 </html>

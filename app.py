@@ -10,7 +10,7 @@ from zoneinfo import ZoneInfo
 from controllers.age_controller import AgeController
 from content.guide_pages import GUIDE_PAGE_BY_SLUG, GUIDE_PAGES
 from db import SessionLocal, close_db_session, init_db
-from models.blog_models import GeneratedPost
+from models.blog_models import GeneratedPost, PageFeedback
 from scripts.adsense_blog_review import audit_post
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -406,6 +406,10 @@ def _adsense_is_enabled_for_path(path: str, *, blog_public_indexable: bool | Non
         if not blog_public_indexable:
             return False
     return bool(ADSENSE_CLIENT_ID)
+
+
+def _is_valid_page_feedback_payload(page_path: str, vote: str) -> bool:
+    return page_path == "/age" and vote in {"helpful", "unhelpful"}
 
 
 def _build_sitemap_entry(loc: str, lastmod: str | None = None) -> str:
@@ -1028,7 +1032,8 @@ def age():
                          year=year if 'year' in locals() else None, 
                          month=month if 'month' in locals() else None, 
                          day=day if 'day' in locals() else None,
-                         calendar_type=calendar_type if 'calendar_type' in locals() else 'solar')
+                         calendar_type=calendar_type if 'calendar_type' in locals() else 'solar',
+                         page_path="/age")
 
 @app.route('/privacy')
 def privacy():
@@ -1676,6 +1681,28 @@ def d_day():
 def parent_child():
     """부모·자녀 나이 관계 계산 페이지"""
     return render_template('parent-child.html')
+
+
+@app.post("/page-feedback")
+def page_feedback():
+    data = request.get_json(silent=True) or {}
+    page_path = (data.get("page_path") or "").strip()
+    vote = (data.get("vote") or "").strip()
+    if not _is_valid_page_feedback_payload(page_path, vote):
+        return jsonify({"ok": False}), 400
+
+    db_session = SessionLocal()
+    try:
+        db_session.add(PageFeedback(page_path=page_path, vote=vote))
+        db_session.commit()
+    except Exception:
+        if hasattr(db_session, "rollback"):
+            db_session.rollback()
+        return jsonify({"ok": False}), 500
+    finally:
+        db_session.close()
+
+    return jsonify({"ok": True}), 201
 
 
 @app.route('/blog')

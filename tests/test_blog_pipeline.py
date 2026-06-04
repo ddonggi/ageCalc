@@ -5,15 +5,26 @@ from datetime import datetime
 from types import SimpleNamespace
 from unittest import mock
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import sessionmaker
 
 from db import Base
-from models.blog_models import FeedItem, FeedSource, GeneratedPost
+from models.blog_models import FeedItem, FeedSource, GeneratedPost, PageFeedback
 from scripts import rss_blog_scheduler as scheduler
 
 
 class BlogPipelineTests(unittest.TestCase):
+    def test_page_feedback_table_is_created_from_metadata(self):
+        engine = create_engine("sqlite:///:memory:", future=True)
+        Base.metadata.create_all(bind=engine)
+
+        table_names = set(inspect(engine).get_table_names())
+
+        self.assertIn("page_feedback", table_names)
+        self.assertIn("page_path", PageFeedback.__table__.columns)
+        self.assertIn("vote", PageFeedback.__table__.columns)
+        self.assertIn("created_at", PageFeedback.__table__.columns)
+
     def _make_feed_item(self, **overrides):
         defaults = {
             "original_title": "Can humans live to 150? New anti-aging research sparks global debate",
