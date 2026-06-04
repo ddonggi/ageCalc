@@ -54,6 +54,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
         self.assertIn("출생년도별 나이표", html)
+        self.assertIn("몇년생 몇살", html)
         self.assertIn("출생년도만 선택하면", html)
         self.assertIn("만나이 범위", html)
         self.assertIn("띠", html)
@@ -362,6 +363,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
         self.assertIn("대학 학번 나이 계산기", html)
+        self.assertIn("대학교 입학년도 계산", html)
         self.assertIn("25학번은 보통 몇 년생", html)
         self.assertIn("학번별 나이표", html)
         self.assertIn("보통 출생연도", html)
@@ -471,8 +473,10 @@ class PublicPageTests(unittest.TestCase):
     def test_static_guide_pages_are_public_with_adsense_code(self):
         client = app.test_client()
 
-        self.assertEqual(18, len(GUIDE_SLUGS))
+        self.assertEqual(20, len(GUIDE_SLUGS))
         self.assertEqual(len(GUIDE_SLUGS), len(set(GUIDE_SLUGS)))
+        self.assertIn("elementary-school-entry-target-2026", GUIDE_SLUGS)
+        self.assertIn("sixtieth-seventieth-eightieth-age-guide", GUIDE_SLUGS)
         self.assertTrue({"age", "school", "anniversary", "pet", "family"}.issubset(GUIDE_CATEGORIES))
 
         for slug in GUIDE_SLUGS:
@@ -488,6 +492,38 @@ class PublicPageTests(unittest.TestCase):
                 self.assertIn("자주 묻는 질문", html)
                 self.assertIn("google-adsense-account", html)
                 self.assertNotIn("noindex", html)
+
+    def test_search_keyword_guides_cover_non_duplicate_queries(self):
+        client = app.test_client()
+
+        entry_response = client.get("/guides/elementary-school-entry-target-2026")
+        self.assertEqual(entry_response.status_code, 200)
+        entry_html = entry_response.get_data(as_text=True)
+        self.assertIn("2026년 초등학교 입학 대상자", entry_html)
+        self.assertIn("2019년생", entry_html)
+        self.assertIn("입학통지서", entry_html)
+
+        milestone_response = client.get("/guides/sixtieth-seventieth-eightieth-age-guide")
+        self.assertEqual(milestone_response.status_code, 200)
+        milestone_html = milestone_response.get_data(as_text=True)
+        self.assertIn("환갑", milestone_html)
+        self.assertIn("칠순", milestone_html)
+        self.assertIn("팔순", milestone_html)
+
+    def test_existing_pages_cover_duplicate_keyword_queries(self):
+        client = app.test_client()
+
+        birth_year_response = client.get("/birth-year-age-table")
+        self.assertEqual(birth_year_response.status_code, 200)
+        self.assertIn("몇년생 몇살", birth_year_response.get_data(as_text=True))
+
+        early_birth_response = client.get("/guides/early-birth-school-grade-guide")
+        self.assertEqual(early_birth_response.status_code, 200)
+        self.assertIn("빠른년생 학년 계산", early_birth_response.get_data(as_text=True))
+
+        college_response = client.get("/college-entry-year-calculator")
+        self.assertEqual(college_response.status_code, 200)
+        self.assertIn("대학교 입학년도 계산", college_response.get_data(as_text=True))
 
     def test_adsense_code_is_not_rendered_on_excluded_pages(self):
         client = app.test_client()
