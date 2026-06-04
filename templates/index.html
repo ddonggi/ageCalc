@@ -5,20 +5,20 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-    <title>나이 계산 도구 모음 | AgeCalc</title>
-    <meta name="description" content="만나이, 연나이, 생년월일 기반의 다양한 나이 계산을 한 곳에서 제공합니다. 필요한 계산 페이지로 이동해 보세요." />
+    <title>오늘 기준 생활 나이 캘린더 | AgeCalc</title>
+    <meta name="description" content="만나이, 학년, 생일 D-day, 반려동물 나이와 육아 기준을 오늘 기준 생활 일정처럼 확인하세요." />
 
     <link rel="canonical" href="https://agecalc.cloud/" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="AgeCalc" />
-    <meta property="og:title" content="나이 계산 도구 모음 | AgeCalc" />
-    <meta property="og:description" content="만나이, 연나이, 생년월일 기반의 다양한 나이 계산을 한 곳에서 제공합니다." />
+    <meta property="og:title" content="오늘 기준 생활 나이 캘린더 | AgeCalc" />
+    <meta property="og:description" content="만나이, 학년, 생일 D-day, 반려동물 나이와 육아 기준을 오늘 기준으로 확인하세요." />
     <meta property="og:url" content="https://agecalc.cloud/" />
     <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="나이 계산 도구 모음 | AgeCalc" />
-    <meta name="twitter:description" content="만나이, 연나이, 생년월일 기반의 다양한 나이 계산을 한 곳에서 제공합니다." />
+    <meta name="twitter:title" content="오늘 기준 생활 나이 캘린더 | AgeCalc" />
+    <meta name="twitter:description" content="만나이, 학년, 생일 D-day, 반려동물 나이와 육아 기준을 오늘 기준으로 확인하세요." />
     <meta name="twitter:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
     <link rel="icon" href="/favicon.ico">
@@ -30,9 +30,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=life-calendar-20260505h" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
@@ -43,47 +41,144 @@
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <section class="hero-band hero-command-board">
-            <div class="hero-copy">
-                <p class="eyebrow">대표 안내</p>
-                <h1>필요한 계산과 기준을 카테고리별로 바로 이동하세요</h1>
-                <p class="page-intro">
-                    AgeCalc는 생활 계산기와 기준 안내를 한 흐름으로 묶은 서비스입니다. 직접 계산하는 페이지,
-                    빠르게 비교하는 표, 기준을 설명하는 안내 문서를 나눠 배치해 필요한 정보로 곧바로 이동할 수 있게 했습니다.
-                </p>
-                <div class="hero-actions">
-                    <a class="btn btn-primary" href="{{ url_for('age') }}">대표 계산기 시작</a>
-                    <a class="btn btn-secondary" href="{{ url_for('blog_list') }}">설명 글 보기</a>
-                </div>
+        <section class="hero-band hero-command-board life-calendar-hero">
+            <div class="calendar-week-row" aria-hidden="true">
+                <span class="is-today">일</span>
+                <span>월</span>
+                <span>화</span>
+                <span>수</span>
+                <span>목</span>
+                <span>금</span>
+                <span>토</span>
             </div>
-            <div class="hero-command" aria-label="핵심 정보 미리보기">
-                <article class="command-panel command-panel-primary">
-                    <p class="command-label">탐색 구조</p>
-                    <h2>계산기, 표·비교, 안내를 같은 기준으로 정리했습니다</h2>
-                    <p>헤더 메가메뉴와 홈 섹션이 같은 구조를 쓰기 때문에 한 번 익히면 어디서든 필요한 페이지를 빠르게 찾을 수 있습니다.</p>
-                </article>
-                <div class="command-grid">
-                    <article class="command-panel">
-                        <p class="command-label">계산기</p>
-                        <strong>{{ navigation_counts.calculators }}</strong>
-                        <span>입력형 핵심 도구</span>
-                    </article>
-                    <article class="command-panel">
-                        <p class="command-label">표·비교</p>
-                        <strong>{{ navigation_counts.reference }}</strong>
-                        <span>빠른 확인 페이지</span>
-                    </article>
-                    <article class="command-panel">
-                        <p class="command-label">안내</p>
-                        <strong>{{ navigation_counts.guides }}</strong>
-                        <span>기준과 운영 문서</span>
-                    </article>
+
+            <div class="calendar-sheet">
+                <div class="hero-copy calendar-copy">
+                    <p class="eyebrow">Life Calendar</p>
+                    <h1>오늘 기준<br>생활 나이 캘린더</h1>
+                    <span class="calendar-stamp" aria-hidden="true">Life<br>Calendar</span>
+                    <p class="page-intro">
+                        만나이, 학년, 생일, 반려동물 나이와 육아 기준을 날짜표처럼 정리해
+                        오늘 필요한 생활 기준으로 카테고리별로 바로 이동할 수 있습니다.
+                    </p>
+                    <div class="hero-actions">
+                        <a class="btn btn-primary" href="{{ url_for('age') }}">만나이 계산하기</a>
+                        <a class="btn btn-secondary" href="{{ url_for('school_grade_calculator') }}">학년 기준 보기</a>
+                    </div>
                 </div>
+
+                <div class="hero-command life-timeline" aria-label="오늘 기준 생활 이벤트 미리보기">
+                    <div class="timeline-head">
+                        <div>
+                            <p class="command-label">오늘 기준</p>
+                            <strong>{{ today.strftime("%Y.%m.%d") }}</strong>
+                        </div>
+                        <span>{{ ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"][today.weekday()] }}</span>
+                    </div>
+                    <ol class="timeline-list">
+                        <li>
+                            <span class="timeline-time">09:00</span>
+                            <a class="timeline-event" href="{{ url_for('school_grade_calculator') }}">
+                                <span class="event-index">01</span>
+                                <span>
+                                    <small>학년</small>
+                                    <strong>초등 3학년</strong>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <span class="timeline-time">10:00</span>
+                            <a class="timeline-event" href="{{ url_for('birthday_dday_calculator') }}">
+                                <span class="event-index">02</span>
+                                <span>
+                                    <small>생일 D-day</small>
+                                    <strong>D-42</strong>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <span class="timeline-time">14:00</span>
+                            <a class="timeline-event" href="{{ url_for('dog') }}">
+                                <span class="event-index">03</span>
+                                <span>
+                                    <small>반려동물 나이</small>
+                                    <strong>7세 4개월</strong>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <span class="timeline-time">16:00</span>
+                            <a class="timeline-event" href="{{ url_for('baby_months') }}">
+                                <span class="event-index">04</span>
+                                <span>
+                                    <small>육아 기준</small>
+                                    <strong>28개월 12일</strong>
+                                </span>
+                            </a>
+                        </li>
+                    </ol>
+                </div>
+
+                <nav class="calendar-side-tabs" aria-label="주요 계산기 빠른 이동">
+                    <a class="is-primary" href="{{ url_for('age') }}">만나이</a>
+                    <a href="{{ url_for('school_grade_calculator') }}">학년</a>
+                    <a href="{{ url_for('birthday_dday_calculator') }}">생일</a>
+                    <a href="{{ url_for('dog') }}">반려동물</a>
+                </nav>
+            </div>
+
+            <div class="calendar-date-strip" aria-hidden="true">
+                <span>26</span>
+                <span>27</span>
+                <span>28</span>
+                <span>29</span>
+                <span>30</span>
+                <span>1</span>
+                <span>2</span>
             </div>
         </section>
 
+        <section class="home-preview-deck" aria-label="자주 찾는 생활 계산 미리보기">
+            <a class="preview-card preview-table" href="{{ url_for('birth_year_age_table') }}">
+                <strong>출생연도 나이표</strong>
+                <span class="preview-arrow" aria-hidden="true">›</span>
+                <div class="mini-table" aria-hidden="true">
+                    <span>출생연도</span><span>만나이</span><span>한국 나이</span>
+                    <span>2026</span><span>0</span><span>1</span>
+                    <span>2025</span><span>1</span><span>2</span>
+                    <span>2024</span><span>2</span><span>3</span>
+                </div>
+            </a>
+            <a class="preview-card preview-entry" href="{{ url_for('school_entry_year_table') }}">
+                <strong>입학연도 계산</strong>
+                <span class="preview-arrow" aria-hidden="true">›</span>
+                <p>출생연도</p>
+                <div class="year-tiles" aria-hidden="true">
+                    <span>2</span><span>0</span><span>1</span><span>9</span>
+                    <b>→</b>
+                    <span>2</span><span>0</span><span>2</span><span>6</span>
+                </div>
+            </a>
+            <a class="preview-card preview-stamp" href="{{ url_for('birth_year_zodiac_table') }}">
+                <strong>띠 나이표</strong>
+                <span class="preview-arrow" aria-hidden="true">›</span>
+                <small>2026년 기준</small>
+                <div class="stamp-table" aria-hidden="true">
+                    <span>호랑이띠</span><span>2010</span><span>16</span>
+                    <span>토끼띠</span><span>2011</span><span>15</span>
+                </div>
+            </a>
+            <a class="preview-card preview-note" href="{{ url_for('baby_months') }}">
+                <strong>아기 개월수</strong>
+                <span class="preview-arrow" aria-hidden="true">›</span>
+                <p>생년월일 <span>2024.02.23</span></p>
+                <b>15개월 12일</b>
+                <small>다음 기념일 16개월 D-19</small>
+            </a>
+        </section>
+
         {% for section in home_navigation_sections %}
-        <section class="section-shell category-hub-section" id="section-{{ section.key }}">
+        <section class="section-shell category-hub-section calendar-hub-section hub-{{ section.key }}" id="section-{{ section.key }}">
             <div class="section-heading">
                 <p class="eyebrow">{{ section.section_label }}</p>
                 <h2>{{ section.title }}</h2>
@@ -93,7 +188,8 @@
             <div class="hub-card-grid">
                 {% for link in section.links %}
                 <a class="hub-card-link" href="{{ url_for(link.endpoint) }}">
-                    <article class="hub-card">
+                    <article class="hub-card calendar-card calendar-card-{{ loop.index % 4 }}">
+                        <span class="hub-card-index">{{ "%02d"|format(loop.index) }}</span>
                         <strong>{{ link.label }}</strong>
                         <p>{{ link.summary }}</p>
                     </article>
