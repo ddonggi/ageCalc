@@ -1,6 +1,7 @@
 import os
 import tempfile
 import unittest
+from datetime import datetime
 from types import SimpleNamespace
 from unittest import mock
 
@@ -117,6 +118,95 @@ class BlogPipelineTests(unittest.TestCase):
         )
 
         self.assertEqual("CBMiabc123", article_id)
+
+    def test_upsert_feed_items_skips_existing_truncated_url(self):
+        engine = create_engine("sqlite:///:memory:", future=True)
+        Session = sessionmaker(bind=engine, autocommit=False, autoflush=False, future=True)
+        Base.metadata.create_all(bind=engine)
+
+        session = Session()
+        source = FeedSource(name="Google News", rss_url="https://example.com/rss")
+        session.add(source)
+        session.flush()
+
+        long_url = "https://news.google.com/rss/articles/" + ("a" * 620) + "?oc=5"
+        session.add(
+            FeedItem(
+                source_id=source.id,
+                original_title="기존 기사",
+                original_url=long_url[:500],
+                summary="기존 요약",
+                content="기존 본문",
+                status="new",
+            )
+        )
+        session.commit()
+
+        duplicate_items = []
+        created = scheduler.upsert_feed_items(
+            session,
+            source,
+            [
+                {
+                    "title": "새 기사처럼 보이는 중복",
+                    "url": long_url,
+                    "published_at": datetime(2026, 5, 11, 12, 0),
+                    "summary": "요약",
+                    "content": "본문",
+                }
+            ],
+            duplicate_items=duplicate_items,
+        )
+        session.commit()
+
+        self.assertEqual(0, created)
+        self.assertEqual(1, session.query(FeedItem).count())
+        self.assertEqual(1, len(duplicate_items))
+        self.assertEqual("duplicate-url", duplicate_items[0]["reason"])
+
+    def test_duplicate_skip_notice_is_sent_when_only_duplicates_exist(self):
+        duplicate_items = [
+            {
+                "source_name": "Google News",
+                "title": "이미 처리한 기사",
+                "url": "https://example.com/story",
+                "reason": "duplicate-url",
+            }
+        ]
+
+        with mock.patch.object(scheduler, "_send_duplicate_skip_email") as send_duplicate_email:
+            sent = scheduler._notify_duplicate_skip_if_needed(
+                duplicate_items=duplicate_items,
+                source_count=1,
+                new_items=0,
+                created_posts=0,
+                status="draft",
+            )
+
+        self.assertTrue(sent)
+        send_duplicate_email.assert_called_once()
+
+    def test_duplicate_skip_notice_is_not_sent_when_post_was_created(self):
+        duplicate_items = [
+            {
+                "source_name": "Google News",
+                "title": "이미 처리한 기사",
+                "url": "https://example.com/story",
+                "reason": "duplicate-url",
+            }
+        ]
+
+        with mock.patch.object(scheduler, "_send_duplicate_skip_email") as send_duplicate_email:
+            sent = scheduler._notify_duplicate_skip_if_needed(
+                duplicate_items=duplicate_items,
+                source_count=1,
+                new_items=0,
+                created_posts=1,
+                status="draft",
+            )
+
+        self.assertFalse(sent)
+        send_duplicate_email.assert_not_called()
 
     def test_create_posts_marks_generation_failures_as_needs_review(self):
         engine = create_engine("sqlite:///:memory:", future=True)

@@ -685,13 +685,11 @@ def _cleanup_generated_images(image_urls: list[str]) -> None:
             pass
 
 
-def _send_review_email(post: GeneratedPost) -> None:
+def _smtp_delivery_settings() -> SimpleNamespace | None:
     smtp_host = os.getenv("SMTP_HOST", "").strip()
     smtp_to = os.getenv("SMTP_TO_EMAIL", "").strip()
-    review_token = (os.getenv("BLOG_REVIEW_TOKEN", "") or "").strip()
-    base_url = (os.getenv("BLOG_BASE_URL", "https://agecalc.cloud") or "").rstrip("/")
-    if not smtp_host or not smtp_to or not review_token:
-        return
+    if not smtp_host or not smtp_to:
+        return None
 
     try:
         smtp_port = int(os.getenv("SMTP_PORT", str(DEFAULT_SMTP_PORT)).strip())
@@ -702,13 +700,44 @@ def _send_review_email(post: GeneratedPost) -> None:
     smtp_password = os.getenv("SMTP_PASSWORD", "").strip()
     smtp_from = (os.getenv("SMTP_FROM_EMAIL", smtp_username or smtp_to) or "").strip()
     use_tls = _env_bool("SMTP_USE_TLS", default=True)
+    return SimpleNamespace(
+        host=smtp_host,
+        port=smtp_port,
+        to=smtp_to,
+        username=smtp_username,
+        password=smtp_password,
+        from_email=smtp_from,
+        use_tls=use_tls,
+    )
+
+
+def _send_email_message(msg: EmailMessage, settings: SimpleNamespace) -> None:
+    with smtplib.SMTP(settings.host, settings.port, timeout=20) as client:
+        client.ehlo()
+        if settings.use_tls:
+            client.starttls()
+            client.ehlo()
+        if settings.password and not settings.username:
+            raise RuntimeError("SMTP_USERNAME is required when SMTP_PASSWORD is set")
+        if settings.username:
+            client.login(settings.username, settings.password)
+        client.send_message(msg)
+
+
+def _send_review_email(post: GeneratedPost) -> None:
+    settings = _smtp_delivery_settings()
+    review_token = (os.getenv("BLOG_REVIEW_TOKEN", "") or "").strip()
+    base_url = (os.getenv("BLOG_BASE_URL", "https://agecalc.cloud") or "").rstrip("/")
+    if settings is None or not review_token:
+        return
+
     review_url = f"{base_url}/blog/review/{post.id}?token={urllib.parse.quote(review_token)}"
     approve_url = f"{base_url}/blog/review/{post.id}/approve?token={urllib.parse.quote(review_token)}"
 
     msg = EmailMessage()
     msg["Subject"] = f"[AgeCalc] 블로그 초안 검토 필요: {post.title}"
-    msg["From"] = smtp_from
-    msg["To"] = smtp_to
+    msg["From"] = settings.from_email
+    msg["To"] = settings.to
     msg.set_content(
         "\n".join(
             [
@@ -724,17 +753,71 @@ def _send_review_email(post: GeneratedPost) -> None:
         )
     )
 
-    with smtplib.SMTP(smtp_host, smtp_port, timeout=20) as client:
-        client.ehlo()
-        if use_tls:
-            client.starttls()
-            client.ehlo()
-        if smtp_password and not smtp_username:
-            raise RuntimeError("SMTP_USERNAME is required when SMTP_PASSWORD is set")
-        if smtp_username:
-            client.login(smtp_username, smtp_password)
-        client.send_message(msg)
+    _send_email_message(msg, settings)
     print(f"[notify] sent review email for post_id={post.id}")
+
+
+def _send_duplicate_skip_email(
+    duplicate_items: list[dict[str, Any]],
+    source_count: int,
+    new_items: int,
+    created_posts: int,
+    status: str,
+) -> None:
+    settings = _smtp_delivery_settings()
+    if settings is None or not duplicate_items:
+        return
+
+    sample_lines = []
+    for item in duplicate_items[:8]:
+        title = _normalize_space(item.get("title") or "(제목 없음)")
+        source_name = _normalize_space(item.get("source_name") or "")
+        reason = _normalize_space(item.get("reason") or "duplicate")
+        url = (item.get("url") or "").strip()
+        sample_lines.append(f"- [{reason}] {title} / {source_name}\n  {url}")
+
+    msg = EmailMessage()
+    msg["Subject"] = f"[AgeCalc] 블로그 자동 발행 안 함: 중복 후보 {len(duplicate_items)}건"
+    msg["From"] = settings.from_email
+    msg["To"] = settings.to
+    msg.set_content(
+        "\n".join(
+            [
+                "이번 RSS 블로그 자동 실행에서 중복 후보가 확인되어 새 글 발행/초안 생성을 진행하지 않았습니다.",
+                "",
+                f"확인한 RSS 소스 수: {source_count}",
+                f"새로 저장된 RSS 후보 수: {new_items}",
+                f"생성된 블로그 글 수: {created_posts}",
+                f"요청 상태: {status}",
+                f"중복으로 스킵한 후보 수: {len(duplicate_items)}",
+                "",
+                "중복 후보 예시:",
+                *sample_lines,
+            ]
+        )
+    )
+
+    _send_email_message(msg, settings)
+    print(f"[notify] sent duplicate skip email duplicates={len(duplicate_items)}")
+
+
+def _notify_duplicate_skip_if_needed(
+    duplicate_items: list[dict[str, Any]],
+    source_count: int,
+    new_items: int,
+    created_posts: int,
+    status: str,
+) -> bool:
+    if not duplicate_items or new_items != 0 or created_posts != 0:
+        return False
+    _send_duplicate_skip_email(
+        duplicate_items=duplicate_items,
+        source_count=source_count,
+        new_items=new_items,
+        created_posts=created_posts,
+        status=status,
+    )
+    return True
 
 
 def _generate_with_openai(feed_item: FeedItem, model: str, feedback: str = "") -> tuple[str, str, str]:
@@ -837,7 +920,12 @@ def _generate_with_ollama(
     return _parse_generated_json(text)
 
 
-def upsert_feed_items(session, source: FeedSource, parsed_items: list[dict[str, Any]]) -> int:
+def upsert_feed_items(
+    session,
+    source: FeedSource,
+    parsed_items: list[dict[str, Any]],
+    duplicate_items: list[dict[str, Any]] | None = None,
+) -> int:
     normalized_rows: list[dict[str, Any]] = []
     candidate_urls: set[str] = set()
 
@@ -846,9 +934,11 @@ def upsert_feed_items(session, source: FeedSource, parsed_items: list[dict[str, 
         title = _normalize_space(item.get("title") or "")
         if not url or not title:
             continue
+        stored_url = url[:500]
         normalized_rows.append(
             {
                 "url": url,
+                "stored_url": stored_url,
                 "title": title,
                 "published_at": item.get("published_at"),
                 "summary": item.get("summary") or "",
@@ -856,7 +946,7 @@ def upsert_feed_items(session, source: FeedSource, parsed_items: list[dict[str, 
                 "content_hash": _content_hash(item),
             }
         )
-        candidate_urls.add(url)
+        candidate_urls.add(stored_url)
 
     existing_urls: set[str] = set()
     if candidate_urls:
@@ -884,19 +974,40 @@ def upsert_feed_items(session, source: FeedSource, parsed_items: list[dict[str, 
     seen_story_keys: set[tuple[int, str, datetime]] = set()
     for row in normalized_rows:
         url = row["url"]
+        stored_url = row["stored_url"]
         story_key = _story_identity_key(source.id, row["title"], row["published_at"])
-        if url in existing_urls or url in seen_urls:
+        if stored_url in existing_urls or stored_url in seen_urls:
+            if duplicate_items is not None:
+                duplicate_items.append(
+                    {
+                        "source_id": source.id,
+                        "source_name": source.name,
+                        "title": row["title"],
+                        "url": url,
+                        "reason": "duplicate-url",
+                    }
+                )
             continue
         if story_key is not None and (story_key in existing_story_keys or story_key in seen_story_keys):
+            if duplicate_items is not None:
+                duplicate_items.append(
+                    {
+                        "source_id": source.id,
+                        "source_name": source.name,
+                        "title": row["title"],
+                        "url": url,
+                        "reason": "duplicate-story",
+                    }
+                )
             continue
-        seen_urls.add(url)
+        seen_urls.add(stored_url)
         if story_key is not None:
             seen_story_keys.add(story_key)
         session.add(
             FeedItem(
                 source_id=source.id,
                 original_title=row["title"][:255],
-                original_url=url[:500],
+                original_url=stored_url,
                 published_at=row["published_at"],
                 summary=row["summary"][:100000],
                 content=row["content"][:200000],
@@ -908,22 +1019,23 @@ def upsert_feed_items(session, source: FeedSource, parsed_items: list[dict[str, 
     return created
 
 
-def ingest_sources(session, timeout: int) -> tuple[int, int]:
+def ingest_sources(session, timeout: int) -> tuple[int, int, list[dict[str, Any]]]:
     total_sources = 0
     total_items = 0
+    duplicate_items: list[dict[str, Any]] = []
     sources = session.scalars(select(FeedSource).where(FeedSource.is_active == 1)).all()
     for source in sources:
         total_sources += 1
         try:
             raw = _fetch(source.rss_url, timeout=timeout)
             parsed = _parse_feed(raw)
-            created = upsert_feed_items(session, source, parsed)
+            created = upsert_feed_items(session, source, parsed, duplicate_items=duplicate_items)
             total_items += created
             print(f"[ingest] {source.name}: parsed={len(parsed)} created={created}")
         except (urllib.error.URLError, TimeoutError, ET.ParseError) as exc:
             print(f"[ingest] {source.name}: failed={exc}", file=sys.stderr)
     session.commit()
-    return total_sources, total_items
+    return total_sources, total_items, duplicate_items
 
 
 def create_posts(
@@ -1248,7 +1360,7 @@ def cmd_run(
     init_db()
     session = SessionLocal()
     try:
-        source_count, new_items = ingest_sources(session, timeout=timeout)
+        source_count, new_items, duplicate_items = ingest_sources(session, timeout=timeout)
         created_posts = create_posts(
             session=session,
             limit=limit,
@@ -1258,8 +1370,17 @@ def cmd_run(
             ollama_url=ollama_url,
             dry_run=dry_run,
         )
+        if not dry_run:
+            _notify_duplicate_skip_if_needed(
+                duplicate_items=duplicate_items,
+                source_count=source_count,
+                new_items=new_items,
+                created_posts=created_posts,
+                status=status,
+            )
         print(
-            f"[done] sources={source_count} new_items={new_items} created_posts={created_posts} "
+            f"[done] sources={source_count} new_items={new_items} duplicates={len(duplicate_items)} "
+            f"created_posts={created_posts} "
             f"status={status} provider={provider} model={model} dry_run={dry_run}"
         )
         return 0
