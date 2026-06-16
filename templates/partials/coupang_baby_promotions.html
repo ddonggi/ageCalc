@@ -1,15 +1,8 @@
 {% if coupang_partners_enabled %}
 <section class="section-shell coupang-affiliate-block coupang-affiliate-baby" aria-label="쿠팡 파트너스 출산 유아동 프로모션">
-    <div class="section-heading">
-        <p class="eyebrow">기간 한정 추천</p>
-        <h2>출산·유아동 프로모션</h2>
-        <p class="section-intro">개월 수와 기념일을 확인한 뒤 계절 육아용품과 외출 준비물을 함께 살펴볼 수 있습니다.</p>
-    </div>
     <div class="coupang-product-grid">
         <a class="coupang-product-card" href="https://link.coupang.com/a/eDqzcGE02m" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
             <img src="https://image14.coupangcdn.com/image/affiliate/banner/efb674425bc822bb44966c84130312be@2x.jpg" alt="히얼투파티 아기 200일 셀프 촬영 소품 50일 100일 300일 500일 1000일, 1세트, 35.리본기념일_블루_1000일" width="120" height="240">
-            <strong>아기 기념일 촬영 소품</strong>
-            <span>아기 200일 셀프 촬영 소품</span>
         </a>
     </div>
     {% if coupang_active_baby_promotions %}
@@ -17,9 +10,6 @@
         {% for promotion in coupang_active_baby_promotions %}
         <a class="coupang-promo-card" href="{{ promotion.url }}" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
             <img src="{{ promotion.image_url }}" alt="{{ promotion.category }}, {{ promotion.title }}" loading="lazy">
-            <span>{{ promotion.category }}</span>
-            <strong>{{ promotion.title }}</strong>
-            <small>행사기간 ~ {{ promotion.end_label }}</small>
         </a>
         {% endfor %}
     </div>

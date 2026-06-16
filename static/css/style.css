@@ -2580,14 +2580,15 @@ input.error {
     line-height: 1.35;
 }
 
-.coupang-promo-card small,
-.coupang-disclosure {
+.coupang-promo-card small {
     font-size: 0.9rem;
     line-height: 1.55;
 }
 
 .coupang-disclosure {
     margin: 0;
+    font-size: 0.78rem;
+    line-height: 1.5;
     word-break: keep-all;
 }
 

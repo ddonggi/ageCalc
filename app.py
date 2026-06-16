@@ -186,6 +186,12 @@ HOME_SECTION_CONFIG = {
         "featured_limit": 4,
     },
 }
+GUIDE_NAVIGATION_ENDPOINTS = {
+    link["endpoint"]
+    for group in SITE_NAVIGATION
+    if group["key"] == "guides"
+    for link in group["links"]
+} | {"guide_detail"}
 FOOTER_POLICY_LINKS = [
     {"endpoint": "about", "label": "운영 원칙"},
     {"endpoint": "references", "label": "계산 기준"},
@@ -275,6 +281,8 @@ def inject_csp_nonce():
         "blog_public_indexable": blog_public_indexable,
         "blog_public_count": blog_public_count,
         "coupang_partners_enabled": COUPANG_PARTNERS_ENABLED,
+        "coupang_carousel_enabled": COUPANG_PARTNERS_ENABLED
+        and (request.endpoint or "") not in GUIDE_NAVIGATION_ENDPOINTS,
         "coupang_active_baby_promotions": _active_coupang_baby_promotions(),
         "site_navigation": site_navigation,
         "home_navigation_sections": home_navigation_sections,

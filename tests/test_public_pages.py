@@ -1,3 +1,4 @@
+import re
 import unittest
 from datetime import date, datetime
 from types import SimpleNamespace
@@ -762,8 +763,6 @@ class PublicPageTests(unittest.TestCase):
                     self.assertIn("풀캉스 COOL SALE", html)
                     self.assertIn("https://link.coupang.com/a/eDqzcGE02m", html)
                     self.assertIn("아기 200일 셀프 촬영 소품", html)
-                    self.assertIn("2026.06.21", html)
-                    self.assertIn("2026.06.28", html)
 
     def test_coupang_age_affiliate_blocks_render_on_age_pages_when_enabled(self):
         client = app.test_client()
@@ -812,6 +811,87 @@ class PublicPageTests(unittest.TestCase):
                     self.assertIn("홈플래닛 메탈 쿨링홀 노트북 거치대", html)
                     self.assertIn("홈플래닛 8포트 USB3.0", html)
                     self.assertIn("DaeBak+ 경량 백팩", html)
+
+    def test_coupang_affiliate_blocks_render_links_without_visible_copy(self):
+        client = app.test_client()
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True), mock.patch.object(
+            app_module, "_current_local_date", return_value=date(2026, 6, 17)
+        ):
+            response = client.get("/baby-months")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        blocks = re.findall(
+            r'<section class="section-shell coupang-affiliate-block[^>]*>.*?</section>',
+            html,
+            flags=re.DOTALL,
+        )
+
+        self.assertTrue(blocks)
+        for block in blocks:
+            self.assertNotIn("section-heading", block)
+            self.assertNotIn("<h2", block)
+            self.assertNotIn("<strong", block)
+            self.assertNotIn("<span", block)
+            self.assertNotIn("<small", block)
+            if "widgets.html?id=997602" in block:
+                self.assertIn('referrerpolicy="unsafe-url"', block)
+                self.assertIn("browsingtopics", block)
+            else:
+                self.assertIn('rel="sponsored nofollow noopener"', block)
+            self.assertIn("이 포스팅은 쿠팡 파트너스 활동의 일환으로", block)
+
+    def test_coupang_affiliate_disclosure_uses_smaller_text(self):
+        css = Path("static/css/style.css").read_text(encoding="utf-8")
+
+        self.assertRegex(css, r"\.coupang-disclosure\s*\{[^}]*font-size:\s*0\.78rem;")
+
+    def test_coupang_carousel_renders_by_default_on_non_guide_pages_when_enabled(self):
+        client = app.test_client()
+        carousel_src = (
+            "https://ads-partners.coupang.com/widgets.html?id=997602&template=carousel&trackingCode=AF6844979"
+        )
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+            for path in ["/", "/age", "/birth-year-age-table", "/blog", "/minigames/2048"]:
+                with self.subTest(path=path):
+                    response = client.get(path)
+
+                    self.assertEqual(response.status_code, 200)
+                    html = response.get_data(as_text=True)
+                    self.assertIn(carousel_src, html)
+                    self.assertIn('width="680"', html)
+                    self.assertIn('height="140"', html)
+                    self.assertIn('frameborder="0"', html)
+                    self.assertIn('scrolling="no"', html)
+                    self.assertIn('referrerpolicy="unsafe-url"', html)
+                    self.assertIn("browsingtopics", html)
+
+    def test_coupang_carousel_does_not_render_on_guide_pages(self):
+        client = app.test_client()
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+            guide_paths = ["/guide", "/faq", "/korean-age-guide", "/references", "/about", "/contact", "/privacy", "/terms"]
+            guide_paths.append(f"/guides/{GUIDE_SLUGS[0]}")
+
+            for path in guide_paths:
+                with self.subTest(path=path):
+                    response = client.get(path)
+
+                    self.assertEqual(response.status_code, 200)
+                    html = response.get_data(as_text=True)
+                    self.assertNotIn("widgets.html?id=997602", html)
+
+    def test_coupang_carousel_hides_when_disabled(self):
+        client = app.test_client()
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", False):
+            response = client.get("/age")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertNotIn("widgets.html?id=997602", html)
 
     def test_coupang_affiliate_blocks_hide_when_disabled(self):
         client = app.test_client()
