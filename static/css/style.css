@@ -2453,6 +2453,144 @@ input.error {
     word-break: keep-all;
 }
 
+.coupang-affiliate-block {
+    display: grid;
+    gap: 18px;
+    background:
+        linear-gradient(90deg, rgba(102, 120, 79, 0.08), transparent 34%),
+        rgba(255, 255, 255, 0.84);
+}
+
+.coupang-pet-layout {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    align-items: center;
+    gap: 18px;
+}
+
+.coupang-square-banner,
+.coupang-promo-card {
+    display: grid;
+    color: var(--text);
+}
+
+.coupang-square-banner {
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(76, 55, 38, 0.08);
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.coupang-square-banner img {
+    display: block;
+    width: 200px;
+    height: 200px;
+}
+
+.coupang-carousel-frame {
+    width: 100%;
+    max-width: 680px;
+    min-height: 140px;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    background: rgba(76, 55, 38, 0.04);
+}
+
+.coupang-carousel-frame iframe {
+    display: block;
+    width: 100%;
+    max-width: 680px;
+}
+
+.coupang-promo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.coupang-product-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.coupang-promo-card {
+    gap: 10px;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(76, 55, 38, 0.08);
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: var(--shadow-soft);
+}
+
+.coupang-product-card {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(76, 55, 38, 0.08);
+    background: rgba(255, 255, 255, 0.78);
+    color: var(--text);
+    text-align: center;
+    box-shadow: var(--shadow-soft);
+}
+
+.coupang-product-card img {
+    display: block;
+    width: 120px;
+    height: 240px;
+    border-radius: 10px;
+}
+
+.coupang-product-card strong {
+    font-size: 1.02rem;
+    line-height: 1.35;
+}
+
+.coupang-product-card span {
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.45;
+}
+
+.coupang-promo-card img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: calc(var(--radius-sm) - 4px);
+}
+
+.coupang-promo-card span,
+.coupang-promo-card small,
+.coupang-disclosure {
+    color: var(--muted);
+}
+
+.coupang-promo-card span {
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+.coupang-promo-card strong {
+    font-size: 1.08rem;
+    line-height: 1.35;
+}
+
+.coupang-promo-card small,
+.coupang-disclosure {
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+.coupang-disclosure {
+    margin: 0;
+    word-break: keep-all;
+}
+
 .mini-game {
     display: flex;
     justify-content: center;
@@ -3105,6 +3243,22 @@ body.snake-page .game-panel {
         grid-template-columns: 1fr;
         justify-items: center;
         text-align: center;
+    }
+
+    .coupang-pet-layout,
+    .coupang-promo-grid,
+    .coupang-product-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .coupang-pet-layout,
+    .coupang-affiliate-block {
+        justify-items: center;
+        text-align: center;
+    }
+
+    .coupang-carousel-frame {
+        max-width: calc(100vw - 72px);
     }
 
     .page-feedback {

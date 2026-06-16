@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime
+from datetime import date, datetime
 from types import SimpleNamespace
 from pathlib import Path
 from unittest import mock
@@ -717,12 +717,94 @@ class PublicPageTests(unittest.TestCase):
                 post=post,
                 draft_mode=False,
                 review_mode=False,
+                coupang_partners_enabled=False,
                 author_name="AgeCalc 편집팀",
                 editorial_policy_url="/about",
             )
 
         self.assertNotIn('class="coupang-partners-aside"', html)
         self.assertNotIn("coupa.ng/cnsP92", html)
+
+    def test_coupang_pet_affiliate_blocks_render_on_pet_pages_when_enabled(self):
+        client = app.test_client()
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+            for path in ["/cat", "/dog", "/pet-age-table", "/pet-months-table"]:
+                with self.subTest(path=path):
+                    response = client.get(path)
+
+                    self.assertEqual(response.status_code, 200)
+                    html = response.get_data(as_text=True)
+                    self.assertIn("coupang-affiliate-block coupang-affiliate-pet", html)
+                    self.assertIn("https://link.coupang.com/a/eDoGHtGC3U", html)
+                    self.assertIn("https://ads-partners.coupang.com/widgets.html?id=997602", html)
+                    self.assertIn("로켓 반려동물용품", html)
+                    self.assertIn("이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.", html)
+
+    def test_coupang_baby_promotion_blocks_render_on_baby_pages_when_enabled(self):
+        client = app.test_client()
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True), mock.patch.object(
+            app_module, "_current_local_date", return_value=date(2026, 6, 17)
+        ):
+            for path in ["/baby-months", "/baby-months-table", "/100-day-calculator", "/birthday-dday-calculator"]:
+                with self.subTest(path=path):
+                    response = client.get(path)
+
+                    self.assertEqual(response.status_code, 200)
+                    html = response.get_data(as_text=True)
+                    self.assertIn("coupang-affiliate-block coupang-affiliate-baby", html)
+                    self.assertIn("https://link.coupang.com/a/eDoP3hEASq", html)
+                    self.assertIn("https://link.coupang.com/a/eDoUqmShXM", html)
+                    self.assertIn("썸머 준비 육아템", html)
+                    self.assertIn("풀캉스 COOL SALE", html)
+                    self.assertIn("2026.06.21", html)
+                    self.assertIn("2026.06.28", html)
+
+    def test_coupang_student_affiliate_blocks_render_on_school_pages_when_enabled(self):
+        client = app.test_client()
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+            for path in ["/college-entry-year-calculator", "/school-entry-year-table", "/school-grade-calculator"]:
+                with self.subTest(path=path):
+                    response = client.get(path)
+
+                    self.assertEqual(response.status_code, 200)
+                    html = response.get_data(as_text=True)
+                    self.assertIn("coupang-affiliate-block coupang-affiliate-student", html)
+                    self.assertIn("https://link.coupang.com/a/eDpnPJLPc4", html)
+                    self.assertIn("https://link.coupang.com/a/eDpCBqkj12", html)
+                    self.assertIn("https://link.coupang.com/a/eDpGaaihNY", html)
+                    self.assertIn("홈플래닛 메탈 쿨링홀 노트북 거치대", html)
+                    self.assertIn("홈플래닛 8포트 USB3.0", html)
+                    self.assertIn("DaeBak+ 경량 백팩", html)
+
+    def test_coupang_affiliate_blocks_hide_when_disabled(self):
+        client = app.test_client()
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", False):
+            for path in ["/cat", "/baby-months", "/college-entry-year-calculator"]:
+                with self.subTest(path=path):
+                    response = client.get(path)
+
+                    self.assertEqual(response.status_code, 200)
+                    html = response.get_data(as_text=True)
+                    self.assertNotIn("coupang-affiliate-block", html)
+                    self.assertNotIn("link.coupang.com/a/eDo", html)
+
+    def test_coupang_baby_promotion_blocks_hide_after_promotions_expire(self):
+        client = app.test_client()
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True), mock.patch.object(
+            app_module, "_current_local_date", return_value=date(2026, 6, 29)
+        ):
+            response = client.get("/baby-months")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertNotIn("coupang-affiliate-baby", html)
+        self.assertNotIn("https://link.coupang.com/a/eDoP3hEASq", html)
+        self.assertNotIn("https://link.coupang.com/a/eDoUqmShXM", html)
 
     def test_blog_detail_hides_internal_generation_attribution(self):
         post = SimpleNamespace(
@@ -1381,6 +1463,21 @@ class PublicPageTests(unittest.TestCase):
 
         self.assertIn("server_name www.agecalc.cloud;", conf)
         self.assertIn("return 301 https://agecalc.cloud$request_uri;", conf)
+
+    def test_content_security_policy_allows_coupang_affiliate_assets(self):
+        client = app.test_client()
+        response = client.get("/dog")
+
+        self.assertEqual(response.status_code, 200)
+        csp = response.headers.get("Content-Security-Policy", "")
+        self.assertIn("https://ads-partners.coupang.com", csp)
+        self.assertIn("https://image15.coupangcdn.com", csp)
+        self.assertIn("https://image8.coupangcdn.com", csp)
+        self.assertIn("https://image9.coupangcdn.com", csp)
+        self.assertIn("https://img1c.coupangcdn.com", csp)
+        self.assertIn("https://image11.coupangcdn.com", csp)
+        self.assertIn("frame-src", csp)
+        self.assertIn("https://ep2.adtrafficquality.google", csp)
 
 
 if __name__ == "__main__":

@@ -79,6 +79,24 @@ COUPANG_PARTNERS_ENABLED = (os.getenv("COUPANG_PARTNERS_ENABLED", "false") or "f
     "yes",
     "on",
 }
+COUPANG_BABY_PROMOTIONS = [
+    {
+        "title": "썸머 준비 육아템",
+        "category": "출산/유아동",
+        "url": "https://link.coupang.com/a/eDoP3hEASq",
+        "image_url": "https://img1c.coupangcdn.com/image/affiliate/event/promotion/2026/06/15/1bb95dbd7f98002701a8fc22bbf631aa.png",
+        "end_date": datetime(2026, 6, 21).date(),
+        "end_label": "2026.06.21",
+    },
+    {
+        "title": "풀캉스 COOL SALE",
+        "category": "출산/유아동",
+        "url": "https://link.coupang.com/a/eDoUqmShXM",
+        "image_url": "https://image11.coupangcdn.com/image/affiliate/event/promotion/2026/06/15/10b97ebd229800b901a80422bcf7b22c.png",
+        "end_date": datetime(2026, 6, 28).date(),
+        "end_label": "2026.06.28",
+    },
+]
 KOREAN_ZODIAC = ["원숭이", "닭", "개", "돼지", "쥐", "소", "호랑이", "토끼", "용", "뱀", "말", "양"]
 GENERATION_LABELS = [
     ((1946, 1964), "베이비붐 세대"),
@@ -257,6 +275,7 @@ def inject_csp_nonce():
         "blog_public_indexable": blog_public_indexable,
         "blog_public_count": blog_public_count,
         "coupang_partners_enabled": COUPANG_PARTNERS_ENABLED,
+        "coupang_active_baby_promotions": _active_coupang_baby_promotions(),
         "site_navigation": site_navigation,
         "home_navigation_sections": home_navigation_sections,
         "footer_policy_links": FOOTER_POLICY_LINKS,
@@ -282,12 +301,12 @@ def add_security_headers(response):
     nonce = getattr(g, "csp_nonce", "")
     csp = (
         "default-src 'self'; "
-        "img-src 'self' data: https://c.clarity.ms https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net; "
+        "img-src 'self' data: https://c.clarity.ms https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ads-partners.coupang.com https://image15.coupangcdn.com https://image8.coupangcdn.com https://image9.coupangcdn.com https://img1c.coupangcdn.com https://image11.coupangcdn.com; "
         "font-src 'self' https://fonts.gstatic.com; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
         f"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com https://www.clarity.ms https://scripts.clarity.ms https://pagead2.googlesyndication.com https://ep2.adtrafficquality.google; "
         "connect-src 'self' https://www.google-analytics.com https://www.clarity.ms https://c.clarity.ms https://i.clarity.ms https://ep1.adtrafficquality.google https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net; "
-        "frame-src https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com; "
+        "frame-src https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://ads-partners.coupang.com https://ep2.adtrafficquality.google https://www.google.com; "
         "frame-ancestors 'none'; "
         "base-uri 'self'; "
         "form-action 'self'"
@@ -427,6 +446,11 @@ def _build_sitemap_entry(loc: str, lastmod: str | None = None) -> str:
 
 def _current_local_date():
     return datetime.now(BLOG_TIMEZONE).date()
+
+
+def _active_coupang_baby_promotions(today=None):
+    today = today or _current_local_date()
+    return [promotion for promotion in COUPANG_BABY_PROMOTIONS if today <= promotion["end_date"]]
 
 
 def _generation_label(year: int) -> str:

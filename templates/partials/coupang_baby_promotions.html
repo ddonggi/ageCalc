@@ -1,0 +1,20 @@
+{% if coupang_partners_enabled and coupang_active_baby_promotions %}
+<section class="section-shell coupang-affiliate-block coupang-affiliate-baby" aria-label="쿠팡 파트너스 출산 유아동 프로모션">
+    <div class="section-heading">
+        <p class="eyebrow">기간 한정 추천</p>
+        <h2>출산·유아동 프로모션</h2>
+        <p class="section-intro">개월 수와 기념일을 확인한 뒤 계절 육아용품과 외출 준비물을 함께 살펴볼 수 있습니다.</p>
+    </div>
+    <div class="coupang-promo-grid">
+        {% for promotion in coupang_active_baby_promotions %}
+        <a class="coupang-promo-card" href="{{ promotion.url }}" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
+            <img src="{{ promotion.image_url }}" alt="{{ promotion.category }}, {{ promotion.title }}" loading="lazy">
+            <span>{{ promotion.category }}</span>
+            <strong>{{ promotion.title }}</strong>
+            <small>행사기간 ~ {{ promotion.end_label }}</small>
+        </a>
+        {% endfor %}
+    </div>
+    <p class="coupang-disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+</section>
+{% endif %}
