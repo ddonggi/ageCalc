@@ -738,7 +738,9 @@ class PublicPageTests(unittest.TestCase):
                     self.assertIn("coupang-affiliate-block coupang-affiliate-pet", html)
                     self.assertIn("https://link.coupang.com/a/eDoGHtGC3U", html)
                     self.assertIn("https://ads-partners.coupang.com/widgets.html?id=997602", html)
+                    self.assertIn("https://link.coupang.com/a/eDqA9F8bu0", html)
                     self.assertIn("로켓 반려동물용품", html)
+                    self.assertIn("집똑똑이 강아지 고양이 체중계", html)
                     self.assertIn("이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.", html)
 
     def test_coupang_baby_promotion_blocks_render_on_baby_pages_when_enabled(self):
@@ -758,8 +760,40 @@ class PublicPageTests(unittest.TestCase):
                     self.assertIn("https://link.coupang.com/a/eDoUqmShXM", html)
                     self.assertIn("썸머 준비 육아템", html)
                     self.assertIn("풀캉스 COOL SALE", html)
+                    self.assertIn("https://link.coupang.com/a/eDqzcGE02m", html)
+                    self.assertIn("아기 200일 셀프 촬영 소품", html)
                     self.assertIn("2026.06.21", html)
                     self.assertIn("2026.06.28", html)
+
+    def test_coupang_age_affiliate_blocks_render_on_age_pages_when_enabled(self):
+        client = app.test_client()
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+            for path in ["/age", "/annual-age-calculator", "/age-comparison-table", "/birth-year-age-table"]:
+                with self.subTest(path=path):
+                    response = client.get(path)
+
+                    self.assertEqual(response.status_code, 200)
+                    html = response.get_data(as_text=True)
+                    self.assertIn("coupang-affiliate-block coupang-affiliate-age", html)
+                    self.assertIn("https://link.coupang.com/a/eDqhh4eCjI", html)
+                    self.assertIn("https://link.coupang.com/a/eDqnt9iYpM", html)
+                    self.assertIn("환갑 칠순 고희연 팔순 구순 축하 잔치", html)
+                    self.assertIn("스마트체중계", html)
+
+    def test_coupang_anniversary_affiliate_blocks_render_on_anniversary_pages_when_enabled(self):
+        client = app.test_client()
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+            for path in ["/d-day", "/birthday-dday-calculator"]:
+                with self.subTest(path=path):
+                    response = client.get(path)
+
+                    self.assertEqual(response.status_code, 200)
+                    html = response.get_data(as_text=True)
+                    self.assertIn("coupang-affiliate-block coupang-affiliate-anniversary", html)
+                    self.assertIn("https://link.coupang.com/a/eDquXG1o8i", html)
+                    self.assertIn("기념일 선물 상자", html)
 
     def test_coupang_student_affiliate_blocks_render_on_school_pages_when_enabled(self):
         client = app.test_client()
@@ -783,7 +817,7 @@ class PublicPageTests(unittest.TestCase):
         client = app.test_client()
 
         with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", False):
-            for path in ["/cat", "/baby-months", "/college-entry-year-calculator"]:
+            for path in ["/cat", "/baby-months", "/college-entry-year-calculator", "/age", "/d-day"]:
                 with self.subTest(path=path):
                     response = client.get(path)
 
@@ -802,9 +836,9 @@ class PublicPageTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
-        self.assertNotIn("coupang-affiliate-baby", html)
         self.assertNotIn("https://link.coupang.com/a/eDoP3hEASq", html)
         self.assertNotIn("https://link.coupang.com/a/eDoUqmShXM", html)
+        self.assertIn("https://link.coupang.com/a/eDqzcGE02m", html)
 
     def test_blog_detail_hides_internal_generation_attribution(self):
         post = SimpleNamespace(
@@ -1476,6 +1510,10 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("https://image9.coupangcdn.com", csp)
         self.assertIn("https://img1c.coupangcdn.com", csp)
         self.assertIn("https://image11.coupangcdn.com", csp)
+        self.assertIn("https://image7.coupangcdn.com", csp)
+        self.assertIn("https://image14.coupangcdn.com", csp)
+        self.assertIn("https://image2.coupangcdn.com", csp)
+        self.assertIn("https://img4c.coupangcdn.com", csp)
         self.assertIn("frame-src", csp)
         self.assertIn("https://ep2.adtrafficquality.google", csp)
 

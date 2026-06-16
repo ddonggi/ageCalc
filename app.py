@@ -301,7 +301,7 @@ def add_security_headers(response):
     nonce = getattr(g, "csp_nonce", "")
     csp = (
         "default-src 'self'; "
-        "img-src 'self' data: https://c.clarity.ms https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ads-partners.coupang.com https://image15.coupangcdn.com https://image8.coupangcdn.com https://image9.coupangcdn.com https://img1c.coupangcdn.com https://image11.coupangcdn.com; "
+        "img-src 'self' data: https://c.clarity.ms https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ads-partners.coupang.com https://image15.coupangcdn.com https://image8.coupangcdn.com https://image9.coupangcdn.com https://img1c.coupangcdn.com https://image11.coupangcdn.com https://image7.coupangcdn.com https://image14.coupangcdn.com https://image2.coupangcdn.com https://img4c.coupangcdn.com; "
         "font-src 'self' https://fonts.gstatic.com; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
         f"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com https://www.clarity.ms https://scripts.clarity.ms https://pagead2.googlesyndication.com https://ep2.adtrafficquality.google; "
