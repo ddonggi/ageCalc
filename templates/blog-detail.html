@@ -110,6 +110,9 @@
             <img class="blog-hero" src="{{ post.cover_image_url }}" alt="{{ post.title }}">
             {% endif %}
             <div class="blog-content">{{ post.content_html | safe }}</div>
+            {% if coupang_partners_enabled and not draft_mode and not review_mode %}
+            {% include 'partials/coupang_partners.html' %}
+            {% endif %}
             {% if post.sources %}
             <section class="notice">
                 <h2>참고한 자료</h2>

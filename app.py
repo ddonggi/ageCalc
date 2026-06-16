@@ -73,6 +73,12 @@ BLOG_PUBLIC_INDEXING_ENABLED = (os.getenv("BLOG_PUBLIC_INDEXING_ENABLED", "false
     "yes",
     "on",
 }
+COUPANG_PARTNERS_ENABLED = (os.getenv("COUPANG_PARTNERS_ENABLED", "false") or "false").strip().lower() in {
+    "1",
+    "true",
+    "yes",
+    "on",
+}
 KOREAN_ZODIAC = ["원숭이", "닭", "개", "돼지", "쥐", "소", "호랑이", "토끼", "용", "뱀", "말", "양"]
 GENERATION_LABELS = [
     ((1946, 1964), "베이비붐 세대"),
@@ -250,6 +256,7 @@ def inject_csp_nonce():
         "google_site_verification": GOOGLE_SITE_VERIFICATION,
         "blog_public_indexable": blog_public_indexable,
         "blog_public_count": blog_public_count,
+        "coupang_partners_enabled": COUPANG_PARTNERS_ENABLED,
         "site_navigation": site_navigation,
         "home_navigation_sections": home_navigation_sections,
         "footer_policy_links": FOOTER_POLICY_LINKS,

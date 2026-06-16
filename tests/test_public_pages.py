@@ -661,6 +661,69 @@ class PublicPageTests(unittest.TestCase):
         self.assertNotIn("AgeCalc Editorial", html)
         self.assertNotIn("Related Tools", html)
 
+    def test_blog_detail_renders_coupang_partners_sidebar_disclosure(self):
+        post = SimpleNamespace(
+            title="테스트 글",
+            slug="test-post",
+            excerpt="요약",
+            cover_image_url=None,
+            content_html="<p>본문</p>",
+            published_at=None,
+            created_at=None,
+            updated_at=None,
+            status="published",
+            sources=[],
+        )
+
+        with app.test_request_context("/blog/test-post"):
+            html = render_template(
+                "blog-detail.html",
+                post=post,
+                draft_mode=False,
+                review_mode=False,
+                coupang_partners_enabled=True,
+                author_name="AgeCalc 편집팀",
+                editorial_policy_url="/about",
+            )
+
+        self.assertIn('class="coupang-partners-aside"', html)
+        self.assertIn('href="https://link.coupang.com/a/eDmOIdCZP2"', html)
+        self.assertIn('target="_blank"', html)
+        self.assertIn('rel="sponsored nofollow noopener"', html)
+        self.assertIn('referrerpolicy="unsafe-url"', html)
+        self.assertIn('src="https://image7.coupangcdn.com/image/affiliate/banner/2df432f2970e664540a310403499b76e@2x.jpg"', html)
+        self.assertIn('alt="말랑하니 신생아 디데이달력 4칸, 밀크베이지, 1개"', html)
+        self.assertIn('width="120"', html)
+        self.assertIn('height="240"', html)
+        self.assertIn("이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.", html)
+
+    def test_blog_detail_hides_coupang_partners_sidebar_by_default(self):
+        post = SimpleNamespace(
+            title="테스트 글",
+            slug="test-post",
+            excerpt="요약",
+            cover_image_url=None,
+            content_html="<p>본문</p>",
+            published_at=None,
+            created_at=None,
+            updated_at=None,
+            status="published",
+            sources=[],
+        )
+
+        with app.test_request_context("/blog/test-post"):
+            html = render_template(
+                "blog-detail.html",
+                post=post,
+                draft_mode=False,
+                review_mode=False,
+                author_name="AgeCalc 편집팀",
+                editorial_policy_url="/about",
+            )
+
+        self.assertNotIn('class="coupang-partners-aside"', html)
+        self.assertNotIn("coupa.ng/cnsP92", html)
+
     def test_blog_detail_hides_internal_generation_attribution(self):
         post = SimpleNamespace(
             title="테스트 글",
