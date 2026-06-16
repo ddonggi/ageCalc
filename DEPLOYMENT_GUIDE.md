@@ -119,6 +119,7 @@ chmod 600 .env.rss
 - `BLOG_BASE_URL`: 기본값 `https://agecalc.cloud`
 - `BLOG_REVIEW_TOKEN`: 토큰 기반 검토 링크
 - `BLOG_DRAFT_PASSWORD`: `/blog/drafts` 접근 비밀번호
+- `COUPANG_PARTNERS_ENABLED`: `true`이면 공개 블로그 글에 쿠팡 파트너스 배너와 고지 문구를 노출
 - `SMTP_*`: draft 생성 알림 메일
 - `FLASK_SECRET_KEY`: Flask 세션 서명 키
 
