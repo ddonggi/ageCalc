@@ -2461,6 +2461,52 @@ input.error {
         rgba(255, 255, 255, 0.84);
 }
 
+.coupang-ad-aside {
+    display: grid;
+    gap: 14px;
+    margin: 24px 0 0;
+}
+
+.coupang-ad-rail {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 200px));
+    justify-content: center;
+    gap: 16px;
+}
+
+.coupang-ad-frame,
+.coupang-ad-card {
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(76, 55, 38, 0.08);
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: var(--shadow-soft);
+}
+
+.coupang-ad-frame {
+    width: 200px;
+    height: 640px;
+    max-width: 100%;
+}
+
+.coupang-ad-frame iframe {
+    display: block;
+    width: 200px;
+    height: 640px;
+}
+
+.coupang-ad-card {
+    width: 200px;
+    height: 200px;
+}
+
+.coupang-ad-card img {
+    display: block;
+    width: 200px;
+    height: 200px;
+}
+
 .coupang-pet-layout {
     display: grid;
     grid-template-columns: 200px minmax(0, 1fr);
@@ -3256,6 +3302,18 @@ body.snake-page .game-panel {
     .coupang-affiliate-block {
         justify-items: center;
         text-align: center;
+    }
+
+    .coupang-ad-rail {
+        grid-template-columns: 1fr;
+        justify-items: center;
+    }
+
+    .coupang-ad-frame,
+    .coupang-ad-card,
+    .coupang-ad-frame iframe,
+    .coupang-ad-card img {
+        width: min(100%, 200px);
     }
 
     .coupang-carousel-frame {

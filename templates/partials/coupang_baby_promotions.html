@@ -1,15 +1,15 @@
 {% if coupang_partners_enabled %}
-<section class="section-shell coupang-affiliate-block coupang-affiliate-baby" aria-label="쿠팡 파트너스 출산 유아동 프로모션">
+<section class="section-shell coupang-affiliate-block coupang-affiliate-baby">
     <div class="coupang-product-grid">
         <a class="coupang-product-card" href="https://link.coupang.com/a/eDqzcGE02m" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
-            <img src="https://image14.coupangcdn.com/image/affiliate/banner/efb674425bc822bb44966c84130312be@2x.jpg" alt="히얼투파티 아기 200일 셀프 촬영 소품 50일 100일 300일 500일 1000일, 1세트, 35.리본기념일_블루_1000일" width="120" height="240">
+            <img src="https://image14.coupangcdn.com/image/affiliate/banner/efb674425bc822bb44966c84130312be@2x.jpg" alt="" width="120" height="240">
         </a>
     </div>
     {% if coupang_active_baby_promotions %}
     <div class="coupang-promo-grid">
         {% for promotion in coupang_active_baby_promotions %}
         <a class="coupang-promo-card" href="{{ promotion.url }}" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
-            <img src="{{ promotion.image_url }}" alt="{{ promotion.category }}, {{ promotion.title }}" loading="lazy">
+            <img src="{{ promotion.image_url }}" alt="" loading="lazy">
         </a>
         {% endfor %}
     </div>
