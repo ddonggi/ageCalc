@@ -2507,6 +2507,31 @@ input.error {
     height: 200px;
 }
 
+@media (min-width: 1180px) {
+    .coupang-ad-aside {
+        position: fixed;
+        top: 96px;
+        right: 18px;
+        z-index: 35;
+        width: 200px;
+        max-height: calc(100vh - 116px);
+        margin: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+    }
+
+    .coupang-ad-rail {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .coupang-ad-aside .coupang-disclosure {
+        text-align: center;
+        font-size: 0.7rem;
+    }
+}
+
 .coupang-pet-layout {
     display: grid;
     grid-template-columns: 200px minmax(0, 1fr);

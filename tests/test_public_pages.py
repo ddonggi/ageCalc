@@ -797,11 +797,15 @@ class PublicPageTests(unittest.TestCase):
 
         self.assertRegex(css, r"\.coupang-disclosure\s*\{[^}]*font-size:\s*0\.78rem;")
 
-    def test_coupang_ad_aside_stacks_on_mobile(self):
+    def test_coupang_ad_aside_is_fixed_on_desktop_and_stacks_on_mobile(self):
         css = Path("static/css/style.css").read_text(encoding="utf-8")
 
         self.assertIn(".coupang-ad-rail {", css)
         self.assertIn("grid-template-columns: repeat(3, minmax(0, 200px));", css)
+        self.assertIn("@media (min-width: 1180px)", css)
+        self.assertIn("position: fixed;", css)
+        self.assertIn("right: 18px;", css)
+        self.assertIn("max-height: calc(100vh - 116px);", css)
         self.assertIn("@media (max-width: 760px)", css)
         self.assertIn("grid-template-columns: 1fr;", css)
         self.assertIn("width: min(100%, 200px);", css)
@@ -1293,9 +1297,9 @@ class PublicPageTests(unittest.TestCase):
         self.assertNotIn("빠른 시작", html)
         self.assertNotIn("정보 구성", html)
 
-    def test_footer_includes_coupang_ad_aside(self):
+    def test_header_includes_coupang_ad_aside(self):
         with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True), app.test_request_context("/"):
-            html = render_template("partials/footer.html")
+            html = render_template("partials/header.html")
 
         self.assertIn('class="coupang-ad-aside"', html)
         self.assertIn("widgets.html?id=997602&template=carousel&trackingCode=AF6844979", html)
@@ -1306,11 +1310,22 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn('alt=""', html)
         self.assertIn("이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.", html)
 
+    def test_coupang_ad_aside_renders_before_main_content_on_mobile_flow(self):
+        client = app.test_client()
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+            response = client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertLess(html.index('class="coupang-ad-aside"'), html.index('class="hero-band'))
+
     def test_footer_is_trimmed_to_policy_links(self):
         with app.test_request_context("/"):
             html = render_template("partials/footer.html")
 
         self.assertNotIn("All rights reserved.", html)
+        self.assertNotIn("coupang-ad-aside", html)
         self.assertIn('href="/contact"', html)
         self.assertIn('href="/references"', html)
         self.assertIn('href="/about"', html)
