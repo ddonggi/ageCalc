@@ -45,6 +45,7 @@ Thumbs.db
 # Runtime data
 data/
 static/generated/
+.worktrees/
 
 # Configuration files with sensitive data
 config.py
