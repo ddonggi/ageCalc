@@ -737,7 +737,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertNotIn('class="coupang-partners-aside"', html)
         self.assertNotIn("coupa.ng/cnsP92", html)
 
-    def test_coupang_pet_affiliate_blocks_render_on_pet_pages_when_enabled(self):
+    def test_coupang_pet_affiliate_blocks_stay_hidden_on_pet_pages_when_enabled(self):
         client = app.test_client()
 
         with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
@@ -748,9 +748,9 @@ class PublicPageTests(unittest.TestCase):
                     self.assertEqual(response.status_code, 200)
                     html = response.get_data(as_text=True)
                     self.assertNotIn("coupang-affiliate-block coupang-affiliate-pet", html)
-                    self.assertIn('class="coupang-ad-aside"', html)
+                    self.assertNotIn('class="coupang-ad-aside"', html)
 
-    def test_coupang_baby_promotion_blocks_render_on_baby_pages_when_enabled(self):
+    def test_coupang_baby_promotion_blocks_stay_hidden_on_baby_pages_when_enabled(self):
         client = app.test_client()
 
         with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True), mock.patch.object(
@@ -763,9 +763,9 @@ class PublicPageTests(unittest.TestCase):
                     self.assertEqual(response.status_code, 200)
                     html = response.get_data(as_text=True)
                     self.assertNotIn("coupang-affiliate-block coupang-affiliate-baby", html)
-                    self.assertIn('class="coupang-ad-aside"', html)
+                    self.assertNotIn('class="coupang-ad-aside"', html)
 
-    def test_coupang_age_affiliate_blocks_render_on_age_pages_when_enabled(self):
+    def test_coupang_age_affiliate_blocks_stay_hidden_on_age_pages_when_enabled(self):
         client = app.test_client()
 
         with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
@@ -776,9 +776,9 @@ class PublicPageTests(unittest.TestCase):
                     self.assertEqual(response.status_code, 200)
                     html = response.get_data(as_text=True)
                     self.assertNotIn("coupang-affiliate-block coupang-affiliate-age", html)
-                    self.assertIn('class="coupang-ad-aside"', html)
+                    self.assertNotIn('class="coupang-ad-aside"', html)
 
-    def test_coupang_anniversary_affiliate_blocks_render_on_anniversary_pages_when_enabled(self):
+    def test_coupang_anniversary_affiliate_blocks_stay_hidden_when_enabled(self):
         client = app.test_client()
 
         with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
@@ -789,9 +789,9 @@ class PublicPageTests(unittest.TestCase):
                     self.assertEqual(response.status_code, 200)
                     html = response.get_data(as_text=True)
                     self.assertNotIn("coupang-affiliate-block coupang-affiliate-anniversary", html)
-                    self.assertIn('class="coupang-ad-aside"', html)
+                    self.assertNotIn('class="coupang-ad-aside"', html)
 
-    def test_coupang_student_affiliate_blocks_render_on_school_pages_when_enabled(self):
+    def test_coupang_student_affiliate_blocks_stay_hidden_on_school_pages_when_enabled(self):
         client = app.test_client()
 
         with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
@@ -802,27 +802,22 @@ class PublicPageTests(unittest.TestCase):
                     self.assertEqual(response.status_code, 200)
                     html = response.get_data(as_text=True)
                     self.assertNotIn("coupang-affiliate-block coupang-affiliate-student", html)
-                    self.assertIn('class="coupang-ad-aside"', html)
+                    self.assertNotIn('class="coupang-ad-aside"', html)
 
     def test_coupang_affiliate_disclosure_uses_smaller_text(self):
         css = Path("static/css/style.css").read_text(encoding="utf-8")
 
         self.assertRegex(css, r"\.coupang-disclosure\s*\{[^}]*font-size:\s*0\.78rem;")
 
-    def test_coupang_ad_aside_is_fixed_on_desktop_and_stacks_on_mobile(self):
+    def test_global_coupang_ad_aside_styles_are_removed(self):
         css = Path("static/css/style.css").read_text(encoding="utf-8")
 
-        self.assertIn(".coupang-ad-rail {", css)
-        self.assertIn("grid-template-columns: repeat(3, minmax(0, 200px));", css)
-        self.assertIn("@media (min-width: 1180px)", css)
-        self.assertIn("position: fixed;", css)
-        self.assertIn("right: 18px;", css)
-        self.assertIn("max-height: calc(100vh - 116px);", css)
-        self.assertIn("@media (max-width: 760px)", css)
-        self.assertIn("grid-template-columns: 1fr;", css)
-        self.assertIn("width: min(100%, 200px);", css)
+        self.assertNotIn(".coupang-ad-aside", css)
+        self.assertNotIn(".coupang-ad-rail", css)
+        self.assertNotIn(".coupang-ad-frame", css)
+        self.assertNotIn(".coupang-ad-card", css)
 
-    def test_coupang_ad_aside_renders_by_default_on_non_guide_pages_when_enabled(self):
+    def test_global_coupang_ad_aside_never_renders_when_affiliates_are_enabled(self):
         client = app.test_client()
 
         with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
@@ -832,19 +827,11 @@ class PublicPageTests(unittest.TestCase):
 
                     self.assertEqual(response.status_code, 200)
                     html = response.get_data(as_text=True)
-                    self.assertIn('class="coupang-ad-aside"', html)
-                    self.assertIn(
-                        'https://ads-partners.coupang.com/widgets.html?id=997602&template=carousel&trackingCode=AF6844979&subId=&width=140&height=640&tsource=',
+                    self.assertNotIn('class="coupang-ad-aside"', html)
+                    self.assertNotIn(
+                        "widgets.html?id=997602&template=carousel&trackingCode=AF6844979",
                         html,
                     )
-                    self.assertIn('width="200"', html)
-                    self.assertIn('height="640"', html)
-                    self.assertIn('frameborder="0"', html)
-                    self.assertIn('scrolling="no"', html)
-                    self.assertIn('referrerpolicy="unsafe-url"', html)
-                    self.assertIn("browsingtopics", html)
-                    self.assertIn("https://link.coupang.com/a/eDtbnycaRg", html)
-                    self.assertIn("https://link.coupang.com/a/eDtcE5ScoK", html)
 
     def test_coupang_ad_aside_does_not_render_on_guide_pages(self):
         client = app.test_client()
@@ -913,7 +900,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertNotIn("https://link.coupang.com/a/eDoP3hEASq", html)
         self.assertNotIn("https://link.coupang.com/a/eDoUqmShXM", html)
         self.assertNotIn("https://link.coupang.com/a/eDqzcGE02m", html)
-        self.assertIn('class="coupang-ad-aside"', html)
+        self.assertNotIn('class="coupang-ad-aside"', html)
 
     def test_blog_detail_hides_internal_generation_attribution(self):
         post = SimpleNamespace(
@@ -1324,20 +1311,16 @@ class PublicPageTests(unittest.TestCase):
         self.assertNotIn("빠른 시작", html)
         self.assertNotIn("정보 구성", html)
 
-    def test_header_includes_coupang_ad_aside(self):
+    def test_header_excludes_global_coupang_ad_aside(self):
         with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True), app.test_request_context("/"):
             html = render_template("partials/header.html")
 
-        self.assertIn('class="coupang-ad-aside"', html)
-        self.assertIn("widgets.html?id=997602&template=carousel&trackingCode=AF6844979", html)
-        self.assertIn("https://link.coupang.com/a/eDtbnycaRg", html)
-        self.assertIn("https://link.coupang.com/a/eDtcE5ScoK", html)
-        self.assertIn('src="https://ads-partners.coupang.com/banners/997623?subId=&traceId=V0-301-5f4982b43e2b4522-I997623&w=200&h=200"', html)
-        self.assertIn('src="https://ads-partners.coupang.com/banners/997606?subId=&traceId=V0-301-7e6e8eb8ddfa1bfb-I997606&w=200&h=200"', html)
-        self.assertIn('alt=""', html)
-        self.assertIn("이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.", html)
+        self.assertNotIn('class="coupang-ad-aside"', html)
+        self.assertNotIn("widgets.html?id=997602&template=carousel&trackingCode=AF6844979", html)
+        self.assertNotIn("https://link.coupang.com/a/eDtbnycaRg", html)
+        self.assertNotIn("https://link.coupang.com/a/eDtcE5ScoK", html)
 
-    def test_coupang_ad_aside_renders_before_main_content_on_mobile_flow(self):
+    def test_coupang_ad_aside_does_not_precede_main_content_on_mobile_flow(self):
         client = app.test_client()
 
         with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
@@ -1345,7 +1328,8 @@ class PublicPageTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
-        self.assertLess(html.index('class="coupang-ad-aside"'), html.index('class="hero-band'))
+        self.assertNotIn('class="coupang-ad-aside"', html)
+        self.assertIn('class="hero-band', html)
 
     def test_footer_is_trimmed_to_policy_links(self):
         with app.test_request_context("/"):
