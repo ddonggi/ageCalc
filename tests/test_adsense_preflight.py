@@ -16,7 +16,9 @@ class AdsensePreflightTests(unittest.TestCase):
         report = run_local_preflight()
 
         self.assertTrue(report.ok, format_report(report))
-        self.assertGreaterEqual(report.checked_pages, len(PUBLIC_SITEMAP_ENDPOINTS) - 1)
+        self.assertEqual(50, report.sitemap_urls)
+        self.assertEqual(50, report.checked_pages)
+        self.assertEqual(31, len(PUBLIC_SITEMAP_ENDPOINTS))
 
     def test_preflight_reports_forbidden_sitemap_paths(self):
         report = PreflightReport()

@@ -529,6 +529,18 @@ class PublicPageTests(unittest.TestCase):
                 self.assertIn("tracking-config", html)
                 self.assertNotIn("www.googletagmanager.com/gtag/js", html)
 
+    def test_public_sitemap_has_fifty_indexable_urls_at_adsense_baseline(self):
+        client = app.test_client()
+        response = client.get("/sitemap.xml")
+
+        self.assertEqual(response.status_code, 200)
+        xml = response.get_data(as_text=True)
+        self.assertEqual(50, xml.count("<loc>"))
+        self.assertNotIn("/minigames", xml)
+        self.assertNotIn("/blog/drafts", xml)
+        self.assertNotIn("/blog/review", xml)
+        self.assertNotIn("<loc>https://agecalc.cloud/blog</loc>", xml)
+
     def test_static_guide_pages_are_public_with_adsense_code(self):
         client = app.test_client()
 
@@ -854,12 +866,27 @@ class PublicPageTests(unittest.TestCase):
         client = app.test_client()
 
         with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", False):
-            response = client.get("/age")
+            for path in [
+                "/",
+                "/age",
+                "/birth-year-age-table",
+                "/school-grade-calculator",
+                "/dog",
+                "/cat",
+                "/baby-months",
+                "/d-day",
+                "/parent-child",
+            ]:
+                with self.subTest(path=path):
+                    response = client.get(path)
 
-        self.assertEqual(response.status_code, 200)
-        html = response.get_data(as_text=True)
-        self.assertNotIn("coupang-ad-aside", html)
-        self.assertNotIn("widgets.html?id=997602&template=carousel&trackingCode=AF6844979", html)
+                    self.assertEqual(response.status_code, 200)
+                    html = response.get_data(as_text=True)
+                    self.assertNotIn("coupang-ad-aside", html)
+                    self.assertNotIn(
+                        "widgets.html?id=997602&template=carousel&trackingCode=AF6844979",
+                        html,
+                    )
 
     def test_coupang_page_sections_no_longer_render_affiliate_blocks(self):
         client = app.test_client()
