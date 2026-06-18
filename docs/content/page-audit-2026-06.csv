@@ -1,0 +1,51 @@
+path,endpoint,hub,content_action,current_status,unique_value,official_source_required
+/,index,core,keep,indexable,전체 생활 나이 도구 탐색,false
+/age,age,age,strengthen,indexable,양력 음력 만나이 계산,true
+/about,about,core,keep,indexable,편집 및 운영 원칙,false
+/contact,contact,core,keep,indexable,운영자와 수정 문의 경로,false
+/references,references,core,strengthen,indexable,계산 공식과 참고 출처,true
+/birth-year-age-table,birth_year_age_table,age,strengthen,indexable,출생연도별 나이 띠 세대 표,false
+/school-grade-calculator,school_grade_calculator,education,strengthen,indexable,출생연도 기준 현재 학년,true
+/school-entry-year-table,school_entry_year_table,education,strengthen,indexable,초중고 입학년도 표,true
+/age-gap-calculator,age_gap_calculator,family,strengthen,indexable,두 출생연도 나이 차이,false
+/100-day-calculator,hundred_day_calculator,anniversary,strengthen,indexable,시작일 포함 백일 계산,false
+/baby-months-table,baby_months_table,family,strengthen,indexable,월령별 연 단위 환산,false
+/annual-age-calculator,annual_age_calculator,age,strengthen,indexable,생일 무관 연나이 계산,false
+/age-comparison-table,age_comparison_table,age,strengthen,indexable,나이 체계 비교,false
+/grade-age-table,grade_age_table,education,strengthen,indexable,학년별 일반 나이,true
+/pet-age-table,pet_age_table,pets,strengthen,indexable,반려동물 사람 나이 비교,true
+/korean-age-guide,korean_age_guide,age,strengthen,indexable,만나이 통일 기준,true
+/pet-months-table,pet_months_table,pets,strengthen,indexable,반려동물 월령별 환산,true
+/grade-birth-year-table,grade_birth_year_table,education,strengthen,indexable,학년별 일반 출생연도,true
+/birth-year-zodiac-table,birth_year_zodiac_table,age,strengthen,indexable,출생연도별 띠와 나이,false
+/college-entry-year-calculator,college_entry_year_calculator,education,strengthen,indexable,학번별 출생연도와 나이,false
+/birthday-dday-calculator,birthday_dday_calculator,anniversary,strengthen,indexable,반복 생일 디데이 계산,false
+/privacy,privacy,core,keep,indexable,개인정보와 쿠키 처리,false
+/terms,terms,core,keep,indexable,서비스 이용 조건,false
+/guide,guide,guides,strengthen,indexable,주제별 계산 가이드 탐색,false
+/faq,faq,guides,keep,indexable,계산 예외 질문 모음,true
+/dog,dog,pets,strengthen,indexable,체형별 강아지 나이 환산,true
+/cat,cat,pets,strengthen,indexable,고양이 생애 단계 환산,true
+/baby-months,baby_months,family,strengthen,indexable,출생일 기준 현재 월령,true
+/d-day,d_day,anniversary,strengthen,indexable,목표일까지 남은 날짜,false
+/parent-child,parent_child,family,strengthen,indexable,부모 자녀 생애 시점 교차,false
+/guides/age-calculation-2026,guide_detail,age,strengthen,indexable,2026년 생일 전후 만나이 기준,true
+/guides/reference-date-age-guide,guide_detail,age,strengthen,indexable,특정 기준일 만나이 계산,true
+/guides/lunar-birthday-age-guide,guide_detail,age,strengthen,indexable,음력 생일 양력 환산 기준,true
+/guides/birth-year-age-table-guide,guide_detail,age,strengthen,indexable,출생연도 나이표 해석,false
+/guides/korean-age-vs-annual-age,guide_detail,age,strengthen,indexable,세 나이 체계 차이,true
+/guides/sixtieth-seventieth-eightieth-age-guide,guide_detail,anniversary,strengthen,indexable,환갑 칠순 팔순 기준,true
+/guides/generation-by-birth-year-guide,guide_detail,age,strengthen,indexable,출생연도별 세대 범위,false
+/guides/school-entry-year-guide,guide_detail,education,strengthen,indexable,학교 입학연도 계산,true
+/guides/elementary-school-entry-target-2026,guide_detail,education,strengthen,indexable,2026년 초등 입학 대상,true
+/guides/school-grade-birth-year-guide,guide_detail,education,strengthen,indexable,학년별 출생연도 해석,true
+/guides/early-birth-school-grade-guide,guide_detail,education,strengthen,indexable,빠른년생과 입학유예,true
+/guides/baby-months-calculation-guide,guide_detail,anniversary,strengthen,indexable,아이 개월 수 계산 원리,true
+/guides/100-day-calculation-guide,guide_detail,anniversary,strengthen,indexable,시작일 포함 백일 기준,false
+/guides/birthday-dday-calculation-guide,guide_detail,anniversary,strengthen,indexable,다음 생일 디데이 기준,false
+/guides/baby-anniversary-calculation-guide,guide_detail,anniversary,strengthen,indexable,돌 백일 생일 월령 차이,false
+/guides/age-gap-calculation-guide,guide_detail,family,strengthen,indexable,나이 차이 계산 해석,false
+/guides/parent-child-age-gap-guide,guide_detail,family,strengthen,indexable,부모 자녀 나이 차이 해석,false
+/guides/dog-age-human-age-guide,guide_detail,pets,strengthen,indexable,강아지 사람 나이 환산 한계,true
+/guides/cat-age-human-age-guide,guide_detail,pets,strengthen,indexable,고양이 사람 나이 환산 한계,true
+/guides/pet-age-table-guide,guide_detail,pets,strengthen,indexable,반려동물 연령표 월령표 선택,true

@@ -9,6 +9,11 @@ import secrets
 from zoneinfo import ZoneInfo
 from controllers.age_controller import AgeController
 from content.guide_pages import GUIDE_PAGE_BY_SLUG, GUIDE_PAGES
+from content.page_registry import (
+    PUBLIC_SITEMAP_ENDPOINTS,
+    indexable_guide_pages,
+    indexable_static_pages,
+)
 from db import SessionLocal, close_db_session, init_db
 from models.blog_models import GeneratedPost, PageFeedback
 from scripts.adsense_blog_review import audit_post
@@ -193,40 +198,6 @@ FOOTER_POLICY_LINKS = [
     {"endpoint": "privacy", "label": "개인정보처리방침"},
     {"endpoint": "terms", "label": "이용약관"},
 ]
-PUBLIC_SITEMAP_ENDPOINTS = [
-    "index",
-    "age",
-    "about",
-    "contact",
-    "references",
-    "birth_year_age_table",
-    "school_grade_calculator",
-    "school_entry_year_table",
-    "age_gap_calculator",
-    "hundred_day_calculator",
-    "baby_months_table",
-    "annual_age_calculator",
-    "age_comparison_table",
-    "grade_age_table",
-    "pet_age_table",
-    "korean_age_guide",
-    "pet_months_table",
-    "grade_birth_year_table",
-    "birth_year_zodiac_table",
-    "college_entry_year_calculator",
-    "birthday_dday_calculator",
-    "privacy",
-    "terms",
-    "guide",
-    "faq",
-    "dog",
-    "cat",
-    "baby_months",
-    "d_day",
-    "parent_child",
-    "blog_list",
-]
-
 @app.before_request
 def set_csp_nonce():
     g.csp_nonce = secrets.token_urlsafe(16)
@@ -976,14 +947,25 @@ def sitemap():
         )
         blog_public_indexable = _is_blog_public_indexable(len(posts))
         entries = []
-        for endpoint in PUBLIC_SITEMAP_ENDPOINTS:
-            if endpoint == "blog_list" and not blog_public_indexable:
-                continue
+        for page in indexable_static_pages(blog_public_indexable=blog_public_indexable):
+            endpoint = str(page["endpoint"])
             lastmod = _format_sitemap_lastmod(newest_post_dt) if endpoint == "blog_list" else None
-            entries.append(_build_sitemap_entry(_absolute_url_for(endpoint), lastmod))
+            entries.append(
+                _build_sitemap_entry(
+                    _absolute_url_for(endpoint, **dict(page["route_values"])),
+                    lastmod,
+                )
+            )
 
-        for page in GUIDE_PAGES:
-            entries.append(_build_sitemap_entry(_absolute_url_for("guide_detail", slug=page["slug"])))
+        for page in indexable_guide_pages():
+            entries.append(
+                _build_sitemap_entry(
+                    _absolute_url_for(
+                        str(page["endpoint"]),
+                        **dict(page["route_values"]),
+                    )
+                )
+            )
 
         if blog_public_indexable:
             for post in posts:
