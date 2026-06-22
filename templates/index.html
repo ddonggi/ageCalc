@@ -59,7 +59,7 @@
                     <span class="calendar-stamp" aria-hidden="true">Life<br>Calendar</span>
                     <p class="page-intro">
                         만나이, 학년, 생일, 반려동물 나이와 육아 기준을 날짜표처럼 정리해
-                        오늘 필요한 생활 기준으로 카테고리별로 바로 이동할 수 있습니다.
+                        오늘 필요한 생활 기준을 8개의 생활 영역으로 나눠 바로 이동할 수 있습니다.
                     </p>
                     <div class="hero-actions">
                         <a class="btn btn-primary" href="{{ url_for('age') }}">만나이 계산하기</a>
@@ -177,38 +177,26 @@
             </a>
         </section>
 
-        {% for section in home_navigation_sections %}
-        <section class="section-shell category-hub-section calendar-hub-section hub-{{ section.key }}" id="section-{{ section.key }}">
+        <section class="section-shell home-life-hubs" aria-labelledby="home-life-hubs-title">
             <div class="section-heading">
-                <p class="eyebrow">{{ section.section_label }}</p>
-                <h2>{{ section.title }}</h2>
-                <p class="section-intro">{{ section.intro }}</p>
+                <p class="eyebrow">Life Paths</p>
+                <h2 id="home-life-hubs-title">8개의 생활 영역</h2>
+                <p class="section-intro">계산 결과를 가족, 학교, 기념일, 건강과 앞으로의 생애 시점으로 연결합니다.</p>
             </div>
-
-            <div class="hub-card-grid">
-                {% for link in section.links %}
-                <a class="hub-card-link" href="{{ url_for(link.endpoint) }}">
-                    <article class="hub-card calendar-card calendar-card-{{ loop.index % 4 }}">
-                        <span class="hub-card-index">{{ "%02d"|format(loop.index) }}</span>
-                        <strong>{{ link.label }}</strong>
-                        <p>{{ link.summary }}</p>
+            <div class="home-life-hub-grid">
+                {% for hub in life_hubs %}
+                <a class="home-life-hub-card" href="{{ hub.path }}" data-hub-key="{{ hub.key }}">
+                    <article>
+                        <span class="home-life-hub-number">{{ "%02d"|format(loop.index) }}</span>
+                        <p class="eyebrow">{{ hub.eyebrow }}</p>
+                        <h3>{{ hub.title }}</h3>
+                        <p>{{ hub.description }}</p>
+                        <span class="home-life-hub-action">허브 보기 <b aria-hidden="true">↗</b></span>
                     </article>
                 </a>
                 {% endfor %}
             </div>
-
-            {% if section.more_links %}
-            <div class="hub-more-links">
-                <p class="hub-more-label">같이 보면 좋은 페이지</p>
-                <div class="hub-link-list">
-                    {% for link in section.more_links %}
-                    <a href="{{ url_for(link.endpoint) }}">{{ link.label }}</a>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
         </section>
-        {% endfor %}
 
         {% include 'partials/footer.html' %}
     </div>

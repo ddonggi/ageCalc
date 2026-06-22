@@ -1051,18 +1051,53 @@ class PublicPageTests(unittest.TestCase):
         for phrase in ["Core Utility", "Dual", "Guide", "Policy", "설명형 결과 해석"]:
             self.assertNotIn(phrase, html)
 
-    def test_header_uses_category_navigation(self):
+    def test_header_uses_life_hub_navigation(self):
         with app.test_request_context("/"):
             html = render_template("partials/header.html", blog_public_indexable=True)
 
-        self.assertIn("계산기", html)
-        self.assertIn("표·비교", html)
-        self.assertIn("안내", html)
+        for label in ["나이", "가족", "교육", "기념일"]:
+            self.assertIn('class="hub-nav-direct"', html)
+            self.assertIn(f">{label}</a>", html)
+        for key in [
+            "age",
+            "family",
+            "education",
+            "anniversary",
+            "retirement",
+            "health",
+            "pets",
+            "generations",
+        ]:
+            self.assertIn(f'data-hub-key="{key}"', html)
+            self.assertIn(f'href="/{key}/"', html)
+        self.assertIn("전체 허브", html)
         self.assertIn("블로그", html)
         self.assertIn("메뉴 열기", html)
         self.assertIn("mega-nav", html)
         self.assertIn("mega-menu-panel", html)
+        self.assertNotIn(">계산기<", html)
+        self.assertNotIn(">표·비교<", html)
         self.assertNotIn('class="nav-links"', html)
+
+    def test_mobile_navigation_lists_eight_hubs_with_three_tools_at_most(self):
+        with app.test_request_context("/"):
+            html = render_template("partials/header.html", blog_public_indexable=False)
+
+        self.assertEqual(8, html.count('class="mobile-hub-group"'))
+        self.assertNotIn("mobile-nav-group-toggle", html)
+        self.assertIn("생활 영역 8개", html)
+        for key in [
+            "age",
+            "family",
+            "education",
+            "anniversary",
+            "retirement",
+            "health",
+            "pets",
+            "generations",
+        ]:
+            block = html.split(f'id="mobile-hub-{key}"', 1)[1].split("</section>", 1)[0]
+            self.assertLessEqual(block.count('class="mobile-nav-link"'), 3)
 
     def test_header_hides_blog_when_public_blog_is_not_indexable(self):
         with app.test_request_context("/"):
@@ -1347,18 +1382,26 @@ class PublicPageTests(unittest.TestCase):
         self.assertFalse(fake_session.committed)
         self.assertIn("대표 이미지가 없습니다", response.get_data(as_text=True))
 
-    def test_home_page_uses_category_hub_sections(self):
+    def test_home_page_links_all_life_hubs(self):
         client = app.test_client()
         response = client.get("/")
 
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
-        self.assertIn("대표 계산기", html)
-        self.assertIn("표·비교 모음", html)
-        self.assertIn("기준과 안내", html)
-        self.assertIn("카테고리별로 바로 이동", html)
-        self.assertNotIn("빠른 시작", html)
-        self.assertNotIn("정보 구성", html)
+        self.assertIn("8개의 생활 영역", html)
+        self.assertEqual(8, html.count('class="home-life-hub-card'))
+        for key in [
+            "age",
+            "family",
+            "education",
+            "anniversary",
+            "retirement",
+            "health",
+            "pets",
+            "generations",
+        ]:
+            self.assertIn(f'href="/{key}/"', html)
+        self.assertNotIn("표·비교 모음", html)
 
     def test_header_excludes_global_coupang_ad_aside(self):
         with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True), app.test_request_context("/"):
