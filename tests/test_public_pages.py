@@ -677,6 +677,52 @@ class PublicPageTests(unittest.TestCase):
                 self.assertIn("확인일 2026-06-22", html)
                 self.assertIn("공식 판단이나 진단을 대신하지 않습니다", html)
 
+    def test_core_age_pages_have_distinct_deep_content_sections(self):
+        client = app.test_client()
+        expectations = {
+            "/age": (
+                "생일이 지났는지에 따라 만나이가 한 살 달라집니다",
+                "만나이 공식",
+                "2월 29일과 음력 생일",
+                "계산 결과 다음에 확인할 일",
+            ),
+            "/birth-year-age-table": (
+                "출생연도만 알면 연나이와 만나이 범위를 빠르게 확인할 수 있습니다",
+                "나이·띠·세대·학교·기념 나이",
+                "출생연도표 해석 예외",
+                "표를 본 다음 할 일",
+            ),
+            "/annual-age-calculator": (
+                "연나이는 올해 연도에서 출생연도를 빼서 계산합니다",
+                "입력형 연나이 계산",
+                "연나이 사용 예외",
+                "연나이 결과 다음에 확인할 일",
+            ),
+            "/age-comparison-table": (
+                "비교표는 세 나이 체계의 차이를 개념별로 설명합니다",
+                "만나이·연나이·한국식 나이 공식 비교",
+                "비교표 해석 예외",
+                "비교한 다음 선택할 계산기",
+            ),
+            "/birthday-dday-calculator": (
+                "다음 생일까지 남은 날짜는 올해 생일과 내년 생일을 차례로 비교해 계산합니다",
+                "생일 D-day 공식",
+                "2월 29일 생일과 기준일 예외",
+                "D-day 결과 다음에 할 일",
+            ),
+        }
+
+        for path, phrases in expectations.items():
+            with self.subTest(path=path):
+                response = client.get(path)
+
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                self.assertRegex(html, r'class="[^"]*\bdirect-answer\b[^"]*"')
+                self.assertGreaterEqual(html.count("data-example-card"), 3)
+                for phrase in phrases:
+                    self.assertIn(phrase, html)
+
     def test_core_pages_render_contextual_links(self):
         client = app.test_client()
         core_paths = (

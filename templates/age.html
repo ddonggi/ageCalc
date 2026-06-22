@@ -132,6 +132,15 @@
                 </article>
             </div>
         </section>
+        <section class="section-shell direct-answer" aria-label="만나이 바로 답변">
+            <p class="eyebrow">바로 답변</p>
+            <h2>생일 전후를 확인하면 현재 만나이를 알 수 있습니다</h2>
+            <p>
+                기준연도에서 출생연도를 뺀 뒤, 올해 생일이 아직 지나지 않았다면 1을 뺍니다.
+                따라서 같은 출생연도라도 <strong>생일이 지났는지에 따라 만나이가 한 살 달라집니다</strong>.
+                정확한 결과에는 출생연도뿐 아니라 월과 일이 필요합니다.
+            </p>
+        </section>
         <form class="age-form" id="age-form" action="{{ url_for('age') }}" method="post" autocomplete="off">
             <div class="form-group">
                 <h3>생년월일을 입력하세요 (6자리)</h3>
@@ -195,11 +204,23 @@
                 예를 들어 1992-10-02 출생이라면, 생일 전날까지는 전년도 나이가 유지되고,
                 생일이 지난 시점부터 만나이가 1살 증가합니다. 즉 “생일 기준으로 변하는 나이”가 만나이의 핵심입니다.
             </p>
-            <ul>
-                <li>생일 전: 만 나이는 그대로 유지</li>
-                <li>생일 당일/이후: 만 나이 +1</li>
-                <li>연나이와 혼동 주의: 연나이는 생일과 무관하게 올해 기준으로 계산</li>
-            </ul>
+            <div class="section-card-grid">
+                <article class="section-card" data-example-card>
+                    <p class="eyebrow">사례 1 · 생일 전</p>
+                    <h3>1992년 10월 2일생, 2026년 10월 1일</h3>
+                    <p>2026-1992에서 아직 지나지 않은 생일을 반영해 만 33세입니다.</p>
+                </article>
+                <article class="section-card" data-example-card>
+                    <p class="eyebrow">사례 2 · 생일 당일</p>
+                    <h3>1992년 10월 2일생, 2026년 10월 2일</h3>
+                    <p>생일 당일부터 한 살이 올라가므로 만 34세입니다.</p>
+                </article>
+                <article class="section-card" data-example-card>
+                    <p class="eyebrow">사례 3 · 올해 출생</p>
+                    <h3>2026년 1월 15일생, 2026년 6월 22일</h3>
+                    <p>첫 생일 전이므로 만 0세이며, 월령은 아이 개월 수 계산기로 별도 확인합니다.</p>
+                </article>
+            </div>
             <p>
                 출생년도만으로 빠르게 보고 싶다면
                 <a href="{{ url_for('birth_year_age_table') }}">출생년도별 나이표</a>에서 여러 연도를 한눈에 확인할 수 있습니다.
@@ -214,6 +235,10 @@
         <!-- 연령별 주요 권리·제도 -->
         <div class="age-rights-section">
             <h3>🧑 연령별 주요 권리·제도 (만나이 기준)</h3>
+            <p>
+                기준 확인일: 2026-06-22. 아래 내용은 연령 조건을 이해하기 위한 일반 안내입니다.
+                실제 신청 가능 여부와 시행일은 정부24·국가법령정보센터·담당 기관의 최신 공고를 우선합니다.
+            </p>
 
             <div class="age-rights-grid">
                 <div class="age-right-item" data-age="14">
@@ -462,7 +487,7 @@
 
 
         <section aria-labelledby="how-works" style="margin-top:40px">
-            <h2 id="how-works">만나이 계산 방식</h2>
+            <h2 id="how-works">만나이 공식</h2>
             <p>
                 만나이는 출생일을 기준으로 오늘 날짜와의 차이를 연·월·일 단위로 계산해 산출합니다.
 
@@ -477,6 +502,31 @@
                 <li>윤년/말일 보정: 2월 29일 출생 등 특수 케이스 안내</li>
                 <li>서머타임/타임존: 날짜만 계산, 시·분은 사용하지 않음</li>
             </ul>
+        </section>
+
+        <section class="section-shell section-card-grid" aria-label="만나이 예외와 다음 행동">
+            <article class="section-card">
+                <p class="eyebrow">예외</p>
+                <h2>2월 29일과 음력 생일</h2>
+                <p>
+                    2월 29일 출생자는 윤년이 아닌 해의 생일 취급 기준이 기관별 업무 규정에 따라 달라질 수 있습니다.
+                    음력 생일은 먼저 양력 날짜로 환산한 뒤 만나이 공식을 적용합니다. 제출·계약·신청에 사용하는 나이라면
+                    계산 결과만 보지 말고 해당 기관이 지정한 기준일과 생일 처리 방식을 확인해야 합니다.
+                </p>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">다음 행동</p>
+                <h2>계산 결과 다음에 확인할 일</h2>
+                <p>
+                    정확한 만나이를 확인했다면 신청서의 기준일, 다음 생일까지 남은 기간, 학교나 가족의 주요 시점을 이어서 볼 수 있습니다.
+                    연도만 빠르게 비교하려면 출생년도별 나이표를, 생일과 무관한 연도 기준 숫자가 필요하면 연나이 계산기를 선택하세요.
+                </p>
+                <div class="footer-links">
+                    <a href="{{ url_for('birthday_dday_calculator') }}">다음 생일 확인</a>
+                    <a href="{{ url_for('birth_year_age_table') }}">출생연도표 보기</a>
+                    <a href="{{ url_for('annual_age_calculator') }}">연나이 계산</a>
+                </div>
+            </article>
         </section>
 
         <section aria-labelledby="compare">

@@ -6,6 +6,7 @@ from content.official_sources import SOURCE_CHECKED_AT, sources_for_hub
 EDITORIAL_AUTHOR = "AgeCalc 편집팀"
 EDITORIAL_REVIEWER = "AgeCalc 편집팀"
 DEFAULT_MODIFIED_AT = "2026-06-22"
+CORE_AGE_CONTENT_REVIEWED_AT = "2026-06-22"
 INFORMATIONAL_DISCLAIMER = (
     "이 페이지의 계산과 설명은 일반 정보이며, 관계 기관의 공식 판단이나 진단을 대신하지 않습니다. "
     "개별 상황은 관계 기관 또는 전문가에게 확인하세요."
@@ -56,7 +57,17 @@ def editorial_metadata_for(page: dict[str, object] | None) -> dict[str, object] 
     metadata = {
         "author": EDITORIAL_AUTHOR,
         "reviewer": EDITORIAL_REVIEWER,
-        "reviewed_at": SOURCE_CHECKED_AT,
+        "reviewed_at": (
+            CORE_AGE_CONTENT_REVIEWED_AT
+            if str(page["key"]) in {
+                "age",
+                "birth_year_age_table",
+                "annual_age_calculator",
+                "age_comparison_table",
+                "birthday_dday_calculator",
+            }
+            else SOURCE_CHECKED_AT
+        ),
         "modified_at": str(page.get("lastmod") or DEFAULT_MODIFIED_AT),
         "official_source_required": official_source_required,
         "sources": sources_for_hub(

@@ -65,6 +65,14 @@
                 </article>
             </div>
         </section>
+        <section class="section-shell direct-answer" aria-label="생일 D-day 바로 답변">
+            <p class="eyebrow">바로 답변</p>
+            <h2>올해 생일이 지났다면 내년 생일까지 계산합니다</h2>
+            <p>
+                <strong>다음 생일까지 남은 날짜는 올해 생일과 내년 생일을 차례로 비교해 계산합니다.</strong>
+                오늘이 생일이면 D-Day, 아직 남았다면 올해 생일까지, 이미 지났다면 내년 생일까지의 날짜 차이를 표시합니다.
+            </p>
+        </section>
 
         <section class="section-shell">
             <div class="section-heading">
@@ -136,7 +144,7 @@
             </div>
             <div class="section-card-grid">
                 {% for example in examples %}
-                <article class="section-card">
+                <article class="section-card" data-example-card>
                     <p class="eyebrow">{{ example.birthday_label }}</p>
                     <h2>{{ example.next_birthday_date }}</h2>
                     <p>{{ example.status_note }}</p>
@@ -149,7 +157,7 @@
         <section class="section-shell section-card-grid">
             <article class="section-card">
                 <p class="eyebrow">계산 기준</p>
-                <h2>어떻게 계산하나요?</h2>
+                <h2>생일 D-day 공식</h2>
                 <ul>
                     <li>입력한 월과 일을 기준으로 오늘 이후 가장 가까운 생일 날짜를 찾습니다.</li>
                     <li>오늘이 생일이면 D-Day로 표시하고, 아니면 남은 일수를 D-형식으로 보여줍니다.</li>
@@ -165,6 +173,25 @@
                     <a href="{{ url_for('age') }}">만나이 계산기</a>
                     <a href="{{ url_for('references') }}">계산 기준과 참고 자료</a>
                 </div>
+            </article>
+        </section>
+
+        <section class="section-shell section-card-grid">
+            <article class="section-card">
+                <p class="eyebrow">예외</p>
+                <h2>2월 29일 생일과 기준일 예외</h2>
+                <p>
+                    2월 29일을 입력하면 다음 실제 2월 29일까지 계산합니다. 윤년이 아닌 해에 2월 28일이나 3월 1일을 생일처럼
+                    기념하는 개인적 관행은 자동으로 바꾸지 않습니다. 해외 체류 중이라면 페이지가 사용하는 오늘 날짜와 현지 날짜가 같은지도 확인하세요.
+                </p>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">다음 행동</p>
+                <h2>D-day 결과 다음에 할 일</h2>
+                <p>
+                    생일까지 남은 기간을 확인한 뒤 정확한 만나이를 계산하거나, 백일·돌·개인 기념일처럼 시작일 포함 규칙이 필요한 날짜는
+                    100일 계산기와 기념일 계산기로 구분해 확인하세요.
+                </p>
             </article>
         </section>
 

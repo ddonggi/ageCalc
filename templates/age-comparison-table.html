@@ -66,6 +66,15 @@
                 </article>
             </div>
         </section>
+        <section class="section-shell direct-answer" aria-label="나이 체계 비교 바로 답변">
+            <p class="eyebrow">바로 답변</p>
+            <h2>같은 사람도 나이 체계에 따라 숫자가 달라집니다</h2>
+            <p>
+                <strong>비교표는 세 나이 체계의 차이를 개념별로 설명합니다.</strong>
+                만나이는 생일을 반영하고, 연나이는 올해와 출생연도의 차이만 사용하며,
+                한국식 나이는 태어날 때 1세로 시작해 새해마다 증가하는 관행적 표현입니다.
+            </p>
+        </section>
 
         <section class="section-shell">
             <div class="section-heading">
@@ -123,7 +132,7 @@
             </div>
             <div class="section-card-grid">
                 {% for example in examples %}
-                <article class="section-card">
+                <article class="section-card" data-example-card>
                     <p class="eyebrow">{{ example.label }}</p>
                     <h2>{{ example.annual_age }} / {{ example.man_age_range }}</h2>
                     <p>{{ example.diff_note }}</p>
@@ -166,11 +175,11 @@
         <section class="section-shell section-card-grid">
             <article class="section-card">
                 <p class="eyebrow">기준 설명</p>
-                <h2>왜 다르게 보이나요?</h2>
+                <h2>만나이·연나이·한국식 나이 공식 비교</h2>
                 <ul>
                     <li>만나이는 생일이 지나야 1살이 늘어나는 방식입니다.</li>
                     <li>연나이는 생일과 관계없이 올해에서 출생연도를 뺀 값입니다.</li>
-                    <li>그래서 생일 전에는 같은 사람도 연나이가 만나이보다 1살 크게 보일 수 있습니다.</li>
+                    <li>한국식 나이는 출생 시 1세, 매년 1월 1일에 1세를 더하는 관행적 방식입니다.</li>
                 </ul>
             </article>
             <article class="section-card">
@@ -182,6 +191,25 @@
                     <a href="{{ url_for('birth_year_age_table') }}">출생년도별 나이표</a>
                     <a href="{{ url_for('references') }}">계산 기준과 참고 자료</a>
                 </div>
+            </article>
+        </section>
+
+        <section class="section-shell section-card-grid">
+            <article class="section-card">
+                <p class="eyebrow">예외</p>
+                <h2>비교표 해석 예외</h2>
+                <p>
+                    비교표의 만나이는 출생연도만 알고 있다는 전제로 범위를 표시합니다. 정확한 월과 일이 있으면 단일 만나이로 좁혀야 합니다.
+                    법령이나 기관 공고에 별도 연령 정의가 있으면 일반 공식보다 그 문서의 정의와 기준일이 우선합니다.
+                </p>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">다음 행동</p>
+                <h2>비교한 다음 선택할 계산기</h2>
+                <p>
+                    현재의 정확한 숫자가 필요하면 만나이 계산기를, 출생연도만으로 빠르게 찾으려면 출생년도별 나이표를 사용하세요.
+                    생일과 무관한 연도 차이를 직접 입력해 확인하려면 연나이 계산기가 맞습니다.
+                </p>
             </article>
         </section>
 
