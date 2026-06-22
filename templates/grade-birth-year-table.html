@@ -65,6 +65,11 @@
                 </article>
             </div>
         </section>
+        <section class="section-shell direct-answer" aria-label="학년별 출생연도 바로 답변">
+            <p class="eyebrow">바로 답변 · 학년별 출생연도 해석</p>
+            <h2>학년에서 일반적인 출생연도를 역산합니다</h2>
+            <p><strong>학년을 선택하면 일반적으로 해당하는 출생연도를 확인할 수 있습니다.</strong> {{ school_year }}학년도와 학교급별 입학 나이를 기준으로 역산합니다.</p>
+        </section>
 
         <section class="section-shell">
             <div class="section-heading">
@@ -122,6 +127,10 @@
                         <span>{{ selected_row.man_age_range }}</span>
                     </div>
                 </div>
+                <div class="footer-links">
+                    <a href="{{ url_for('college_entry_year_calculator', year=selected_row.high_graduation_date[:4]|int) }}">대학 학번 흐름 확인</a>
+                    <a href="{{ url_for('parent_child') }}">부모·자녀 나이 관계 보기</a>
+                </div>
             </article>
         </section>
         {% endif %}
@@ -133,7 +142,7 @@
             </div>
             <div class="section-card-grid">
                 {% for example in examples %}
-                <article class="section-card">
+                <article class="section-card" data-example-card>
                     <p class="eyebrow">{{ example.query_label }}</p>
                     <h2>{{ example.birth_year_label }}</h2>
                     <p>{{ example.label }}은 보통 {{ example.birth_year_label }}이 해당합니다.</p>
@@ -176,6 +185,16 @@
 
         <section class="section-shell section-card-grid">
             <article class="section-card">
+                <p class="eyebrow">출생연도 예외</p>
+                <h2>빠른년생과 출생연도 예외</h2>
+                <p>과거 빠른년생 관행, 조기입학과 입학유예가 있으면 같은 학년의 출생연도가 표와 다를 수 있습니다.</p>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">적용 제외</p>
+                <h2>조기입학·입학유예·해외 학제</h2>
+                <p>1~2월생을 일괄적으로 다른 학년에 배치하지 않으며 실제 학적과 해외 학제는 학교 기록을 확인합니다.</p>
+            </article>
+            <article class="section-card">
                 <p class="eyebrow">같이 보기</p>
                 <h2>연관 페이지</h2>
                 <div class="footer-links">
@@ -185,6 +204,11 @@
                     <a href="{{ url_for('references') }}">계산 기준과 참고 자료</a>
                 </div>
             </article>
+        </section>
+
+        <section class="section-shell">
+            <h2>교육부와 국가법령정보센터 기준</h2>
+            <p>학년도와 취학 의무의 공식 기준을 확인하며 출처 확인일은 2026-06-22입니다.</p>
         </section>
 
         {% include 'partials/footer.html' %}

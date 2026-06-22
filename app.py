@@ -448,6 +448,8 @@ def _build_school_grade_snapshot(birth_year: int, school_year: int) -> dict[str,
     elementary_entry = birth_year + 7
     middle_entry = birth_year + 13
     high_entry = birth_year + 16
+    high_graduation_school_year = birth_year + 18
+    high_graduation_year = birth_year + 19
 
     return {
         "year": birth_year,
@@ -457,6 +459,8 @@ def _build_school_grade_snapshot(birth_year: int, school_year: int) -> dict[str,
         "elementary_entry": f"{elementary_entry}학년도",
         "middle_entry": f"{middle_entry}학년도",
         "high_entry": f"{high_entry}학년도",
+        "high_graduation_school_year": f"{high_graduation_school_year}학년도",
+        "high_graduation_date": f"{high_graduation_year}년 2월",
     }
 
 
@@ -481,6 +485,8 @@ def _build_school_entry_snapshot(birth_year: int, school_year: int) -> dict[str,
         "elementary_entry": grade_snapshot["elementary_entry"],
         "middle_entry": grade_snapshot["middle_entry"],
         "high_entry": grade_snapshot["high_entry"],
+        "high_graduation_school_year": grade_snapshot["high_graduation_school_year"],
+        "high_graduation_date": grade_snapshot["high_graduation_date"],
     }
 
 
@@ -494,6 +500,10 @@ def _build_grade_age_snapshot(stage: str, grade: int, school_year: int, current_
     birth_year = school_year - offset - (grade - 1)
     annual_age = current_year - birth_year
     man_age_range = _birth_year_range_label(birth_year, current_year)
+    elementary_entry = birth_year + 7
+    middle_entry = birth_year + 13
+    high_entry = birth_year + 16
+    high_graduation_year = birth_year + 19
 
     note = f"{school_year}학년도 {school_label} {grade}학년은 보통 {birth_year}년생이 해당하며, 올해 기준 연나이는 {annual_age}세입니다."
 
@@ -502,8 +512,13 @@ def _build_grade_age_snapshot(stage: str, grade: int, school_year: int, current_
         "grade": grade,
         "label": f"{school_label} {grade}학년",
         "birth_year_label": f"{birth_year}년생",
+        "birth_year": birth_year,
         "annual_age": f"{annual_age}세",
         "man_age_range": man_age_range,
+        "elementary_entry": f"{elementary_entry}학년도",
+        "middle_entry": f"{middle_entry}학년도",
+        "high_entry": f"{high_entry}학년도",
+        "high_graduation_date": f"{high_graduation_year}년 2월",
         "note": note,
     }
 
@@ -821,6 +836,7 @@ def _build_college_entry_snapshot(entry_year: int, current_year: int) -> dict[st
     annual_age = current_year - birth_year
     man_age_range = _birth_year_range_label(birth_year, current_year)
     cohort_label = _format_college_cohort_label(entry_year)
+    high_graduation_year = entry_year
 
     if entry_year > current_year:
         status_note = f"{cohort_label}은 아직 입학 전이거나 입학 준비 중인 시기로, 보통 {birth_year}년생 기준으로 안내합니다."
@@ -839,6 +855,7 @@ def _build_college_entry_snapshot(entry_year: int, current_year: int) -> dict[st
         "man_age_range": man_age_range,
         "detail": status_note,
         "query_label": f"{cohort_label}은 보통 몇 년생",
+        "high_graduation_date": f"{high_graduation_year}년 2월",
     }
 
 

@@ -723,6 +723,99 @@ class PublicPageTests(unittest.TestCase):
                 for phrase in phrases:
                     self.assertIn(phrase, html)
 
+    def test_core_education_pages_have_distinct_deep_content_sections(self):
+        client = app.test_client()
+        expectations = {
+            "/school-grade-calculator": (
+                "출생연도로 현재 학년과 졸업 예정 학년도를 계산합니다",
+                "현재 학년 계산",
+                "학년도와 1~2월 기준",
+                "조기입학·입학유예·해외 학제",
+            ),
+            "/school-entry-year-table": (
+                "출생연도로 초등학교·중학교·고등학교 입학 학년도를 확인합니다",
+                "입학 시점 계산",
+                "취학통지서와 실제 입학",
+                "조기입학·입학유예·해외 학제",
+            ),
+            "/grade-age-table": (
+                "학년을 선택하면 그 학년의 일반적인 나이 범위를 확인할 수 있습니다",
+                "학년별 나이 해석",
+                "같은 학년의 나이가 다른 이유",
+                "조기입학·입학유예·해외 학제",
+            ),
+            "/grade-birth-year-table": (
+                "학년을 선택하면 일반적으로 해당하는 출생연도를 확인할 수 있습니다",
+                "학년별 출생연도 해석",
+                "빠른년생과 출생연도 예외",
+                "조기입학·입학유예·해외 학제",
+            ),
+            "/college-entry-year-calculator": (
+                "학번으로 일반적인 출생연도와 현재 나이 범위를 역산합니다",
+                "대학 학번 역산",
+                "재수·편입·복학 예외",
+                "해외 대학과 학교별 학번 체계",
+            ),
+        }
+
+        for path, phrases in expectations.items():
+            with self.subTest(path=path):
+                response = client.get(path)
+
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                self.assertRegex(html, r'class="[^"]*\bdirect-answer\b[^"]*"')
+                self.assertGreaterEqual(html.count("data-example-card"), 3)
+                self.assertIn("교육부", html)
+                self.assertIn("국가법령정보센터", html)
+                self.assertIn("확인일 2026-06-22", html)
+                for phrase in phrases:
+                    self.assertIn(phrase, html)
+
+    def test_education_results_link_to_next_school_milestones(self):
+        client = app.test_client()
+        cases = {
+            "/school-grade-calculator?year=2015": (
+                "2028학년도 중학교 입학",
+                "2034년 2월 고등학교 졸업 예정",
+                'href="/school-entry-year-table?year=2015"',
+                'href="/parent-child"',
+            ),
+            "/school-entry-year-table?year=2019": (
+                "2026학년도 초등학교 입학",
+                "2038년 2월 고등학교 졸업 예정",
+                'href="/school-grade-calculator?year=2019"',
+                'href="/parent-child"',
+            ),
+            "/grade-age-table?stage=middle&grade=1": (
+                "중학교 1학년",
+                "고등학교 입학 시점 확인",
+                'href="/school-entry-year-table',
+                'href="/parent-child"',
+            ),
+            "/grade-birth-year-table?stage=high&grade=1": (
+                "고등학교 1학년",
+                "대학 학번 흐름 확인",
+                'href="/college-entry-year-calculator',
+                'href="/parent-child"',
+            ),
+            "/college-entry-year-calculator?year=2026": (
+                "26학번",
+                "고등학교 졸업 시점 역산",
+                'href="/grade-birth-year-table',
+                'href="/parent-child"',
+            ),
+        }
+
+        for path, phrases in cases.items():
+            with self.subTest(path=path):
+                response = client.get(path)
+
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                for phrase in phrases:
+                    self.assertIn(phrase, html)
+
     def test_core_pages_render_contextual_links(self):
         client = app.test_client()
         core_paths = (

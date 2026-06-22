@@ -65,6 +65,11 @@
                 </article>
             </div>
         </section>
+        <section class="section-shell direct-answer" aria-label="대학 학번 바로 답변">
+            <p class="eyebrow">바로 답변 · 대학 학번 역산</p>
+            <h2>학번에서 일반적인 고교 졸업연도와 출생연도를 역산합니다</h2>
+            <p><strong>학번으로 일반적인 출생연도와 현재 나이 범위를 역산합니다.</strong> 일반 진학 흐름에서는 입학연도-19를 출생연도로 봅니다.</p>
+        </section>
 
         <section class="section-shell">
             <div class="section-heading">
@@ -112,6 +117,11 @@
                         <span>{{ selected_row.man_age_range }}</span>
                     </div>
                 </div>
+                <p>{{ selected_row.high_graduation_date }} 고등학교 졸업 시점 역산 기준입니다.</p>
+                <div class="footer-links">
+                    <a href="{{ url_for('grade_birth_year_table', stage='high', grade=3) }}">고등학교 졸업 시점 역산</a>
+                    <a href="{{ url_for('parent_child') }}">부모·자녀 나이 관계 보기</a>
+                </div>
             </article>
         </section>
         {% endif %}
@@ -123,7 +133,7 @@
             </div>
             <div class="section-card-grid">
                 {% for example in examples %}
-                <article class="section-card">
+                <article class="section-card" data-example-card>
                     <p class="eyebrow">{{ example.query_label }}</p>
                     <h2>{{ example.cohort_label }}</h2>
                     <p>{{ example.birth_year_label }} 기준으로 보는 일반적인 흐름입니다.</p>
@@ -169,7 +179,7 @@
         <section class="section-shell section-card-grid">
             <article class="section-card">
                 <p class="eyebrow">계산 기준</p>
-                <h2>어떻게 계산하나요?</h2>
+                <h2>대학 학번 역산</h2>
                 <ul>
                     <li>일반적인 진학 흐름에서는 대학 입학연도 = 출생연도 + 19년 기준으로 계산합니다.</li>
                     <li>현재 연나이는 {{ current_year }}년 - 출생연도로 계산합니다.</li>
@@ -178,12 +188,18 @@
             </article>
             <article class="section-card">
                 <p class="eyebrow">자주 묻는 질문</p>
-                <h2>학번으로 몇 년생인지 볼 때</h2>
+                <h2>재수·편입·복학 예외</h2>
                 <ul>
                     <li><strong>26학번은 몇 년생인가요?</strong> 일반적인 진학 흐름에서는 2026년에 대학에 입학한 학번이므로 보통 2007년생으로 봅니다.</li>
                     <li><strong>학번은 입학연도와 같은 뜻인가요?</strong> 보통은 입학한 연도의 끝 두 자리를 학번으로 부르지만, 학교나 전형에 따라 세부 기준이 다를 수 있습니다.</li>
                     <li><strong>재수하면 학번과 출생연도가 달라지나요?</strong> 달라질 수 있습니다. 재수, 삼수, 편입, 조기입학은 개인별 차이가 있어 이 페이지는 일반적인 기준만 안내합니다.</li>
                 </ul>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">적용 제외</p>
+                <h2>해외 대학과 학교별 학번 체계</h2>
+                <p>해외 대학, 편입생, 대학원, 학교별 고유 학번 부여 방식은 입학연도 끝 두 자리와 일치하지 않을 수 있습니다.</p>
+                <p>초·중등 학제 연결은 교육부와 국가법령정보센터 자료를 참고하며 출처 확인일은 2026-06-22입니다.</p>
             </article>
             <article class="section-card">
                 <p class="eyebrow">같이 보기</p>

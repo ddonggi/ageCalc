@@ -28,6 +28,16 @@ OFFICIAL_SOURCES_BY_HUB = {
             "초·중등교육법 제13조(취학 의무)",
             "https://www.law.go.kr/법령/초·중등교육법",
         ),
+        _source(
+            "교육부",
+            "초·중등 교육 정책 안내",
+            "https://www.moe.go.kr/",
+        ),
+        _source(
+            "정부24",
+            "취학통지서 온라인 발급 안내",
+            "https://www.gov.kr/",
+        ),
     ),
     "family": (
         _source(
