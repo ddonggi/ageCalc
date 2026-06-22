@@ -35,6 +35,8 @@ class PreflightIssue:
 class PreflightReport:
     checked_pages: int = 0
     sitemap_urls: int = 0
+    content_quality_failures: int = 0
+    content_quality_warnings: int = 0
     issues: list[PreflightIssue] = field(default_factory=list)
 
     @property
@@ -125,6 +127,7 @@ def _validate_ads_txt(ads_path: Path, adsense_client_id: str, report: PreflightR
 
 def run_local_preflight() -> PreflightReport:
     from app import ADSENSE_CLIENT_ID, SITE_BASE_URL, app
+    from scripts.content_quality_audit import audit_local_pages
 
     report = PreflightReport()
     client = app.test_client()
@@ -197,13 +200,23 @@ def run_local_preflight() -> PreflightReport:
 
     _validate_robots_txt(PROJECT_ROOT / "static" / "robots.txt", SITE_BASE_URL, report)
     _validate_ads_txt(PROJECT_ROOT / "static" / "ads.txt", ADSENSE_CLIENT_ID, report)
+    quality_report = audit_local_pages()
+    report.content_quality_failures = sum(
+        not result.passed for result in quality_report.results
+    )
+    report.content_quality_warnings = quality_report.warning_count
     return report
 
 
 def format_report(report: PreflightReport) -> str:
     status = "PASS" if report.ok else "FAIL"
     lines = [
-        f"[adsense-preflight] {status} checked_pages={report.checked_pages} sitemap_urls={report.sitemap_urls}",
+        (
+            f"[adsense-preflight] {status} checked_pages={report.checked_pages} "
+            f"sitemap_urls={report.sitemap_urls} "
+            f"quality_failures={report.content_quality_failures} "
+            f"quality_warnings={report.content_quality_warnings}"
+        ),
     ]
     for issue in report.issues:
         lines.append(f"- {issue.code}: {issue.target} - {issue.message}")
@@ -215,6 +228,8 @@ def _report_to_json(report: PreflightReport) -> str:
         "ok": report.ok,
         "checked_pages": report.checked_pages,
         "sitemap_urls": report.sitemap_urls,
+        "content_quality_failures": report.content_quality_failures,
+        "content_quality_warnings": report.content_quality_warnings,
         "issues": [issue.__dict__ for issue in report.issues],
     }
     return json.dumps(payload, ensure_ascii=False, indent=2)
