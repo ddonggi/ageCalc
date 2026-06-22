@@ -1,0 +1,57 @@
+{% if editorial_metadata %}
+<aside class="editorial-meta" aria-labelledby="editorial-meta-title">
+    <div class="editorial-meta-heading">
+        <p class="eyebrow">Editorial Standard</p>
+        <h2 id="editorial-meta-title">작성·검수 정보</h2>
+    </div>
+    <dl class="editorial-meta-facts">
+        <div>
+            <dt>작성</dt>
+            <dd>{{ editorial_metadata.author }}</dd>
+        </div>
+        <div>
+            <dt>검수</dt>
+            <dd>{{ editorial_metadata.reviewer }}</dd>
+        </div>
+        <div>
+            <dt>기준 확인일</dt>
+            <dd>{{ editorial_metadata.reviewed_at }}</dd>
+        </div>
+        <div>
+            <dt>최종 수정일</dt>
+            <dd>{{ editorial_metadata.modified_at }}</dd>
+        </div>
+    </dl>
+    <div class="editorial-meta-sources">
+        <h3>참고 출처</h3>
+        <ul>
+            {% for source in editorial_metadata.sources %}
+            <li data-official-source="{{ 'true' if source.official else 'false' }}">
+                <a href="{{ source.url }}"
+                    {% if source.url.startswith('https://') %}target="_blank" rel="noopener noreferrer"{% endif %}>
+                    {{ source.institution }} · {{ source.title }}
+                </a>
+                <span>확인일 {{ source.checked_at }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% if editorial_metadata.disclaimer %}
+    <p class="editorial-disclaimer">{{ editorial_metadata.disclaimer }}</p>
+    {% endif %}
+    <p class="editorial-correction">
+        기준 오류나 수정 제안은 <a href="{{ url_for('contact') }}">문의 페이지</a>로 보내주세요.
+    </p>
+</aside>
+<script type="application/ld+json" nonce="{{ csp_nonce }}">
+{{ {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": current_page.title,
+    "url": site_base_url ~ current_page.path,
+    "dateModified": editorial_metadata.modified_at,
+    "author": {"@type": "Organization", "name": editorial_metadata.author},
+    "reviewedBy": {"@type": "Organization", "name": editorial_metadata.reviewer}
+} | tojson }}
+</script>
+{% endif %}

@@ -8,6 +8,7 @@ from pathlib import Path
 import secrets
 from zoneinfo import ZoneInfo
 from controllers.age_controller import AgeController
+from content.editorial_metadata import editorial_metadata_for
 from content.guide_pages import GUIDE_PAGE_BY_SLUG, GUIDE_PAGES
 from content.hub_pages import HUB_PAGE_BY_KEY, HUB_PAGES
 from content.page_registry import (
@@ -197,6 +198,9 @@ def inject_csp_nonce():
         "life_hubs": HUB_PAGES,
         "primary_life_hubs": HUB_PAGES[:4],
         "current_hub_key": current_hub_key,
+        "current_page": current_page,
+        "site_base_url": SITE_BASE_URL,
+        "editorial_metadata": editorial_metadata_for(current_page),
         "breadcrumbs": breadcrumbs,
         "breadcrumb_schema": breadcrumb_schema,
         "footer_policy_links": FOOTER_POLICY_LINKS,

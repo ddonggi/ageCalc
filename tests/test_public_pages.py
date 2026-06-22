@@ -601,6 +601,72 @@ class PublicPageTests(unittest.TestCase):
                 self.assertIn('class="breadcrumbs"', html)
                 self.assertIn('"@type": "BreadcrumbList"', html)
 
+    def test_core_pages_render_editorial_metadata(self):
+        client = app.test_client()
+        core_paths = (
+            "/age",
+            "/birth-year-age-table",
+            "/school-grade-calculator",
+            "/school-entry-year-table",
+            "/age-gap-calculator",
+            "/100-day-calculator",
+            "/annual-age-calculator",
+            "/age-comparison-table",
+            "/grade-age-table",
+            "/pet-age-table",
+            "/korean-age-guide",
+            "/pet-months-table",
+            "/grade-birth-year-table",
+            "/college-entry-year-calculator",
+            "/birthday-dday-calculator",
+            "/dog",
+            "/cat",
+            "/baby-months",
+            "/d-day",
+            "/parent-child",
+        )
+
+        self.assertEqual(20, len(core_paths))
+        for path in core_paths:
+            with self.subTest(path=path):
+                response = client.get(path)
+
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                self.assertIn('class="editorial-meta"', html)
+                self.assertIn("작성·검수 정보", html)
+                self.assertIn("AgeCalc 편집팀", html)
+                self.assertIn("기준 확인일", html)
+                self.assertIn("최종 수정일", html)
+                self.assertIn("참고 출처", html)
+                self.assertIn('"@type": "WebPage"', html)
+                self.assertIn('"dateModified"', html)
+                self.assertIn('"author"', html)
+                self.assertIn('"reviewedBy"', html)
+
+    def test_ymyl_pages_require_official_sources(self):
+        client = app.test_client()
+        ymyl_paths = (
+            "/age",
+            "/school-grade-calculator",
+            "/school-entry-year-table",
+            "/grade-age-table",
+            "/dog",
+            "/cat",
+            "/baby-months",
+        )
+
+        for path in ymyl_paths:
+            with self.subTest(path=path):
+                response = client.get(path)
+
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                self.assertIn('data-official-source="true"', html)
+                self.assertRegex(html, r'href="https://[^"]+"')
+                self.assertIn("확인일 2026-06-22", html)
+                self.assertIn("공식 판단이나 진단을 대신하지 않습니다", html)
+
     def test_public_sitemap_pages_render_adsense_approval_code(self):
         client = app.test_client()
 
