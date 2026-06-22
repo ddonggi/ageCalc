@@ -7,6 +7,7 @@ from app import app
 from content.page_registry import (
     CONTENT_ACTIONS,
     GUIDE_PAGE_REGISTRY,
+    HUB_PAGE_REGISTRY,
     PUBLIC_PAGE_REGISTRY,
     REQUIRED_PAGE_FIELDS,
     STATIC_PAGE_REGISTRY,
@@ -17,8 +18,9 @@ from content.page_registry import (
 class PageRegistryTests(unittest.TestCase):
     def test_registry_covers_current_static_and_guide_pages(self):
         self.assertEqual(31, len(STATIC_PAGE_REGISTRY))
+        self.assertEqual(8, len(HUB_PAGE_REGISTRY))
         self.assertEqual(20, len(GUIDE_PAGE_REGISTRY))
-        self.assertEqual(51, len(PUBLIC_PAGE_REGISTRY))
+        self.assertEqual(59, len(PUBLIC_PAGE_REGISTRY))
 
         self.assertEqual(
             {"index", "age", "blog_list"},
@@ -55,10 +57,11 @@ class PageRegistryTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         urls = re.findall(r"<loc>(.*?)</loc>", response.get_data(as_text=True))
-        self.assertEqual(50, len(urls))
-        self.assertEqual(50, len(set(urls)))
+        self.assertEqual(58, len(urls))
+        self.assertEqual(58, len(set(urls)))
         self.assertNotIn("https://agecalc.cloud/blog", urls)
         self.assertIn("https://agecalc.cloud/age", urls)
+        self.assertIn("https://agecalc.cloud/age/", urls)
         self.assertIn(
             "https://agecalc.cloud/guides/age-calculation-2026",
             urls,

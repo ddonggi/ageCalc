@@ -1794,6 +1794,201 @@ body:not(.home-page):not(.blog-page):not(.games-hub-page):not(.age-page) .contai
     font-weight: 700;
 }
 
+.life-hub-page .container {
+    gap: 22px;
+}
+
+.life-hub-hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+    min-height: 470px;
+    overflow: hidden;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-xl);
+    background:
+        linear-gradient(rgba(112, 82, 52, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(112, 82, 52, 0.05) 1px, transparent 1px),
+        var(--paper);
+    background-size: 34px 34px, 34px 34px, auto;
+    box-shadow: var(--shadow);
+}
+
+.life-hub-hero::before {
+    content: "";
+    position: absolute;
+    inset: 18px;
+    pointer-events: none;
+    border: 1px solid rgba(76, 55, 38, 0.12);
+}
+
+.life-hub-copy,
+.life-hub-index {
+    position: relative;
+    z-index: 1;
+    padding: clamp(34px, 6vw, 78px);
+}
+
+.life-hub-copy {
+    display: grid;
+    align-content: center;
+    justify-items: start;
+    gap: 20px;
+}
+
+.life-hub-copy h1 {
+    max-width: 7ch;
+    margin: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(3.4rem, 8vw, 7.5rem);
+    font-weight: 400;
+    line-height: 0.94;
+    letter-spacing: -0.045em;
+}
+
+.life-hub-copy .page-intro {
+    max-width: 54ch;
+    margin: 0;
+}
+
+.life-hub-index {
+    display: grid;
+    align-content: end;
+    gap: 28px;
+    color: var(--paper);
+    background: var(--surface-dark);
+}
+
+.life-hub-stamp {
+    display: grid;
+    place-items: center;
+    width: 96px;
+    height: 96px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    font-family: var(--number-font);
+    font-size: 2rem;
+    transform: rotate(-7deg);
+}
+
+.life-hub-index ol {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid rgba(255, 250, 240, 0.3);
+}
+
+.life-hub-index li {
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr);
+    align-items: center;
+    min-height: 58px;
+    border-bottom: 1px solid rgba(255, 250, 240, 0.2);
+}
+
+.life-hub-index li span {
+    font-family: var(--number-font);
+    color: rgba(255, 250, 240, 0.58);
+}
+
+.life-hub-index a {
+    color: var(--paper);
+    font-weight: 700;
+}
+
+.life-hub-link-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-top: 1px solid var(--line-strong);
+}
+
+.life-hub-link-list a {
+    display: grid;
+    gap: 8px;
+    min-height: 150px;
+    padding: 24px;
+    color: var(--text);
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+
+.life-hub-link-list a:last-child {
+    border-right: 0;
+}
+
+.life-hub-link-list a:hover,
+.life-hub-link-list a:focus-visible {
+    color: var(--text);
+    background: rgba(190, 77, 36, 0.07);
+}
+
+.life-hub-link-list strong {
+    font-size: 1.08rem;
+}
+
+.life-hub-link-list span {
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+.hub-theme-olive .life-hub-index {
+    background: #4f5840;
+}
+
+.hub-theme-mustard .life-hub-index {
+    background: #765a2d;
+}
+
+.hub-theme-terracotta .life-hub-index {
+    background: #71351f;
+}
+
+@media (max-width: 900px) {
+    .life-hub-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .life-hub-index {
+        padding-block: 30px;
+    }
+
+    .life-hub-stamp {
+        width: 74px;
+        height: 74px;
+    }
+}
+
+@media (max-width: 760px) {
+    .life-hub-page .container {
+        width: min(100vw - 16px, 100%);
+    }
+
+    .life-hub-hero {
+        min-height: auto;
+        border-radius: var(--radius-lg);
+    }
+
+    .life-hub-copy,
+    .life-hub-index {
+        padding: 28px 22px;
+    }
+
+    .life-hub-copy h1 {
+        font-size: clamp(3rem, 17vw, 4.8rem);
+    }
+
+    .life-hub-link-list {
+        grid-template-columns: 1fr;
+    }
+
+    .life-hub-link-list a {
+        min-height: 0;
+        border-right: 0;
+    }
+}
+
 .hub-link-list {
     display: flex;
     flex-wrap: wrap;

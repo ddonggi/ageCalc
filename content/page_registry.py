@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from content.guide_pages import GUIDE_PAGES
+from content.hub_pages import HUB_PAGES
 
 
 CONTENT_ACTIONS = frozenset({"keep", "strengthen", "merge", "noindex"})
@@ -357,7 +358,24 @@ def _guide_page(page: dict[str, object]) -> dict[str, object]:
 
 
 GUIDE_PAGE_REGISTRY = tuple(_guide_page(page) for page in GUIDE_PAGES)
-PUBLIC_PAGE_REGISTRY = STATIC_PAGE_REGISTRY + GUIDE_PAGE_REGISTRY
+HUB_PAGE_REGISTRY = tuple(
+    {
+        "key": f"hub:{hub['key']}",
+        "endpoint": "life_hub",
+        "route_values": {"hub_key": hub["key"]},
+        "path": hub["path"],
+        "hub": hub["key"],
+        "title": hub["title"],
+        "search_intent": f"{hub['title']} 관련 계산기와 기준 탐색",
+        "content_action": "keep",
+        "indexable": True,
+        "release_batch": "foundation",
+        "priority": "core",
+        "related_endpoints": tuple(link["endpoint"] for link in hub["primary_links"]),
+    }
+    for hub in HUB_PAGES
+)
+PUBLIC_PAGE_REGISTRY = STATIC_PAGE_REGISTRY + HUB_PAGE_REGISTRY + GUIDE_PAGE_REGISTRY
 
 
 def validate_page_registry() -> tuple[str, ...]:
@@ -380,11 +398,12 @@ def validate_page_registry() -> tuple[str, ...]:
 
 
 def indexable_static_pages(*, blog_public_indexable: bool) -> tuple[dict[str, object], ...]:
-    return tuple(
+    static_pages = tuple(
         page
         for page in STATIC_PAGE_REGISTRY
         if page["indexable"] and (page["endpoint"] != "blog_list" or blog_public_indexable)
     )
+    return static_pages + tuple(page for page in HUB_PAGE_REGISTRY if page["indexable"])
 
 
 def indexable_guide_pages() -> tuple[dict[str, object], ...]:

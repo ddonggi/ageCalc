@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <title>{{ hub.title }} | AgeCalc 라이프 허브</title>
+    <meta name="description" content="{{ hub.description }}" />
+    <link rel="canonical" href="{{ hub.canonical }}" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="{{ hub.title }} | AgeCalc 라이프 허브" />
+    <meta property="og:description" content="{{ hub.description }}" />
+    <meta property="og:url" content="{{ hub.canonical }}" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=life-hubs-20260622a" />
+    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    {% include 'partials/adsense.html' %}
+</head>
+
+<body class="life-hub-page hub-theme-{{ hub.accent }}">
+    <div class="container">
+        {% include 'partials/header.html' %}
+
+        <section class="life-hub-hero">
+            <div class="life-hub-copy">
+                <p class="eyebrow">{{ hub.eyebrow }} Life Calendar</p>
+                <h1>{{ hub.title }}</h1>
+                <p class="page-intro">{{ hub.intro }}</p>
+                <a class="btn btn-primary" href="{{ url_for(hub.primary_links[0].endpoint) }}">{{ hub.primary_links[0].label }} 시작</a>
+            </div>
+            <div class="life-hub-index" aria-label="{{ hub.title }} 대표 도구 목록">
+                <span class="life-hub-stamp" aria-hidden="true">{{ "%02d"|format(hub_number) }}</span>
+                <ol>
+                    {% for link in hub.primary_links %}
+                    <li>
+                        <span>{{ "%02d"|format(loop.index) }}</span>
+                        <a href="{{ url_for(link.endpoint) }}">{{ link.label }}</a>
+                    </li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </section>
+
+        <section class="section-shell life-hub-tools">
+            <div class="section-heading">
+                <p class="eyebrow">대표 도구</p>
+                <h2>{{ hub.title }}에서 먼저 확인할 것</h2>
+                <p class="section-intro">{{ hub.description }}</p>
+            </div>
+            <div class="hub-card-grid">
+                {% for link in hub.primary_links %}
+                <a class="hub-card-link" href="{{ url_for(link.endpoint) }}">
+                    <article class="hub-card calendar-card calendar-card-{{ loop.index % 4 }}">
+                        <span class="hub-card-index">{{ "%02d"|format(loop.index) }}</span>
+                        <strong>{{ link.label }}</strong>
+                        <p>{{ link.summary }}</p>
+                    </article>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="section-shell life-hub-support">
+            <div class="section-heading">
+                <p class="eyebrow">더 살펴보기</p>
+                <h2>결과를 다음 생활 기준으로 연결하세요</h2>
+            </div>
+            <div class="life-hub-link-list">
+                {% for link in hub.supporting_links %}
+                <a href="{{ url_for(link.endpoint) }}">
+                    <strong>{{ link.label }}</strong>
+                    <span>{{ link.summary }}</span>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="section-shell life-hub-questions">
+            <div class="section-heading">
+                <p class="eyebrow">운영 기준</p>
+                <h2>이 허브를 사용할 때 알아둘 점</h2>
+            </div>
+            <div class="faq">
+                {% for question, answer in hub.questions %}
+                <div>
+                    <strong>{{ question }}</strong>
+                    <p>{{ answer }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            <p class="small">
+                계산 공식과 참고 범위는 <a href="{{ url_for('references') }}">계산 기준과 참고 자료</a>에서 확인할 수 있습니다.
+                제도·건강 판단은 관계 기관과 전문가의 최신 안내를 우선하세요.
+            </p>
+        </section>
+
+        {% include 'partials/footer.html' %}
+    </div>
+
+    <div class="cookie-banner" id="cookie-banner">
+        <div class="cookie-content">
+            <p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 거부해도 주요 기능은 그대로 이용할 수 있습니다.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn btn-primary">동의</button>
+                <button id="reject-cookies" class="btn btn-secondary">거부</button>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
+</body>
+
+</html>

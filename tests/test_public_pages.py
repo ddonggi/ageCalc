@@ -506,6 +506,55 @@ class PublicPageTests(unittest.TestCase):
         ]:
             self.assertNotIn(phrase, html)
 
+    def test_life_hub_pages_are_public(self):
+        client = app.test_client()
+        expected_hubs = {
+            "age": "나이 계산",
+            "family": "가족·육아",
+            "education": "학교·교육",
+            "anniversary": "생일·기념일",
+            "retirement": "은퇴·노후",
+            "health": "건강·검진",
+            "pets": "반려동물",
+            "generations": "세대·추억",
+        }
+
+        for key, title in expected_hubs.items():
+            with self.subTest(key=key):
+                response = client.get(f"/{key}/")
+
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                self.assertIn(f"<h1>{title}</h1>", html)
+                self.assertIn(
+                    f'<link rel="canonical" href="https://agecalc.cloud/{key}/" />',
+                    html,
+                )
+                self.assertIn('name="description"', html)
+                self.assertIn("대표 도구", html)
+                self.assertIn("더 살펴보기", html)
+                self.assertIn("운영 기준", html)
+                self.assertIn("google-adsense-account", html)
+                self.assertNotIn("noindex", html)
+
+    def test_life_hubs_are_added_to_the_public_sitemap(self):
+        response = app.test_client().get("/sitemap.xml")
+
+        self.assertEqual(response.status_code, 200)
+        xml = response.get_data(as_text=True)
+        for key in (
+            "age",
+            "family",
+            "education",
+            "anniversary",
+            "retirement",
+            "health",
+            "pets",
+            "generations",
+        ):
+            self.assertIn(f"<loc>https://agecalc.cloud/{key}/</loc>", xml)
+        self.assertEqual(58, xml.count("<loc>"))
+
     def test_public_sitemap_pages_render_adsense_approval_code(self):
         client = app.test_client()
 
@@ -529,13 +578,13 @@ class PublicPageTests(unittest.TestCase):
                 self.assertIn("tracking-config", html)
                 self.assertNotIn("www.googletagmanager.com/gtag/js", html)
 
-    def test_public_sitemap_has_fifty_indexable_urls_at_adsense_baseline(self):
+    def test_public_sitemap_keeps_baseline_urls_and_adds_life_hubs(self):
         client = app.test_client()
         response = client.get("/sitemap.xml")
 
         self.assertEqual(response.status_code, 200)
         xml = response.get_data(as_text=True)
-        self.assertEqual(50, xml.count("<loc>"))
+        self.assertEqual(58, xml.count("<loc>"))
         self.assertNotIn("/minigames", xml)
         self.assertNotIn("/blog/drafts", xml)
         self.assertNotIn("/blog/review", xml)

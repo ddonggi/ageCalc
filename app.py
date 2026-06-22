@@ -9,6 +9,7 @@ import secrets
 from zoneinfo import ZoneInfo
 from controllers.age_controller import AgeController
 from content.guide_pages import GUIDE_PAGE_BY_SLUG, GUIDE_PAGES
+from content.hub_pages import HUB_PAGE_BY_KEY, HUB_PAGES
 from content.page_registry import (
     PUBLIC_SITEMAP_ENDPOINTS,
     indexable_guide_pages,
@@ -987,6 +988,22 @@ def sitemap():
 def index():
     """메인 페이지 - 나이 계산 도구 안내"""
     return render_template('index.html', today=_current_local_date())
+
+
+@app.get("/<hub_key>/")
+def life_hub(hub_key):
+    hub = HUB_PAGE_BY_KEY.get(hub_key)
+    if hub is None:
+        abort(404)
+    return render_template(
+        "hub-detail.html",
+        hub=hub,
+        hub_number=next(
+            index
+            for index, candidate in enumerate(HUB_PAGES, start=1)
+            if candidate["key"] == hub_key
+        ),
+    )
 
 
 @app.route('/age', methods=['GET', 'POST'])

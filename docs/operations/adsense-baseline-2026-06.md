@@ -40,3 +40,16 @@ OK
 - `/minigames`, `/blog/drafts`, `/blog/review`는 sitemap에 포함하지 않는다.
 - 공개 블로그 색인이 비활성인 동안 `/blog`를 sitemap에 포함하지 않는다.
 - 전역 제휴 기능이 비활성일 때 핵심 페이지 HTML에 쿠팡 레일 iframe과 배너가 없어야 한다.
+
+## Foundation 확장
+
+2026-06-22에 8개 라이프 허브를 추가하면서 sitemap의 의도된 URL 수는 50개에서 58개로 증가한다. 기존 50개 URL은 유지하며 다음 canonical 허브만 추가한다.
+
+- `/age/`
+- `/family/`
+- `/education/`
+- `/anniversary/`
+- `/retirement/`
+- `/health/`
+- `/pets/`
+- `/generations/`
