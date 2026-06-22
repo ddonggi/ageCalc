@@ -397,6 +397,20 @@ def validate_page_registry() -> tuple[str, ...]:
     return tuple(errors)
 
 
+def find_page(endpoint: str | None, route_values: dict[str, object] | None = None) -> dict[str, object] | None:
+    if not endpoint:
+        return None
+
+    route_values = route_values or {}
+    for page in PUBLIC_PAGE_REGISTRY:
+        if page["endpoint"] != endpoint:
+            continue
+        expected_values = dict(page["route_values"])
+        if all(route_values.get(key) == value for key, value in expected_values.items()):
+            return page
+    return None
+
+
 def indexable_static_pages(*, blog_public_indexable: bool) -> tuple[dict[str, object], ...]:
     static_pages = tuple(
         page

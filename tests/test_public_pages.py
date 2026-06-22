@@ -1,3 +1,4 @@
+import re
 import unittest
 from datetime import date, datetime
 from types import SimpleNamespace
@@ -554,6 +555,51 @@ class PublicPageTests(unittest.TestCase):
         ):
             self.assertIn(f"<loc>https://agecalc.cloud/{key}/</loc>", xml)
         self.assertEqual(58, xml.count("<loc>"))
+
+    def test_public_pages_render_visual_and_schema_breadcrumbs(self):
+        client = app.test_client()
+        expected_paths = {
+            "/age": ("나이 계산", "만나이 계산기"),
+            "/family/": ("가족·육아",),
+            "/guides/age-calculation-2026": ("나이 계산", "2026년 만나이 계산 기준"),
+            "/privacy": ("개인정보처리방침",),
+        }
+
+        for path, labels in expected_paths.items():
+            with self.subTest(path=path):
+                response = client.get(path)
+
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                self.assertIn('class="breadcrumbs"', html)
+                self.assertIn('aria-label="현재 위치"', html)
+                self.assertIn('"@type": "BreadcrumbList"', html)
+                self.assertIn('"itemListElement"', html)
+                self.assertIn('"https://agecalc.cloud/"', html)
+                for label in labels:
+                    self.assertIn(label, html)
+
+        home_html = client.get("/").get_data(as_text=True)
+        self.assertNotIn('class="breadcrumbs"', home_html)
+        self.assertNotIn('"@type": "BreadcrumbList"', home_html)
+
+    def test_every_non_home_sitemap_page_renders_breadcrumb_schema(self):
+        client = app.test_client()
+        sitemap = client.get("/sitemap.xml").get_data(as_text=True)
+        paths = [
+            location.removeprefix("https://agecalc.cloud")
+            for location in re.findall(r"<loc>(.*?)</loc>", sitemap)
+            if location != "https://agecalc.cloud/"
+        ]
+
+        for path in paths:
+            with self.subTest(path=path):
+                response = client.get(path)
+
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                self.assertIn('class="breadcrumbs"', html)
+                self.assertIn('"@type": "BreadcrumbList"', html)
 
     def test_public_sitemap_pages_render_adsense_approval_code(self):
         client = app.test_client()

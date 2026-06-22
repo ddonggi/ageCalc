@@ -517,6 +517,50 @@ button {
     text-align: center;
 }
 
+.breadcrumbs {
+    width: min(1280px, calc(100vw - 32px));
+    margin: 14px auto 0;
+    padding: 0 2px;
+}
+
+.breadcrumbs ol {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--muted);
+    font-size: 0.84rem;
+}
+
+.breadcrumbs li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.breadcrumbs li:not(:last-child)::after {
+    content: "/";
+    color: rgba(76, 55, 38, 0.38);
+    font-family: var(--number-font);
+}
+
+.breadcrumbs a {
+    color: var(--muted);
+}
+
+.breadcrumbs a:hover,
+.breadcrumbs a:focus-visible {
+    color: var(--accent-1);
+}
+
+.breadcrumbs [aria-current="page"] {
+    color: var(--text);
+    font-weight: 700;
+}
+
 .mega-nav-item:hover .mega-menu-panel,
 .mega-nav-item:focus-within .mega-menu-panel {
     opacity: 1;
@@ -3389,6 +3433,18 @@ body.snake-page .game-panel {
     .home-page .site-header {
         grid-template-columns: minmax(0, 1fr) auto;
         padding-inline: 18px;
+    }
+
+    .breadcrumbs {
+        width: calc(100vw - 28px);
+        margin-top: 10px;
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: none;
+    }
+
+    .breadcrumbs ol {
+        flex-wrap: nowrap;
     }
 
     .brand-word,

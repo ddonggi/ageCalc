@@ -12,6 +12,7 @@ from content.page_registry import (
     REQUIRED_PAGE_FIELDS,
     STATIC_PAGE_REGISTRY,
     validate_page_registry,
+    find_page,
 )
 
 
@@ -51,6 +52,21 @@ class PageRegistryTests(unittest.TestCase):
                 self.assertEqual(len(values), len(set(values)))
 
         self.assertEqual((), validate_page_registry())
+
+    def test_find_page_resolves_static_hub_and_guide_routes(self):
+        self.assertEqual(
+            "age",
+            find_page("age", {})["key"],
+        )
+        self.assertEqual(
+            "hub:family",
+            find_page("life_hub", {"hub_key": "family"})["key"],
+        )
+        self.assertEqual(
+            "guide:age-calculation-2026",
+            find_page("guide_detail", {"slug": "age-calculation-2026"})["key"],
+        )
+        self.assertIsNone(find_page("guide_detail", {"slug": "missing"}))
 
     def test_registry_driven_sitemap_preserves_the_fifty_url_baseline(self):
         response = app.test_client().get("/sitemap.xml")

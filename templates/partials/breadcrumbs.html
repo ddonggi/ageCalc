@@ -1,0 +1,18 @@
+{% if breadcrumbs %}
+<nav class="breadcrumbs" aria-label="현재 위치">
+    <ol>
+        {% for item in breadcrumbs %}
+        <li>
+            {% if item.current %}
+            <span aria-current="page">{{ item.label }}</span>
+            {% else %}
+            <a href="{{ item.url }}">{{ item.label }}</a>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+</nav>
+<script type="application/ld+json" nonce="{{ csp_nonce }}">
+{{ breadcrumb_schema | tojson }}
+</script>
+{% endif %}

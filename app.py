@@ -11,8 +11,8 @@ from controllers.age_controller import AgeController
 from content.guide_pages import GUIDE_PAGE_BY_SLUG, GUIDE_PAGES
 from content.hub_pages import HUB_PAGE_BY_KEY, HUB_PAGES
 from content.page_registry import (
-    PUBLIC_PAGE_REGISTRY,
     PUBLIC_SITEMAP_ENDPOINTS,
+    find_page,
     indexable_guide_pages,
     indexable_static_pages,
 )
@@ -139,20 +139,45 @@ def inject_csp_nonce():
 
     blog_public_count = _published_blog_count() if BLOG_PUBLIC_INDEXING_ENABLED else 0
     blog_public_indexable = _is_blog_public_indexable(blog_public_count)
-    current_hub_key = None
-    if request.endpoint == "life_hub":
-        current_hub_key = (request.view_args or {}).get("hub_key")
-    else:
-        request_slug = (request.view_args or {}).get("slug")
-        for page in PUBLIC_PAGE_REGISTRY:
-            if page["endpoint"] != request.endpoint:
-                continue
-            route_slug = dict(page["route_values"]).get("slug")
-            if route_slug is not None and route_slug != request_slug:
-                continue
-            if page["hub"] in HUB_PAGE_BY_KEY:
-                current_hub_key = page["hub"]
-            break
+    current_page = find_page(request.endpoint, request.view_args)
+    current_hub_key = (
+        str(current_page["hub"])
+        if current_page and current_page["hub"] in HUB_PAGE_BY_KEY
+        else None
+    )
+    breadcrumbs = []
+    breadcrumb_schema = None
+    if current_page and current_page["endpoint"] != "index":
+        breadcrumbs.append({"label": "홈", "url": f"{SITE_BASE_URL}/", "current": False})
+        if current_hub_key and not str(current_page["key"]).startswith("hub:"):
+            hub = HUB_PAGE_BY_KEY[current_hub_key]
+            breadcrumbs.append(
+                {
+                    "label": hub["title"],
+                    "url": f"{SITE_BASE_URL}{hub['path']}",
+                    "current": False,
+                }
+            )
+        breadcrumbs.append(
+            {
+                "label": current_page["title"],
+                "url": f"{SITE_BASE_URL}{current_page['path']}",
+                "current": True,
+            }
+        )
+        breadcrumb_schema = {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": position,
+                    "name": item["label"],
+                    "item": item["url"],
+                }
+                for position, item in enumerate(breadcrumbs, start=1)
+            ],
+        }
 
     return {
         "csp_nonce": getattr(g, "csp_nonce", ""),
@@ -172,6 +197,8 @@ def inject_csp_nonce():
         "life_hubs": HUB_PAGES,
         "primary_life_hubs": HUB_PAGES[:4],
         "current_hub_key": current_hub_key,
+        "breadcrumbs": breadcrumbs,
+        "breadcrumb_schema": breadcrumb_schema,
         "footer_policy_links": FOOTER_POLICY_LINKS,
         "static_guide_pages": GUIDE_PAGES,
     }
