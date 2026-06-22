@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 Allow: /ads.txt
 
-# 사이트맵 위치
+# 사이트맵 인덱스 위치
 Sitemap: https://agecalc.cloud/sitemap.xml
 
 # 특정 디렉토리 차단 (필요시)

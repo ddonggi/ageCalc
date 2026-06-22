@@ -13,10 +13,10 @@ from content.guide_pages import GUIDE_PAGE_BY_SLUG, GUIDE_PAGES
 from content.hub_pages import HUB_PAGE_BY_KEY, HUB_PAGES
 from content.page_registry import (
     PUBLIC_SITEMAP_ENDPOINTS,
+    SITEMAP_GROUPS,
     contextual_links_for,
     find_page,
-    indexable_guide_pages,
-    indexable_static_pages,
+    indexable_pages_for_sitemap,
 )
 from db import SessionLocal, close_db_session, init_db
 from models.blog_models import GeneratedPost, PageFeedback
@@ -371,6 +371,10 @@ def _build_sitemap_entry(loc: str, lastmod: str | None = None) -> str:
     if lastmod:
         return f"  <url><loc>{loc}</loc><lastmod>{lastmod}</lastmod></url>"
     return f"  <url><loc>{loc}</loc></url>"
+
+
+def _build_sitemap_index_entry(loc: str) -> str:
+    return f"  <sitemap><loc>{loc}</loc></sitemap>"
 
 
 def _current_local_date():
@@ -883,54 +887,59 @@ def _build_baby_month_snapshot(months: int) -> dict[str, object]:
 
 @app.get("/sitemap.xml")
 def sitemap():
-    db_session = SessionLocal()
-    try:
-        if BLOG_PUBLIC_INDEXING_ENABLED:
+    entries = [
+        _build_sitemap_index_entry(
+            f"{SITE_BASE_URL}/sitemaps/{group}.xml",
+        )
+        for group in SITEMAP_GROUPS
+    ]
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        f"{chr(10).join(entries)}\n"
+        "</sitemapindex>\n"
+    )
+    return Response(xml, mimetype="application/xml")
+
+
+@app.get("/sitemaps/<group>.xml")
+def sitemap_group(group):
+    if group not in SITEMAP_GROUPS:
+        abort(404)
+
+    posts = []
+    if group == "guides" and BLOG_PUBLIC_INDEXING_ENABLED:
+        db_session = SessionLocal()
+        try:
             posts = (
                 db_session.query(GeneratedPost)
                 .filter(GeneratedPost.status == "published")
                 .order_by(GeneratedPost.published_at.desc(), GeneratedPost.id.desc())
                 .all()
             )
-        else:
-            posts = []
+        finally:
+            db_session.close()
 
-        newest_post_dt = next(
-            (
-                post.published_at or post.updated_at or post.created_at
-                for post in posts
-                if post.published_at or post.updated_at or post.created_at
-            ),
-            None,
+    blog_public_indexable = _is_blog_public_indexable(len(posts))
+    entries = [
+        _build_sitemap_entry(
+            f"{SITE_BASE_URL}{page['path']}",
+            str(page["lastmod"]),
         )
-        blog_public_indexable = _is_blog_public_indexable(len(posts))
-        entries = []
-        for page in indexable_static_pages(blog_public_indexable=blog_public_indexable):
-            endpoint = str(page["endpoint"])
-            lastmod = _format_sitemap_lastmod(newest_post_dt) if endpoint == "blog_list" else None
+        for page in indexable_pages_for_sitemap(
+            group,
+            blog_public_indexable=blog_public_indexable,
+        )
+    ]
+    if group == "guides" and blog_public_indexable:
+        for post in posts:
+            lastmod = _format_sitemap_lastmod(post.updated_at or post.published_at or post.created_at)
             entries.append(
                 _build_sitemap_entry(
-                    _absolute_url_for(endpoint, **dict(page["route_values"])),
+                    _absolute_url_for("blog_detail", slug=post.slug),
                     lastmod,
                 )
             )
-
-        for page in indexable_guide_pages():
-            entries.append(
-                _build_sitemap_entry(
-                    _absolute_url_for(
-                        str(page["endpoint"]),
-                        **dict(page["route_values"]),
-                    )
-                )
-            )
-
-        if blog_public_indexable:
-            for post in posts:
-                lastmod = _format_sitemap_lastmod(post.updated_at or post.published_at or post.created_at)
-                entries.append(_build_sitemap_entry(_absolute_url_for("blog_detail", slug=post.slug), lastmod))
-    finally:
-        db_session.close()
 
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>\n'

@@ -5,6 +5,7 @@ from content.hub_pages import HUB_PAGES
 
 
 CONTENT_ACTIONS = frozenset({"keep", "strengthen", "merge", "noindex"})
+PUBLIC_RELEASE_BATCHES = frozenset({"existing", "foundation"})
 REQUIRED_PAGE_FIELDS = frozenset(
     {
         "key",
@@ -17,6 +18,7 @@ REQUIRED_PAGE_FIELDS = frozenset(
         "content_action",
         "indexable",
         "release_batch",
+        "lastmod",
         "priority",
         "related_endpoints",
         "related_link_groups",
@@ -70,6 +72,7 @@ def _page(
         "content_action": content_action,
         "indexable": indexable,
         "release_batch": "existing",
+        "lastmod": "2026-06-22",
         "priority": priority,
         "related_endpoints": related_endpoints,
         "related_link_groups": _related_link_groups(endpoint, related_endpoints),
@@ -377,6 +380,7 @@ def _guide_page(page: dict[str, object]) -> dict[str, object]:
         "content_action": "strengthen",
         "indexable": True,
         "release_batch": "existing",
+        "lastmod": "2026-06-22",
         "priority": "supporting",
         "related_endpoints": related_endpoints,
         "related_link_groups": _related_link_groups("guide_detail", related_endpoints),
@@ -396,6 +400,7 @@ HUB_PAGE_REGISTRY = tuple(
         "content_action": "keep",
         "indexable": True,
         "release_batch": "foundation",
+        "lastmod": "2026-06-22",
         "priority": "core",
         "related_endpoints": tuple(link["endpoint"] for link in hub["primary_links"]),
         "related_link_groups": _related_link_groups(
@@ -519,6 +524,65 @@ def indexable_static_pages(*, blog_public_indexable: bool) -> tuple[dict[str, ob
 
 def indexable_guide_pages() -> tuple[dict[str, object], ...]:
     return tuple(page for page in GUIDE_PAGE_REGISTRY if page["indexable"])
+
+
+SITEMAP_GROUPS = (
+    "core",
+    "age",
+    "family",
+    "education",
+    "anniversary",
+    "retirement",
+    "health",
+    "pets",
+    "generations",
+    "guides",
+)
+
+
+def indexable_pages_for_sitemap(
+    group: str,
+    *,
+    blog_public_indexable: bool,
+) -> tuple[dict[str, object], ...]:
+    if group not in SITEMAP_GROUPS:
+        return ()
+
+    if group == "core":
+        return tuple(
+            page
+            for page in STATIC_PAGE_REGISTRY
+            if page["indexable"]
+            and page["release_batch"] in PUBLIC_RELEASE_BATCHES
+            and page["hub"] == "core"
+        )
+
+    if group == "guides":
+        static_guides = tuple(
+            page
+            for page in STATIC_PAGE_REGISTRY
+            if page["indexable"]
+            and page["release_batch"] in PUBLIC_RELEASE_BATCHES
+            and page["hub"] == "guides"
+            and (page["endpoint"] != "blog_list" or blog_public_indexable)
+        )
+        return static_guides + indexable_guide_pages()
+
+    static_pages = tuple(
+        page
+        for page in STATIC_PAGE_REGISTRY
+        if page["indexable"]
+        and page["release_batch"] in PUBLIC_RELEASE_BATCHES
+        and page["hub"] == group
+    )
+    hub_pages = tuple(
+        page
+        for page in HUB_PAGE_REGISTRY
+        if page["indexable"]
+        and page["release_batch"] in PUBLIC_RELEASE_BATCHES
+        and page["hub"] == group
+    )
+    return hub_pages + static_pages
 
 
 PUBLIC_SITEMAP_ENDPOINTS = tuple(page["endpoint"] for page in STATIC_PAGE_REGISTRY if page["indexable"])

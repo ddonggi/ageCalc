@@ -13,6 +13,20 @@ from content.guide_pages import GUIDE_CATEGORIES, GUIDE_SLUGS
 from models.blog_models import PageFeedback
 
 
+def _sitemap_leaf_locations(client) -> list[str]:
+    root_xml = client.get("/sitemap.xml").get_data(as_text=True)
+    root_locations = re.findall(r"<loc>(.*?)</loc>", root_xml)
+    if "<sitemapindex" not in root_xml:
+        return root_locations
+
+    locations = []
+    for child_location in root_locations:
+        child_path = child_location.removeprefix("https://agecalc.cloud")
+        child_xml = client.get(child_path).get_data(as_text=True)
+        locations.extend(re.findall(r"<loc>(.*?)</loc>", child_xml))
+    return locations
+
+
 class PublicPageTests(unittest.TestCase):
     def test_about_page_is_public(self):
         client = app.test_client()
@@ -539,10 +553,7 @@ class PublicPageTests(unittest.TestCase):
                 self.assertNotIn("noindex", html)
 
     def test_life_hubs_are_added_to_the_public_sitemap(self):
-        response = app.test_client().get("/sitemap.xml")
-
-        self.assertEqual(response.status_code, 200)
-        xml = response.get_data(as_text=True)
+        locations = _sitemap_leaf_locations(app.test_client())
         for key in (
             "age",
             "family",
@@ -553,8 +564,8 @@ class PublicPageTests(unittest.TestCase):
             "pets",
             "generations",
         ):
-            self.assertIn(f"<loc>https://agecalc.cloud/{key}/</loc>", xml)
-        self.assertEqual(58, xml.count("<loc>"))
+            self.assertIn(f"https://agecalc.cloud/{key}/", locations)
+        self.assertEqual(58, len(locations))
 
     def test_public_pages_render_visual_and_schema_breadcrumbs(self):
         client = app.test_client()
@@ -585,10 +596,9 @@ class PublicPageTests(unittest.TestCase):
 
     def test_every_non_home_sitemap_page_renders_breadcrumb_schema(self):
         client = app.test_client()
-        sitemap = client.get("/sitemap.xml").get_data(as_text=True)
         paths = [
             location.removeprefix("https://agecalc.cloud")
-            for location in re.findall(r"<loc>(.*?)</loc>", sitemap)
+            for location in _sitemap_leaf_locations(client)
             if location != "https://agecalc.cloud/"
         ]
 
@@ -730,15 +740,14 @@ class PublicPageTests(unittest.TestCase):
 
     def test_public_sitemap_keeps_baseline_urls_and_adds_life_hubs(self):
         client = app.test_client()
-        response = client.get("/sitemap.xml")
+        locations = _sitemap_leaf_locations(client)
+        joined_locations = "\n".join(locations)
 
-        self.assertEqual(response.status_code, 200)
-        xml = response.get_data(as_text=True)
-        self.assertEqual(58, xml.count("<loc>"))
-        self.assertNotIn("/minigames", xml)
-        self.assertNotIn("/blog/drafts", xml)
-        self.assertNotIn("/blog/review", xml)
-        self.assertNotIn("<loc>https://agecalc.cloud/blog</loc>", xml)
+        self.assertEqual(58, len(locations))
+        self.assertNotIn("/minigames", joined_locations)
+        self.assertNotIn("/blog/drafts", joined_locations)
+        self.assertNotIn("/blog/review", joined_locations)
+        self.assertNotIn("https://agecalc.cloud/blog", locations)
 
     def test_static_guide_pages_are_public_with_adsense_code(self):
         client = app.test_client()
@@ -1729,10 +1738,7 @@ class PublicPageTests(unittest.TestCase):
 
     def test_dynamic_sitemap_excludes_minigames(self):
         client = app.test_client()
-        response = client.get("/sitemap.xml")
-
-        self.assertEqual(response.status_code, 200)
-        body = response.get_data(as_text=True)
+        body = "\n".join(_sitemap_leaf_locations(client))
         self.assertIn("https://agecalc.cloud/age", body)
         self.assertIn("https://agecalc.cloud/contact", body)
         self.assertIn("https://agecalc.cloud/references", body)
@@ -1754,12 +1760,47 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("https://agecalc.cloud/birthday-dday-calculator", body)
         self.assertNotIn("/minigames", body)
 
+    def test_sitemap_index_groups_public_pages(self):
+        client = app.test_client()
+        index_response = client.get("/sitemap.xml")
+
+        self.assertEqual(index_response.status_code, 200)
+        index_xml = index_response.get_data(as_text=True)
+        self.assertIn("<sitemapindex", index_xml)
+        child_locations = re.findall(r"<loc>(.*?)</loc>", index_xml)
+        expected_children = {
+            "https://agecalc.cloud/sitemaps/core.xml",
+            "https://agecalc.cloud/sitemaps/age.xml",
+            "https://agecalc.cloud/sitemaps/family.xml",
+            "https://agecalc.cloud/sitemaps/education.xml",
+            "https://agecalc.cloud/sitemaps/anniversary.xml",
+            "https://agecalc.cloud/sitemaps/retirement.xml",
+            "https://agecalc.cloud/sitemaps/health.xml",
+            "https://agecalc.cloud/sitemaps/pets.xml",
+            "https://agecalc.cloud/sitemaps/generations.xml",
+            "https://agecalc.cloud/sitemaps/guides.xml",
+        }
+        self.assertEqual(expected_children, set(child_locations))
+
+        public_locations = []
+        for location in child_locations:
+            path = location.removeprefix("https://agecalc.cloud")
+            with self.subTest(path=path):
+                response = client.get(path)
+                self.assertEqual(response.status_code, 200)
+                xml = response.get_data(as_text=True)
+                self.assertIn("<urlset", xml)
+                self.assertEqual(xml.count("<loc>"), xml.count("<lastmod>"))
+                public_locations.extend(re.findall(r"<loc>(.*?)</loc>", xml))
+
+        self.assertEqual(58, len(public_locations))
+        self.assertEqual(58, len(set(public_locations)))
+        for forbidden in ("?", "#", "/minigames", "/blog/drafts", "/blog/review"):
+            self.assertNotIn(forbidden, "\n".join(public_locations))
+
     def test_dynamic_sitemap_includes_static_guides_and_excludes_blog_by_default(self):
         client = app.test_client()
-        response = client.get("/sitemap.xml")
-
-        self.assertEqual(response.status_code, 200)
-        body = response.get_data(as_text=True)
+        body = "\n".join(_sitemap_leaf_locations(client))
         for slug in GUIDE_SLUGS:
             self.assertIn(f"https://agecalc.cloud/guides/{slug}", body)
         self.assertNotIn("https://agecalc.cloud/blog", body)
@@ -1768,10 +1809,8 @@ class PublicPageTests(unittest.TestCase):
         client = app.test_client()
 
         with mock.patch.object(app_module, "_is_blog_public_indexable", return_value=False):
-            response = client.get("/sitemap.xml")
+            body = "\n".join(_sitemap_leaf_locations(client))
 
-        self.assertEqual(response.status_code, 200)
-        body = response.get_data(as_text=True)
         self.assertNotIn("https://agecalc.cloud/blog", body)
 
     def test_sitemap_is_served_only_from_dynamic_route(self):

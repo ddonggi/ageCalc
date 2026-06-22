@@ -135,10 +135,52 @@ def run_local_preflight() -> PreflightReport:
         return report
 
     sitemap_body = sitemap_response.get_data(as_text=True)
-    locations = _extract_sitemap_locations(sitemap_body)
-    report.sitemap_urls = len(locations)
-    if not locations:
+    root_locations = _extract_sitemap_locations(sitemap_body)
+    if not root_locations:
         report.add_issue("sitemap_empty", "/sitemap.xml", "사이트맵에 공개 URL이 없습니다.")
+
+    locations = []
+    if "<sitemapindex" in sitemap_body:
+        child_paths = [
+            path
+            for location in root_locations
+            if (path := _sitemap_location_to_path(location, SITE_BASE_URL, report)) is not None
+        ]
+        for child_path in child_paths:
+            if not child_path.startswith("/sitemaps/") or not child_path.endswith(".xml"):
+                report.add_issue(
+                    "invalid_child_sitemap_path",
+                    child_path,
+                    "사이트맵 인덱스의 하위 문서는 /sitemaps/*.xml 경로여야 합니다.",
+                )
+                continue
+            child_response = client.get(child_path)
+            if child_response.status_code != 200:
+                report.add_issue(
+                    "child_sitemap_not_200",
+                    child_path,
+                    f"하위 사이트맵 응답이 {child_response.status_code}입니다.",
+                )
+                continue
+            child_body = child_response.get_data(as_text=True)
+            if "<urlset" not in child_body:
+                report.add_issue(
+                    "child_sitemap_not_urlset",
+                    child_path,
+                    "하위 사이트맵이 urlset 형식이 아닙니다.",
+                )
+                continue
+            locations.extend(_extract_sitemap_locations(child_body))
+    else:
+        locations = root_locations
+
+    report.sitemap_urls = len(locations)
+    if len(locations) != len(set(locations)):
+        report.add_issue(
+            "duplicate_sitemap_url",
+            "/sitemap.xml",
+            "둘 이상의 하위 사이트맵에 중복된 공개 URL이 있습니다.",
+        )
 
     paths = [
         path
