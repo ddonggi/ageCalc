@@ -13,6 +13,7 @@ from content.guide_pages import GUIDE_PAGE_BY_SLUG, GUIDE_PAGES
 from content.hub_pages import HUB_PAGE_BY_KEY, HUB_PAGES
 from content.page_registry import (
     PUBLIC_SITEMAP_ENDPOINTS,
+    contextual_links_for,
     find_page,
     indexable_guide_pages,
     indexable_static_pages,
@@ -201,6 +202,10 @@ def inject_csp_nonce():
         "current_page": current_page,
         "site_base_url": SITE_BASE_URL,
         "editorial_metadata": editorial_metadata_for(current_page),
+        "related_paths": contextual_links_for(
+            current_page,
+            recommended_endpoints=tuple(getattr(g, "recommended_endpoints", ())),
+        ),
         "breadcrumbs": breadcrumbs,
         "breadcrumb_schema": breadcrumb_schema,
         "footer_policy_links": FOOTER_POLICY_LINKS,

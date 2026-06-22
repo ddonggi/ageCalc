@@ -19,8 +19,32 @@ REQUIRED_PAGE_FIELDS = frozenset(
         "release_batch",
         "priority",
         "related_endpoints",
+        "related_link_groups",
     }
 )
+
+
+def _related_link_groups(
+    endpoint: str,
+    related_endpoints: tuple[str, ...],
+) -> dict[str, tuple[str, ...]]:
+    candidates = {
+        "before_calculation": ("guide",),
+        "after_result": related_endpoints[:1],
+        "adjacent_tools": related_endpoints[1:],
+        "official_sources": ("references",),
+    }
+    seen = {endpoint}
+    groups: dict[str, tuple[str, ...]] = {}
+    for group_name, endpoints in candidates.items():
+        unique_endpoints = []
+        for related_endpoint in endpoints:
+            if related_endpoint in seen:
+                continue
+            seen.add(related_endpoint)
+            unique_endpoints.append(related_endpoint)
+        groups[group_name] = tuple(unique_endpoints)
+    return groups
 
 
 def _page(
@@ -48,6 +72,7 @@ def _page(
         "release_batch": "existing",
         "priority": priority,
         "related_endpoints": related_endpoints,
+        "related_link_groups": _related_link_groups(endpoint, related_endpoints),
     }
 
 
@@ -354,6 +379,7 @@ def _guide_page(page: dict[str, object]) -> dict[str, object]:
         "release_batch": "existing",
         "priority": "supporting",
         "related_endpoints": related_endpoints,
+        "related_link_groups": _related_link_groups("guide_detail", related_endpoints),
     }
 
 
@@ -372,6 +398,10 @@ HUB_PAGE_REGISTRY = tuple(
         "release_batch": "foundation",
         "priority": "core",
         "related_endpoints": tuple(link["endpoint"] for link in hub["primary_links"]),
+        "related_link_groups": _related_link_groups(
+            "life_hub",
+            tuple(link["endpoint"] for link in hub["primary_links"]),
+        ),
     }
     for hub in HUB_PAGES
 )
@@ -409,6 +439,73 @@ def find_page(endpoint: str | None, route_values: dict[str, object] | None = Non
         if all(route_values.get(key) == value for key, value in expected_values.items()):
             return page
     return None
+
+
+def contextual_links_for(
+    page: dict[str, object] | None,
+    *,
+    recommended_endpoints: tuple[str, ...] = (),
+) -> dict[str, object] | None:
+    if not page or page["endpoint"] == "index":
+        return None
+
+    hub_page = next(
+        (
+            candidate
+            for candidate in HUB_PAGE_REGISTRY
+            if candidate["hub"] == page["hub"] and candidate["key"] != page["key"]
+        ),
+        None,
+    )
+    if hub_page is None:
+        return None
+
+    registry_by_endpoint = {
+        str(candidate["endpoint"]): candidate
+        for candidate in PUBLIC_PAGE_REGISTRY
+        if candidate["endpoint"] != "guide_detail"
+    }
+    groups = {
+        group_name: list(endpoints)
+        for group_name, endpoints in dict(page["related_link_groups"]).items()
+    }
+    if recommended_endpoints:
+        groups["after_result"] = list(recommended_endpoints) + groups["after_result"]
+
+    seen_paths = {str(page["path"]), str(hub_page["path"])}
+    resolved_groups: dict[str, tuple[dict[str, str], ...]] = {}
+    for group_name in (
+        "before_calculation",
+        "after_result",
+        "adjacent_tools",
+        "official_sources",
+    ):
+        links = []
+        for endpoint in groups.get(group_name, ()):
+            candidate = registry_by_endpoint.get(str(endpoint))
+            if candidate is None:
+                continue
+            path = str(candidate["path"])
+            if path in seen_paths:
+                continue
+            seen_paths.add(path)
+            links.append(
+                {
+                    "endpoint": str(candidate["endpoint"]),
+                    "path": path,
+                    "label": str(candidate["title"]),
+                    "summary": str(candidate["search_intent"]),
+                }
+            )
+        resolved_groups[group_name] = tuple(links)
+
+    return {
+        "hub": {
+            "path": str(hub_page["path"]),
+            "label": str(hub_page["title"]),
+        },
+        "groups": resolved_groups,
+    }
 
 
 def indexable_static_pages(*, blog_public_indexable: bool) -> tuple[dict[str, object], ...]:

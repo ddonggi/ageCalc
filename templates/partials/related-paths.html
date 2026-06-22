@@ -1,0 +1,40 @@
+{% if related_paths %}
+{% set group_labels = {
+    "before_calculation": ("계산 전에", "기준 먼저 읽기"),
+    "after_result": ("결과 다음", "다음 생활 시점 보기"),
+    "adjacent_tools": ("같은 입력으로", "인접 도구 이어보기"),
+    "official_sources": ("근거 확인", "출처와 계산 기준 보기")
+} %}
+<nav class="related-paths" aria-labelledby="related-paths-title">
+    <div class="related-paths-heading">
+        <div>
+            <p class="eyebrow">Next Path</p>
+            <h2 id="related-paths-title">이 결과를 다음 기준으로 연결하세요</h2>
+        </div>
+        <a class="related-hub-link" href="{{ related_paths.hub.path }}">
+            {{ related_paths.hub.label }} 전체 보기
+        </a>
+    </div>
+    <div class="related-path-groups">
+        {% for group_name in ("before_calculation", "after_result", "adjacent_tools", "official_sources") %}
+        {% set group_links = related_paths.groups[group_name] %}
+        <section class="related-path-group" data-link-group="{{ group_name }}">
+            <p>{{ group_labels[group_name][0] }}</p>
+            <h3>{{ group_labels[group_name][1] }}</h3>
+            {% if group_links %}
+            <ul>
+                {% for link in group_links %}
+                <li>
+                    <a href="{{ link.path }}">{{ link.label }}</a>
+                    <span>{{ link.summary }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="related-path-empty">현재 페이지의 기준 안에서 확인할 수 있습니다.</p>
+            {% endif %}
+        </section>
+        {% endfor %}
+    </div>
+</nav>
+{% endif %}

@@ -68,6 +68,38 @@ class PageRegistryTests(unittest.TestCase):
         )
         self.assertIsNone(find_page("guide_detail", {"slug": "missing"}))
 
+    def test_core_pages_have_contextual_links(self):
+        core_pages = [
+            page
+            for page in STATIC_PAGE_REGISTRY
+            if page["priority"] == "core"
+            and page["endpoint"] != "index"
+            and page["hub"] in {hub["hub"] for hub in HUB_PAGE_REGISTRY}
+        ]
+
+        self.assertGreaterEqual(len(core_pages), 10)
+        for page in core_pages:
+            with self.subTest(key=page["key"]):
+                self.assertIn("related_link_groups", page)
+                groups = page["related_link_groups"]
+                self.assertEqual(
+                    {
+                        "before_calculation",
+                        "after_result",
+                        "adjacent_tools",
+                        "official_sources",
+                    },
+                    set(groups),
+                )
+                grouped_endpoints = {
+                    endpoint
+                    for endpoints in groups.values()
+                    for endpoint in endpoints
+                }
+                self.assertGreaterEqual(len(grouped_endpoints), 3)
+                self.assertNotIn(page["endpoint"], grouped_endpoints)
+                self.assertIn(page["hub"], {hub["hub"] for hub in HUB_PAGE_REGISTRY})
+
     def test_registry_driven_sitemap_preserves_the_fifty_url_baseline(self):
         response = app.test_client().get("/sitemap.xml")
 

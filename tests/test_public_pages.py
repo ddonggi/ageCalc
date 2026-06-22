@@ -667,6 +667,44 @@ class PublicPageTests(unittest.TestCase):
                 self.assertIn("확인일 2026-06-22", html)
                 self.assertIn("공식 판단이나 진단을 대신하지 않습니다", html)
 
+    def test_core_pages_render_contextual_links(self):
+        client = app.test_client()
+        core_paths = (
+            "/age",
+            "/birth-year-age-table",
+            "/school-grade-calculator",
+            "/school-entry-year-table",
+            "/100-day-calculator",
+            "/pet-age-table",
+            "/birthday-dday-calculator",
+            "/dog",
+            "/cat",
+            "/baby-months",
+            "/d-day",
+            "/parent-child",
+        )
+
+        for path in core_paths:
+            with self.subTest(path=path):
+                response = client.get(path)
+
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                match = re.search(
+                    r'<nav class="related-paths".*?</nav>',
+                    html,
+                    re.S,
+                )
+                self.assertIsNotNone(match)
+                related_html = match.group(0)
+                self.assertIn('data-link-group="before_calculation"', related_html)
+                self.assertIn('data-link-group="after_result"', related_html)
+                self.assertIn('data-link-group="adjacent_tools"', related_html)
+                self.assertIn('data-link-group="official_sources"', related_html)
+                hrefs = re.findall(r'href="([^"]+)"', related_html)
+                self.assertGreaterEqual(len(set(hrefs)), 4)
+                self.assertNotIn(path, hrefs)
+
     def test_public_sitemap_pages_render_adsense_approval_code(self):
         client = app.test_client()
 
