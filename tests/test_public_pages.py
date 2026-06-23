@@ -8,8 +8,13 @@ from unittest import mock
 from flask import render_template, url_for
 
 import app as app_module
+import content.guide_pages as guide_pages_module
 from app import PUBLIC_SITEMAP_ENDPOINTS, app, _current_local_date
-from content.guide_pages import GUIDE_CATEGORIES, GUIDE_SLUGS
+from content.guide_pages import (
+    GUIDE_CATEGORIES,
+    GUIDE_PAGES,
+    GUIDE_SLUGS,
+)
 from models.blog_models import PageFeedback
 
 
@@ -565,7 +570,26 @@ class PublicPageTests(unittest.TestCase):
             "generations",
         ):
             self.assertIn(f"https://agecalc.cloud/{key}/", locations)
-        self.assertEqual(58, len(locations))
+        self.assertEqual(54, len(locations))
+
+    def test_life_hubs_render_direct_answers_and_contextual_paths(self):
+        client = app.test_client()
+
+        for key in (
+            "age",
+            "family",
+            "education",
+            "anniversary",
+            "retirement",
+            "health",
+            "pets",
+            "generations",
+        ):
+            with self.subTest(key=key):
+                html = client.get(f"/{key}/").get_data(as_text=True)
+
+                self.assertRegex(html, r'class="[^"]*\bdirect-answer\b[^"]*"')
+                self.assertIn('class="related-paths"', html)
 
     def test_public_pages_render_visual_and_schema_breadcrumbs(self):
         client = app.test_client()
@@ -848,6 +872,118 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("환갑·칠순 기준 보기", script)
         self.assertIn("자녀 학교 시점 보기", script)
 
+    def test_core_pet_pages_have_distinct_deep_content_sections(self):
+        client = app.test_client()
+        expectations = {
+            "/dog": (
+                "강아지 사람 나이 환산값은 체형별 연령표를 적용한 참고 수치입니다",
+                "환산 나이와 건강 상태는 다릅니다",
+                "체형·품종·생활환경에 따른 한계",
+                "환산 결과 다음에 확인할 일",
+            ),
+            "/cat": (
+                "고양이 사람 나이 환산값은 초기 성장 속도를 반영한 참고 수치입니다",
+                "환산 나이와 건강 상태는 다릅니다",
+                "품종·생활환경·질병 이력에 따른 한계",
+                "환산 결과 다음에 확인할 일",
+            ),
+            "/pet-age-table": (
+                "반려동물 나이표는 실제 나이를 사람 나이 기준으로 비교하는 참고표입니다",
+                "나이표가 건강 상태를 뜻하지 않는 이유",
+                "종·체형·품종별 해석 한계",
+                "나이표 다음에 확인할 일",
+            ),
+            "/pet-months-table": (
+                "반려동물 월령표는 생후 24개월까지의 환산 흐름을 보는 참고표입니다",
+                "월령 환산과 발달·건강 판단의 차이",
+                "어린 반려동물 환산의 한계",
+                "월령표 다음에 확인할 일",
+            ),
+        }
+
+        for path, phrases in expectations.items():
+            with self.subTest(path=path):
+                response = client.get(path)
+
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                self.assertRegex(html, r'class="[^"]*\bdirect-answer\b[^"]*"')
+                self.assertGreaterEqual(html.count("data-example-card"), 3)
+                self.assertIn('data-official-source="true"', html)
+                self.assertIn("수의학적 진단을 대신하지 않습니다", html)
+                for phrase in phrases:
+                    self.assertIn(phrase, html)
+
+    def test_pet_calculator_result_separates_conversion_from_diagnosis(self):
+        script = Path("static/js/pet-age.js").read_text(encoding="utf-8")
+
+        self.assertIn("환산 나이는 건강 상태나 기대수명을 판정하지 않습니다.", script)
+        self.assertNotIn("건강 관리 방향을 잡기 위한 참고치", script)
+        self.assertNotIn("체감 나이", script)
+
+    def test_guide_content_policy_covers_all_twenty_guides(self):
+        self.assertTrue(hasattr(guide_pages_module, "GUIDE_CONTENT_POLICY"))
+        guide_content_policy = guide_pages_module.GUIDE_CONTENT_POLICY
+        self.assertEqual(20, len(guide_content_policy))
+        self.assertEqual(set(GUIDE_SLUGS), set(guide_content_policy))
+
+        allowed_actions = {"keep", "strengthen", "merge", "noindex"}
+        for page in GUIDE_PAGES:
+            with self.subTest(slug=page["slug"]):
+                policy = guide_content_policy[page["slug"]]
+                self.assertIn(policy["action"], allowed_actions)
+                self.assertEqual(policy["action"], page["content_action"])
+                self.assertEqual(policy["indexable"], page["indexable"])
+                if not policy["indexable"]:
+                    self.assertTrue(policy["canonical_path"].startswith("/"))
+                    self.assertEqual(policy["canonical_path"], policy["future_redirect"])
+
+    def test_merged_guides_are_preserved_but_noindex_without_ads(self):
+        client = app.test_client()
+        merged_targets = {
+            "dog-age-human-age-guide": "/dog",
+            "cat-age-human-age-guide": "/cat",
+            "pet-age-table-guide": "/pet-age-table",
+            "age-gap-calculation-guide": "/age-gap-calculator",
+        }
+        sitemap_body = "\n".join(_sitemap_leaf_locations(client))
+        guide_html = client.get("/guide").get_data(as_text=True)
+
+        for slug, canonical_path in merged_targets.items():
+            with self.subTest(slug=slug):
+                response = client.get(f"/guides/{slug}")
+                html = response.get_data(as_text=True)
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.headers.get("X-Robots-Tag"), "noindex, follow")
+                self.assertIn('<meta name="robots" content="noindex,follow" />', html)
+                self.assertIn(
+                    f'<link rel="canonical" href="https://agecalc.cloud{canonical_path}" />',
+                    html,
+                )
+                self.assertIn("통합 예정 안내", html)
+                self.assertNotIn("google-adsense-account", html)
+                self.assertNotIn(f"https://agecalc.cloud/guides/{slug}", sitemap_body)
+                self.assertNotIn(f'href="/guides/{slug}"', guide_html)
+
+    def test_retained_guides_add_examples_and_comparison_tables(self):
+        client = app.test_client()
+
+        for page in GUIDE_PAGES:
+            if not page.get("indexable", True):
+                continue
+            with self.subTest(slug=page["slug"]):
+                response = client.get(f"/guides/{page['slug']}")
+                html = response.get_data(as_text=True)
+
+                self.assertEqual(response.status_code, 200)
+                self.assertRegex(html, r'class="[^"]*\bdirect-answer\b[^"]*"')
+                self.assertGreaterEqual(html.count("data-example-card"), 3)
+                self.assertIn('class="guide-comparison-table"', html)
+                self.assertIn("content_format", page)
+                self.assertIn(f'data-content-format="{page.get("content_format", "")}"', html)
+                self.assertIn(f'class="guide-content-{page.get("content_format", "")}"', html)
+
     def test_education_results_link_to_next_school_milestones(self):
         client = app.test_client()
         cases = {
@@ -958,7 +1094,7 @@ class PublicPageTests(unittest.TestCase):
         locations = _sitemap_leaf_locations(client)
         joined_locations = "\n".join(locations)
 
-        self.assertEqual(58, len(locations))
+        self.assertEqual(54, len(locations))
         self.assertNotIn("/minigames", joined_locations)
         self.assertNotIn("/blog/drafts", joined_locations)
         self.assertNotIn("/blog/review", joined_locations)
@@ -966,6 +1102,7 @@ class PublicPageTests(unittest.TestCase):
 
     def test_static_guide_pages_are_public_with_adsense_code(self):
         client = app.test_client()
+        guide_content_policy = getattr(guide_pages_module, "GUIDE_CONTENT_POLICY", {})
 
         self.assertEqual(20, len(GUIDE_SLUGS))
         self.assertEqual(len(GUIDE_SLUGS), len(set(GUIDE_SLUGS)))
@@ -978,14 +1115,25 @@ class PublicPageTests(unittest.TestCase):
                 response = client.get(f"/guides/{slug}")
                 self.assertEqual(response.status_code, 200)
                 html = response.get_data(as_text=True)
-                self.assertIn(f'<link rel="canonical" href="https://agecalc.cloud/guides/{slug}" />', html)
+                canonical_path = guide_content_policy.get(slug, {}).get(
+                    "canonical_path",
+                    f"/guides/{slug}",
+                )
+                self.assertIn(
+                    f'<link rel="canonical" href="https://agecalc.cloud{canonical_path}" />',
+                    html,
+                )
                 self.assertIn("<h1", html)
                 self.assertIn('name="description"', html)
                 self.assertIn("guide-category-label", html)
                 self.assertIn("관련 계산기", html)
                 self.assertIn("자주 묻는 질문", html)
-                self.assertIn("google-adsense-account", html)
-                self.assertNotIn("noindex", html)
+                if guide_content_policy.get(slug, {}).get("indexable", True):
+                    self.assertIn("google-adsense-account", html)
+                    self.assertNotIn("noindex", html)
+                else:
+                    self.assertNotIn("google-adsense-account", html)
+                    self.assertIn("noindex", html)
 
     def test_search_keyword_guides_cover_non_duplicate_queries(self):
         client = app.test_client()
@@ -2008,16 +2156,21 @@ class PublicPageTests(unittest.TestCase):
                 self.assertEqual(xml.count("<loc>"), xml.count("<lastmod>"))
                 public_locations.extend(re.findall(r"<loc>(.*?)</loc>", xml))
 
-        self.assertEqual(58, len(public_locations))
-        self.assertEqual(58, len(set(public_locations)))
+        self.assertEqual(54, len(public_locations))
+        self.assertEqual(54, len(set(public_locations)))
         for forbidden in ("?", "#", "/minigames", "/blog/drafts", "/blog/review"):
             self.assertNotIn(forbidden, "\n".join(public_locations))
 
     def test_dynamic_sitemap_includes_static_guides_and_excludes_blog_by_default(self):
         client = app.test_client()
+        guide_content_policy = getattr(guide_pages_module, "GUIDE_CONTENT_POLICY", {})
         body = "\n".join(_sitemap_leaf_locations(client))
         for slug in GUIDE_SLUGS:
-            self.assertIn(f"https://agecalc.cloud/guides/{slug}", body)
+            guide_url = f"https://agecalc.cloud/guides/{slug}"
+            if guide_content_policy.get(slug, {}).get("indexable", True):
+                self.assertIn(guide_url, body)
+            else:
+                self.assertNotIn(guide_url, body)
         self.assertNotIn("https://agecalc.cloud/blog", body)
 
     def test_dynamic_sitemap_excludes_blog_when_public_blog_is_not_indexable(self):

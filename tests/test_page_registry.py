@@ -110,8 +110,8 @@ class PageRegistryTests(unittest.TestCase):
             child_xml = client.get(child_path).get_data(as_text=True)
             urls.extend(re.findall(r"<loc>(.*?)</loc>", child_xml))
 
-        self.assertEqual(58, len(urls))
-        self.assertEqual(58, len(set(urls)))
+        self.assertEqual(54, len(urls))
+        self.assertEqual(54, len(set(urls)))
         self.assertNotIn("https://agecalc.cloud/blog", urls)
         self.assertIn("https://agecalc.cloud/age", urls)
         self.assertIn("https://agecalc.cloud/age/", urls)

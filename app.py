@@ -9,7 +9,11 @@ import secrets
 from zoneinfo import ZoneInfo
 from controllers.age_controller import AgeController
 from content.editorial_metadata import editorial_metadata_for
-from content.guide_pages import GUIDE_PAGE_BY_SLUG, GUIDE_PAGES
+from content.guide_pages import (
+    GUIDE_PAGE_BY_SLUG,
+    INDEXABLE_GUIDE_PAGES,
+    NON_INDEXABLE_GUIDE_PATHS,
+)
 from content.hub_pages import HUB_PAGE_BY_KEY, HUB_PAGES
 from content.page_registry import (
     PUBLIC_SITEMAP_ENDPOINTS,
@@ -209,7 +213,7 @@ def inject_csp_nonce():
         "breadcrumbs": breadcrumbs,
         "breadcrumb_schema": breadcrumb_schema,
         "footer_policy_links": FOOTER_POLICY_LINKS,
-        "static_guide_pages": GUIDE_PAGES,
+        "static_guide_pages": INDEXABLE_GUIDE_PAGES,
     }
 
 
@@ -354,6 +358,8 @@ def _is_blog_public_indexable(published_count: int | None = None) -> bool:
 def _adsense_is_enabled_for_path(path: str, *, blog_public_indexable: bool | None = None) -> bool:
     excluded_prefixes = ("/minigames", "/blog/drafts", "/blog/review")
     if any(path == prefix or path.startswith(f"{prefix}/") for prefix in excluded_prefixes):
+        return False
+    if path in NON_INDEXABLE_GUIDE_PATHS:
         return False
     if path == "/blog" or path.startswith("/blog/"):
         if blog_public_indexable is None:
@@ -1663,7 +1669,10 @@ def guide_detail(slug):
     page = GUIDE_PAGE_BY_SLUG.get(slug)
     if page is None:
         abort(404)
-    return render_template('guide-detail.html', page=page)
+    response = make_response(render_template('guide-detail.html', page=page))
+    if not page["indexable"]:
+        response.headers["X-Robots-Tag"] = "noindex, follow"
+    return response
 
 @app.route('/faq')
 def faq():

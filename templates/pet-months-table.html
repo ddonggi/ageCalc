@@ -66,6 +66,18 @@
             </div>
         </section>
 
+        <section class="section-shell direct-answer" aria-label="반려동물 월령표 바로 답변">
+            <div class="section-heading">
+                <p class="eyebrow">바로 답변</p>
+                <h2>반려동물 월령표는 생후 24개월까지의 환산 흐름을 보는 참고표입니다</h2>
+            </div>
+            <p>
+                1살 미만처럼 연 단위 나이표가 거친 시기에 강아지와 고양이의 월령을 사람 나이 환산값으로 비교합니다.
+                개월 사이 값은 일반 연령표의 구간을 나누어 표시한 근삿값입니다.
+            </p>
+            <p class="small">월령 환산값은 성장이나 건강 상태를 평가하는 수의학적 진단을 대신하지 않습니다.</p>
+        </section>
+
         <section class="section-shell">
             <div class="section-heading">
                 <h2 id="pet-month-search">월령 선택</h2>
@@ -134,7 +146,7 @@
             </div>
             <div class="section-card-grid">
                 {% for example in examples %}
-                <article class="section-card">
+                <article class="section-card" data-example-card>
                     <p class="eyebrow">{{ example.label }}</p>
                     <h2>{{ example.human_age }}</h2>
                     <p>{{ example.detail }}</p>
@@ -205,13 +217,44 @@
 
         <section class="section-shell section-card-grid">
             <article class="section-card">
-                <p class="eyebrow">같이 보기</p>
-                <h2>연관 페이지</h2>
+                <p class="eyebrow">해석 범위</p>
+                <h2>월령 환산과 발달·건강 판단의 차이</h2>
+                <p>
+                    월령표는 사람 나이와 비교하기 위한 숫자일 뿐, 예방 일정이나 정상 발달 여부를 확정하지 않습니다.
+                    어린 반려동물의 체중, 식욕, 활동과 행동 변화는 담당 수의사의 검진 기준으로 확인해야 합니다.
+                </p>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">근삿값 한계</p>
+                <h2>어린 반려동물 환산의 한계</h2>
+                <ul>
+                    <li>연령표 사이를 월 단위로 나눈 값이라 생물학적 성숙을 월별로 정확히 측정하지 않습니다.</li>
+                    <li>강아지는 체형·품종, 고양이는 품종·생활환경에 따라 성장 속도가 다를 수 있습니다.</li>
+                    <li>입양 시 추정 월령은 실제 출생일 오차가 결과에 그대로 반영됩니다.</li>
+                </ul>
+            </article>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>월령표 다음에 확인할 일</h2>
+                <p class="section-intro">연 단위 나이표와 종별 계산기, 공식 생애 단계 자료를 함께 확인하세요.</p>
+            </div>
+            <div class="footer-links">
+                <a href="{{ url_for('pet_age_table') }}">1살 이후 반려동물 나이표</a>
+                <a href="{{ url_for('dog') }}">강아지 체형별 직접 계산</a>
+                <a href="{{ url_for('cat') }}">고양이 직접 계산</a>
+                <a href="{{ url_for('references') }}">환산 기준과 공식 자료 확인</a>
+            </div>
+        </section>
+
+        <section class="section-shell section-card-grid">
+            <article class="section-card">
+                <p class="eyebrow">공식 자료</p>
+                <h2>생애 단계 기준 같이 보기</h2>
                 <div class="footer-links">
-                    <a href="{{ url_for('pet_age_table') }}">반려동물 나이표</a>
-                    <a href="{{ url_for('dog') }}">강아지 나이 계산기</a>
-                    <a href="{{ url_for('cat') }}">고양이 나이 계산기</a>
-                    <a href="{{ url_for('references') }}">계산 기준과 참고 자료</a>
+                    <a href="https://www.aaha.org/resources/life-stage-canine-2019/" target="_blank" rel="noopener noreferrer">AAHA 강아지 생애 단계 가이드</a>
+                    <a href="https://catvets.com/resource/life-stage-guidelines/" target="_blank" rel="noopener noreferrer">FelineVMA 고양이 생애 단계 가이드</a>
                 </div>
             </article>
         </section>

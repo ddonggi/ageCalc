@@ -7,7 +7,10 @@
 
     <title>{{ page.title }} | AgeCalc 가이드</title>
     <meta name="description" content="{{ page.description }}" />
-    <link rel="canonical" href="https://agecalc.cloud/guides/{{ page.slug }}" />
+    {% if not page.indexable %}
+    <meta name="robots" content="noindex,follow" />
+    {% endif %}
+    <link rel="canonical" href="https://agecalc.cloud{{ page.canonical_path }}" />
 
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="AgeCalc" />
@@ -39,13 +42,31 @@
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <article class="guide-article">
+        <article class="guide-article" data-content-format="{{ page.content_format }}">
             <header class="guide-article-header">
                 <p class="eyebrow">AgeCalc 기준 가이드</p>
                 <span class="guide-category-label">{{ page.category_label }}</span>
                 <h1>{{ page.title }}</h1>
                 <p class="page-intro">{{ page.intro }}</p>
             </header>
+
+            {% if not page.indexable %}
+            <section class="guide-related-box" aria-label="콘텐츠 통합 안내">
+                <p class="eyebrow">통합 예정 안내</p>
+                <h2>이 가이드는 더 완전한 계산 페이지로 통합합니다</h2>
+                <p>기존 링크 이용자를 위해 현재 URL은 유지하며, 검색 기준과 후속 콘텐츠는 아래 대표 페이지로 모읍니다.</p>
+                <a href="{{ page.canonical_path }}">대표 페이지로 이동</a>
+            </section>
+            {% else %}
+            <section class="section-shell direct-answer" aria-label="{{ page.title }} 바로 답변">
+                <div class="section-heading">
+                    <p class="eyebrow">바로 답변</p>
+                    <h2>{{ page.title }} 핵심 기준</h2>
+                </div>
+                <p>{{ page.intro }}</p>
+                <p class="small">{{ page.description }}</p>
+            </section>
+            {% endif %}
 
             <section class="guide-related-box" aria-label="관련 계산기">
                 <p class="eyebrow">관련 계산기</p>
@@ -56,7 +77,90 @@
                 </div>
             </section>
 
-            <div class="guide-content">
+            {% if page.indexable %}
+            <section class="section-shell">
+                <div class="section-heading">
+                    <p class="eyebrow">상황별 해석</p>
+                    <h2>사례로 먼저 확인하기</h2>
+                </div>
+                <div class="section-card-grid">
+                    {% for example in page.example_cards %}
+                    <article class="section-card" data-example-card>
+                        <p class="eyebrow">{{ example.label }}</p>
+                        <h3>{{ example.title }}</h3>
+                        <p>{{ example.description }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="section-shell">
+                <div class="section-heading">
+                    <p class="eyebrow">기준 비교</p>
+                    <h2>기본 기준과 예외 비교표</h2>
+                </div>
+                <div class="guide-comparison-table">
+                    <div class="data-table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">확인 항목</th>
+                                <th scope="col">기본 기준</th>
+                                <th scope="col">예외·해석</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in page.comparison_rows %}
+                            <tr>
+                                <td>{{ row.label }}</td>
+                                <td>{{ row.standard }}</td>
+                                <td>{{ row.exception }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            {% if page.content_format == "checklist" and page.indexable %}
+            <ol class="guide-content-checklist">
+                {% for heading, paragraphs in page.sections %}
+                <li>
+                    <h2>{{ heading }}</h2>
+                    {% for paragraph in paragraphs %}
+                    <p>{{ paragraph }}</p>
+                    {% endfor %}
+                </li>
+                {% endfor %}
+            </ol>
+            {% elif page.content_format == "case-study" and page.indexable %}
+            <div class="guide-content-case-study">
+                <div class="section-card-grid">
+                {% for heading, paragraphs in page.sections %}
+                <article class="section-card">
+                    <h2>{{ heading }}</h2>
+                    {% for paragraph in paragraphs %}
+                    <p>{{ paragraph }}</p>
+                    {% endfor %}
+                </article>
+                {% endfor %}
+                </div>
+            </div>
+            {% elif page.content_format == "comparison" and page.indexable %}
+            <dl class="guide-content-comparison">
+                {% for heading, paragraphs in page.sections %}
+                <div>
+                    <dt><h2>{{ heading }}</h2></dt>
+                    {% for paragraph in paragraphs %}
+                    <dd>{{ paragraph }}</dd>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </dl>
+            {% else %}
+            <div class="guide-content-reference">
                 {% for heading, paragraphs in page.sections %}
                 <section>
                     <h2>{{ heading }}</h2>
@@ -66,6 +170,7 @@
                 </section>
                 {% endfor %}
             </div>
+            {% endif %}
 
             <section class="guide-faq">
                 <h2>자주 묻는 질문</h2>

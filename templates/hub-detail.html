@@ -50,6 +50,15 @@
             </div>
         </section>
 
+        <section class="section-shell direct-answer" aria-label="{{ hub.title }} 바로 답변">
+            <div class="section-heading">
+                <p class="eyebrow">바로 답변</p>
+                <h2>{{ hub.title }}에서 무엇을 확인할 수 있나요?</h2>
+            </div>
+            <p>{{ hub.intro }}</p>
+            <p class="small">{{ hub.description }}</p>
+        </section>
+
         <section class="section-shell life-hub-tools">
             <div class="section-heading">
                 <p class="eyebrow">대표 도구</p>
@@ -69,6 +78,7 @@
             </div>
         </section>
 
+        <nav class="related-paths" aria-label="{{ hub.title }} 관련 경로">
         <section class="section-shell life-hub-support">
             <div class="section-heading">
                 <p class="eyebrow">더 살펴보기</p>
@@ -83,6 +93,7 @@
                 {% endfor %}
             </div>
         </section>
+        </nav>
 
         <section class="section-shell life-hub-questions">
             <div class="section-heading">

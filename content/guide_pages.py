@@ -410,13 +410,94 @@ GUIDE_METADATA = {
     "pet-age-table-guide": ("pet", 160),
 }
 
+GUIDE_CONTENT_POLICY = {
+    "age-calculation-2026": {"action": "keep", "indexable": True},
+    "reference-date-age-guide": {"action": "strengthen", "indexable": True},
+    "lunar-birthday-age-guide": {"action": "strengthen", "indexable": True},
+    "birth-year-age-table-guide": {"action": "keep", "indexable": True},
+    "korean-age-vs-annual-age": {"action": "keep", "indexable": True},
+    "sixtieth-seventieth-eightieth-age-guide": {"action": "keep", "indexable": True},
+    "generation-by-birth-year-guide": {"action": "keep", "indexable": True},
+    "school-entry-year-guide": {"action": "strengthen", "indexable": True},
+    "elementary-school-entry-target-2026": {"action": "keep", "indexable": True},
+    "school-grade-birth-year-guide": {"action": "strengthen", "indexable": True},
+    "early-birth-school-grade-guide": {"action": "keep", "indexable": True},
+    "baby-months-calculation-guide": {"action": "strengthen", "indexable": True},
+    "100-day-calculation-guide": {"action": "strengthen", "indexable": True},
+    "birthday-dday-calculation-guide": {"action": "strengthen", "indexable": True},
+    "baby-anniversary-calculation-guide": {"action": "keep", "indexable": True},
+    "age-gap-calculation-guide": {
+        "action": "noindex",
+        "indexable": False,
+        "canonical_path": "/age-gap-calculator",
+        "future_redirect": "/age-gap-calculator",
+    },
+    "parent-child-age-gap-guide": {"action": "keep", "indexable": True},
+    "dog-age-human-age-guide": {
+        "action": "merge",
+        "indexable": False,
+        "canonical_path": "/dog",
+        "future_redirect": "/dog",
+    },
+    "cat-age-human-age-guide": {
+        "action": "merge",
+        "indexable": False,
+        "canonical_path": "/cat",
+        "future_redirect": "/cat",
+    },
+    "pet-age-table-guide": {
+        "action": "merge",
+        "indexable": False,
+        "canonical_path": "/pet-age-table",
+        "future_redirect": "/pet-age-table",
+    },
+}
+
+GUIDE_CONTENT_FORMATS = (
+    "reference",
+    "checklist",
+    "case-study",
+    "comparison",
+)
+
 for page in GUIDE_PAGES:
     category, priority = GUIDE_METADATA[page["slug"]]
+    policy = GUIDE_CONTENT_POLICY[page["slug"]]
     page["category"] = category
     page["category_label"] = CATEGORY_LABELS[category]
     page["priority"] = priority
+    page["content_action"] = policy["action"]
+    page["indexable"] = policy["indexable"]
+    page["canonical_path"] = policy.get(
+        "canonical_path",
+        f"/guides/{page['slug']}",
+    )
+    page["future_redirect"] = policy.get("future_redirect")
+    page["content_format"] = GUIDE_CONTENT_FORMATS[(priority // 10) % len(GUIDE_CONTENT_FORMATS)]
+    page["example_cards"] = tuple(
+        {
+            "label": heading,
+            "title": paragraphs[0],
+            "description": paragraphs[1] if len(paragraphs) > 1 else page["description"],
+        }
+        for heading, paragraphs in page["sections"][:3]
+    )
+    page["comparison_rows"] = tuple(
+        {
+            "label": heading,
+            "standard": paragraphs[0],
+            "exception": paragraphs[1] if len(paragraphs) > 1 else "개별 상황은 관련 기준을 확인하세요.",
+        }
+        for heading, paragraphs in page["sections"][:3]
+    )
 
 GUIDE_PAGES = sorted(GUIDE_PAGES, key=lambda page: page["priority"])
 GUIDE_PAGE_BY_SLUG = {page["slug"]: page for page in GUIDE_PAGES}
 GUIDE_SLUGS = tuple(page["slug"] for page in GUIDE_PAGES)
 GUIDE_CATEGORIES = frozenset(page["category"] for page in GUIDE_PAGES)
+INDEXABLE_GUIDE_PAGES = tuple(page for page in GUIDE_PAGES if page["indexable"])
+NON_INDEXABLE_GUIDE_PATHS = frozenset(
+    f"/guides/{page['slug']}"
+    for page in GUIDE_PAGES
+    if not page["indexable"]
+)

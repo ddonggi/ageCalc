@@ -150,7 +150,7 @@ class PetAgeCalculator {
                 <div class="age-info">
                     <p class="age">사람 나이 환산: <span class="age-number">${rounded}세</span></p>
                 </div>
-                <p class="small">* 참고용 환산입니다. 개체 특성에 따라 차이가 있을 수 있습니다.</p>
+                <p class="small">환산 나이는 건강 상태나 기대수명을 판정하지 않습니다.</p>
             </div>
         `;
         this.resultContainer.classList.add('show');
