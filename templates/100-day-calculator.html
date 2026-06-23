@@ -67,6 +67,17 @@
             </div>
         </section>
 
+        <section class="section-shell direct-answer" aria-label="100일 계산 바로 답변">
+            <div class="section-heading">
+                <p class="eyebrow">바로 답변</p>
+                <h2>100일째는 시작일을 1일째로 포함해 시작일에 99일을 더한 날짜입니다</h2>
+            </div>
+            <p>
+                출생일, 연애 시작일, 프로젝트 시작일처럼 첫날을 1일째로 세는 상황에 맞춘 계산입니다.
+                첫날을 제외하고 100일 뒤를 찾는 일정 계산과는 결과가 하루 다릅니다.
+            </p>
+        </section>
+
         <section class="section-shell">
             <div class="section-heading">
                 <h2 id="hundred-day-search">시작일 입력</h2>
@@ -128,7 +139,7 @@
             </div>
             <div class="section-card-grid">
                 {% for example in examples %}
-                <article class="section-card">
+                <article class="section-card" data-example-card>
                     <p class="eyebrow">{{ example.title }}</p>
                     <h2>{{ example.hundredth_date }}</h2>
                     <p>{{ example.status_note }}</p>
@@ -141,7 +152,7 @@
         <section class="section-shell section-card-grid">
             <article class="section-card">
                 <p class="eyebrow">계산 기준</p>
-                <h2>어떻게 계산하나요?</h2>
+                <h2>시작일 포함 100일 공식</h2>
                 <ul>
                     <li>시작일을 1일째로 계산하므로 100일째 날짜는 시작일에 99일을 더해 구합니다.</li>
                     <li>오늘 기준 상태는 100일째 날짜와 오늘 날짜를 비교해 D-Day 형식으로 보여줍니다.</li>
@@ -149,15 +160,27 @@
                 </ul>
             </article>
             <article class="section-card">
-                <p class="eyebrow">같이 보기</p>
-                <h2>함께 보면 좋은 페이지</h2>
-                <div class="footer-links">
-                    <a href="{{ url_for('d_day') }}">기념일 계산기</a>
-                    <a href="{{ url_for('baby_months') }}">아이 개월 수 계산기</a>
-                    <a href="{{ url_for('references') }}">계산 기준과 참고 자료</a>
-                    <a href="{{ url_for('faq') }}">자주 묻는 질문</a>
-                </div>
+                <p class="eyebrow">달력 예외</p>
+                <h2>윤년과 월말을 지나는 100일</h2>
+                <ul>
+                    <li>윤년의 2월 29일을 지나면 실제 달력 날짜 수에 따라 자동 계산됩니다.</li>
+                    <li>1월 31일처럼 월말에 시작해도 월 단위가 아니라 정확히 99일을 더합니다.</li>
+                    <li>예: 2024년 2월 29일을 1일째로 세면 100일째는 2024년 6월 7일입니다.</li>
+                </ul>
             </article>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>100일 결과 다음에 할 일</h2>
+                <p class="section-intro">계산 목적에 따라 일반 D-day, 아이 월령, 생일 계산으로 이어서 확인할 수 있습니다.</p>
+            </div>
+            <div class="footer-links">
+                <a href="{{ url_for('d_day') }}">오늘 제외 D-day 계산하기</a>
+                <a href="{{ url_for('baby_months') }}">아이의 현재 완료 월령 계산하기</a>
+                <a href="{{ url_for('birthday_dday_calculator') }}">다음 생일까지 남은 날짜 보기</a>
+                <a href="{{ url_for('references') }}">계산 기준과 참고 자료 확인</a>
+            </div>
         </section>
 
         {% include 'partials/footer.html' %}

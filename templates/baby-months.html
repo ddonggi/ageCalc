@@ -47,6 +47,20 @@
         <h1>아이 개월 수 계산기</h1>
         <div style="text-align: center;margin-bottom: 2rem;">출생일만 입력하면 현재 개월 수를 바로 확인할 수 있습니다.</div>
 
+        <section class="section-shell direct-answer" aria-label="아이 월령 바로 답변">
+            <div class="section-heading">
+                <p class="eyebrow">바로 답변</p>
+                <h2>월령은 출생일에서 기준일까지 완료된 달 수입니다</h2>
+            </div>
+            <p>
+                기준일의 일자가 출생일의 일자에 아직 이르지 않았다면 마지막 한 달은 완료되지 않은 것으로 봅니다.
+                예를 들어 2025년 6월 15일 출생 아이는 2026년 2월 14일에 7개월, 2월 15일에 8개월입니다.
+            </p>
+            <p class="small">
+                이 결과는 달력상 날짜 차이를 계산한 월령입니다. 날짜 계산 결과이며 발달 평가나 의료 진단을 대신하지 않습니다.
+            </p>
+        </section>
+
         <form class="age-form" id="baby-months-form" autocomplete="off">
             <div class="form-group">
                 <h3>출생일을 입력하세요</h3>
@@ -64,55 +78,62 @@
             <div id="baby-result-content"></div>
         </div>
 
-        <section style="margin-top:40px">
-            <h2>이 계산기로 알 수 있는 내용</h2>
-            <ul>
-                <li>출생일 기준으로 현재 개월 수를 계산합니다.</li>
-                <li>예방접종 일정, 발달 단계 확인에 활용할 수 있습니다.</li>
-                <li>결과는 참고용이며, 의료적 판단은 전문가 상담을 권장합니다.</li>
-            </ul>
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>월령 계산 예시</h2>
+                <p class="section-intro">같은 출생일도 기준일의 일자와 월말 여부에 따라 완료된 개월 수가 달라집니다.</p>
+            </div>
+            <div class="section-card-grid">
+                <article class="section-card" data-example-card>
+                    <p class="eyebrow">일자 전</p>
+                    <h3>2025.06.15 → 2026.02.14</h3>
+                    <p>2월의 15일이 되기 전이므로 완료된 월령은 7개월입니다.</p>
+                </article>
+                <article class="section-card" data-example-card>
+                    <p class="eyebrow">같은 일자</p>
+                    <h3>2025.06.15 → 2026.02.15</h3>
+                    <p>출생일과 같은 일자에 도달했으므로 완료된 월령은 8개월입니다.</p>
+                </article>
+                <article class="section-card" data-example-card>
+                    <p class="eyebrow">월말 출생</p>
+                    <h3>2025.01.31 → 2025.02.28</h3>
+                    <p>다음 달에 같은 일자가 없을 수 있어 서비스별 월말 처리 기준을 함께 확인해야 합니다.</p>
+                </article>
+            </div>
         </section>
 
-        <section style="margin-top:40px">
-            <h2>도움 되는 팁</h2>
-            <ul>
-                <li>미숙아(조산)인 경우 교정 월령 기준으로 확인하는 것이 도움될 수 있습니다.</li>
-                <li>발달 이정표는 “대부분의 아이가 그 나이에 할 수 있는 것”을 기준으로 합니다.</li>
-                <li>궁금한 점이 있다면 소아과에서 발달 선별검사를 상담해 보세요.</li>
-                <li>같은 월령이라도 수면, 수유, 활동량에 개인차가 큽니다. 평균보다 흐름을 보는 것이 좋아요.</li>
-                <li>아이의 변화 기록(사진/메모)을 남겨두면 성장 패턴을 확인하는 데 도움이 됩니다.</li>
-            </ul>
-            <h3 style="margin-top:16px;">참고 링크/앱</h3>
-            <ul>
-                <li><a href="https://nip.kdca.go.kr/" target="_blank" rel="noopener noreferrer">질병관리청 예방접종도우미</a> — 접종 일정 확인, 접종기관 찾기</li>
-                <li><a href="https://hi.nhis.or.kr/" target="_blank" rel="noopener noreferrer">건강iN(국민건강보험공단)</a> — 영유아 건강검진 안내 및 문진표 작성</li>
-                <li>The건강보험 앱 — <a href="https://play.google.com/store/apps/details?hl=ko&id=kr.or.nhic" target="_blank" rel="noopener noreferrer">Android</a> / <a href="https://apps.apple.com/kr/app/the%EA%B1%B4%EA%B0%95%EB%B3%B4%ED%97%98/id375279377" target="_blank" rel="noopener noreferrer">iOS</a></li>
-                <li><a href="https://play.google.com/store/apps/details?hl=ko&id=com.mw.Android_KidsLove2" target="_blank" rel="noopener noreferrer">아이사랑 모바일(Android)</a> — 육아·보육 정보와 서비스 안내</li>
-            </ul>
+        <section class="section-shell section-card-grid">
+            <article class="section-card">
+                <p class="eyebrow">해석 기준</p>
+                <h2>월령 계산과 발달 판단은 다릅니다</h2>
+                <p>
+                    이 계산기는 출생일과 오늘 사이의 완료된 달 수만 계산합니다. 같은 월령이라도 성장 속도와 생활 리듬은 다를 수 있으며,
+                    조산아의 교정 월령이나 발달 상태는 의료진과 공식 검진 안내를 기준으로 확인해야 합니다.
+                </p>
+                <p class="small">월령은 날짜 정보이며 발달 평가나 의료 진단을 대신하지 않습니다.</p>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">날짜 예외</p>
+                <h2>월말 출생일 계산 예외</h2>
+                <ul>
+                    <li>29일·30일·31일 출생은 다음 달에 같은 일자가 없을 수 있습니다.</li>
+                    <li>2월 29일 출생은 윤년이 아닌 해의 기준일 처리 방식이 서비스마다 다를 수 있습니다.</li>
+                    <li>행정·검진·접종 일정은 계산 결과가 아니라 해당 기관이 정한 기간 기준을 우선합니다.</li>
+                </ul>
+            </article>
         </section>
 
-        <section style="margin-top:40px">
-            <h2>계산 방식과 예시</h2>
-            <p>
-                개월 수는 출생일을 기준으로 오늘 날짜까지 경과한 달 수를 계산한 값입니다.
-                예를 들어 2025-06-15 출생이라면, 2026-02-15에는 8개월로 계산되고
-                2026-02-14에는 7개월로 계산됩니다. 날짜 단위의 차이를 반영하기 때문에
-                하루 차이로도 개월 수가 달라질 수 있습니다.
-            </p>
-            <ul>
-                <li>기준: 출생일과 오늘 날짜의 차이를 월 단위로 환산</li>
-                <li>활용: 예방접종 일정, 발달 체크, 생활 리듬 점검</li>
-                <li>주의: 의료적 판단은 전문가 상담 권장</li>
-            </ul>
-            <p>
-                학령기 자녀의 현재 학년이 궁금하다면
-                <a href="{{ url_for('school_grade_calculator') }}">학년 계산기</a>에서 출생년도 기준으로 바로 확인할 수 있습니다.
-            </p>
-            <p>
-                생후 6개월, 12개월, 18개월처럼 자주 찾는 월령을 표로 바로 보고 싶다면
-                <a href="{{ url_for('baby_months_table') }}">개월수 계산표</a>를 함께 활용해 보세요.
-            </p>
-            <p class="small">마지막 기준 확인일: 2026-02-09</p>
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>월령 결과 다음에 확인할 일</h2>
+                <p class="section-intro">계산한 월령을 실제 일정에 사용할 때는 목적별 공식 기준을 이어서 확인하세요.</p>
+            </div>
+            <div class="footer-links">
+                <a href="{{ url_for('baby_months_table') }}">개월수 계산표로 연·개월 표현 보기</a>
+                <a href="{{ url_for('hundred_day_calculator') }}">출생일 포함 백일 날짜 계산</a>
+                <a href="https://nip.kdca.go.kr/" target="_blank" rel="noopener noreferrer">질병관리청 예방접종도우미 확인</a>
+                <a href="https://www.nhis.or.kr/" target="_blank" rel="noopener noreferrer">국민건강보험공단 영유아 건강검진 확인</a>
+            </div>
         </section>
 
         {% include 'partials/footer.html' %}

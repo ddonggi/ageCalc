@@ -47,6 +47,17 @@
         <h1>부모·자녀 나이 관계 계산기</h1>
         <div style="text-align: center;margin-bottom: 2rem;">부모와 자녀의 나이 차이와 주요 시점을 함께 살펴볼 수 있습니다.</div>
 
+        <section class="section-shell direct-answer" aria-label="부모 자녀 나이 관계 바로 답변">
+            <div class="section-heading">
+                <p class="eyebrow">바로 답변</p>
+                <h2>부모와 자녀의 생년월일로 출산 당시 만나이와 주요 가족 시점을 계산합니다</h2>
+            </div>
+            <p>
+                자녀 출생일 당시 부모의 만나이, 현재 두 사람의 만나이 차이, 부모가 60세·70세가 되는 해의 자녀 나이를 함께 보여줍니다.
+                자녀 출생연도는 학년 계산기와 입학년도 계산표로 이어서 확인할 수 있습니다.
+            </p>
+        </section>
+
         <form class="age-form" id="parent-child-form" autocomplete="off">
             <div class="form-group">
                 <h3>부모</h3>
@@ -78,40 +89,61 @@
             </div>
         </div>
 
-        <section style="margin-top:40px">
-            <h2>이 계산기로 알 수 있는 내용</h2>
-            <ul>
-                <li>부모가 자녀를 낳았을 때의 나이를 계산합니다.</li>
-                <li>현재 부모·자녀의 나이 차이를 확인합니다.</li>
-                <li>부모의 환갑(60세), 칠순(70세) 시점의 자녀 나이를 계산합니다.</li>
-            </ul>
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>가족 시점 계산 예시</h2>
+                <p class="section-intro">출산 당시 나이와 기념 나이는 생일 도달 여부를 포함해 만나이 기준으로 계산합니다.</p>
+            </div>
+            <div class="section-card-grid">
+                <article class="section-card" data-example-card>
+                    <p class="eyebrow">출산 당시</p>
+                    <h3>자녀 출생일 기준 부모 만나이</h3>
+                    <p>부모의 생일이 지났는지 비교해 자녀가 태어난 날의 완료 나이를 계산합니다.</p>
+                </article>
+                <article class="section-card" data-example-card>
+                    <p class="eyebrow">부모 기념 나이</p>
+                    <h3>환갑 60세·칠순 70세</h3>
+                    <p>부모 생년월일에 60년 또는 70년을 더한 날짜에서 자녀의 만나이를 계산합니다.</p>
+                </article>
+                <article class="section-card" data-example-card>
+                    <p class="eyebrow">자녀 교육 시점</p>
+                    <h3>출생연도로 학년 연결</h3>
+                    <p>자녀의 출생연도를 학년·입학년도 페이지로 넘겨 일반적인 학교 시점을 확인합니다.</p>
+                </article>
+            </div>
         </section>
 
-        <section style="margin-top:40px">
-            <h2>계산 방식</h2>
-            <p>
-                부모·자녀 각각의 생년월일을 기준으로 만나이를 계산한 뒤,
-                출산 시점(자녀 출생일 기준)에서 부모의 만나이와 현재 시점의 만나이를 비교합니다.
-                환갑/칠순 시점 계산은 “부모 생일 기준으로 60세/70세가 되는 해”를 기준으로 산출합니다.
-            </p>
-            <ul>
-                <li>입력: 부모와 자녀 생년월일</li>
-                <li>출산 당시 나이: 자녀 출생일 기준 부모 만나이</li>
-                <li>환갑/칠순: 부모 생일 기준으로 계산</li>
-            </ul>
+        <section class="section-shell section-card-grid">
+            <article class="section-card">
+                <p class="eyebrow">계산 기준</p>
+                <h2>부모·자녀 나이 관계 공식</h2>
+                <ul>
+                    <li>출산 당시 나이: 자녀 출생일의 연도 차이에서 부모 생일 전 여부를 반영합니다.</li>
+                    <li>현재 나이 차이: 오늘 기준 부모 만나이에서 자녀 만나이를 뺍니다.</li>
+                    <li>기념 나이: 부모 생일에 60년·70년을 더한 날짜에서 자녀 만나이를 다시 계산합니다.</li>
+                </ul>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">생애 연결</p>
+                <h2>환갑·칠순과 학교 시점</h2>
+                <p>
+                    결과 카드에서 부모의 환갑·칠순 기준 안내와 자녀 출생연도에 맞는 학년·입학년도 페이지로 이동할 수 있습니다.
+                    조기입학, 입학유예, 해외 학제는 일반 출생연도 계산과 실제 학적이 다를 수 있습니다.
+                </p>
+            </article>
         </section>
 
-        <section style="margin-top:40px">
-            <h2>활용 예시와 주의</h2>
-            <p>
-                가족 행사 계획, 기념일 정리, 세대 간 나이 차이 계산에 유용합니다.
-                다만 법적·행정적 기준이 필요한 경우에는 관계 기관의 최신 안내를 확인하세요.
-            </p>
-            <p>
-                가족 관계가 아니라 두 사람의 출생년도만 빠르게 비교하고 싶다면
-                <a href="{{ url_for('age_gap_calculator') }}">나이 차이 계산기</a>에서 간단히 확인할 수 있습니다.
-            </p>
-            <p class="small">마지막 기준 확인일: 2026-02-09</p>
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>가족 결과 다음에 확인할 일</h2>
+                <p class="section-intro">계산 결과는 가족 일정 정리를 위한 참고값입니다. 법적·행정적 판단에는 관계 기관의 기준을 우선하세요.</p>
+            </div>
+            <div class="footer-links">
+                <a href="{{ url_for('age_gap_calculator') }}">두 출생연도의 나이 차이 비교</a>
+                <a href="{{ url_for('school_grade_calculator') }}">자녀의 현재 학년 확인</a>
+                <a href="{{ url_for('school_entry_year_table') }}">자녀의 초·중·고 입학년도 확인</a>
+                <a href="{{ url_for('guide_detail', slug='sixtieth-seventieth-eightieth-age-guide') }}">환갑·칠순·팔순 기준 읽기</a>
+            </div>
         </section>
 
         {% include 'partials/footer.html' %}

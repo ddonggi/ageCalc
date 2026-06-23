@@ -27,6 +27,7 @@ OFFICIAL_SOURCE_REQUIRED_KEYS = frozenset(
         "dog",
         "cat",
         "baby_months",
+        "baby_months_table",
         "guide:age-calculation-2026",
         "guide:reference-date-age-guide",
         "guide:lunar-birthday-age-guide",

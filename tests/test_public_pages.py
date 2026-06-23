@@ -664,6 +664,7 @@ class PublicPageTests(unittest.TestCase):
             "/dog",
             "/cat",
             "/baby-months",
+            "/baby-months-table",
         )
 
         for path in ymyl_paths:
@@ -771,6 +772,81 @@ class PublicPageTests(unittest.TestCase):
                 self.assertIn("확인일 2026-06-22", html)
                 for phrase in phrases:
                     self.assertIn(phrase, html)
+
+    def test_core_family_anniversary_pages_have_distinct_deep_content_sections(self):
+        client = app.test_client()
+        expectations = {
+            "/baby-months": (
+                "월령은 출생일에서 기준일까지 완료된 달 수입니다",
+                "월령 계산과 발달 판단은 다릅니다",
+                "월말 출생일 계산 예외",
+                "월령 결과 다음에 확인할 일",
+            ),
+            "/baby-months-table": (
+                "개월수 계산표는 월령을 연·개월 표현으로 바꿔 읽는 표입니다",
+                "월령표와 발달 정보의 차이",
+                "월령표 해석 예외",
+                "표를 본 다음 할 일",
+            ),
+            "/100-day-calculator": (
+                "100일째는 시작일을 1일째로 포함해 시작일에 99일을 더한 날짜입니다",
+                "시작일 포함 100일 공식",
+                "윤년과 월말을 지나는 100일",
+                "100일 결과 다음에 할 일",
+            ),
+            "/d-day": (
+                "D-day는 오늘을 제외하고 목표 날짜까지 남은 날짜 수를 계산합니다",
+                "D-day 포함 기준",
+                "윤년·월말·시간대 예외",
+                "D-day 결과 다음에 할 일",
+            ),
+            "/parent-child": (
+                "부모와 자녀의 생년월일로 출산 당시 만나이와 주요 가족 시점을 계산합니다",
+                "부모·자녀 나이 관계 공식",
+                "환갑·칠순과 학교 시점",
+                "가족 결과 다음에 확인할 일",
+            ),
+        }
+
+        for path, phrases in expectations.items():
+            with self.subTest(path=path):
+                response = client.get(path)
+
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                self.assertRegex(html, r'class="[^"]*\bdirect-answer\b[^"]*"')
+                self.assertGreaterEqual(html.count("data-example-card"), 3)
+                for phrase in phrases:
+                    self.assertIn(phrase, html)
+
+    def test_baby_month_pages_separate_date_calculation_from_medical_judgment(self):
+        client = app.test_client()
+
+        for path in ("/baby-months", "/baby-months-table"):
+            with self.subTest(path=path):
+                response = client.get(path)
+
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                self.assertIn("질병관리청", html)
+                self.assertIn("국민건강보험공단", html)
+                self.assertIn('data-official-source="true"', html)
+                self.assertIn("날짜 계산", html)
+                self.assertIn("발달 평가나 의료 진단을 대신하지 않습니다", html)
+
+        script = Path("static/js/baby-months.js").read_text(encoding="utf-8")
+        self.assertIn("날짜 계산 결과이며 발달 평가나 의료 진단이 아닙니다.", script)
+        self.assertNotIn("미국 일정 예시", script)
+        self.assertNotIn("발달 단계 참고", script)
+
+    def test_parent_child_results_link_family_and_school_milestones(self):
+        script = Path("static/js/parent-child.js").read_text(encoding="utf-8")
+
+        self.assertIn("/guides/sixtieth-seventieth-eightieth-age-guide", script)
+        self.assertIn("/school-grade-calculator?year=", script)
+        self.assertIn("/school-entry-year-table?year=", script)
+        self.assertIn("환갑·칠순 기준 보기", script)
+        self.assertIn("자녀 학교 시점 보기", script)
 
     def test_education_results_link_to_next_school_milestones(self):
         client = app.test_client()

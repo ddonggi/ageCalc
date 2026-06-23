@@ -278,6 +278,7 @@ class ParentChildCalculator {
                 const parentLabel = parent.role === 'mother' ? '엄마' : '아빠';
                 const childLabel = child.role === 'daughter' ? '딸' : '아들';
                 const orderLabel = this.childOrderLabel(idx);
+                const childBirthYear = childBirth.getFullYear();
 
                 const milestoneHtml = milestones.map(age => {
                     const date = new Date(parentBirth.getFullYear() + age, parentBirth.getMonth(), parentBirth.getDate());
@@ -308,6 +309,14 @@ class ParentChildCalculator {
                             <p class="age">지금 두 사람의 만 나이 차이: <span class="age-number">${diff}세</span></p>
                         </div>
                         ${milestoneHtml}
+                        <div class="result-section">
+                            <h4>다음 가족 시점 확인</h4>
+                            <div class="footer-links">
+                                <a href="/guides/sixtieth-seventieth-eightieth-age-guide">환갑·칠순 기준 보기</a>
+                                <a href="/school-grade-calculator?year=${childBirthYear}">자녀 학교 시점 보기</a>
+                                <a href="/school-entry-year-table?year=${childBirthYear}">자녀 입학년도 보기</a>
+                            </div>
+                        </div>
                     </div>
                 `);
             }

@@ -59,6 +59,17 @@
             </div>
         </section>
 
+        <section class="section-shell direct-answer" aria-label="기념일 D-day 바로 답변">
+            <div class="section-heading">
+                <p class="eyebrow">바로 답변</p>
+                <h2>D-day는 오늘을 제외하고 목표 날짜까지 남은 날짜 수를 계산합니다</h2>
+            </div>
+            <p>
+                오늘과 목표일이 같으면 D-Day, 목표일이 내일이면 D-1, 어제였다면 D+1로 표시합니다.
+                시작일을 1일째로 세는 백일 계산과 달리 두 날짜 사이의 순수한 날짜 차이를 사용합니다.
+            </p>
+        </section>
+
         <form class="age-form" id="dday-form" autocomplete="off">
             <div class="form-split">
                 <div class="field-stack">
@@ -96,10 +107,34 @@
             <div id="dday-result-content"></div>
         </div>
 
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>상황별 D-day 예시</h2>
+                <p class="section-intro">포함 기준이 달라지면 표시가 어떻게 달라지는지 확인하세요.</p>
+            </div>
+            <div class="section-card-grid">
+                <article class="section-card" data-example-card>
+                    <p class="eyebrow">내일 일정</p>
+                    <h3>오늘 제외 D-1</h3>
+                    <p>오늘 밤이 지나고 다음 날짜가 되기까지 하루가 남은 것으로 계산합니다.</p>
+                </article>
+                <article class="section-card" data-example-card>
+                    <p class="eyebrow">오늘 일정</p>
+                    <h3>같은 날짜는 D-Day</h3>
+                    <p>시간까지 계산하지 않고 사용 중인 브라우저 시간대의 달력 날짜가 같은지 비교합니다.</p>
+                </article>
+                <article class="section-card" data-example-card>
+                    <p class="eyebrow">어제 일정</p>
+                    <h3>오늘 제외 D+1</h3>
+                    <p>목표 날짜가 하루 지났으므로 지난 날짜 기준으로 1일이 경과했다고 표시합니다.</p>
+                </article>
+            </div>
+        </section>
+
         <section class="section-shell section-card-grid">
             <article class="section-card">
                 <p class="eyebrow">계산 기준</p>
-                <h2>계산 방식</h2>
+                <h2>D-day 포함 기준</h2>
                 <ul>
                     <li>오늘 날짜와 입력한 날짜를 날짜 단위로 비교합니다.</li>
                     <li>다가오는 일정은 D-Day 형식으로, 지난 일정은 경과 일수 기준으로 표시합니다.</li>
@@ -107,18 +142,27 @@
                 </ul>
             </article>
             <article class="section-card">
-                <p class="eyebrow">활용 예시</p>
-                <h2>이럴 때 유용합니다</h2>
+                <p class="eyebrow">달력 예외</p>
+                <h2>윤년·월말·시간대 예외</h2>
                 <ul>
-                    <li>시험, 입사, 여행, 공연 같은 다가오는 일정 정리</li>
-                    <li>연애, 결혼, 프로젝트 시작일 등 지난 날짜 추적</li>
-                    <li>선물 준비나 일정 관리용 기준 날짜 메모</li>
+                    <li>2월 29일을 포함한 기간은 실제 달력 일수로 계산합니다.</li>
+                    <li>1월 31일에서 2월 말까지도 월 수가 아니라 날짜 차이로 계산합니다.</li>
+                    <li>해외 일정은 현지 시간대와 한국 날짜가 다를 수 있으므로 행사 지역의 날짜를 확인해야 합니다.</li>
                 </ul>
-                <p class="small">
-                    커플 100일이나 아기 백일처럼 시작일 포함 계산이 필요하면
-                    <a href="{{ url_for('hundred_day_calculator') }}">100일 계산기</a>를 함께 이용해 보세요.
-                </p>
             </article>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading">
+                <h2>D-day 결과 다음에 할 일</h2>
+                <p class="section-intro">첫날을 포함하는 기념일인지, 매년 반복되는 생일인지에 따라 전용 계산기를 선택하세요.</p>
+            </div>
+            <div class="footer-links">
+                <a href="{{ url_for('hundred_day_calculator') }}">시작일 포함 100일 계산하기</a>
+                <a href="{{ url_for('birthday_dday_calculator') }}">다음 생일 D-day 계산하기</a>
+                <a href="{{ url_for('baby_months') }}">출생일 기준 아이 월령 계산하기</a>
+                <a href="{{ url_for('references') }}">날짜 계산 기준 확인하기</a>
+            </div>
         </section>
 
         {% include 'partials/footer.html' %}
