@@ -46,7 +46,7 @@ OFFICIAL_SOURCE_REQUIRED_KEYS = frozenset(
 
 
 def editorial_metadata_for(page: dict[str, object] | None) -> dict[str, object] | None:
-    if not page or page["endpoint"] == "index":
+    if not page:
         return None
 
     official_source_required = str(page["key"]) in OFFICIAL_SOURCE_REQUIRED_KEYS

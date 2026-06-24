@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from content.guide_pages import GUIDE_PAGES
-from content.hub_pages import HUB_PAGES
+from content.hub_pages import HUB_PAGE_BY_KEY, HUB_PAGES
 
 
 CONTENT_ACTIONS = frozenset({"keep", "strengthen", "merge", "noindex"})
@@ -451,8 +451,14 @@ def contextual_links_for(
     *,
     recommended_endpoints: tuple[str, ...] = (),
 ) -> dict[str, object] | None:
-    if not page or page["endpoint"] == "index":
+    if not page:
         return None
+
+    registry_by_endpoint = {
+        str(candidate["endpoint"]): candidate
+        for candidate in PUBLIC_PAGE_REGISTRY
+        if candidate["endpoint"] != "guide_detail"
+    }
 
     hub_page = next(
         (
@@ -463,13 +469,24 @@ def contextual_links_for(
         None,
     )
     if hub_page is None:
-        return None
+        related_hub_candidate = next(
+            (
+                registry_by_endpoint[str(endpoint)]
+                for endpoint in page.get("related_endpoints", ())
+                if str(endpoint) in registry_by_endpoint
+                and registry_by_endpoint[str(endpoint)].get("hub") in HUB_PAGE_BY_KEY
+            ),
+            None,
+        )
+        hub_key = (
+            str(related_hub_candidate["hub"])
+            if related_hub_candidate
+            else "age"
+        )
+        hub_page = next(
+            candidate for candidate in HUB_PAGE_REGISTRY if candidate["hub"] == hub_key
+        )
 
-    registry_by_endpoint = {
-        str(candidate["endpoint"]): candidate
-        for candidate in PUBLIC_PAGE_REGISTRY
-        if candidate["endpoint"] != "guide_detail"
-    }
     groups = {
         group_name: list(endpoints)
         for group_name, endpoints in dict(page["related_link_groups"]).items()

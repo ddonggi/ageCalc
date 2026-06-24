@@ -111,6 +111,16 @@ class ContentQualityAuditTests(unittest.TestCase):
         self.assertGreaterEqual(len(hub_report.results), 5)
         self.assertTrue(all(result.hub == "age" for result in hub_report.results))
 
+    def test_all_indexable_local_pages_pass_content_quality_errors(self):
+        report = audit_local_pages()
+        failing = {
+            result.path: [issue.code for issue in result.errors]
+            for result in report.results
+            if result.errors
+        }
+
+        self.assertEqual({}, failing)
+
 
 if __name__ == "__main__":
     unittest.main()
