@@ -1271,6 +1271,27 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("/blog/birth-year-age-interpretation", article_paths)
         self.assertIn("/blog/early-birth-school-grade-guide", article_paths)
 
+    def test_structured_blog_article_registry_returns_isolated_deep_copy(self):
+        from content.blog_articles import BLOG_ARTICLE_BLUEPRINTS, structured_blog_article_for_slug
+
+        article = structured_blog_article_for_slug("2026-man-age-guide")
+        article["primary_cta"]["path"] = "/mutated-path"
+        article["related_tools"][0]["path"] = "/mutated-tool"
+        article["faq_items"][0]["answer"] = "changed"
+
+        blueprint = BLOG_ARTICLE_BLUEPRINTS["2026-man-age-guide"]
+        self.assertEqual("/age", blueprint["primary_cta"]["path"])
+        self.assertEqual("/age", blueprint["related_tools"][0]["path"])
+        self.assertEqual(
+            "네. 공적 기준은 원칙적으로 만나이로 확인하는 것이 안전합니다.",
+            blueprint["faq_items"][0]["answer"],
+        )
+
+    def test_structured_blog_article_registry_returns_none_for_missing_slug(self):
+        from content.blog_articles import structured_blog_article_for_slug
+
+        self.assertIsNone(structured_blog_article_for_slug("missing-slug"))
+
     def test_blog_detail_renders_coupang_partners_sidebar_disclosure(self):
         post = SimpleNamespace(
             title="테스트 글",
