@@ -1244,6 +1244,33 @@ class PublicPageTests(unittest.TestCase):
         self.assertNotIn("AgeCalc Editorial", html)
         self.assertNotIn("Related Tools", html)
 
+    def test_structured_blog_article_registry_defines_flagship_man_age_post(self):
+        from content.blog_articles import BLOG_ARTICLE_BLUEPRINTS, structured_blog_article_for_slug
+
+        article = structured_blog_article_for_slug("2026-man-age-guide")
+
+        self.assertIn("2026-man-age-guide", BLOG_ARTICLE_BLUEPRINTS)
+        self.assertEqual("2026년 만나이 계산 기준 총정리", article["h1"])
+        self.assertEqual("/age", article["primary_cta"]["path"])
+        self.assertGreaterEqual(len(article["direct_answer_paragraphs"]), 3)
+        self.assertGreaterEqual(len(article["example_cards"]), 3)
+        self.assertGreaterEqual(len(article["faq_items"]), 3)
+
+    def test_structured_blog_article_registry_exposes_related_tools_and_articles(self):
+        from content.blog_articles import structured_blog_article_for_slug
+
+        article = structured_blog_article_for_slug("2026-man-age-guide")
+
+        tool_paths = [tool["path"] for tool in article["related_tools"]]
+        article_paths = [item["path"] for item in article["related_articles"]]
+
+        self.assertIn("/age", tool_paths)
+        self.assertIn("/age-comparison-table", tool_paths)
+        self.assertIn("/birth-year-age-table", tool_paths)
+        self.assertIn("/references", tool_paths)
+        self.assertIn("/blog/birth-year-age-interpretation", article_paths)
+        self.assertIn("/blog/early-birth-school-grade-guide", article_paths)
+
     def test_blog_detail_renders_coupang_partners_sidebar_disclosure(self):
         post = SimpleNamespace(
             title="테스트 글",
