@@ -49,6 +49,8 @@ def upsert_seed_post(slug: str) -> GeneratedPost:
         session.add(post)
     else:
         for field, value in payload.items():
+            if field == "published_at" and post.published_at is not None:
+                continue
             setattr(post, field, value)
     session.commit()
     session.refresh(post)

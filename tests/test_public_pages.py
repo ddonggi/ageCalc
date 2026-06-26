@@ -6,16 +6,19 @@ from pathlib import Path
 from unittest import mock
 
 from flask import render_template, url_for
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 import app as app_module
 import content.guide_pages as guide_pages_module
 from app import PUBLIC_SITEMAP_ENDPOINTS, app, _current_local_date
+from db import Base
 from content.guide_pages import (
     GUIDE_CATEGORIES,
     GUIDE_PAGES,
     GUIDE_SLUGS,
 )
-from models.blog_models import PageFeedback
+from models.blog_models import GeneratedPost, PageFeedback
 
 
 def _sitemap_leaf_locations(client) -> list[str]:
@@ -1328,6 +1331,54 @@ class PublicPageTests(unittest.TestCase):
 
         self.assertIsNone(app_module._structured_blog_context(post))
 
+    def test_blog_detail_route_passes_structured_article_context_for_curated_slug(self):
+        class FakeQuery:
+            def __init__(self, post):
+                self.post = post
+
+            def filter(self, *args, **kwargs):
+                return self
+
+            def first(self):
+                return self.post
+
+        class FakeSession:
+            def __init__(self, post):
+                self.post = post
+
+            def query(self, model):
+                return FakeQuery(self.post)
+
+        post = SimpleNamespace(
+            id=1,
+            title="2026년 만나이 계산 기준 총정리 | 생일 전후·예외까지 정리",
+            slug="2026-man-age-guide",
+            excerpt="요약",
+            cover_image_url=None,
+            content_html="<p>레거시 본문</p>",
+            published_at=None,
+            created_at=None,
+            updated_at=None,
+            status="published",
+            sources=[],
+        )
+        captured = {}
+
+        def fake_render(template_name, **kwargs):
+            captured["template_name"] = template_name
+            captured["kwargs"] = kwargs
+            return "rendered-blog-detail"
+
+        with mock.patch.object(app_module, "SessionLocal", return_value=FakeSession(post)), mock.patch.object(
+            app_module, "render_template", side_effect=fake_render
+        ), mock.patch.object(app_module, "_is_blog_public_indexable", return_value=True):
+            response = app.test_client().get("/blog/2026-man-age-guide")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual("blog-detail.html", captured["template_name"])
+        self.assertEqual("2026-man-age-guide", captured["kwargs"]["structured_article"]["slug"])
+        self.assertEqual("/age", captured["kwargs"]["structured_article"]["primary_cta"]["path"])
+
     def test_seed_public_blog_posts_upserts_flagship_article(self):
         from scripts.seed_public_blog_posts import build_seed_post_payload
 
@@ -1337,6 +1388,42 @@ class PublicPageTests(unittest.TestCase):
         self.assertEqual("published", payload["status"])
         self.assertIn("2026년 만나이 계산 기준 총정리", payload["title"])
         self.assertIn("<h2>만나이는 무엇을 기준으로 계산하나</h2>", payload["content_html"])
+
+    def test_seed_public_blog_posts_upsert_preserves_existing_published_at(self):
+        from scripts import seed_public_blog_posts
+
+        engine = create_engine("sqlite:///:memory:", future=True)
+        Session = sessionmaker(bind=engine, autocommit=False, autoflush=False, future=True)
+        Base.metadata.create_all(bind=engine)
+
+        published_at = datetime(2026, 6, 1, 12, 0)
+        setup_session = Session()
+        setup_session.add(
+            GeneratedPost(
+                slug="2026-man-age-guide",
+                title="이전 제목",
+                excerpt="이전 요약",
+                content_html="<p>이전 본문</p>",
+                cover_image_url=None,
+                status="published",
+                published_at=published_at,
+            )
+        )
+        setup_session.commit()
+        setup_session.close()
+
+        with mock.patch.object(seed_public_blog_posts, "SessionLocal", Session):
+            post = seed_public_blog_posts.upsert_seed_post("2026-man-age-guide")
+
+        self.assertEqual(published_at, post.published_at)
+
+        verify_session = Session()
+        stored = verify_session.query(GeneratedPost).filter(GeneratedPost.slug == "2026-man-age-guide").first()
+        verify_session.close()
+
+        self.assertIsNotNone(stored)
+        self.assertEqual(published_at, stored.published_at)
+        self.assertIn("2026년 만나이 계산 기준 총정리", stored.title)
 
     def test_blog_detail_renders_coupang_partners_sidebar_disclosure(self):
         post = SimpleNamespace(
