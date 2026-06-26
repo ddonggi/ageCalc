@@ -8,7 +8,7 @@ from pathlib import Path
 import secrets
 from zoneinfo import ZoneInfo
 from controllers.age_controller import AgeController
-from content.blog_articles import structured_blog_article_for_slug
+from content.blog_articles import BLOG_ARTICLE_BLUEPRINTS, structured_blog_article_for_slug
 from content.editorial_metadata import editorial_metadata_for
 from content.guide_pages import (
     GUIDE_PAGE_BY_SLUG,
@@ -341,10 +341,21 @@ def _independent_db_session():
     return factory() if factory is not None else SessionLocal()
 
 
+def _public_blog_slugs() -> tuple[str, ...]:
+    return tuple(BLOG_ARTICLE_BLUEPRINTS.keys())
+
+
 def _published_blog_count() -> int:
+    public_slugs = _public_blog_slugs()
+    if not public_slugs:
+        return 0
     db_session = _independent_db_session()
     try:
-        return db_session.query(GeneratedPost).filter(GeneratedPost.status == "published").count()
+        return (
+            db_session.query(GeneratedPost)
+            .filter(GeneratedPost.status == "published", GeneratedPost.slug.in_(public_slugs))
+            .count()
+        )
     finally:
         db_session.close()
 
@@ -937,14 +948,17 @@ def sitemap_group(group):
 
     posts = []
     if group == "guides" and BLOG_PUBLIC_INDEXING_ENABLED:
+        public_slugs = _public_blog_slugs()
         db_session = SessionLocal()
         try:
-            posts = (
-                db_session.query(GeneratedPost)
-                .filter(GeneratedPost.status == "published")
-                .order_by(GeneratedPost.published_at.desc(), GeneratedPost.id.desc())
-                .all()
-            )
+            if public_slugs:
+                posts = (
+                    db_session.query(GeneratedPost)
+                    .filter(GeneratedPost.status == "published", GeneratedPost.slug.in_(public_slugs))
+                    .order_by(GeneratedPost.published_at.desc(), GeneratedPost.id.desc())
+                    .all()
+                )
+                posts = [post for post in posts if post.slug in BLOG_ARTICLE_BLUEPRINTS]
         finally:
             db_session.close()
 
@@ -1739,17 +1753,23 @@ def blog_list():
     per_page = 8
     session = SessionLocal()
 
-    base_query = (
-        session.query(GeneratedPost)
-        .filter(GeneratedPost.status == "published")
-        .order_by(GeneratedPost.published_at.desc(), GeneratedPost.id.desc())
-    )
-    total = base_query.count()
+    public_slugs = _public_blog_slugs()
+    posts = []
+    if public_slugs:
+        posts = (
+            session.query(GeneratedPost)
+            .filter(GeneratedPost.status == "published", GeneratedPost.slug.in_(public_slugs))
+            .order_by(GeneratedPost.published_at.desc(), GeneratedPost.id.desc())
+            .all()
+        )
+        posts = [post for post in posts if post.slug in BLOG_ARTICLE_BLUEPRINTS]
+
+    total = len(posts)
     total_pages = max(1, math.ceil(total / per_page)) if total else 1
     if page > total_pages:
         page = total_pages
 
-    posts = base_query.offset((page - 1) * per_page).limit(per_page).all()
+    posts = posts[(page - 1) * per_page : page * per_page]
     blog_indexable = _is_blog_public_indexable(total)
     response = make_response(render_template(
         'blog-list.html',
@@ -1766,6 +1786,8 @@ def blog_list():
 
 @app.route('/blog/<slug>')
 def blog_detail(slug):
+    if slug not in BLOG_ARTICLE_BLUEPRINTS:
+        abort(404)
     session = SessionLocal()
     post = (
         session.query(GeneratedPost)

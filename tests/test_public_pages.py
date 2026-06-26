@@ -1947,7 +1947,7 @@ class PublicPageTests(unittest.TestCase):
         post = SimpleNamespace(
             id=1,
             title="승인 전 숨김 글",
-            slug="hidden-post",
+            slug="2026-man-age-guide",
             excerpt="요약입니다.",
             cover_image_url=None,
             content_html="<h2>본문</h2><p>AgeCalc 계산기 안내입니다.</p>",
@@ -1965,13 +1965,170 @@ class PublicPageTests(unittest.TestCase):
         self.assertNotIn("google-adsense-account", list_response.get_data(as_text=True))
 
         with mock.patch.object(app_module, "SessionLocal", return_value=FakeSession(post)):
-            detail_response = client.get("/blog/hidden-post")
+            detail_response = client.get("/blog/2026-man-age-guide")
 
         self.assertEqual(detail_response.status_code, 200)
         self.assertEqual(detail_response.headers.get("X-Robots-Tag"), "noindex, nofollow")
         detail_html = detail_response.get_data(as_text=True)
         self.assertIn('<meta name="robots" content="noindex,nofollow" />', detail_html)
         self.assertNotIn("google-adsense-account", detail_html)
+
+    def test_blog_list_hides_legacy_published_posts_from_public_index(self):
+        class FakeQuery:
+            def __init__(self, posts):
+                self.posts = posts
+
+            def filter(self, *args, **kwargs):
+                return self
+
+            def order_by(self, *args, **kwargs):
+                return self
+
+            def count(self):
+                return len(self.posts)
+
+            def offset(self, *args, **kwargs):
+                return self
+
+            def limit(self, *args, **kwargs):
+                return self
+
+            def all(self):
+                return self.posts
+
+        class FakeSession:
+            def __init__(self, posts):
+                self.posts = posts
+
+            def query(self, model):
+                return FakeQuery(self.posts)
+
+            def close(self):
+                pass
+
+        curated_post = SimpleNamespace(
+            id=1,
+            slug="2026-man-age-guide",
+            title="2026년 만나이 계산 기준 총정리 | 생일 전후·예외까지 정리",
+            excerpt="요약",
+            cover_image_url=None,
+            published_at=datetime(2026, 6, 26, 12, 0),
+            created_at=datetime(2026, 6, 26, 12, 0),
+            updated_at=datetime(2026, 6, 26, 12, 0),
+            status="published",
+            sources=[],
+        )
+        legacy_post = SimpleNamespace(
+            id=2,
+            slug="legacy-general-post",
+            title="일반 건강 뉴스 요약",
+            excerpt="요약",
+            cover_image_url=None,
+            published_at=datetime(2026, 6, 20, 12, 0),
+            created_at=datetime(2026, 6, 20, 12, 0),
+            updated_at=datetime(2026, 6, 20, 12, 0),
+            status="published",
+            sources=[],
+        )
+
+        with mock.patch.object(app_module, "SessionLocal", return_value=FakeSession([curated_post, legacy_post])), mock.patch.object(
+            app_module, "_is_blog_public_indexable", return_value=True
+        ):
+            response = app.test_client().get("/blog")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn('href="/blog/2026-man-age-guide"', html)
+        self.assertNotIn('href="/blog/legacy-general-post"', html)
+
+    def test_blog_detail_returns_404_for_legacy_published_post_outside_curated_set(self):
+        class FakeQuery:
+            def __init__(self, post):
+                self.post = post
+
+            def filter(self, *args, **kwargs):
+                return self
+
+            def first(self):
+                return self.post
+
+        class FakeSession:
+            def __init__(self, post):
+                self.post = post
+
+            def query(self, model):
+                return FakeQuery(self.post)
+
+            def close(self):
+                pass
+
+        legacy_post = SimpleNamespace(
+            id=2,
+            slug="legacy-general-post",
+            title="일반 건강 뉴스 요약",
+            excerpt="요약",
+            cover_image_url=None,
+            content_html="<p>본문</p>",
+            published_at=datetime(2026, 6, 20, 12, 0),
+            created_at=datetime(2026, 6, 20, 12, 0),
+            updated_at=datetime(2026, 6, 20, 12, 0),
+            status="published",
+            sources=[],
+        )
+
+        with mock.patch.object(app_module, "SessionLocal", return_value=FakeSession(legacy_post)):
+            response = app.test_client().get("/blog/legacy-general-post")
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_guides_sitemap_excludes_legacy_published_blog_posts(self):
+        class FakeQuery:
+            def __init__(self, posts):
+                self.posts = posts
+
+            def filter(self, *args, **kwargs):
+                return self
+
+            def order_by(self, *args, **kwargs):
+                return self
+
+            def all(self):
+                return self.posts
+
+        class FakeSession:
+            def __init__(self, posts):
+                self.posts = posts
+
+            def query(self, model):
+                return FakeQuery(self.posts)
+
+            def close(self):
+                pass
+
+        curated_post = SimpleNamespace(
+            slug="2026-man-age-guide",
+            published_at=datetime(2026, 6, 26, 12, 0),
+            created_at=datetime(2026, 6, 26, 12, 0),
+            updated_at=datetime(2026, 6, 26, 12, 0),
+            status="published",
+        )
+        legacy_post = SimpleNamespace(
+            slug="legacy-general-post",
+            published_at=datetime(2026, 6, 20, 12, 0),
+            created_at=datetime(2026, 6, 20, 12, 0),
+            updated_at=datetime(2026, 6, 20, 12, 0),
+            status="published",
+        )
+
+        with mock.patch.object(app_module, "BLOG_PUBLIC_INDEXING_ENABLED", True), mock.patch.object(
+            app_module, "_is_blog_public_indexable", return_value=True
+        ), mock.patch.object(app_module, "SessionLocal", return_value=FakeSession([curated_post, legacy_post])):
+            response = app.test_client().get("/sitemaps/guides.xml")
+
+        self.assertEqual(response.status_code, 200)
+        xml = response.get_data(as_text=True)
+        self.assertIn("https://agecalc.cloud/blog/2026-man-age-guide", xml)
+        self.assertNotIn("https://agecalc.cloud/blog/legacy-general-post", xml)
 
     def test_blog_review_approval_blocks_posts_that_fail_adsense_audit(self):
         class FakeQuery:
