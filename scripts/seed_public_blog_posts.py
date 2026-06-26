@@ -1,9 +1,15 @@
 from __future__ import annotations
 
+import sys
 from datetime import datetime, timezone
+from pathlib import Path
 
-from content.blog_articles import structured_blog_article_for_slug
-from db import SessionLocal
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from content.blog_articles import BLOG_ARTICLE_BLUEPRINTS, structured_blog_article_for_slug
+from db import SessionLocal, init_db
 from models.blog_models import GeneratedPost
 
 
@@ -56,3 +62,17 @@ def upsert_seed_post(slug: str) -> GeneratedPost:
     session.refresh(post)
     session.close()
     return post
+
+
+def main() -> list[str]:
+    init_db()
+    seeded_slugs: list[str] = []
+    for slug in BLOG_ARTICLE_BLUEPRINTS:
+        upsert_seed_post(slug)
+        seeded_slugs.append(slug)
+        print(f"seeded {slug}")
+    return seeded_slugs
+
+
+if __name__ == "__main__":
+    main()

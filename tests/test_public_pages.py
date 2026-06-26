@@ -1425,6 +1425,15 @@ class PublicPageTests(unittest.TestCase):
         self.assertEqual(published_at, stored.published_at)
         self.assertIn("2026년 만나이 계산 기준 총정리", stored.title)
 
+    def test_seed_public_blog_posts_main_seeds_curated_slugs(self):
+        from scripts import seed_public_blog_posts
+
+        with mock.patch.object(seed_public_blog_posts, "upsert_seed_post") as upsert_seed_post:
+            seeded = seed_public_blog_posts.main()
+
+        self.assertEqual(["2026-man-age-guide"], seeded)
+        upsert_seed_post.assert_called_once_with("2026-man-age-guide")
+
     def test_blog_detail_renders_structured_related_tools_and_related_articles(self):
         from content.blog_articles import structured_blog_article_for_slug
 

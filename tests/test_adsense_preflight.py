@@ -20,6 +20,12 @@ class AdsensePreflightTests(unittest.TestCase):
         self.assertEqual(54, report.checked_pages)
         self.assertEqual(31, len(PUBLIC_SITEMAP_ENDPOINTS))
 
+    def test_local_preflight_still_passes_after_curated_blog_support(self):
+        report = run_local_preflight()
+
+        self.assertTrue(report.ok)
+        self.assertEqual(0, report.content_quality_failures)
+
     def test_preflight_reports_forbidden_sitemap_paths(self):
         report = PreflightReport()
 
