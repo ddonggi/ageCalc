@@ -573,7 +573,7 @@ class PublicPageTests(unittest.TestCase):
             "generations",
         ):
             self.assertIn(f"https://agecalc.cloud/{key}/", locations)
-        self.assertEqual(54, len(locations))
+        self.assertEqual(56, len(locations))
 
     def test_life_hubs_render_direct_answers_and_contextual_paths(self):
         client = app.test_client()
@@ -1097,11 +1097,12 @@ class PublicPageTests(unittest.TestCase):
         locations = _sitemap_leaf_locations(client)
         joined_locations = "\n".join(locations)
 
-        self.assertEqual(54, len(locations))
+        self.assertEqual(56, len(locations))
         self.assertNotIn("/minigames", joined_locations)
         self.assertNotIn("/blog/drafts", joined_locations)
         self.assertNotIn("/blog/review", joined_locations)
-        self.assertNotIn("https://agecalc.cloud/blog", locations)
+        self.assertIn("https://agecalc.cloud/blog", locations)
+        self.assertIn("https://agecalc.cloud/blog/2026-man-age-guide", locations)
 
     def test_static_guide_pages_are_public_with_adsense_code(self):
         client = app.test_client()
@@ -1259,6 +1260,27 @@ class PublicPageTests(unittest.TestCase):
         self.assertGreaterEqual(len(article["example_cards"]), 3)
         self.assertGreaterEqual(len(article["faq_items"]), 3)
 
+    def test_structured_blog_article_registry_defines_four_additional_curated_posts(self):
+        from content.blog_articles import BLOG_ARTICLE_BLUEPRINTS, structured_blog_article_for_slug
+
+        expected = {
+            "birth-year-age-interpretation": "/birth-year-age-table",
+            "early-birth-school-grade-guide": "/school-grade-calculator",
+            "baby-months-calculation-guide": "/baby-months",
+            "parent-child-age-gap-guide": "/parent-child",
+        }
+
+        for slug, primary_path in expected.items():
+            with self.subTest(slug=slug):
+                article = structured_blog_article_for_slug(slug)
+                self.assertIn(slug, BLOG_ARTICLE_BLUEPRINTS)
+                self.assertIsNotNone(article)
+                self.assertEqual(slug, article["slug"])
+                self.assertEqual(primary_path, article["primary_cta"]["path"])
+                self.assertGreaterEqual(len(article["direct_answer_paragraphs"]), 3)
+                self.assertGreaterEqual(len(article["example_cards"]), 3)
+                self.assertGreaterEqual(len(article["faq_items"]), 3)
+
     def test_structured_blog_article_registry_exposes_related_tools_and_articles(self):
         from content.blog_articles import structured_blog_article_for_slug
 
@@ -1338,6 +1360,9 @@ class PublicPageTests(unittest.TestCase):
 
             def filter(self, *args, **kwargs):
                 return self
+
+            def count(self):
+                return 1
 
             def first(self):
                 return self.post
@@ -1431,8 +1456,17 @@ class PublicPageTests(unittest.TestCase):
         with mock.patch.object(seed_public_blog_posts, "upsert_seed_post") as upsert_seed_post:
             seeded = seed_public_blog_posts.main()
 
-        self.assertEqual(["2026-man-age-guide"], seeded)
-        upsert_seed_post.assert_called_once_with("2026-man-age-guide")
+        self.assertEqual(
+            [
+                "2026-man-age-guide",
+                "birth-year-age-interpretation",
+                "early-birth-school-grade-guide",
+                "baby-months-calculation-guide",
+                "parent-child-age-gap-guide",
+            ],
+            seeded,
+        )
+        self.assertEqual(5, upsert_seed_post.call_count)
 
     def test_blog_detail_renders_structured_related_tools_and_related_articles(self):
         from content.blog_articles import structured_blog_article_for_slug
@@ -1524,6 +1558,66 @@ class PublicPageTests(unittest.TestCase):
 
         self.assertIn("계산기 결과를 해석하는 설명형 글", html)
         self.assertIn('href="/blog/2026-man-age-guide"', html)
+
+    def test_blog_list_shows_all_curated_public_slugs(self):
+        class FakeQuery:
+            def __init__(self, posts):
+                self.posts = posts
+
+            def filter(self, *args, **kwargs):
+                return self
+
+            def order_by(self, *args, **kwargs):
+                return self
+
+            def all(self):
+                return self.posts
+
+        class FakeSession:
+            def __init__(self, posts):
+                self.posts = posts
+
+            def query(self, model):
+                return FakeQuery(self.posts)
+
+            def close(self):
+                pass
+
+        posts = [
+            SimpleNamespace(
+                id=index,
+                slug=slug,
+                title=slug,
+                excerpt="요약",
+                cover_image_url=None,
+                published_at=datetime(2026, 6, 26, 12, 0),
+                created_at=datetime(2026, 6, 26, 12, 0),
+                updated_at=datetime(2026, 6, 26, 12, 0),
+                status="published",
+                sources=[],
+            )
+            for index, slug in enumerate(
+                [
+                    "2026-man-age-guide",
+                    "birth-year-age-interpretation",
+                    "early-birth-school-grade-guide",
+                    "baby-months-calculation-guide",
+                    "parent-child-age-gap-guide",
+                ],
+                start=1,
+            )
+        ]
+
+        with mock.patch.object(app_module, "SessionLocal", return_value=FakeSession(posts)), mock.patch.object(
+            app_module, "_is_blog_public_indexable", return_value=True
+        ):
+            response = app.test_client().get("/blog")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        for slug in [post.slug for post in posts]:
+            with self.subTest(slug=slug):
+                self.assertIn(f'href="/blog/{slug}"', html)
 
     def test_blog_detail_renders_coupang_partners_sidebar_disclosure(self):
         post = SimpleNamespace(
@@ -1923,7 +2017,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn('<meta name="robots" content="noindex,nofollow" />', html)
         self.assertIn("아직 게시된 글이 없습니다.", html)
 
-    def test_blog_routes_are_noindex_and_without_adsense_by_default(self):
+    def test_blog_routes_follow_current_public_indexing_policy(self):
         class FakeQuery:
             def __init__(self, post):
                 self.post = post
@@ -1958,20 +2052,36 @@ class PublicPageTests(unittest.TestCase):
             sources=[],
         )
         client = app.test_client()
+        expected_public = app_module._is_blog_public_indexable(1)
 
         list_response = client.get("/blog")
         self.assertEqual(list_response.status_code, 200)
-        self.assertEqual(list_response.headers.get("X-Robots-Tag"), "noindex, nofollow")
-        self.assertNotIn("google-adsense-account", list_response.get_data(as_text=True))
+        list_html = list_response.get_data(as_text=True)
+        if expected_public:
+            self.assertIsNone(list_response.headers.get("X-Robots-Tag"))
+            self.assertIn("google-adsense-account", list_html)
+        else:
+            self.assertEqual(list_response.headers.get("X-Robots-Tag"), "noindex, nofollow")
+            self.assertNotIn("google-adsense-account", list_html)
 
-        with mock.patch.object(app_module, "SessionLocal", return_value=FakeSession(post)):
+        with (
+            mock.patch.object(app_module, "SessionLocal", return_value=FakeSession(post)),
+            mock.patch.object(app_module, "_is_blog_public_indexable", return_value=expected_public),
+        ):
             detail_response = client.get("/blog/2026-man-age-guide")
 
         self.assertEqual(detail_response.status_code, 200)
-        self.assertEqual(detail_response.headers.get("X-Robots-Tag"), "noindex, nofollow")
         detail_html = detail_response.get_data(as_text=True)
-        self.assertIn('<meta name="robots" content="noindex,nofollow" />', detail_html)
-        self.assertNotIn("google-adsense-account", detail_html)
+        self.assertIn('class="breadcrumbs"', detail_html)
+        self.assertIn('"@type": "BreadcrumbList"', detail_html)
+        if expected_public:
+            self.assertIsNone(detail_response.headers.get("X-Robots-Tag"))
+            self.assertNotIn('<meta name="robots" content="noindex,nofollow" />', detail_html)
+            self.assertIn("google-adsense-account", detail_html)
+        else:
+            self.assertEqual(detail_response.headers.get("X-Robots-Tag"), "noindex, nofollow")
+            self.assertIn('<meta name="robots" content="noindex,nofollow" />', detail_html)
+            self.assertNotIn("google-adsense-account", detail_html)
 
     def test_blog_list_hides_legacy_published_posts_from_public_index(self):
         class FakeQuery:
@@ -2595,8 +2705,8 @@ class PublicPageTests(unittest.TestCase):
                 self.assertEqual(xml.count("<loc>"), xml.count("<lastmod>"))
                 public_locations.extend(re.findall(r"<loc>(.*?)</loc>", xml))
 
-        self.assertEqual(54, len(public_locations))
-        self.assertEqual(54, len(set(public_locations)))
+        self.assertEqual(56, len(public_locations))
+        self.assertEqual(56, len(set(public_locations)))
         for forbidden in ("?", "#", "/minigames", "/blog/drafts", "/blog/review"):
             self.assertNotIn(forbidden, "\n".join(public_locations))
 
@@ -2610,7 +2720,8 @@ class PublicPageTests(unittest.TestCase):
                 self.assertIn(guide_url, body)
             else:
                 self.assertNotIn(guide_url, body)
-        self.assertNotIn("https://agecalc.cloud/blog", body)
+        self.assertIn("https://agecalc.cloud/blog", body)
+        self.assertIn("https://agecalc.cloud/blog/2026-man-age-guide", body)
 
     def test_dynamic_sitemap_excludes_blog_when_public_blog_is_not_indexable(self):
         client = app.test_client()

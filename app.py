@@ -1797,6 +1797,28 @@ def blog_detail(slug):
     if post is None:
         abort(404)
     blog_indexable = _is_blog_public_indexable()
+    breadcrumbs = [
+        {"label": "홈", "url": f"{SITE_BASE_URL}/", "current": False},
+        {"label": "블로그", "url": f"{SITE_BASE_URL}/blog", "current": False},
+        {
+            "label": BLOG_ARTICLE_BLUEPRINTS[slug]["title"],
+            "url": f"{SITE_BASE_URL}/blog/{slug}",
+            "current": True,
+        },
+    ]
+    breadcrumb_schema = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": position,
+                "name": item["label"],
+                "item": item["url"],
+            }
+            for position, item in enumerate(breadcrumbs, start=1)
+        ],
+    }
     response = make_response(
         render_template(
             'blog-detail.html',
@@ -1805,6 +1827,8 @@ def blog_detail(slug):
             review_mode=False,
             blog_indexable=blog_indexable,
             structured_article=_structured_blog_context(post),
+            breadcrumbs=breadcrumbs,
+            breadcrumb_schema=breadcrumb_schema,
         )
     )
     if not blog_indexable:

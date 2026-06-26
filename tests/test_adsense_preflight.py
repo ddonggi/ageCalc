@@ -16,8 +16,8 @@ class AdsensePreflightTests(unittest.TestCase):
         report = run_local_preflight()
 
         self.assertTrue(report.ok, format_report(report))
-        self.assertEqual(54, report.sitemap_urls)
-        self.assertEqual(54, report.checked_pages)
+        self.assertEqual(56, report.sitemap_urls)
+        self.assertEqual(56, report.checked_pages)
         self.assertEqual(31, len(PUBLIC_SITEMAP_ENDPOINTS))
 
     def test_local_preflight_still_passes_after_curated_blog_support(self):

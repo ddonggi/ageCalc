@@ -69,6 +69,24 @@
         {% else %}
         <a class="back-link" href="{{ url_for('blog_list') }}">글 목록으로 돌아가기</a>
         {% endif %}
+        {% if breadcrumbs %}
+        <nav class="breadcrumbs" aria-label="현재 위치">
+            <ol>
+                {% for crumb in breadcrumbs %}
+                <li>
+                    {% if crumb.current %}
+                    <span aria-current="page">{{ crumb.label }}</span>
+                    {% else %}
+                    <a href="{{ crumb.url }}">{{ crumb.label }}</a>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ol>
+        </nav>
+        {% endif %}
+        {% if breadcrumb_schema %}
+        <script type="application/ld+json" nonce="{{ csp_nonce }}">{{ breadcrumb_schema | tojson }}</script>
+        {% endif %}
         <article class="blog-article">
             <header class="article-header">
                 <p class="eyebrow">{{ article.eyebrow if article else '해설 글' }}</p>
