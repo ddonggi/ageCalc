@@ -1297,6 +1297,47 @@ class PublicPageTests(unittest.TestCase):
 
         self.assertIsNone(structured_blog_article_for_slug("missing-slug"))
 
+    def test_structured_blog_context_returns_article_for_curated_slug(self):
+        from content.blog_articles import structured_blog_article_for_slug
+
+        post = SimpleNamespace(
+            id=1,
+            title="2026년 만나이 계산 기준 총정리 | 생일 전후·예외까지 정리",
+            slug="2026-man-age-guide",
+            excerpt="요약",
+            cover_image_url=None,
+            content_html="<p>레거시 본문</p>",
+            published_at=None,
+            created_at=None,
+            updated_at=None,
+            status="published",
+            sources=[],
+        )
+
+        structured_article = app_module._structured_blog_context(post)
+
+        self.assertIsNotNone(structured_article)
+        self.assertEqual(
+            structured_blog_article_for_slug("2026-man-age-guide"),
+            structured_article,
+        )
+        self.assertEqual("/age", structured_article["primary_cta"]["path"])
+
+    def test_structured_blog_context_returns_none_for_uncurated_slug(self):
+        post = SimpleNamespace(slug="uncurated-post")
+
+        self.assertIsNone(app_module._structured_blog_context(post))
+
+    def test_seed_public_blog_posts_upserts_flagship_article(self):
+        from scripts.seed_public_blog_posts import build_seed_post_payload
+
+        payload = build_seed_post_payload("2026-man-age-guide")
+
+        self.assertEqual("2026-man-age-guide", payload["slug"])
+        self.assertEqual("published", payload["status"])
+        self.assertIn("2026년 만나이 계산 기준 총정리", payload["title"])
+        self.assertIn("<h2>만나이는 무엇을 기준으로 계산하나</h2>", payload["content_html"])
+
     def test_blog_detail_renders_coupang_partners_sidebar_disclosure(self):
         post = SimpleNamespace(
             title="테스트 글",

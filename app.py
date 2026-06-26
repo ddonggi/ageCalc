@@ -8,6 +8,7 @@ from pathlib import Path
 import secrets
 from zoneinfo import ZoneInfo
 from controllers.age_controller import AgeController
+from content.blog_articles import structured_blog_article_for_slug
 from content.editorial_metadata import editorial_metadata_for
 from content.guide_pages import (
     GUIDE_PAGE_BY_SLUG,
@@ -353,6 +354,10 @@ def _is_blog_public_indexable(published_count: int | None = None) -> bool:
         return False
     count = _published_blog_count() if published_count is None else published_count
     return count >= BLOG_INDEX_MIN_POSTS
+
+
+def _structured_blog_context(post) -> dict[str, object] | None:
+    return structured_blog_article_for_slug(post.slug)
 
 
 def _adsense_is_enabled_for_path(path: str, *, blog_public_indexable: bool | None = None) -> bool:
@@ -1777,6 +1782,7 @@ def blog_detail(slug):
             draft_mode=False,
             review_mode=False,
             blog_indexable=blog_indexable,
+            structured_article=_structured_blog_context(post),
         )
     )
     if not blog_indexable:
@@ -1837,7 +1843,13 @@ def blog_draft_detail(slug):
     )
     if post is None:
         abort(404)
-    return render_template('blog-detail.html', post=post, draft_mode=True, review_mode=False)
+    return render_template(
+        'blog-detail.html',
+        post=post,
+        draft_mode=True,
+        review_mode=False,
+        structured_article=_structured_blog_context(post),
+    )
 
 
 @app.post('/blog/drafts/<slug>/publish')
@@ -1864,6 +1876,7 @@ def blog_draft_publish(slug):
                 draft_mode=True,
                 review_mode=False,
                 draft_publish_errors=draft_publish_errors,
+                structured_article=_structured_blog_context(post),
             ),
             400,
         )
@@ -1891,6 +1904,7 @@ def blog_review(post_id):
         review_mode=True,
         review_token=token,
         review_errors=[],
+        structured_article=_structured_blog_context(post),
     )
 
 
@@ -1915,6 +1929,7 @@ def blog_review_approve(post_id):
                 review_mode=True,
                 review_token=token,
                 review_errors=review_errors,
+                structured_article=_structured_blog_context(post),
             ),
             400,
         )
