@@ -3013,6 +3013,20 @@ input.error {
     color: #e4eef8;
 }
 
+.blog-article .section-shell {
+    margin-top: 28px;
+}
+
+.blog-article .section-card-grid,
+.blog-article .faq-list {
+    margin-top: 16px;
+}
+
+.blog-related-articles .section-card,
+.blog-related-tools .section-card {
+    min-height: 100%;
+}
+
 .coupang-partners-aside {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);

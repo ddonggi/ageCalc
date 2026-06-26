@@ -1425,6 +1425,73 @@ class PublicPageTests(unittest.TestCase):
         self.assertEqual(published_at, stored.published_at)
         self.assertIn("2026년 만나이 계산 기준 총정리", stored.title)
 
+    def test_blog_detail_renders_structured_related_tools_and_related_articles(self):
+        from content.blog_articles import structured_blog_article_for_slug
+
+        post = SimpleNamespace(
+            title="2026년 만나이 계산 기준 총정리 | 생일 전후·예외까지 정리",
+            slug="2026-man-age-guide",
+            excerpt="요약",
+            cover_image_url=None,
+            content_html="<p>본문</p>",
+            published_at=None,
+            created_at=None,
+            updated_at=None,
+            status="published",
+            sources=[],
+        )
+
+        with app.test_request_context("/blog/2026-man-age-guide"):
+            html = render_template(
+                "blog-detail.html",
+                post=post,
+                draft_mode=False,
+                review_mode=False,
+                blog_indexable=True,
+                structured_article=structured_blog_article_for_slug("2026-man-age-guide"),
+                author_name="AgeCalc 편집팀",
+                editorial_policy_url="/about",
+                coupang_partners_enabled=False,
+            )
+
+        self.assertIn("AgeCalc에서 바로 확인하는 순서", html)
+        self.assertIn("다음에 읽을 글", html)
+        self.assertIn('href="/blog/birth-year-age-interpretation"', html)
+        self.assertIn('href="/blog/early-birth-school-grade-guide"', html)
+        self.assertIn('data-page-feedback="/blog/2026-man-age-guide"', html)
+
+    def test_blog_detail_uses_faqpage_schema_for_structured_articles(self):
+        from content.blog_articles import structured_blog_article_for_slug
+
+        post = SimpleNamespace(
+            title="2026년 만나이 계산 기준 총정리 | 생일 전후·예외까지 정리",
+            slug="2026-man-age-guide",
+            excerpt="요약",
+            cover_image_url=None,
+            content_html="<p>본문</p>",
+            published_at=None,
+            created_at=None,
+            updated_at=None,
+            status="published",
+            sources=[],
+        )
+
+        with app.test_request_context("/blog/2026-man-age-guide"):
+            html = render_template(
+                "blog-detail.html",
+                post=post,
+                draft_mode=False,
+                review_mode=False,
+                blog_indexable=True,
+                structured_article=structured_blog_article_for_slug("2026-man-age-guide"),
+                author_name="AgeCalc 편집팀",
+                editorial_policy_url="/about",
+                coupang_partners_enabled=False,
+            )
+
+        self.assertIn('"@type":"FAQPage"', html.replace(" ", ""))
+        self.assertIn("2026년에도 공적 기준은 만나이인가요?", html)
+
     def test_blog_detail_renders_coupang_partners_sidebar_disclosure(self):
         post = SimpleNamespace(
             title="테스트 글",

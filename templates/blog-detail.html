@@ -36,10 +36,31 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=life-calendar-20260505h" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    {% if structured_article and structured_article.faq_items %}
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {% for faq in structured_article.faq_items %}
+                {
+                    "@type": "Question",
+                    "name": {{ faq.question | tojson }},
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": {{ faq.answer | tojson }}
+                    }
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ]
+        }
+    </script>
+    {% endif %}
     {% include 'partials/adsense.html' %}
 </head>
 
 <body class="blog-page">
+    {% set article = structured_article %}
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
@@ -50,8 +71,8 @@
         {% endif %}
         <article class="blog-article">
             <header class="article-header">
-                <p class="eyebrow">해설 글</p>
-                <h1>{{ post.title }}</h1>
+                <p class="eyebrow">{{ article.eyebrow if article else '해설 글' }}</p>
+                <h1>{{ article.h1 if article else post.title }}</h1>
                 {% if review_mode %}
                 <p class="blog-date">검토 모드 · 현재 상태: {{ post.status }}</p>
                 {% elif draft_mode %}
@@ -105,11 +126,92 @@
                 {% if post.excerpt %}
                 <p class="page-intro article-intro">{{ post.excerpt }}</p>
                 {% endif %}
+                {% if article and article.hero_summary %}
+                <p class="page-intro article-intro">{{ article.hero_summary }}</p>
+                {% endif %}
             </header>
             {% if post.cover_image_url %}
             <img class="blog-hero" src="{{ post.cover_image_url }}" alt="{{ post.title }}">
             {% endif %}
+            {% if article %}
+            <section class="section-shell direct-answer" aria-label="{{ article.direct_answer_title }}">
+                <div class="section-heading">
+                    <p class="eyebrow">바로 답변</p>
+                    <h2>{{ article.direct_answer_title }}</h2>
+                </div>
+                {% for paragraph in article.direct_answer_paragraphs %}
+                <p>{{ paragraph }}</p>
+                {% endfor %}
+            </section>
+
+            <section class="section-shell blog-primary-cta">
+                <div class="section-heading">
+                    <p class="eyebrow">바로 실행</p>
+                    <h2>AgeCalc에서 바로 확인하는 순서</h2>
+                </div>
+                <div class="article-links">
+                    <a href="{{ article.primary_cta.path }}">{{ article.primary_cta.label }}</a>
+                    <a href="{{ article.secondary_cta.path }}">{{ article.secondary_cta.label }}</a>
+                </div>
+            </section>
+
+            <section class="section-shell">
+                <div class="section-heading">
+                    <p class="eyebrow">이런 분께</p>
+                    <h2>이 글이 필요한 사람</h2>
+                </div>
+                <ul>
+                    {% for item in article.audience_items %}
+                    <li>{{ item }}</li>
+                    {% endfor %}
+                </ul>
+            </section>
+
+            <section class="section-shell">
+                <div class="section-heading">
+                    <p class="eyebrow">사례</p>
+                    <h2>사례로 보면 더 빠릅니다</h2>
+                </div>
+                <div class="section-card-grid">
+                    {% for example in article.example_cards %}
+                    <article class="section-card" data-example-card>
+                        <p class="eyebrow">{{ example.label }}</p>
+                        <h3>{{ example.title }}</h3>
+                        <p>{{ example.description }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="section-shell">
+                <div class="section-heading">
+                    <p class="eyebrow">비교</p>
+                    <h2>상황별 확인 기준</h2>
+                </div>
+                <div class="table-scroll">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">상황</th>
+                                <th scope="col">우선 확인</th>
+                                <th scope="col">주의할 점</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in article.comparison_rows %}
+                            <tr>
+                                <th scope="row">{{ row.label }}</th>
+                                <td>{{ row.standard }}</td>
+                                <td>{{ row.exception }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            {% else %}
             <div class="blog-content">{{ post.content_html | safe }}</div>
+            {% endif %}
             {% if coupang_partners_enabled and not draft_mode and not review_mode %}
             {% include 'partials/coupang_partners.html' %}
             {% endif %}
@@ -130,6 +232,57 @@
                 </ul>
             </section>
             {% endif %}
+            {% if article %}
+            <section class="section-shell blog-related-tools">
+                <div class="section-heading">
+                    <p class="eyebrow">연결 계산기</p>
+                    <h2>같이 확인하면 정확도가 높아집니다</h2>
+                </div>
+                <div class="section-card-grid">
+                    {% for tool in article.related_tools %}
+                    <article class="section-card">
+                        <p class="eyebrow">도구</p>
+                        <h3><a href="{{ tool.path }}">{{ tool.label }}</a></h3>
+                        <p>{{ tool.summary }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="section-shell blog-related-articles">
+                <div class="section-heading">
+                    <p class="eyebrow">다음 읽기</p>
+                    <h2>다음에 읽을 글</h2>
+                </div>
+                <div class="section-card-grid">
+                    {% for related in article.related_articles %}
+                    <article class="section-card">
+                        <p class="eyebrow">해설</p>
+                        <h3><a href="{{ related.path }}">{{ related.title }}</a></h3>
+                        <p>{{ related.summary }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="section-shell faq">
+                <div class="section-heading">
+                    <p class="eyebrow">자주 묻는 질문</p>
+                    <h2>FAQ</h2>
+                </div>
+                <div class="faq-list">
+                    {% for faq in article.faq_items %}
+                    <article class="section-card">
+                        <h3>{{ faq.question }}</h3>
+                        <p>{{ faq.answer }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            {% set page_path = '/blog/' ~ post.slug %}
+            {% include 'partials/page-feedback.html' with context %}
+            {% else %}
             <section class="article-tools">
                 <p class="eyebrow">같이 읽어보기</p>
                 <h2>같이 보면 좋은 계산기</h2>
@@ -139,6 +292,7 @@
                     <a href="{{ url_for('dog') }}">강아지 나이 계산기</a>
                 </div>
             </section>
+            {% endif %}
         </article>
         {% include 'partials/footer.html' %}
     </div>
@@ -154,6 +308,9 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    {% if article %}
+    <script src="{{ url_for('static', filename='js/page-feedback.js') }}" defer></script>
+    {% endif %}
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
 </body>
