@@ -86,3 +86,13 @@ cd /srv/apps/agecalc
 5. 실패하면 오류 메시지를 표시하고 공개하지 않습니다.
 
 `needs_review` 글에는 공개 버튼이 없습니다. 먼저 재작성하거나 수동 보정해 `draft`로 전환해야 합니다. 대량 보강 스크립트에서 `--publish-on-pass`를 쓰면 검수 통과 글은 바로 `published`로 전환되고, 실패 글은 `needs_review`로 남습니다.
+
+## Curated Public Posts
+
+Curated public blog posts are not published directly from raw generated drafts.
+They must:
+
+- map to a structured article blueprint
+- pass the public quality checklist
+- include direct answer, examples, FAQ, and source sections
+- be seeded or updated through `scripts/seed_public_blog_posts.py`

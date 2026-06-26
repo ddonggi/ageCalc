@@ -1492,6 +1492,30 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn('"@type":"FAQPage"', html.replace(" ", ""))
         self.assertIn("2026년에도 공적 기준은 만나이인가요?", html)
 
+    def test_blog_list_surfaces_curated_editorial_positioning_copy(self):
+        posts = [
+            SimpleNamespace(
+                slug="2026-man-age-guide",
+                title="2026년 만나이 계산 기준 총정리 | 생일 전후·예외까지 정리",
+                excerpt="2026년 기준 만나이 계산법과 생일 전후 예외를 한 번에 정리합니다.",
+                cover_image_url=None,
+                published_at=None,
+            )
+        ]
+
+        with app.test_request_context("/blog"):
+            html = render_template(
+                "blog-list.html",
+                posts=posts,
+                total=1,
+                page=1,
+                total_pages=1,
+                blog_indexable=True,
+            )
+
+        self.assertIn("계산기 결과를 해석하는 설명형 글", html)
+        self.assertIn('href="/blog/2026-man-age-guide"', html)
+
     def test_blog_detail_renders_coupang_partners_sidebar_disclosure(self):
         post = SimpleNamespace(
             title="테스트 글",
@@ -1775,7 +1799,7 @@ class PublicPageTests(unittest.TestCase):
                 blog_indexable=True,
             )
 
-        self.assertIn("계산 결과를 이해하는 데 도움이 되는 배경 설명과 생활 정보를 글로 정리합니다.", html)
+        self.assertIn("계산기 결과를 해석하는 설명형 글만 선별해 공개합니다.", html)
         self.assertNotIn("계산기에서 끝나지 않는 배경 설명과 생활 맥락을 읽기 좋은 형식으로 정리합니다.", html)
 
     def test_blog_detail_uses_natural_fixed_copy(self):
