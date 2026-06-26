@@ -1272,20 +1272,25 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("/blog/early-birth-school-grade-guide", article_paths)
 
     def test_structured_blog_article_registry_returns_isolated_deep_copy(self):
-        from content.blog_articles import BLOG_ARTICLE_BLUEPRINTS, structured_blog_article_for_slug
+        from content.blog_articles import structured_blog_article_for_slug
 
-        article = structured_blog_article_for_slug("2026-man-age-guide")
-        article["primary_cta"]["path"] = "/mutated-path"
-        article["related_tools"][0]["path"] = "/mutated-tool"
-        article["faq_items"][0]["answer"] = "changed"
+        article_one = structured_blog_article_for_slug("2026-man-age-guide")
+        original_primary_path = article_one["primary_cta"]["path"]
+        original_related_tool_path = article_one["related_tools"][0]["path"]
+        original_faq_question = article_one["faq_items"][0]["question"]
 
-        blueprint = BLOG_ARTICLE_BLUEPRINTS["2026-man-age-guide"]
-        self.assertEqual("/age", blueprint["primary_cta"]["path"])
-        self.assertEqual("/age", blueprint["related_tools"][0]["path"])
-        self.assertEqual(
-            "네. 공적 기준은 원칙적으로 만나이로 확인하는 것이 안전합니다.",
-            blueprint["faq_items"][0]["answer"],
-        )
+        article_one["primary_cta"]["path"] = "/mutated-path"
+        article_one["related_tools"][0]["path"] = "/mutated-tool"
+        article_one["faq_items"][0]["question"] = "mutated-question"
+
+        article_two = structured_blog_article_for_slug("2026-man-age-guide")
+
+        self.assertEqual(original_primary_path, article_two["primary_cta"]["path"])
+        self.assertEqual(original_related_tool_path, article_two["related_tools"][0]["path"])
+        self.assertEqual(original_faq_question, article_two["faq_items"][0]["question"])
+        self.assertNotEqual(article_one["primary_cta"]["path"], article_two["primary_cta"]["path"])
+        self.assertNotEqual(article_one["related_tools"][0]["path"], article_two["related_tools"][0]["path"])
+        self.assertNotEqual(article_one["faq_items"][0]["question"], article_two["faq_items"][0]["question"])
 
     def test_structured_blog_article_registry_returns_none_for_missing_slug(self):
         from content.blog_articles import structured_blog_article_for_slug
