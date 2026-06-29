@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-    <title>26학번 몇년생? 대학교 입학년도 계산기 | AgeCalc</title>
-    <meta name="description" content="26학번 몇년생, 25학번 몇살, 2026학번 나이처럼 대학교 입학년도 계산과 학번별 보통 출생연도를 확인하는 대학 학번 계산기입니다." />
+    <title>26학번 몇년생? 26학번 나이·대학교 학번 계산기 | AgeCalc</title>
+    <meta name="description" content="26학번 몇년생, 26학번 나이, 22학번 나이, 09학번 몇살처럼 학번 기준 출생연도와 현재 나이를 확인하는 대학 학번 계산기입니다." />
     <link rel="canonical" href="https://agecalc.cloud/college-entry-year-calculator" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="AgeCalc" />
-    <meta property="og:title" content="대학교 입학년도 계산기 | AgeCalc" />
-    <meta property="og:description" content="대학교 입학년도 계산과 학번별 보통 출생연도, 연나이, 만나이 범위를 한 화면에서 정리했습니다." />
+    <meta property="og:title" content="대학 학번 계산기 | AgeCalc" />
+    <meta property="og:description" content="26학번 몇년생, 26학번 나이, 22학번 나이처럼 학번 기준 출생연도와 현재 나이를 한 화면에서 정리했습니다." />
     <meta property="og:url" content="https://agecalc.cloud/college-entry-year-calculator" />
     <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
@@ -42,7 +42,7 @@
                 <p class="eyebrow">대학 입학 기준 안내</p>
                 <h1>대학 학번 나이 계산기</h1>
                 <p class="page-intro">
-                    26학번 몇년생, 25학번 몇살, 2026학번 나이처럼 학번을 먼저 알고 있을 때 빠르게 확인할 수 있게 정리한 대학교 입학년도 계산 페이지입니다.
+                    26학번 몇년생, 26학번 나이, 22학번 나이, 09학번 몇살처럼 학번을 먼저 알고 있을 때 빠르게 확인할 수 있게 정리한 대학 학번 계산 페이지입니다.
                     일반적인 진학 흐름을 기준으로 학번별 보통 출생연도와 현재 연나이, 만나이 범위를 함께 보여드립니다.
                 </p>
                 <div class="hero-actions">
@@ -67,7 +67,7 @@
         </section>
         <section class="section-shell direct-answer" aria-label="대학 학번 바로 답변">
             <p class="eyebrow">바로 답변 · 대학 학번 역산</p>
-            <h2>학번에서 일반적인 고교 졸업연도와 출생연도를 역산합니다</h2>
+            <h2>26학번 몇년생, 22학번 나이처럼 학번에서 출생연도와 현재 나이를 역산합니다</h2>
             <p><strong>학번으로 일반적인 출생연도와 현재 나이 범위를 역산합니다.</strong> 일반 진학 흐름에서는 입학연도-19를 출생연도로 봅니다.</p>
         </section>
 
@@ -128,13 +128,13 @@
 
         <section class="section-shell">
             <div class="section-heading">
-                <h2>예시로 보는 최근 학번</h2>
-                <p class="section-intro">많이 찾는 최근 학번 예시를 먼저 정리했습니다.</p>
+                <h2>많이 찾는 학번 빠른 답변</h2>
+                <p class="section-intro">26학번 몇년생, 22학번 나이, 19학번 나이처럼 많이 찾는 학번 질문을 먼저 정리했습니다.</p>
             </div>
             <div class="section-card-grid">
                 {% for example in examples %}
                 <article class="section-card" data-example-card>
-                    <p class="eyebrow">{{ example.query_label }}</p>
+                    <p class="eyebrow">{% if example.entry_year == 2026 %}26학번 몇년생{% elif example.entry_year == 2025 %}25학번 몇살{% elif example.entry_year == 2022 %}22학번 나이{% elif example.entry_year == 2019 %}19학번 나이{% elif example.entry_year == 2018 %}18학번 나이{% elif example.entry_year == 2009 %}09학번 몇살{% else %}{{ example.query_label }}{% endif %}</p>
                     <h2>{{ example.cohort_label }}</h2>
                     <p>{{ example.birth_year_label }} 기준으로 보는 일반적인 흐름입니다.</p>
                     <p class="small">{{ example.annual_age }} / {{ example.man_age_range }}</p>
@@ -188,11 +188,12 @@
             </article>
             <article class="section-card">
                 <p class="eyebrow">자주 묻는 질문</p>
-                <h2>재수·편입·복학 예외</h2>
+                <h2>학번 검색에서 자주 묻는 질문</h2>
                 <ul>
                     <li><strong>26학번은 몇 년생인가요?</strong> 일반적인 진학 흐름에서는 2026년에 대학에 입학한 학번이므로 보통 2007년생으로 봅니다.</li>
+                    <li><strong>22학번 나이는 몇 살인가요?</strong> 일반적인 진학 흐름에서는 2003년생 기준으로 {{ current_year - 2003 }}세, 만나이는 {{ current_year - 2004 }}~{{ current_year - 2003 }}세 범위로 안내합니다.</li>
+                    <li><strong>09학번은 지금 몇 살인가요?</strong> 일반적인 진학 흐름에서는 1990년생 기준으로 {{ current_year - 1990 }}세, 만나이는 {{ current_year - 1991 }}~{{ current_year - 1990 }}세 범위로 봅니다.</li>
                     <li><strong>학번은 입학연도와 같은 뜻인가요?</strong> 보통은 입학한 연도의 끝 두 자리를 학번으로 부르지만, 학교나 전형에 따라 세부 기준이 다를 수 있습니다.</li>
-                    <li><strong>재수하면 학번과 출생연도가 달라지나요?</strong> 달라질 수 있습니다. 재수, 삼수, 편입, 조기입학은 개인별 차이가 있어 이 페이지는 일반적인 기준만 안내합니다.</li>
                 </ul>
             </article>
             <article class="section-card">

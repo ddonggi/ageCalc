@@ -105,6 +105,8 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("현재 학년", html)
         self.assertIn("초등학교 입학", html)
         self.assertIn("중학교 입학", html)
+        self.assertIn("현재 몇 학년인지", html)
+        self.assertIn("입학 시점만 확인하려면 입학년도 계산표를 보세요.", html)
 
     def test_school_grade_calculator_highlights_selected_year(self):
         client = app.test_client()
@@ -135,6 +137,8 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("초등학교 입학년도", html)
         self.assertIn("중학교 입학년도", html)
         self.assertIn("고등학교 입학년도", html)
+        self.assertIn("입학년도 계산기", html)
+        self.assertIn("현재 학년이 아니라 입학 시점을 빠르게 확인할 때 사용합니다.", html)
 
     def test_school_entry_year_table_highlights_selected_year(self):
         client = app.test_client()
@@ -207,6 +211,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("생후 개월 수", html)
         self.assertIn("월령별 빠른 안내", html)
         self.assertIn("12개월", html)
+        self.assertIn("정확한 현재 개월수 계산은 아이 개월수 계산기에서 확인합니다.", html)
 
     def test_baby_months_table_highlights_selected_months(self):
         client = app.test_client()
@@ -217,6 +222,28 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("선택한 월령", html)
         self.assertIn("12개월", html)
         self.assertIn("1년 0개월", html)
+
+    def test_baby_months_page_uses_months_query_variants(self):
+        client = app.test_client()
+        response = client.get("/baby-months")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn("아이 개월수 계산기", html)
+        self.assertIn("아이 개월수", html)
+        self.assertIn("아기 월령", html)
+        self.assertIn("개월수와 월령은 같은 뜻인가요?", html)
+
+    def test_college_entry_year_calculator_targets_top_queries(self):
+        client = app.test_client()
+        response = client.get("/college-entry-year-calculator")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn("26학번 몇년생", html)
+        self.assertIn("22학번 나이", html)
+        self.assertIn("09학번 몇살", html)
+        self.assertIn("26학번 나이", html)
 
     def test_annual_age_calculator_page_is_public(self):
         client = app.test_client()
@@ -387,8 +414,8 @@ class PublicPageTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
         self.assertIn("대학 학번 나이 계산기", html)
-        self.assertIn("대학교 입학년도 계산", html)
-        self.assertIn("25학번은 보통 몇 년생", html)
+        self.assertIn("26학번 나이", html)
+        self.assertIn("26학번 몇년생", html)
         self.assertIn("학번별 나이표", html)
         self.assertIn("보통 출생연도", html)
 
@@ -400,9 +427,9 @@ class PublicPageTests(unittest.TestCase):
         html = response.get_data(as_text=True)
         self.assertIn("26학번 몇년생", html)
         self.assertIn("26학번은 보통 2007년생", html)
-        self.assertIn("2026학번 나이", html)
+        self.assertIn("26학번 나이", html)
         self.assertIn("학번은 입학연도와 같은 뜻인가요?", html)
-        self.assertIn("재수하면 학번과 출생연도가 달라지나요?", html)
+        self.assertIn("22학번 나이는 몇 살인가요?", html)
 
     def test_college_entry_year_calculator_highlights_selected_entry_year(self):
         client = app.test_client()
@@ -781,7 +808,7 @@ class PublicPageTests(unittest.TestCase):
             "/college-entry-year-calculator": (
                 "학번으로 일반적인 출생연도와 현재 나이 범위를 역산합니다",
                 "대학 학번 역산",
-                "재수·편입·복학 예외",
+                "학번 검색에서 자주 묻는 질문",
                 "해외 대학과 학교별 학번 체계",
             ),
         }
@@ -1169,7 +1196,7 @@ class PublicPageTests(unittest.TestCase):
 
         college_response = client.get("/college-entry-year-calculator")
         self.assertEqual(college_response.status_code, 200)
-        self.assertIn("대학교 입학년도 계산", college_response.get_data(as_text=True))
+        self.assertIn("26학번 몇년생", college_response.get_data(as_text=True))
 
     def test_adsense_code_is_not_rendered_on_excluded_pages(self):
         client = app.test_client()
@@ -2610,7 +2637,7 @@ class PublicPageTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
-        self.assertIn("출생일만 입력하면 현재 개월 수를 바로 확인할 수 있습니다.", html)
+        self.assertIn("출생일만 입력하면 아이 개월수와 아기 월령을 바로 확인할 수 있습니다.", html)
         self.assertNotIn("“우리 아이는 몇 개월?”", html)
 
     def test_d_day_page_removes_english_labels(self):

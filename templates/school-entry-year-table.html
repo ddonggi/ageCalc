@@ -5,14 +5,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-    <title>입학년도 계산표 | AgeCalc</title>
-    <meta name="description" content="출생년도만 선택하면 초등학교 입학년도, 중학교 입학년도, 고등학교 입학년도를 바로 확인할 수 있는 입학년도 계산표입니다." />
+    <title>입학년도 계산기 | 초중고 입학년도 계산표 | AgeCalc</title>
+    <meta name="description" content="출생년도 기준 초등학교, 중학교, 고등학교 입학년도를 확인하는 입학년도 계산기입니다. 현재 학년이 아니라 입학 시점을 빠르게 확인할 때 사용합니다." />
     <link rel="canonical" href="https://agecalc.cloud/school-entry-year-table" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="AgeCalc" />
-    <meta property="og:title" content="입학년도 계산표 | AgeCalc" />
-    <meta property="og:description" content="출생년도 기준 초등학교·중학교·고등학교 입학 학년도를 한눈에 확인할 수 있습니다." />
+    <meta property="og:title" content="입학년도 계산기 | AgeCalc" />
+    <meta property="og:description" content="출생년도 기준 초등학교·중학교·고등학교 입학 학년도를 확인하는 입학년도 계산기입니다." />
     <meta property="og:url" content="https://agecalc.cloud/school-entry-year-table" />
     <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
@@ -45,6 +45,7 @@
                 <p class="page-intro">
                     출생년도만 선택하면 초등학교 입학년도, 중학교 입학년도, 고등학교 입학년도를 바로 확인할 수 있습니다.
                     현재 학년보다 입학 시점을 먼저 찾는 경우에 맞춰, 출생년도 기준 학년도만 간단히 정리한 페이지입니다.
+                    현재 학년이 아니라 입학 시점을 빠르게 확인할 때 사용합니다.
                 </p>
                 <div class="hero-actions">
                     <a class="btn btn-primary" href="#school-entry-search">출생년도 선택</a>
@@ -68,8 +69,9 @@
         </section>
         <section class="section-shell direct-answer" aria-label="입학년도 바로 답변">
             <p class="eyebrow">바로 답변 · 입학 시점 계산</p>
-            <h2>출생연도에 7을 더하면 일반적인 초등학교 입학 학년도입니다</h2>
+            <h2>입학년도 계산기 기준으로 출생연도에 7을 더하면 일반적인 초등학교 입학 학년도입니다</h2>
             <p><strong>출생연도로 초등학교·중학교·고등학교 입학 학년도를 확인합니다.</strong> 일반 진급 기준으로 중학교는 출생연도+13, 고등학교는 출생연도+16입니다.</p>
+            <p class="small">현재 몇 학년인지 확인하려면 학년 계산기를 사용하세요.</p>
         </section>
 
         <section class="section-shell">
@@ -142,7 +144,7 @@
             <div class="section-card-grid">
                 {% for example in examples %}
                 <article class="section-card" data-example-card>
-                    <p class="eyebrow">{{ example.label }}</p>
+                    <p class="eyebrow">{{ example.label }} 입학년도</p>
                     <h2>{{ example.elementary_entry }}</h2>
                     <p>{{ example.status_note }}</p>
                     <p class="small">중학교 {{ example.middle_entry }} · 고등학교 {{ example.high_entry }}</p>
@@ -195,6 +197,7 @@
             <article class="section-card">
                 <p class="eyebrow">같이 보기</p>
                 <h2>함께 보면 좋은 페이지</h2>
+                <p class="small">이 페이지는 입학 시점을, 학년 계산기는 현재 재학 단계를 확인하는 용도입니다.</p>
                 <div class="footer-links">
                     <a href="{{ url_for('school_grade_calculator') }}">학년 계산기</a>
                     <a href="{{ url_for('baby_months') }}">아이 개월 수 계산기</a>
@@ -205,6 +208,14 @@
         </section>
 
         <section class="section-shell section-card-grid">
+            <article class="section-card">
+                <p class="eyebrow">자주 묻는 질문</p>
+                <h2>입학년도 계산과 현재 학년 계산의 차이</h2>
+                <ul>
+                    <li><strong>2018년생 초등학교 입학년도는?</strong> 일반적인 기준에서는 2025학년도 초등학교 입학으로 안내합니다.</li>
+                    <li><strong>입학년도 계산과 현재 학년 계산은 어떻게 다른가요?</strong> 입학년도 계산은 학교에 들어가는 시점을, 학년 계산기는 지금 어느 학년에 해당하는지를 보여줍니다.</li>
+                </ul>
+            </article>
             <article class="section-card">
                 <p class="eyebrow">학년도</p>
                 <h2>1~2월에는 직전 학년도를 적용합니다</h2>

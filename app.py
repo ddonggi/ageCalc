@@ -1147,7 +1147,7 @@ def school_grade_calculator():
         row["is_selected"] = year == selected_year
         rows.append(row)
 
-    example_years = [year for year in (school_year - 7, school_year - 10, school_year - 13, school_year - 16) if 1900 <= year <= current_year]
+    example_years = [year for year in (2019, 2016, 2013, 2010) if 1900 <= year <= current_year]
     examples = [_build_school_grade_snapshot(year, school_year) for year in example_years]
 
     return render_template(
@@ -1628,7 +1628,7 @@ def college_entry_year_calculator():
         if row["is_selected"]:
             selected_row = row
 
-    example_years = [year for year in (2024, 2025, 2026) if min_entry_year <= year <= max_entry_year]
+    example_years = [year for year in (2026, 2025, 2022, 2019, 2018, 2009) if min_entry_year <= year <= max_entry_year]
     examples = [_build_college_entry_snapshot(year, current_year) for year in example_years]
 
     return render_template(

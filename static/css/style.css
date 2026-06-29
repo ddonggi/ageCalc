@@ -3767,6 +3767,96 @@ body.snake-page .game-panel {
         font-size: clamp(2.6rem, 14vw, 4.1rem);
     }
 
+    body:not(.home-page) .hero-band {
+        gap: 16px;
+        padding: 22px 18px 18px;
+        background-size: 72px 72px, 72px 72px, auto;
+    }
+
+    body:not(.home-page) .hero-band::before {
+        display: none;
+    }
+
+    body:not(.home-page) .hero-copy {
+        gap: 14px;
+        padding-top: 0;
+    }
+
+    body:not(.home-page) .hero-copy h1,
+    body:not(.home-page) .hero-copy h2 {
+        max-width: none;
+        font-size: clamp(2.2rem, 11vw, 3.35rem);
+        line-height: 1.02;
+    }
+
+    body:not(.home-page) .hero-band .page-intro {
+        max-width: none;
+        font-size: 0.98rem;
+    }
+
+    body:not(.home-page) .hero-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    body:not(.home-page) .hero-actions .btn {
+        width: 100%;
+        min-width: 0;
+    }
+
+    body:not(.home-page) .hero-metrics {
+        gap: 10px;
+    }
+
+    body:not(.home-page) .metric-card {
+        padding: 16px;
+    }
+
+    .utility-hero {
+        gap: 16px;
+        padding: 22px 18px 18px;
+    }
+
+    .utility-hero::before {
+        left: 18px;
+        width: 74px;
+    }
+
+    .utility-hero .hero-copy {
+        gap: 14px;
+        padding-top: 14px;
+    }
+
+    .utility-hero .hero-copy h1 {
+        max-width: none;
+        font-size: clamp(2.2rem, 11vw, 3.2rem);
+        line-height: 1.02;
+    }
+
+    .utility-hero .page-intro {
+        max-width: none;
+        font-size: 0.98rem;
+    }
+
+    .utility-hero .hero-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .utility-hero .hero-actions .btn,
+    .utility-hero .metric-card {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .utility-hero .hero-metrics {
+        gap: 10px;
+    }
+
+    .utility-hero .metric-card {
+        padding: 16px;
+    }
+
     .life-calendar-hero::before {
         display: none;
     }
