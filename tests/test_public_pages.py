@@ -1843,6 +1843,8 @@ class PublicPageTests(unittest.TestCase):
                     self.assertEqual(response.status_code, 200)
                     html = response.get_data(as_text=True)
                     self.assertNotIn("coupang-ad-aside", html)
+                    self.assertNotIn("home-coupang-rail", html)
+                    self.assertNotIn("coupang-mobile-banner", html)
                     self.assertNotIn(
                         "widgets.html?id=997602&template=carousel&trackingCode=AF6844979",
                         html,
@@ -2178,7 +2180,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn('href="/blog/2026-man-age-guide"', html)
         self.assertNotIn('href="/blog/legacy-general-post"', html)
 
-    def test_blog_detail_returns_404_for_legacy_published_post_outside_curated_set(self):
+    def test_blog_detail_keeps_legacy_published_post_accessible_but_noindex(self):
         class FakeQuery:
             def __init__(self, post):
                 self.post = post
@@ -2213,10 +2215,13 @@ class PublicPageTests(unittest.TestCase):
             sources=[],
         )
 
-        with mock.patch.object(app_module, "SessionLocal", return_value=FakeSession(legacy_post)):
+        with mock.patch.object(app_module, "SessionLocal", return_value=FakeSession(legacy_post)), mock.patch.object(
+            app_module, "_published_blog_count", return_value=0
+        ):
             response = app.test_client().get("/blog/legacy-general-post")
 
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers.get("X-Robots-Tag"), "noindex, nofollow")
 
     def test_guides_sitemap_excludes_legacy_published_blog_posts(self):
         class FakeQuery:
@@ -2319,6 +2324,69 @@ class PublicPageTests(unittest.TestCase):
         self.assertEqual("needs_review", post.status)
         self.assertFalse(fake_session.committed)
         self.assertIn("공개할 수 없습니다", response.get_data(as_text=True))
+
+    def test_blog_review_approval_accepts_get_links_from_email(self):
+        class FakeQuery:
+            def __init__(self, post):
+                self.post = post
+
+            def filter(self, *args, **kwargs):
+                return self
+
+            def first(self):
+                return self.post
+
+        class FakeSession:
+            def __init__(self, post):
+                self.post = post
+                self.committed = False
+
+            def query(self, model):
+                return FakeQuery(self.post)
+
+            def commit(self):
+                self.committed = True
+
+        content_html = (
+            "<h2>핵심 요약</h2><p>AgeCalc 계산기와 생활 기준을 함께 살펴보는 설명형 글입니다.</p>"
+            "<h2>배경과 맥락</h2><p>한국 독자가 이해하기 쉽도록 원문 내용을 다시 구성했습니다.</p>"
+            "<h2>한국 독자가 확인할 점</h2><p>생활 일정과 가족 기록에 맞춰 읽을 수 있습니다.</p>"
+            "<h2>AgeCalc 활용 포인트</h2>"
+            '<p><a href="/age">만 나이 계산기</a>로 날짜 기준을 먼저 확인하세요.</p>'
+            "<h2>주의할 점과 한계</h2><p>개별 상황에 따라 해석이 달라질 수 있으므로 참고용으로 활용해야 합니다.</p>"
+            "<h2>참고 링크</h2><p><a href=\"https://example.com/story\">원문 보기</a></p>"
+        ) * 24
+        post = SimpleNamespace(
+            id=305,
+            title="검토 글",
+            slug="review-post",
+            excerpt="요약",
+            cover_image_url="/static/generated/review-post-cover.png",
+            content_html=content_html,
+            published_at=None,
+            created_at=None,
+            updated_at=None,
+            status="needs_review",
+            sources=[
+                SimpleNamespace(
+                    source_name="Example",
+                    source_url="https://example.com/story",
+                    attribution_text=None,
+                )
+            ],
+        )
+        fake_session = FakeSession(post)
+
+        with mock.patch.object(app_module, "_review_token_is_valid", return_value=True), mock.patch.object(
+            app_module, "SessionLocal", return_value=fake_session
+        ), mock.patch.object(app_module, "_published_blog_count", return_value=0):
+            response = app.test_client().get("/blog/review/305/approve?token=test")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual("published", post.status)
+        self.assertIsNotNone(post.published_at)
+        self.assertTrue(fake_session.committed)
+        self.assertIn("/blog/review-post", response.headers["Location"])
 
     def test_blog_draft_detail_renders_publish_button_for_draft(self):
         post = SimpleNamespace(
@@ -2479,6 +2547,49 @@ class PublicPageTests(unittest.TestCase):
         self.assertFalse(fake_session.committed)
         self.assertIn("대표 이미지가 없습니다", response.get_data(as_text=True))
 
+    def test_blog_detail_renders_legacy_published_post_as_noindex(self):
+        class FakeQuery:
+            def __init__(self, post):
+                self.post = post
+
+            def filter(self, *args, **kwargs):
+                return self
+
+            def first(self):
+                return self.post
+
+        class FakeSession:
+            def __init__(self, post):
+                self.post = post
+
+            def query(self, model):
+                return FakeQuery(self.post)
+
+        post = SimpleNamespace(
+            id=305,
+            title="일반 검토 글",
+            slug="review-post",
+            excerpt="요약",
+            cover_image_url="/static/generated/review-post-cover.png",
+            content_html="<h2>본문</h2><p>AgeCalc 계산기와 연결한 공개 글입니다.</p>",
+            published_at=datetime(2026, 7, 4, 12, 0),
+            created_at=datetime(2026, 7, 4, 12, 0),
+            updated_at=datetime(2026, 7, 4, 12, 0),
+            status="published",
+            sources=[],
+        )
+
+        with mock.patch.object(app_module, "SessionLocal", return_value=FakeSession(post)), mock.patch.object(
+            app_module, "_published_blog_count", return_value=0
+        ):
+            response = app.test_client().get("/blog/review-post")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers.get("X-Robots-Tag"), "noindex, nofollow")
+        html = response.get_data(as_text=True)
+        self.assertIn("일반 검토 글", html)
+        self.assertIn('<meta name="robots" content="noindex,nofollow" />', html)
+
     def test_home_page_links_all_life_hubs(self):
         client = app.test_client()
         response = client.get("/")
@@ -2500,6 +2611,123 @@ class PublicPageTests(unittest.TestCase):
             self.assertIn(f'href="/{key}/"', html)
         self.assertNotIn("표·비교 모음", html)
 
+    def test_home_page_renders_coupang_side_rails_when_enabled(self):
+        client = app.test_client()
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+            response = client.get("/")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertEqual(2, html.count('class="home-coupang-rail'))
+        self.assertEqual(10, html.count('class="home-coupang-banner"'))
+        self.assertEqual(1, html.count('class="coupang-mobile-banner"'))
+        self.assertIn('href="https://link.coupang.com/a/ffBvZNWzEi"', html)
+        self.assertIn("banners/1002561?trackingCode=AF6844979", html)
+        for url in [
+            "https://link.coupang.com/a/ffu5nazk5Y",
+            "https://link.coupang.com/a/ffvasJKyY0",
+            "https://link.coupang.com/a/ffvcORZcqa",
+            "https://link.coupang.com/a/ffvdyD0ufk",
+            "https://link.coupang.com/a/ffvedsU0Zg",
+            "https://link.coupang.com/a/ffve5qgzEO",
+            "https://link.coupang.com/a/ffvf0tCcQ8",
+            "https://link.coupang.com/a/ffvgxQMD5U",
+            "https://link.coupang.com/a/ffvhsWlA5I",
+            "https://link.coupang.com/a/ffvjmC9bKS",
+        ]:
+            self.assertIn(f'href="{url}"', html)
+        self.assertIn("쿠팡 파트너스 활동으로 일정액의 수수료를 제공받습니다.", html)
+        self.assertLess(html.index('class="hero-band'), html.index('<footer class="footer">'))
+
+    def test_calculator_pages_render_coupang_side_rails_when_enabled(self):
+        client = app.test_client()
+        calculator_paths = [
+            "/age",
+            "/birth-year-age-table",
+            "/school-grade-calculator",
+            "/school-entry-year-table",
+            "/age-gap-calculator",
+            "/100-day-calculator",
+            "/baby-months-table",
+            "/annual-age-calculator",
+            "/age-comparison-table",
+            "/grade-age-table",
+            "/pet-age-table",
+            "/pet-months-table",
+            "/grade-birth-year-table",
+            "/birth-year-zodiac-table",
+            "/college-entry-year-calculator",
+            "/birthday-dday-calculator",
+            "/dog",
+            "/cat",
+            "/baby-months",
+            "/d-day",
+            "/parent-child",
+        ]
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+            for path in calculator_paths:
+                with self.subTest(path=path):
+                    response = client.get(path)
+
+                    self.assertEqual(response.status_code, 200)
+                    html = response.get_data(as_text=True)
+                    self.assertEqual(2, html.count('class="home-coupang-rail'))
+                    self.assertEqual(10, html.count('class="home-coupang-banner"'))
+                    self.assertIn("coupang-side-rail-left", html)
+                    self.assertIn("coupang-side-rail-right", html)
+                    self.assertEqual(1, html.count('class="coupang-mobile-banner"'))
+
+    def test_mobile_coupang_banner_uses_hub_specific_links(self):
+        client = app.test_client()
+        expected_by_path = {
+            "/baby-months": ("https://link.coupang.com/a/ffBqbNUILI", "banners/997624?trackingCode=AF6844979"),
+            "/baby-months-table": ("https://link.coupang.com/a/ffBqbNUILI", "banners/997624?trackingCode=AF6844979"),
+            "/parent-child": ("https://link.coupang.com/a/ffBqbNUILI", "banners/997624?trackingCode=AF6844979"),
+            "/age-gap-calculator": ("https://link.coupang.com/a/ffBqbNUILI", "banners/997624?trackingCode=AF6844979"),
+            "/dog": ("https://link.coupang.com/a/ffBtTssmtg", "banners/997607?trackingCode=AF6844979"),
+            "/cat": ("https://link.coupang.com/a/ffBtTssmtg", "banners/997607?trackingCode=AF6844979"),
+            "/pet-age-table": ("https://link.coupang.com/a/ffBtTssmtg", "banners/997607?trackingCode=AF6844979"),
+            "/pet-months-table": ("https://link.coupang.com/a/ffBtTssmtg", "banners/997607?trackingCode=AF6844979"),
+            "/age": ("https://link.coupang.com/a/ffBvZNWzEi", "banners/1002561?trackingCode=AF6844979"),
+            "/school-grade-calculator": ("https://link.coupang.com/a/ffBvZNWzEi", "banners/1002561?trackingCode=AF6844979"),
+            "/d-day": ("https://link.coupang.com/a/ffBvZNWzEi", "banners/1002561?trackingCode=AF6844979"),
+        }
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+            for path, (href, banner_src) in expected_by_path.items():
+                with self.subTest(path=path):
+                    response = client.get(path)
+
+                    self.assertEqual(response.status_code, 200)
+                    html = response.get_data(as_text=True)
+                    self.assertIn('class="coupang-mobile-banner"', html)
+                    self.assertIn(f'href="{href}"', html)
+                    self.assertIn(banner_src, html)
+
+    def test_mobile_coupang_banner_css_is_mobile_sized(self):
+        css = Path("static/css/style.css").read_text(encoding="utf-8")
+        mobile_css = re.search(r"@media\s*\(max-width:\s*760px\)\s*\{(?P<body>.*)\n\}", css, re.DOTALL)
+
+        self.assertRegex(css, r"\.coupang-mobile-banner\s*\{[^}]*display:\s*none;")
+        self.assertIsNotNone(mobile_css)
+        body = mobile_css.group("body")
+        self.assertRegex(body, r"\.coupang-mobile-banner\s*\{[^}]*display:\s*grid;")
+        self.assertRegex(body, r"\.coupang-mobile-banner\s*\{[^}]*width:\s*min\(100%,\s*300px\);")
+        self.assertRegex(body, r"\.coupang-mobile-banner-link,\s*\.coupang-mobile-banner-link img\s*\{[^}]*width:\s*min\(100%,\s*300px\);")
+
+    def test_home_coupang_rails_are_positioned_in_side_columns(self):
+        css = Path("static/css/style.css").read_text(encoding="utf-8")
+        rail_rule = re.search(r"body:not\(\.snake-page\)\s+\.coupang-side-rail\s*\{(?P<body>[^}]*)\}", css)
+
+        self.assertIsNotNone(rail_rule)
+        self.assertNotIn("overflow-y", rail_rule.group("body"))
+        self.assertNotIn("max-height", rail_rule.group("body"))
+        self.assertNotIn("position: sticky", rail_rule.group("body"))
+        self.assertRegex(css, r"body:not\(\.snake-page\)\s+\.container\s*>\s*\.coupang-side-rail-left\s*\{[^}]*grid-column:\s*1;")
+        self.assertRegex(css, r"body:not\(\.snake-page\)\s+\.container\s*>\s*\.coupang-side-rail-right\s*\{[^}]*grid-column:\s*3;")
+
     def test_header_excludes_global_coupang_ad_aside(self):
         with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True), app.test_request_context("/"):
             html = render_template("partials/header.html")
@@ -2518,6 +2746,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
         self.assertNotIn('class="coupang-ad-aside"', html)
+        self.assertLess(html.index('class="hero-band'), html.index('class="home-coupang-rail'))
         self.assertIn('class="hero-band', html)
 
     def test_footer_is_trimmed_to_policy_links(self):
@@ -2780,6 +3009,34 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn(".section-heading h2 {", css)
         self.assertIn(".hub-card strong {", css)
         self.assertIn(".hub-more-label {", css)
+        self.assertRegex(css, r"\.age-hub-copy\s+h1\s*\{[^}]*font-size:\s*clamp\(3\.2rem,\s*4\.4vw,\s*5\.9rem\);")
+
+    def test_mobile_hero_metrics_do_not_force_horizontal_overflow(self):
+        css = Path("static/css/style.css").read_text(encoding="utf-8")
+        mobile_css = re.search(r"@media\s*\(max-width:\s*760px\)\s*\{(?P<body>.*)\n\}", css, re.DOTALL)
+
+        self.assertIsNotNone(mobile_css)
+        body = mobile_css.group("body")
+        self.assertRegex(
+            body,
+            r"body:not\(\.home-page\)\s+\.hero-metrics\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\);",
+        )
+        self.assertRegex(
+            body,
+            r"body:not\(\.home-page\)\s+\.hero-metrics\s*\{[^}]*width:\s*min\(100%,\s*180px\);",
+        )
+        self.assertRegex(
+            body,
+            r"body:not\(\.home-page\)\s+\.hero-metrics\s*\{[^}]*justify-self:\s*end;",
+        )
+        self.assertRegex(
+            body,
+            r"body:not\(\.home-page\)\s+\.metric-value,\s*body:not\(\.home-page\)\s+\.metric-label\s*\{[^}]*white-space:\s*normal;",
+        )
+        self.assertRegex(
+            body,
+            r"body:not\(\.home-page\)\s+\.metric-value,\s*body:not\(\.home-page\)\s+\.metric-label\s*\{[^}]*overflow-wrap:\s*anywhere;",
+        )
 
     def test_footer_link_styles_are_scoped_to_footer_only(self):
         css = Path("static/css/style.css").read_text(encoding="utf-8")
@@ -2814,15 +3071,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         csp = response.headers.get("Content-Security-Policy", "")
         self.assertIn("https://ads-partners.coupang.com", csp)
-        self.assertIn("https://image15.coupangcdn.com", csp)
-        self.assertIn("https://image8.coupangcdn.com", csp)
-        self.assertIn("https://image9.coupangcdn.com", csp)
-        self.assertIn("https://img1c.coupangcdn.com", csp)
-        self.assertIn("https://image11.coupangcdn.com", csp)
-        self.assertIn("https://image7.coupangcdn.com", csp)
-        self.assertIn("https://image14.coupangcdn.com", csp)
-        self.assertIn("https://image2.coupangcdn.com", csp)
-        self.assertIn("https://img4c.coupangcdn.com", csp)
+        self.assertIn("https://*.coupangcdn.com", csp)
         self.assertIn("frame-src", csp)
         self.assertIn("https://ep2.adtrafficquality.google", csp)
 

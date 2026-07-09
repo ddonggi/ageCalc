@@ -26,7 +26,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=life-calendar-20260505j" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=home-h1-20260710a" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
@@ -65,6 +65,8 @@
                 </article>
             </div>
         </section>
+        {% include 'partials/home_coupang_rails.html' %}
+
         <section class="section-shell direct-answer" aria-label="생일 D-day 바로 답변">
             <p class="eyebrow">바로 답변</p>
             <h2>올해 생일이 지났다면 내년 생일까지 계산합니다</h2>

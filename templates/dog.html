@@ -30,7 +30,7 @@
         href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
         rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=life-calendar-20260505j" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=home-h1-20260710a" />
     <!-- Google tag (gtag.js) -->
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
 
@@ -45,6 +45,8 @@
         {% include 'partials/header.html' %}
         <h1>강아지 나이 계산기</h1>
         <div style="text-align: center;margin-bottom: 2rem;">반려견 나이를 사람 기준으로 얼마나 되는지 쉽게 확인할 수 있습니다.</div>
+
+        {% include 'partials/home_coupang_rails.html' %}
 
         <section class="section-shell direct-answer" aria-label="강아지 나이 환산 바로 답변">
             <div class="section-heading">

@@ -1,0 +1,57 @@
+{% if coupang_partners_enabled %}
+{% set mobile_coupang_category = current_hub_key|default('', true) %}
+<aside class="coupang-mobile-banner" aria-label="쿠팡 파트너스 추천 광고">
+    <p class="home-coupang-disclosure">쿠팡 파트너스 활동으로 일정액의 수수료를 제공받습니다.</p>
+    {% if mobile_coupang_category == 'family' %}
+    <a class="coupang-mobile-banner-link" href="https://link.coupang.com/a/ffBqbNUILI" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
+        <img src="https://ads-partners.coupang.com/banners/997624?trackingCode=AF6844979&amp;subId=&amp;traceId=V0-301-5f4982b43e2b4522-I997624&amp;w=300&amp;h=250" alt="쿠팡 파트너스 가족 육아 추천 광고" width="300" height="250" loading="lazy">
+    </a>
+    {% elif mobile_coupang_category == 'pets' %}
+    <a class="coupang-mobile-banner-link" href="https://link.coupang.com/a/ffBtTssmtg" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
+        <img src="https://ads-partners.coupang.com/banners/997607?trackingCode=AF6844979&amp;subId=&amp;traceId=V0-301-7e6e8eb8ddfa1bfb-I997607&amp;w=300&amp;h=250" alt="쿠팡 파트너스 반려동물 추천 광고" width="300" height="250" loading="lazy">
+    </a>
+    {% else %}
+    <a class="coupang-mobile-banner-link" href="https://link.coupang.com/a/ffBvZNWzEi" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
+        <img src="https://ads-partners.coupang.com/banners/1002561?trackingCode=AF6844979&amp;subId=&amp;traceId=V0-301-879dd1202e5c73b2-I1002561&amp;w=300&amp;h=250" alt="쿠팡 파트너스 추천 광고" width="300" height="250" loading="lazy">
+    </a>
+    {% endif %}
+</aside>
+
+<aside class="home-coupang-rail home-coupang-rail-left coupang-side-rail coupang-side-rail-left" aria-label="쿠팡 파트너스 추천 광고 왼쪽">
+    <p class="home-coupang-disclosure">쿠팡 파트너스 활동으로 일정액의 수수료를 제공받습니다.</p>
+    <a class="home-coupang-banner" href="https://link.coupang.com/a/ffu5nazk5Y" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
+        <img src="https://ads-partners.coupang.com/banners/1002565?trackingCode=AF6844979&amp;subId=&amp;traceId=V0-301-879dd1202e5c73b2-I1002565&amp;w=160&amp;h=600" alt="쿠팡 파트너스 추천 광고" width="160" height="600" loading="lazy">
+    </a>
+    <a class="home-coupang-banner" href="https://link.coupang.com/a/ffvasJKyY0" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
+        <img src="https://ads-partners.coupang.com/banners/1002574?trackingCode=AF6844979&amp;subId=&amp;traceId=V0-301-969b06e95b87326d-I1002574&amp;w=160&amp;h=600" alt="쿠팡 파트너스 추천 광고" width="160" height="600" loading="lazy">
+    </a>
+    <a class="home-coupang-banner" href="https://link.coupang.com/a/ffvcORZcqa" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
+        <img src="https://ads-partners.coupang.com/banners/1002607?trackingCode=AF6844979&amp;subId=&amp;traceId=V0-301-2f679fc6bd8f2e58-I1002607&amp;w=160&amp;h=600" alt="쿠팡 파트너스 추천 광고" width="160" height="600" loading="lazy">
+    </a>
+    <a class="home-coupang-banner" href="https://link.coupang.com/a/ffvdyD0ufk" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
+        <img src="https://ads-partners.coupang.com/banners/1004965?trackingCode=AF6844979&amp;subId=&amp;traceId=V0-301-2b8ef06377ec8f50-I1004965&amp;w=160&amp;h=600" alt="쿠팡 파트너스 추천 광고" width="160" height="600" loading="lazy">
+    </a>
+    <a class="home-coupang-banner" href="https://link.coupang.com/a/ffvedsU0Zg" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
+        <img src="https://ads-partners.coupang.com/banners/997622?trackingCode=AF6844979&amp;subId=&amp;traceId=V0-301-5f4982b43e2b4522-I997622&amp;w=160&amp;h=600" alt="쿠팡 파트너스 추천 광고" width="160" height="600" loading="lazy">
+    </a>
+</aside>
+
+<aside class="home-coupang-rail home-coupang-rail-right coupang-side-rail coupang-side-rail-right" aria-label="쿠팡 파트너스 추천 광고 오른쪽">
+    <p class="home-coupang-disclosure">쿠팡 파트너스 활동으로 일정액의 수수료를 제공받습니다.</p>
+    <a class="home-coupang-banner" href="https://link.coupang.com/a/ffve5qgzEO" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
+        <img src="https://ads-partners.coupang.com/banners/997605?trackingCode=AF6844979&amp;subId=&amp;traceId=V0-301-7e6e8eb8ddfa1bfb-I997605&amp;w=160&amp;h=600" alt="쿠팡 파트너스 추천 광고" width="160" height="600" loading="lazy">
+    </a>
+    <a class="home-coupang-banner" href="https://link.coupang.com/a/ffvf0tCcQ8" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
+        <img src="https://ads-partners.coupang.com/banners/1002601?trackingCode=AF6844979&amp;subId=&amp;traceId=V0-301-12cd6d67384e2afb-I1002601&amp;w=160&amp;h=600" alt="쿠팡 파트너스 추천 광고" width="160" height="600" loading="lazy">
+    </a>
+    <a class="home-coupang-banner" href="https://link.coupang.com/a/ffvgxQMD5U" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
+        <img src="https://ads-partners.coupang.com/banners/1002592?trackingCode=AF6844979&amp;subId=&amp;traceId=V0-301-5079b8362432a905-I1002592&amp;w=160&amp;h=600" alt="쿠팡 파트너스 추천 광고" width="160" height="600" loading="lazy">
+    </a>
+    <a class="home-coupang-banner" href="https://link.coupang.com/a/ffvhsWlA5I" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
+        <img src="https://ads-partners.coupang.com/banners/1002596?trackingCode=AF6844979&amp;subId=&amp;traceId=V0-301-0fd2df58973b32a5-I1002596&amp;w=160&amp;h=600" alt="쿠팡 파트너스 추천 광고" width="160" height="600" loading="lazy">
+    </a>
+    <a class="home-coupang-banner" href="https://link.coupang.com/a/ffvjmC9bKS" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
+        <img src="https://ads-partners.coupang.com/banners/1002589?trackingCode=AF6844979&amp;subId=&amp;traceId=V0-301-371ae01f4226dec2-I1002589&amp;w=160&amp;h=600" alt="쿠팡 파트너스 추천 광고" width="160" height="600" loading="lazy">
+    </a>
+</aside>
+{% endif %}

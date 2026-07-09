@@ -27,7 +27,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=life-calendar-20260505j" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=home-h1-20260710a" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
@@ -67,6 +67,8 @@
                 </article>
             </div>
         </section>
+        {% include 'partials/home_coupang_rails.html' %}
+
         <section class="section-shell direct-answer" aria-label="입학년도 바로 답변">
             <p class="eyebrow">바로 답변 · 입학 시점 계산</p>
             <h2>입학년도 계산기 기준으로 출생연도에 7을 더하면 일반적인 초등학교 입학 학년도입니다</h2>

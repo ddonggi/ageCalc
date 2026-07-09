@@ -5,20 +5,20 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-    <title>오늘 기준 생활 나이 캘린더 | AgeCalc</title>
-    <meta name="description" content="만나이, 학년, 생일 D-day, 반려동물 나이와 육아 기준을 오늘 기준 생활 일정처럼 확인하세요." />
+    <title>오늘 기준 나이 계산기 허브 | AgeCalc</title>
+    <meta name="description" content="만나이, 학년, 생일 D-day, 아이 개월수, 반려동물 나이까지 오늘 기준 생활 나이 계산을 한곳에서 확인하세요." />
 
     <link rel="canonical" href="https://agecalc.cloud/" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="AgeCalc" />
-    <meta property="og:title" content="오늘 기준 생활 나이 캘린더 | AgeCalc" />
-    <meta property="og:description" content="만나이, 학년, 생일 D-day, 반려동물 나이와 육아 기준을 오늘 기준으로 확인하세요." />
+    <meta property="og:title" content="오늘 기준 나이 계산기 허브 | AgeCalc" />
+    <meta property="og:description" content="만나이, 학년, 생일 D-day, 아이 개월수, 반려동물 나이를 오늘 기준으로 계산하세요." />
     <meta property="og:url" content="https://agecalc.cloud/" />
     <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="오늘 기준 생활 나이 캘린더 | AgeCalc" />
-    <meta name="twitter:description" content="만나이, 학년, 생일 D-day, 반려동물 나이와 육아 기준을 오늘 기준으로 확인하세요." />
+    <meta name="twitter:title" content="오늘 기준 나이 계산기 허브 | AgeCalc" />
+    <meta name="twitter:description" content="만나이, 학년, 생일 D-day, 아이 개월수, 반려동물 나이를 오늘 기준으로 계산하세요." />
     <meta name="twitter:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
     <link rel="icon" href="/favicon.ico">
@@ -30,7 +30,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=life-calendar-20260505j" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=home-h1-20260710a" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
@@ -41,102 +41,59 @@
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <section class="hero-band hero-command-board life-calendar-hero">
-            <div class="calendar-week-row" aria-hidden="true">
-                <span class="is-today">일</span>
-                <span>월</span>
-                <span>화</span>
-                <span>수</span>
-                <span>목</span>
-                <span>금</span>
-                <span>토</span>
+        <section class="hero-band hero-command-board age-hub-hero">
+            <div class="hero-copy age-hub-copy">
+                <p class="eyebrow">Age Calculator Hub</p>
+                <h1>오늘 기준 나이를 바로 계산하세요</h1>
+                <p class="page-intro">
+                    만나이, 학년, 생일 D-day, 아이 개월수, 반려동물 나이까지 날짜 기준 생활 계산을 한곳에서 확인하세요.
+                </p>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="{{ url_for('age') }}">만나이 계산하기</a>
+                    <a class="btn btn-secondary" href="{{ url_for('school_grade_calculator') }}">학년 계산하기</a>
+                    <a class="btn btn-secondary" href="{{ url_for('birthday_dday_calculator') }}">생일 D-day 보기</a>
+                </div>
             </div>
 
-            <div class="calendar-sheet">
-                <div class="hero-copy calendar-copy">
-                    <p class="eyebrow">Life Calendar</p>
-                    <h1>오늘 기준<br>생활 나이 캘린더</h1>
-                    <span class="calendar-stamp" aria-hidden="true">Life<br>Calendar</span>
-                    <p class="page-intro">
-                        만나이, 학년, 생일, 반려동물 나이와 육아 기준을 날짜표처럼 정리해
-                        오늘 필요한 생활 기준을 8개의 생활 영역으로 나눠 바로 이동할 수 있습니다.
-                    </p>
-                    <div class="hero-actions">
-                        <a class="btn btn-primary" href="{{ url_for('age') }}">만나이 계산하기</a>
-                        <a class="btn btn-secondary" href="{{ url_for('school_grade_calculator') }}">학년 기준 보기</a>
+            <div class="age-hub-dashboard" aria-label="오늘 기준 나이 계산기 미리보기">
+                <div class="age-hub-dashboard-head">
+                    <div>
+                        <p class="command-label">기준일: 오늘</p>
+                        <strong>{{ today.strftime("%Y.%m.%d") }}</strong>
                     </div>
+                    <span>바로 계산</span>
                 </div>
-
-                <div class="hero-command life-timeline" aria-label="오늘 기준 생활 이벤트 미리보기">
-                    <div class="timeline-head">
-                        <div>
-                            <p class="command-label">오늘 기준</p>
-                            <strong>{{ today.strftime("%Y.%m.%d") }}</strong>
-                        </div>
-                        <span>{{ ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"][today.weekday()] }}</span>
-                    </div>
-                    <ol class="timeline-list">
-                        <li>
-                            <span class="timeline-time">09:00</span>
-                            <a class="timeline-event" href="{{ url_for('school_grade_calculator') }}">
-                                <span class="event-index">01</span>
-                                <span>
-                                    <small>학년</small>
-                                    <strong>초등 3학년</strong>
-                                </span>
-                            </a>
-                        </li>
-                        <li>
-                            <span class="timeline-time">10:00</span>
-                            <a class="timeline-event" href="{{ url_for('birthday_dday_calculator') }}">
-                                <span class="event-index">02</span>
-                                <span>
-                                    <small>생일 D-day</small>
-                                    <strong>D-42</strong>
-                                </span>
-                            </a>
-                        </li>
-                        <li>
-                            <span class="timeline-time">14:00</span>
-                            <a class="timeline-event" href="{{ url_for('dog') }}">
-                                <span class="event-index">03</span>
-                                <span>
-                                    <small>반려동물 나이</small>
-                                    <strong>7세 4개월</strong>
-                                </span>
-                            </a>
-                        </li>
-                        <li>
-                            <span class="timeline-time">16:00</span>
-                            <a class="timeline-event" href="{{ url_for('baby_months') }}">
-                                <span class="event-index">04</span>
-                                <span>
-                                    <small>육아 기준</small>
-                                    <strong>28개월 12일</strong>
-                                </span>
-                            </a>
-                        </li>
-                    </ol>
+                <div class="age-hub-result-grid">
+                    <a class="age-hub-result-card is-primary" href="{{ url_for('age') }}">
+                        <span class="age-hub-result-index">01</span>
+                        <strong>만나이</strong>
+                        <small>생년월일 기준 계산</small>
+                    </a>
+                    <a class="age-hub-result-card" href="{{ url_for('school_grade_calculator') }}">
+                        <span class="age-hub-result-index">02</span>
+                        <strong>학년</strong>
+                        <small>출생연도 기준 확인</small>
+                    </a>
+                    <a class="age-hub-result-card" href="{{ url_for('birthday_dday_calculator') }}">
+                        <span class="age-hub-result-index">03</span>
+                        <strong>생일</strong>
+                        <small>다음 생일까지 D-day</small>
+                    </a>
+                    <a class="age-hub-result-card" href="{{ url_for('baby_months') }}">
+                        <span class="age-hub-result-index">04</span>
+                        <strong>아이 개월수</strong>
+                        <small>출생일 기준 월령 계산</small>
+                    </a>
+                    <a class="age-hub-result-card" href="{{ url_for('dog') }}">
+                        <span class="age-hub-result-index">05</span>
+                        <strong>반려동물 나이</strong>
+                        <small>사람 나이로 환산</small>
+                    </a>
                 </div>
-
-                <nav class="calendar-side-tabs" aria-label="주요 계산기 빠른 이동">
-                    <a class="is-primary" href="{{ url_for('age') }}">만나이</a>
-                    <a href="{{ url_for('school_grade_calculator') }}">학년</a>
-                    <a href="{{ url_for('birthday_dday_calculator') }}">생일</a>
-                    <a href="{{ url_for('dog') }}">반려동물</a>
-                </nav>
-            </div>
-
-            <div class="calendar-date-strip" aria-hidden="true">
-                <span>26</span>
-                <span>27</span>
-                <span>28</span>
-                <span>29</span>
-                <span>30</span>
-                <span>1</span>
-                <span>2</span>
             </div>
         </section>
+
+        {% include 'partials/home_coupang_rails.html' %}
 
         <section class="section-shell direct-answer" aria-label="AgeCalc 바로 답변">
             <div class="section-heading">

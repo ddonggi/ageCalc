@@ -235,7 +235,7 @@ def add_security_headers(response):
     nonce = getattr(g, "csp_nonce", "")
     csp = (
         "default-src 'self'; "
-        "img-src 'self' data: https://c.clarity.ms https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ads-partners.coupang.com https://image15.coupangcdn.com https://image8.coupangcdn.com https://image9.coupangcdn.com https://img1c.coupangcdn.com https://image11.coupangcdn.com https://image7.coupangcdn.com https://image14.coupangcdn.com https://image2.coupangcdn.com https://img4c.coupangcdn.com; "
+        "img-src 'self' data: https://c.clarity.ms https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ads-partners.coupang.com https://*.coupangcdn.com; "
         "font-src 'self' https://fonts.gstatic.com; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
         f"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com https://www.clarity.ms https://scripts.clarity.ms https://pagead2.googlesyndication.com https://ep2.adtrafficquality.google; "
@@ -1786,8 +1786,6 @@ def blog_list():
 
 @app.route('/blog/<slug>')
 def blog_detail(slug):
-    if slug not in BLOG_ARTICLE_BLUEPRINTS:
-        abort(404)
     session = SessionLocal()
     post = (
         session.query(GeneratedPost)
@@ -1796,12 +1794,14 @@ def blog_detail(slug):
     )
     if post is None:
         abort(404)
-    blog_indexable = _is_blog_public_indexable()
+    article = structured_blog_article_for_slug(slug)
+    blog_indexable = bool(article) and _is_blog_public_indexable()
+    crumb_label = article["title"] if article else post.title
     breadcrumbs = [
         {"label": "홈", "url": f"{SITE_BASE_URL}/", "current": False},
         {"label": "블로그", "url": f"{SITE_BASE_URL}/blog", "current": False},
         {
-            "label": BLOG_ARTICLE_BLUEPRINTS[slug]["title"],
+            "label": crumb_label,
             "url": f"{SITE_BASE_URL}/blog/{slug}",
             "current": True,
         },
@@ -1826,7 +1826,7 @@ def blog_detail(slug):
             draft_mode=False,
             review_mode=False,
             blog_indexable=blog_indexable,
-            structured_article=_structured_blog_context(post),
+            structured_article=article,
             breadcrumbs=breadcrumbs,
             breadcrumb_schema=breadcrumb_schema,
         )
@@ -1954,7 +1954,7 @@ def blog_review(post_id):
     )
 
 
-@app.post('/blog/review/<int:post_id>/approve')
+@app.route('/blog/review/<int:post_id>/approve', methods=['GET', 'POST'])
 def blog_review_approve(post_id):
     token = request.args.get("token", "")
     if not _review_token_is_valid(token):
