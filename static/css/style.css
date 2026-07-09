@@ -28,6 +28,9 @@
     --radius-lg: 12px;
     --radius-xl: 16px;
     --page-width: min(1280px, calc(100vw - 32px));
+    --content-width: 1040px;
+    --aside-rail-width: 168px;
+    --aside-rail-gap: 24px;
     --ink: var(--text);
     --ink-soft: var(--muted);
     --card: var(--surface-strong);
@@ -3513,6 +3516,73 @@ body.snake-page #scroll-top {
 body.snake-page .game-panel {
     margin-inline: auto;
     width: min(560px, 100%);
+}
+
+@media (min-width: 1181px) {
+    :root {
+        --page-width: min(1424px, calc(100vw - 32px));
+    }
+
+    body:not(.snake-page) .container {
+        grid-template-columns:
+            minmax(0, var(--aside-rail-width))
+            minmax(0, var(--content-width))
+            minmax(0, var(--aside-rail-width));
+        column-gap: var(--aside-rail-gap);
+        align-items: start;
+    }
+
+    body:not(.snake-page) .container::before,
+    body:not(.snake-page) .container::after {
+        content: "";
+        position: absolute;
+        top: 96px;
+        bottom: 0;
+        z-index: 0;
+        width: var(--aside-rail-width);
+        min-height: 520px;
+        border: 1px solid rgba(76, 55, 38, 0.1);
+        border-radius: var(--radius-lg);
+        background:
+            linear-gradient(rgba(112, 82, 52, 0.035) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(112, 82, 52, 0.03) 1px, transparent 1px),
+            rgba(255, 250, 240, 0.36);
+        background-size: 28px 28px, 28px 28px, auto;
+        pointer-events: none;
+    }
+
+    body:not(.snake-page) .container::before {
+        left: 0;
+    }
+
+    body:not(.snake-page) .container::after {
+        right: 0;
+    }
+
+    body:not(.snake-page) .container > * {
+        grid-column: 2;
+        min-width: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    body:not(.snake-page) .container > .site-header,
+    body:not(.snake-page) .container > .mobile-nav-overlay,
+    body:not(.snake-page) .container > .mobile-nav-panel {
+        grid-column: 1 / -1;
+    }
+
+    .home-page .container {
+        width: var(--page-width);
+        column-gap: var(--aside-rail-gap);
+    }
+
+    .home-page .life-calendar-hero,
+    .home-preview-deck,
+    .home-page .category-hub-section,
+    .home-page .footer {
+        width: 100%;
+    }
 }
 
 .page-feedback {
