@@ -2228,10 +2228,15 @@ body:not(.home-page):not(.blog-page):not(.games-hub-page):not(.age-page) .contai
     grid-template-columns: repeat(4, minmax(0, 1fr));
     border-top: 1px solid var(--line-strong);
     border-left: 1px solid var(--line-strong);
+    position: relative;
+    z-index: 0;
+    isolation: isolate;
 }
 
 .home-life-hub-card {
     min-height: 280px;
+    position: relative;
+    z-index: 0;
     color: var(--text);
     border-right: 1px solid var(--line-strong);
     border-bottom: 1px solid var(--line-strong);
@@ -2253,6 +2258,7 @@ body:not(.home-page):not(.blog-page):not(.games-hub-page):not(.age-page) .contai
 
 .home-life-hub-card:hover,
 .home-life-hub-card:focus-visible {
+    z-index: 2;
     color: var(--text);
     background: rgba(190, 77, 36, 0.09);
     transform: translateY(-3px);
@@ -3503,6 +3509,18 @@ body.snake-page .game-panel {
     body:not(.snake-page) .container > .mobile-nav-overlay,
     body:not(.snake-page) .container > .mobile-nav-panel {
         grid-column: 1 / -1;
+    }
+
+    body:not(.snake-page) .container > .site-header {
+        z-index: 100;
+    }
+
+    body:not(.snake-page) .container > .mobile-nav-overlay {
+        z-index: 110;
+    }
+
+    body:not(.snake-page) .container > .mobile-nav-panel {
+        z-index: 120;
     }
 
     .home-page .container {
