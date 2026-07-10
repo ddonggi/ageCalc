@@ -7,14 +7,6 @@
         </a>
         {% endfor %}
     </div>
-    <div class="info-coupang-mobile-slots" aria-label="쿠팡 파트너스 모바일 이벤트 프로모션">
-        {% for promotion in coupang_event_promotions %}
-        <a class="info-coupang-mobile-slot" href="{{ promotion.url }}" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url" data-event-promo-mobile-slot>
-            <img src="{{ promotion.image_url }}" alt="{{ promotion.alt }}" loading="lazy">
-        </a>
-        {% endfor %}
-    </div>
     <p class="coupang-disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
 </aside>
-<script src="{{ url_for('static', filename='js/coupang-event-promotions.js') }}" defer></script>
 {% endif %}

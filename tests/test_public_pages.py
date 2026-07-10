@@ -2715,24 +2715,27 @@ class PublicPageTests(unittest.TestCase):
             "https://link.coupang.com/a/fhcYPGOPIa",
         ]:
             self.assertIn(f'href="{href}"', html)
-        self.assertEqual(3, html.count("data-event-promo-mobile-slot"))
-        self.assertIn("coupang-event-promotions.js", html)
-        self.assertLess(html.index('class="info-coupang-promotions"'), html.index('<div class="info">'))
-        self.assertLess(html.index('class="section-shell direct-answer"'), html.index('class="info-coupang-promotions"'))
+        self.assertNotIn("data-event-promo-mobile-slot", html)
+        self.assertNotIn("coupang-event-promotions.js", html)
+        self.assertLess(html.index('class="hero-band utility-hero"'), html.index('class="info-coupang-promotions"'))
+        self.assertLess(html.index('class="info-coupang-promotions"'), html.index('class="coupang-mobile-banner"'))
 
-    def test_other_pages_render_event_promotions_before_first_section_shell(self):
+    def test_other_pages_render_event_promotions_after_hero_band(self):
         client = app.test_client()
 
-        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
-            response = client.get("/annual-age-calculator")
+        for path in ["/annual-age-calculator", "/blog"]:
+            with self.subTest(path=path), mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+                response = client.get(path)
 
-        self.assertEqual(response.status_code, 200)
-        html = response.get_data(as_text=True)
-        self.assertIn('class="info-coupang-promotions"', html)
-        self.assertEqual(3, html.count('class="info-coupang-promo"'))
-        self.assertEqual(3, html.count("data-event-promo-mobile-slot"))
-        self.assertIn("coupang-event-promotions.js", html)
-        self.assertLess(html.index('class="info-coupang-promotions"'), html.index('class="section-shell direct-answer"'))
+            self.assertEqual(response.status_code, 200)
+            html = response.get_data(as_text=True)
+            self.assertIn('class="info-coupang-promotions"', html)
+            self.assertEqual(3, html.count('class="info-coupang-promo"'))
+            self.assertNotIn("data-event-promo-mobile-slot", html)
+            self.assertNotIn("coupang-event-promotions.js", html)
+            self.assertLess(html.index('class="hero-band'), html.index('class="info-coupang-promotions"'))
+            if 'class="coupang-mobile-banner"' in html and path != "/blog":
+                self.assertLess(html.index('class="info-coupang-promotions"'), html.index('class="coupang-mobile-banner"'))
 
     def test_event_promotions_are_loaded_from_editable_data_file(self):
         promotions = app_module._active_coupang_event_promotions()

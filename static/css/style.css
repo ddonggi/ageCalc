@@ -2729,25 +2729,6 @@ input.error {
     height: auto;
 }
 
-.info-coupang-mobile-slots,
-.info-coupang-mobile-slot {
-    display: none;
-}
-
-.info-coupang-mobile-slot {
-    overflow: hidden;
-    border-radius: var(--radius-sm);
-    border: 1px solid rgba(76, 55, 38, 0.08);
-    background: rgba(255, 250, 240, 0.58);
-    box-shadow: var(--shadow-soft);
-}
-
-.info-coupang-mobile-slot img {
-    display: block;
-    width: 100%;
-    height: auto;
-}
-
 .line-actions {
     display: flex;
     justify-content: flex-end;
@@ -3854,28 +3835,6 @@ body.snake-page .game-panel {
     .coupang-mobile-banner-link img {
         height: auto;
         aspect-ratio: 300 / 250;
-    }
-
-    .info-coupang-promotions {
-        padding: 0;
-        border: 0;
-        background: transparent;
-        box-shadow: none;
-    }
-
-    .info-coupang-promo-grid,
-    .info-coupang-promotions > .coupang-disclosure {
-        display: none;
-    }
-
-    .info-coupang-mobile-slots {
-        display: contents;
-    }
-
-    .info-coupang-mobile-slot.is-placed {
-        display: block;
-        width: min(100%, 340px);
-        margin: 0 auto;
     }
 
     h1 {
