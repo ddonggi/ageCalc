@@ -1,13 +1,11 @@
 class BabyMonthsCalculator {
     constructor() {
-        this.yearInput = document.getElementById('baby-year');
-        this.monthInput = document.getElementById('baby-month');
-        this.dayInput = document.getElementById('baby-day');
+        this.birthInput = document.getElementById('baby-birth-input');
         this.errorEl = document.getElementById('baby-error');
         this.resultContainer = document.getElementById('baby-result-container');
         this.resultContent = document.getElementById('baby-result-content');
 
-        if (this.yearInput && this.monthInput && this.dayInput) {
+        if (this.birthInput) {
             this.bindEvents();
             this.updateResult();
         }
@@ -15,15 +13,7 @@ class BabyMonthsCalculator {
 
     bindEvents() {
         ['input', 'change'].forEach(evt => {
-            this.yearInput.addEventListener(evt, () => {
-                this.normalizeInputs();
-                this.updateResult();
-            });
-            this.monthInput.addEventListener(evt, () => {
-                this.normalizeInputs();
-                this.updateResult();
-            });
-            this.dayInput.addEventListener(evt, () => {
+            this.birthInput.addEventListener(evt, () => {
                 this.normalizeInputs();
                 this.updateResult();
             });
@@ -31,9 +21,7 @@ class BabyMonthsCalculator {
     }
 
     normalizeInputs() {
-        this.limitDigits(this.yearInput, 4);
-        this.limitDigits(this.monthInput, 2);
-        this.limitDigits(this.dayInput, 2);
+        this.limitDigits(this.birthInput, 6);
     }
 
     limitDigits(input, maxLength) {
@@ -44,26 +32,24 @@ class BabyMonthsCalculator {
         }
     }
 
-    validate() {
-        const yearText = String(this.yearInput.value || '');
-        const monthText = String(this.monthInput.value || '');
-        const dayText = String(this.dayInput.value || '');
-        const y = Number(yearText || 0);
-        const m = Number(monthText || 0);
-        const d = Number(dayText || 0);
+    convertYYtoYYYY(yy) {
+        const num = parseInt(yy, 10);
+        const currentYY = new Date().getFullYear() % 100;
+        if (num <= currentYY) return 2000 + num;
+        return 1900 + num;
+    }
 
-        if (!y || !m || !d) {
-            return { valid: false, msg: '출생일을 모두 입력해 주세요.' };
+    validate() {
+        const digits = String(this.birthInput.value || '').replace(/\D/g, '');
+
+        if (digits.length !== 6) {
+            return { valid: false, msg: '출생일 6자리(YYMMDD)를 입력해 주세요.' };
         }
-        if (yearText.length !== 4) {
-            return { valid: false, msg: '연도는 4자리로 입력해 주세요.' };
-        }
-        if (monthText.length !== 2) {
-            return { valid: false, msg: '월은 2자리로 입력해 주세요.' };
-        }
-        if (dayText.length !== 2) {
-            return { valid: false, msg: '일은 2자리로 입력해 주세요.' };
-        }
+
+        const y = this.convertYYtoYYYY(digits.slice(0, 2));
+        const m = Number(digits.slice(2, 4));
+        const d = Number(digits.slice(4, 6));
+
         if (m < 1 || m > 12) {
             return { valid: false, msg: '월은 1~12 사이로 입력해 주세요.' };
         }
@@ -78,6 +64,9 @@ class BabyMonthsCalculator {
             birth.getDate() !== d
         ) {
             return { valid: false, msg: '올바른 날짜를 입력해 주세요.' };
+        }
+        if (birth > this.getToday()) {
+            return { valid: false, msg: '미래 날짜는 입력할 수 없습니다.' };
         }
         return { valid: true, birth };
     }

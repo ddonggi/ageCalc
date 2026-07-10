@@ -2693,6 +2693,36 @@ input.error {
     box-shadow: var(--shadow-soft);
 }
 
+.info-coupang-promotions {
+    display: grid;
+    gap: 10px;
+    padding: 16px;
+    border: 1px solid rgba(76, 55, 38, 0.08);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: var(--shadow-soft);
+}
+
+.info-coupang-promo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.info-coupang-promo {
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(76, 55, 38, 0.08);
+    background: rgba(255, 250, 240, 0.58);
+}
+
+.info-coupang-promo img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
 .line-actions {
     display: flex;
     justify-content: flex-end;
@@ -4044,7 +4074,8 @@ body.snake-page .game-panel {
 
     .coupang-pet-layout,
     .coupang-promo-grid,
-    .coupang-product-grid {
+    .coupang-product-grid,
+    .info-coupang-promo-grid {
         grid-template-columns: 1fr;
     }
 

@@ -581,6 +581,29 @@ def _parse_calendar_date(year: int | None, month: int | None, day: int | None):
         return None
 
 
+def _convert_short_birth_year(yy: int, current_year: int) -> int:
+    current_yy = current_year % 100
+    return 2000 + yy if yy <= current_yy else 1900 + yy
+
+
+def _parse_six_digit_birth_date(raw: str | None, current_year: int):
+    digits = "".join(ch for ch in str(raw or "") if ch.isdigit())
+    if len(digits) != 6:
+        return None
+
+    year = _convert_short_birth_year(int(digits[:2]), current_year)
+    month = int(digits[2:4])
+    day = int(digits[4:6])
+    birth_date = _parse_calendar_date(year, month, day)
+    if birth_date is None or birth_date.year > current_year:
+        return None
+    return birth_date
+
+
+def _birth_date_to_six_digits(birth_date) -> str:
+    return f"{birth_date.year % 100:02d}{birth_date.month:02d}{birth_date.day:02d}"
+
+
 def _format_calendar_date(value) -> str:
     return value.strftime("%Y.%m.%d")
 
@@ -1317,16 +1340,21 @@ def annual_age_calculator():
     min_year = 1900
     max_year = current_year
 
+    birth_date = request.args.get('birth_date', '').strip()
     year = request.args.get('year', type=int)
     month = request.args.get('month', type=int)
     day = request.args.get('day', type=int)
 
     selected_birth_date = None
-    if year is not None and month is not None and day is not None and min_year <= year <= max_year:
+    if birth_date:
+        selected_birth_date = _parse_six_digit_birth_date(birth_date, current_year)
+    elif year is not None and month is not None and day is not None and min_year <= year <= max_year:
         selected_birth_date = _parse_calendar_date(year, month, day)
+        if selected_birth_date:
+            birth_date = _birth_date_to_six_digits(selected_birth_date)
 
     selected_snapshot = _build_annual_age_snapshot(selected_birth_date, current_year) if selected_birth_date else None
-    invalid_date = year is not None and month is not None and day is not None and selected_snapshot is None
+    invalid_date = (bool(birth_date) or (year is not None and month is not None and day is not None)) and selected_snapshot is None
 
     example_dates = [
         datetime(1990, 1, 1).date(),
@@ -1341,6 +1369,7 @@ def annual_age_calculator():
         today=today,
         selected_snapshot=selected_snapshot,
         invalid_date=invalid_date,
+        birth_date=birth_date,
         year=year,
         month=month,
         day=day,

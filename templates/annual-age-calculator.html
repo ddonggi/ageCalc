@@ -86,13 +86,11 @@
             <form class="age-form" method="get" action="{{ url_for('annual_age_calculator') }}">
                 <div class="form-group">
                     <div class="date-inputs">
-                        <input type="text" name="year" placeholder="년" inputmode="numeric" pattern="[0-9]*" maxlength="4" value="{{ year or '' }}" aria-label="출생 연도">
-                        <input type="text" name="month" placeholder="월" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="{{ month or '' }}" aria-label="출생 월">
-                        <input type="text" name="day" placeholder="일" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="{{ day or '' }}" aria-label="출생 일">
+                        <input type="text" name="birth_date" placeholder="921002" inputmode="numeric" pattern="[0-9]*" maxlength="6" value="{{ birth_date or '' }}" aria-label="생년월일 6자리">
                     </div>
                     <div class="hero-actions">
                         <button class="btn btn-primary" type="submit">연나이 계산</button>
-                        {% if year or month or day %}
+                        {% if birth_date or year or month or day %}
                         <a class="btn btn-secondary" href="{{ url_for('annual_age_calculator') }}">입력 지우기</a>
                         {% endif %}
                     </div>

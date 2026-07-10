@@ -65,11 +65,9 @@
 
         <form class="age-form" id="baby-months-form" autocomplete="off">
             <div class="form-group">
-                <h3>출생일을 입력하세요</h3>
+                <h3>출생일을 입력하세요 (6자리)</h3>
                 <div class="date-inputs">
-                    <input type="text" id="baby-year" placeholder="년" inputmode="numeric" pattern="[0-9]*" maxlength="4" required>
-                    <input type="text" id="baby-month" placeholder="월" inputmode="numeric" pattern="[0-9]*" maxlength="2" required>
-                    <input type="text" id="baby-day" placeholder="일" inputmode="numeric" pattern="[0-9]*" maxlength="2" required>
+                    <input type="text" id="baby-birth-input" placeholder="250615" inputmode="numeric" pattern="[0-9]*" maxlength="6" required aria-label="출생일 6자리">
                 </div>
                 <small id="baby-error" class="error-msg" aria-live="polite"></small>
             </div>

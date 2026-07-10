@@ -233,6 +233,11 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("아이 개월수", html)
         self.assertIn("아기 월령", html)
         self.assertIn("개월수와 월령은 같은 뜻인가요?", html)
+        self.assertIn('id="baby-birth-input"', html)
+        self.assertIn('maxlength="6"', html)
+        self.assertNotIn('id="baby-year"', html)
+        self.assertNotIn('id="baby-month"', html)
+        self.assertNotIn('id="baby-day"', html)
 
     def test_college_entry_year_calculator_targets_top_queries(self):
         client = app.test_client()
@@ -262,6 +267,21 @@ class PublicPageTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
+        self.assertIn("선택한 생년월일", html)
+        self.assertIn("1992.10.02", html)
+        self.assertIn("34세", html)
+
+    def test_annual_age_calculator_accepts_six_digit_birth_date(self):
+        client = app.test_client()
+        response = client.get("/annual-age-calculator?birth_date=921002")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn('name="birth_date"', html)
+        self.assertIn('maxlength="6"', html)
+        self.assertNotIn('name="year"', html)
+        self.assertNotIn('name="month"', html)
+        self.assertNotIn('name="day"', html)
         self.assertIn("선택한 생년월일", html)
         self.assertIn("1992.10.02", html)
         self.assertIn("34세", html)
@@ -2678,6 +2698,24 @@ class PublicPageTests(unittest.TestCase):
                     self.assertIn("coupang-side-rail-left", html)
                     self.assertIn("coupang-side-rail-right", html)
                     self.assertEqual(1, html.count('class="coupang-mobile-banner"'))
+
+    def test_age_page_renders_info_coupang_promotions_when_enabled(self):
+        client = app.test_client()
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+            response = client.get("/age")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn('class="info-coupang-promotions"', html)
+        self.assertEqual(3, html.count('class="info-coupang-promo"'))
+        for href in [
+            "https://link.coupang.com/a/fhcWUfwBBQ",
+            "https://link.coupang.com/a/fhcYeZ1ti8",
+            "https://link.coupang.com/a/fhcYPGOPIa",
+        ]:
+            self.assertIn(f'href="{href}"', html)
+        self.assertLess(html.index('class="info-coupang-promotions"'), html.index('<div class="info">'))
 
     def test_mobile_coupang_banner_uses_hub_specific_links(self):
         client = app.test_client()
