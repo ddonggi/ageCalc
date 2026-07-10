@@ -1,16 +1,20 @@
-{% if coupang_partners_enabled %}
-<aside class="info-coupang-promotions" aria-label="쿠팡 파트너스 추천 프로모션">
+{% if coupang_partners_enabled and coupang_event_promotions %}
+<aside class="info-coupang-promotions" aria-label="쿠팡 파트너스 이벤트 프로모션">
     <div class="info-coupang-promo-grid">
-        <a class="info-coupang-promo" href="https://link.coupang.com/a/fhcWUfwBBQ" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
-            <img src="https://img3c.coupangcdn.com/image/affiliate/event/promotion/2026/07/09/b309e489be3a00f20124db161debbeda.png" alt="쿠팡 파트너스 추천 프로모션" loading="lazy">
+        {% for promotion in coupang_event_promotions %}
+        <a class="info-coupang-promo" href="{{ promotion.url }}" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
+            <img src="{{ promotion.image_url }}" alt="{{ promotion.alt }}" loading="lazy">
         </a>
-        <a class="info-coupang-promo" href="https://link.coupang.com/a/fhcYeZ1ti8" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
-            <img src="https://img5c.coupangcdn.com/image/affiliate/event/promotion/2026/07/08/439574a9d2e5003001888f4b03d111bd.png" alt="쿠팡 파트너스 추천 프로모션" loading="lazy">
+        {% endfor %}
+    </div>
+    <div class="info-coupang-mobile-slots" aria-label="쿠팡 파트너스 모바일 이벤트 프로모션">
+        {% for promotion in coupang_event_promotions %}
+        <a class="info-coupang-mobile-slot" href="{{ promotion.url }}" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url" data-event-promo-mobile-slot>
+            <img src="{{ promotion.image_url }}" alt="{{ promotion.alt }}" loading="lazy">
         </a>
-        <a class="info-coupang-promo" href="https://link.coupang.com/a/fhcYPGOPIa" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
-            <img src="https://image12.coupangcdn.com/image/affiliate/event/promotion/2026/07/08/5b33d0e4f0c900490128625e29f06934.png" alt="쿠팡 파트너스 추천 프로모션" loading="lazy">
-        </a>
+        {% endfor %}
     </div>
     <p class="coupang-disclosure">이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
 </aside>
+<script src="{{ url_for('static', filename='js/coupang-event-promotions.js') }}" defer></script>
 {% endif %}

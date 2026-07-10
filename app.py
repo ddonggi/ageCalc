@@ -93,6 +93,7 @@ COUPANG_PARTNERS_ENABLED = (os.getenv("COUPANG_PARTNERS_ENABLED", "false") or "f
     "yes",
     "on",
 }
+COUPANG_EVENT_PROMOTIONS_FILE = PROJECT_ROOT / "content" / "coupang_event_promotions.json"
 COUPANG_BABY_PROMOTIONS = [
     {
         "title": "썸머 준비 육아템",
@@ -201,6 +202,7 @@ def inject_csp_nonce():
         "blog_public_count": blog_public_count,
         "coupang_partners_enabled": COUPANG_PARTNERS_ENABLED,
         "coupang_active_baby_promotions": _active_coupang_baby_promotions(),
+        "coupang_event_promotions": _active_coupang_event_promotions(),
         "life_hubs": HUB_PAGES,
         "primary_life_hubs": HUB_PAGES[:4],
         "current_hub_key": current_hub_key,
@@ -406,6 +408,50 @@ def _current_local_date():
 def _active_coupang_baby_promotions(today=None):
     today = today or _current_local_date()
     return [promotion for promotion in COUPANG_BABY_PROMOTIONS if today <= promotion["end_date"]]
+
+
+def _parse_optional_date(value):
+    if not value:
+        return None
+    try:
+        return datetime.strptime(str(value), "%Y-%m-%d").date()
+    except ValueError:
+        return None
+
+
+def _active_coupang_event_promotions(today=None):
+    today = today or _current_local_date()
+    try:
+        raw_promotions = json.loads(COUPANG_EVENT_PROMOTIONS_FILE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+
+    promotions = []
+    for item in raw_promotions:
+        if not isinstance(item, dict):
+            continue
+        url = str(item.get("url") or "").strip()
+        image_url = str(item.get("image_url") or "").strip()
+        if not url or not image_url:
+            continue
+
+        start_date = _parse_optional_date(item.get("start_date"))
+        end_date = _parse_optional_date(item.get("end_date"))
+        if start_date and today < start_date:
+            continue
+        if end_date and today > end_date:
+            continue
+
+        promotions.append(
+            {
+                "title": str(item.get("title") or "쿠팡 이벤트 프로모션").strip(),
+                "url": url,
+                "image_url": image_url,
+                "alt": str(item.get("alt") or "쿠팡 이벤트 프로모션").strip(),
+            }
+        )
+
+    return promotions[:3]
 
 
 def _generation_label(year: int) -> str:

@@ -2715,7 +2715,34 @@ class PublicPageTests(unittest.TestCase):
             "https://link.coupang.com/a/fhcYPGOPIa",
         ]:
             self.assertIn(f'href="{href}"', html)
+        self.assertEqual(3, html.count("data-event-promo-mobile-slot"))
+        self.assertIn("coupang-event-promotions.js", html)
         self.assertLess(html.index('class="info-coupang-promotions"'), html.index('<div class="info">'))
+        self.assertLess(html.index('class="section-shell direct-answer"'), html.index('class="info-coupang-promotions"'))
+
+    def test_other_pages_render_event_promotions_before_first_section_shell(self):
+        client = app.test_client()
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+            response = client.get("/annual-age-calculator")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn('class="info-coupang-promotions"', html)
+        self.assertEqual(3, html.count('class="info-coupang-promo"'))
+        self.assertEqual(3, html.count("data-event-promo-mobile-slot"))
+        self.assertIn("coupang-event-promotions.js", html)
+        self.assertLess(html.index('class="info-coupang-promotions"'), html.index('class="section-shell direct-answer"'))
+
+    def test_event_promotions_are_loaded_from_editable_data_file(self):
+        promotions = app_module._active_coupang_event_promotions()
+
+        self.assertEqual(3, len(promotions))
+        self.assertEqual("https://link.coupang.com/a/fhcWUfwBBQ", promotions[0]["url"])
+        self.assertEqual(
+            "https://img3c.coupangcdn.com/image/affiliate/event/promotion/2026/07/09/b309e489be3a00f20124db161debbeda.png",
+            promotions[0]["image_url"],
+        )
 
     def test_mobile_coupang_banner_uses_hub_specific_links(self):
         client = app.test_client()
