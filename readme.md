@@ -63,7 +63,7 @@ flowchart LR
 - `/sitemap.xml`, `/health`
 
 ### 블로그
-- `/blog`: 공개 글 목록. 공개 글이 `BLOG_INDEX_MIN_POSTS` 기본값 3개 미만이면 `noindex, nofollow` 처리됩니다.
+- `/blog`: 공개 글 목록. `ADSENSE_REVIEW_MODE=true`이면 게시물 수와 관계없이 `noindex, nofollow` 처리되고 sitemap과 메뉴에서 제외됩니다.
 - `/blog/<slug>`: `published` 글 상세
 - `/blog/drafts`: 비밀번호 기반 초안/검토 목록
 - `/blog/drafts/<slug>`: 초안/검토 상세
@@ -184,6 +184,9 @@ python scripts/rewrite_blog_posts.py --status all --all --attempts 2 --apply --p
 ## 운영 메모
 - 앱과 스케줄러는 `/srv/apps/agecalc/.env.rss`를 공유합니다.
 - 민감 정보는 저장소에 커밋하지 않고 `.env.rss` 또는 systemd 환경 파일에서 관리합니다.
-- `COUPANG_PARTNERS_ENABLED=true`이면 공개 블로그 글에 쿠팡 파트너스 배너와 고지 문구를 노출합니다.
+- AdSense 재심사 동안 `ADSENSE_REVIEW_MODE=true`, `COUPANG_PARTNERS_ENABLED=false`, `BLOG_PUBLIC_INDEXING_ENABLED=false`를 유지합니다.
+- 승인 모드에서는 쿠팡 설정값과 관계없이 모든 제휴 노출이 차단되고, 블로그와 8개 라이프 허브가 sitemap에서 제외됩니다.
+- 승인 모드 sitemap은 핵심 계산기·정적 가이드·신뢰 페이지 46개로 고정됩니다.
+- `COUPANG_PARTNERS_ENABLED=true`는 승인 모드가 해제된 경우에만 쿠팡 파트너스 배너와 고지 문구를 노출합니다.
 - `agecalc-rss.timer`는 현재 production 기준 매일 `09:00`, `12:00`, `19:00` KST에 실행되며 실행당 초안 1개 생성을 시도합니다.
 - 앱 코드 변경 후 production 반영은 `ubuntu` 계정에서 `sudo systemctl restart agecalc.service`를 실행합니다.

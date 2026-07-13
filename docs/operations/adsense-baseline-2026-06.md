@@ -2,6 +2,27 @@
 
 기준일: 2026-06-19
 
+## 2026-07-13 재심사 승인 모드
+
+`가치가 별로 없는 콘텐츠` 거절 이후 재심사 기간에는 다음 운영 상태를 최우선 기준으로 사용한다.
+
+- `ADSENSE_REVIEW_MODE=true`
+- `COUPANG_PARTNERS_ENABLED=false`
+- `BLOG_PUBLIC_INDEXING_ENABLED=false`
+- sitemap 공개 URL 46개
+- 블로그 목록·상세 6개와 라이프 허브 8개는 접근 가능하지만 sitemap에서 제외한다.
+- 라이프 허브는 `noindex, follow`, 블로그는 `noindex, nofollow`를 사용한다.
+- 승인 모드 제외 페이지에는 AdSense account meta, 승인 스크립트, tracking client를 렌더링하지 않는다.
+- 공개 HTML과 CSP에는 쿠팡 도메인, `rel="sponsored"`, 제휴 고지 문구가 없어야 한다.
+- `retirement`, `health`, `generations` 하위 sitemap은 비어 있으므로 sitemap index에서도 제외한다.
+
+재심사 전 검증 결과는 다음을 만족해야 한다.
+
+```text
+전체 unittest 통과
+[adsense-preflight] PASS checked_pages=46 sitemap_urls=46 quality_failures=0 quality_warnings=0
+```
+
 ## 공개 색인 구조
 
 - `/sitemap.xml` URL 수: 50

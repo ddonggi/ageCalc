@@ -561,6 +561,7 @@ def indexable_pages_for_sitemap(
     group: str,
     *,
     blog_public_indexable: bool,
+    include_hubs: bool = True,
 ) -> tuple[dict[str, object], ...]:
     if group not in SITEMAP_GROUPS:
         return ()
@@ -595,7 +596,8 @@ def indexable_pages_for_sitemap(
     hub_pages = tuple(
         page
         for page in HUB_PAGE_REGISTRY
-        if page["indexable"]
+        if include_hubs
+        and page["indexable"]
         and page["release_batch"] in PUBLIC_RELEASE_BATCHES
         and page["hub"] == group
     )

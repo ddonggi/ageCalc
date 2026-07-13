@@ -75,6 +75,14 @@ class ContentQualityAuditTests(unittest.TestCase):
             {issue.code for issue in result.warnings},
         )
 
+    def test_trust_pages_are_exempt_from_thin_content_warning(self):
+        result = audit_html("/about", RICH_HTML, ymyl=False)
+
+        self.assertNotIn(
+            "thin_content_warning",
+            {issue.code for issue in result.warnings},
+        )
+
     def test_report_detects_duplicate_metadata_and_repeated_sentences(self):
         report = ContentQualityReport()
         report.add(audit_html("/one", RICH_HTML, ymyl=True))
@@ -120,6 +128,14 @@ class ContentQualityAuditTests(unittest.TestCase):
         }
 
         self.assertEqual({}, failing)
+
+    def test_review_mode_audit_covers_only_46_approval_pages(self):
+        report = audit_local_pages()
+
+        self.assertEqual(46, len(report.results))
+        self.assertEqual(0, report.error_count)
+        self.assertEqual(0, report.warning_count)
+        self.assertFalse(any(result.path.endswith("/") and result.path != "/" for result in report.results))
 
 
 if __name__ == "__main__":

@@ -7,6 +7,9 @@
 
     <title>{{ hub.title }} | AgeCalc 라이프 허브</title>
     <meta name="description" content="{{ hub.description }}" />
+    {% if adsense_review_mode %}
+    <meta name="robots" content="noindex,follow" />
+    {% endif %}
     <link rel="canonical" href="{{ hub.canonical }}" />
 
     <meta property="og:type" content="website" />

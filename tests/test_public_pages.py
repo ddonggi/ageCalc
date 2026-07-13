@@ -36,6 +36,89 @@ def _sitemap_leaf_locations(client) -> list[str]:
 
 
 class PublicPageTests(unittest.TestCase):
+    def test_adsense_review_mode_is_enabled_by_default(self):
+        self.assertTrue(getattr(app_module, "ADSENSE_REVIEW_MODE", False))
+
+    def test_adsense_review_mode_overrides_affiliate_and_blog_flags(self):
+        client = app.test_client()
+
+        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True), mock.patch.object(
+            app_module,
+            "BLOG_PUBLIC_INDEXING_ENABLED",
+            True,
+        ), mock.patch.object(app_module, "_published_blog_count", return_value=5):
+            home_response = client.get("/")
+            blog_response = client.get("/blog")
+
+        home_html = home_response.get_data(as_text=True)
+        blog_html = blog_response.get_data(as_text=True)
+        self.assertNotIn("link.coupang.com", home_html)
+        self.assertNotIn("ads-partners.coupang.com", home_html)
+        self.assertNotIn('rel="sponsored', home_html)
+        self.assertNotIn('href="/blog"', home_html)
+        self.assertEqual(blog_response.headers.get("X-Robots-Tag"), "noindex, nofollow")
+        self.assertIn('<meta name="robots" content="noindex,nofollow" />', blog_html)
+        self.assertNotIn("google-adsense-account", blog_html)
+        self.assertIn('"adsense_client": ""', blog_html)
+
+    def test_adsense_review_mode_keeps_hubs_accessible_but_not_indexable(self):
+        client = app.test_client()
+
+        for key in (
+            "age",
+            "family",
+            "education",
+            "anniversary",
+            "retirement",
+            "health",
+            "pets",
+            "generations",
+        ):
+            with self.subTest(key=key):
+                response = client.get(f"/{key}/")
+                html = response.get_data(as_text=True)
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.headers.get("X-Robots-Tag"), "noindex, follow")
+                self.assertIn('<meta name="robots" content="noindex,follow" />', html)
+                self.assertNotIn("google-adsense-account", html)
+                self.assertNotIn("pagead/js/adsbygoogle.js", html)
+                self.assertIn('"adsense_client": ""', html)
+
+        home_html = client.get("/").get_data(as_text=True)
+        for key in ("age", "family", "education", "anniversary"):
+            self.assertIn(f'href="/{key}/"', home_html)
+
+    def test_adsense_review_mode_exposes_only_46_sitemap_urls(self):
+        client = app.test_client()
+        root_xml = client.get("/sitemap.xml").get_data(as_text=True)
+        locations = _sitemap_leaf_locations(client)
+        joined_locations = "\n".join(locations)
+
+        self.assertEqual(46, len(locations))
+        self.assertEqual(46, len(set(locations)))
+        self.assertNotIn("/blog", joined_locations)
+        for key in (
+            "age",
+            "family",
+            "education",
+            "anniversary",
+            "retirement",
+            "health",
+            "pets",
+            "generations",
+        ):
+            self.assertNotIn(f"https://agecalc.cloud/{key}/", locations)
+
+        for empty_group in ("retirement", "health", "generations"):
+            self.assertNotIn(f"/sitemaps/{empty_group}.xml", root_xml)
+
+    def test_adsense_review_mode_removes_coupang_from_csp(self):
+        csp = app.test_client().get("/").headers.get("Content-Security-Policy", "")
+
+        self.assertNotIn("coupang.com", csp)
+        self.assertNotIn("coupangcdn.com", csp)
+
     def test_about_page_is_public(self):
         client = app.test_client()
         response = client.get("/about")
@@ -576,7 +659,7 @@ class PublicPageTests(unittest.TestCase):
         ]:
             self.assertNotIn(phrase, html)
 
-    def test_life_hub_pages_are_public(self):
+    def test_life_hub_pages_remain_accessible_but_noindex_during_review(self):
         client = app.test_client()
         expected_hubs = {
             "age": "나이 계산",
@@ -604,10 +687,11 @@ class PublicPageTests(unittest.TestCase):
                 self.assertIn("대표 도구", html)
                 self.assertIn("더 살펴보기", html)
                 self.assertIn("운영 기준", html)
-                self.assertIn("google-adsense-account", html)
-                self.assertNotIn("noindex", html)
+                self.assertNotIn("google-adsense-account", html)
+                self.assertIn('name="robots" content="noindex,follow"', html)
+                self.assertEqual(response.headers.get("X-Robots-Tag"), "noindex, follow")
 
-    def test_life_hubs_are_added_to_the_public_sitemap(self):
+    def test_life_hubs_are_excluded_from_review_mode_sitemap(self):
         locations = _sitemap_leaf_locations(app.test_client())
         for key in (
             "age",
@@ -619,8 +703,8 @@ class PublicPageTests(unittest.TestCase):
             "pets",
             "generations",
         ):
-            self.assertIn(f"https://agecalc.cloud/{key}/", locations)
-        self.assertEqual(56, len(locations))
+            self.assertNotIn(f"https://agecalc.cloud/{key}/", locations)
+        self.assertEqual(46, len(locations))
 
     def test_life_hubs_render_direct_answers_and_contextual_paths(self):
         client = app.test_client()
@@ -1139,17 +1223,17 @@ class PublicPageTests(unittest.TestCase):
                 self.assertIn("tracking-config", html)
                 self.assertNotIn("www.googletagmanager.com/gtag/js", html)
 
-    def test_public_sitemap_keeps_baseline_urls_and_adds_life_hubs(self):
+    def test_public_sitemap_keeps_only_review_mode_urls(self):
         client = app.test_client()
         locations = _sitemap_leaf_locations(client)
         joined_locations = "\n".join(locations)
 
-        self.assertEqual(56, len(locations))
+        self.assertEqual(46, len(locations))
         self.assertNotIn("/minigames", joined_locations)
         self.assertNotIn("/blog/drafts", joined_locations)
         self.assertNotIn("/blog/review", joined_locations)
-        self.assertIn("https://agecalc.cloud/blog", locations)
-        self.assertIn("https://agecalc.cloud/blog/2026-man-age-guide", locations)
+        self.assertNotIn("https://agecalc.cloud/blog", locations)
+        self.assertNotIn("https://agecalc.cloud/blog/2026-man-age-guide", locations)
 
     def test_static_guide_pages_are_public_with_adsense_code(self):
         client = app.test_client()
@@ -2282,7 +2366,9 @@ class PublicPageTests(unittest.TestCase):
             status="published",
         )
 
-        with mock.patch.object(app_module, "BLOG_PUBLIC_INDEXING_ENABLED", True), mock.patch.object(
+        with mock.patch.object(app_module, "ADSENSE_REVIEW_MODE", False), mock.patch.object(
+            app_module, "BLOG_PUBLIC_INDEXING_ENABLED", True
+        ), mock.patch.object(
             app_module, "_is_blog_public_indexable", return_value=True
         ), mock.patch.object(app_module, "SessionLocal", return_value=FakeSession([curated_post, legacy_post])):
             response = app.test_client().get("/sitemaps/guides.xml")
@@ -2634,7 +2720,9 @@ class PublicPageTests(unittest.TestCase):
     def test_home_page_renders_coupang_side_rails_when_enabled(self):
         client = app.test_client()
 
-        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+        with mock.patch.object(app_module, "ADSENSE_REVIEW_MODE", False), mock.patch.object(
+            app_module, "COUPANG_PARTNERS_ENABLED", True
+        ):
             response = client.get("/")
 
         self.assertEqual(response.status_code, 200)
@@ -2686,7 +2774,9 @@ class PublicPageTests(unittest.TestCase):
             "/parent-child",
         ]
 
-        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+        with mock.patch.object(app_module, "ADSENSE_REVIEW_MODE", False), mock.patch.object(
+            app_module, "COUPANG_PARTNERS_ENABLED", True
+        ):
             for path in calculator_paths:
                 with self.subTest(path=path):
                     response = client.get(path)
@@ -2702,7 +2792,9 @@ class PublicPageTests(unittest.TestCase):
     def test_age_page_renders_info_coupang_promotions_when_enabled(self):
         client = app.test_client()
 
-        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+        with mock.patch.object(app_module, "ADSENSE_REVIEW_MODE", False), mock.patch.object(
+            app_module, "COUPANG_PARTNERS_ENABLED", True
+        ):
             response = client.get("/age")
 
         self.assertEqual(response.status_code, 200)
@@ -2724,7 +2816,9 @@ class PublicPageTests(unittest.TestCase):
         client = app.test_client()
 
         for path in ["/annual-age-calculator", "/blog"]:
-            with self.subTest(path=path), mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+            with self.subTest(path=path), mock.patch.object(
+                app_module, "ADSENSE_REVIEW_MODE", False
+            ), mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
                 response = client.get(path)
 
             self.assertEqual(response.status_code, 200)
@@ -2763,7 +2857,9 @@ class PublicPageTests(unittest.TestCase):
             "/d-day": ("https://link.coupang.com/a/ffBvZNWzEi", "banners/1002561?trackingCode=AF6844979"),
         }
 
-        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+        with mock.patch.object(app_module, "ADSENSE_REVIEW_MODE", False), mock.patch.object(
+            app_module, "COUPANG_PARTNERS_ENABLED", True
+        ):
             for path, (href, banner_src) in expected_by_path.items():
                 with self.subTest(path=path):
                     response = client.get(path)
@@ -2808,7 +2904,9 @@ class PublicPageTests(unittest.TestCase):
     def test_coupang_ad_aside_does_not_precede_main_content_on_mobile_flow(self):
         client = app.test_client()
 
-        with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
+        with mock.patch.object(app_module, "ADSENSE_REVIEW_MODE", False), mock.patch.object(
+            app_module, "COUPANG_PARTNERS_ENABLED", True
+        ):
             response = client.get("/")
 
         self.assertEqual(response.status_code, 200)
@@ -3010,10 +3108,7 @@ class PublicPageTests(unittest.TestCase):
             "https://agecalc.cloud/sitemaps/family.xml",
             "https://agecalc.cloud/sitemaps/education.xml",
             "https://agecalc.cloud/sitemaps/anniversary.xml",
-            "https://agecalc.cloud/sitemaps/retirement.xml",
-            "https://agecalc.cloud/sitemaps/health.xml",
             "https://agecalc.cloud/sitemaps/pets.xml",
-            "https://agecalc.cloud/sitemaps/generations.xml",
             "https://agecalc.cloud/sitemaps/guides.xml",
         }
         self.assertEqual(expected_children, set(child_locations))
@@ -3029,8 +3124,8 @@ class PublicPageTests(unittest.TestCase):
                 self.assertEqual(xml.count("<loc>"), xml.count("<lastmod>"))
                 public_locations.extend(re.findall(r"<loc>(.*?)</loc>", xml))
 
-        self.assertEqual(56, len(public_locations))
-        self.assertEqual(56, len(set(public_locations)))
+        self.assertEqual(46, len(public_locations))
+        self.assertEqual(46, len(set(public_locations)))
         for forbidden in ("?", "#", "/minigames", "/blog/drafts", "/blog/review"):
             self.assertNotIn(forbidden, "\n".join(public_locations))
 
@@ -3044,8 +3139,8 @@ class PublicPageTests(unittest.TestCase):
                 self.assertIn(guide_url, body)
             else:
                 self.assertNotIn(guide_url, body)
-        self.assertIn("https://agecalc.cloud/blog", body)
-        self.assertIn("https://agecalc.cloud/blog/2026-man-age-guide", body)
+        self.assertNotIn("https://agecalc.cloud/blog", body)
+        self.assertNotIn("https://agecalc.cloud/blog/2026-man-age-guide", body)
 
     def test_dynamic_sitemap_excludes_blog_when_public_blog_is_not_indexable(self):
         client = app.test_client()
@@ -3134,7 +3229,8 @@ class PublicPageTests(unittest.TestCase):
 
     def test_content_security_policy_allows_coupang_affiliate_assets(self):
         client = app.test_client()
-        response = client.get("/dog")
+        with mock.patch.object(app_module, "ADSENSE_REVIEW_MODE", False):
+            response = client.get("/dog")
 
         self.assertEqual(response.status_code, 200)
         csp = response.headers.get("Content-Security-Policy", "")

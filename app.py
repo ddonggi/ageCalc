@@ -80,6 +80,12 @@ GOOGLE_SITE_VERIFICATION = os.getenv(
     "GOOGLE_SITE_VERIFICATION",
     "q0nvIaon9IVWNZZEQzTRCycYka7jIHuzYu-PwxxoKu8",
 ).strip()
+ADSENSE_REVIEW_MODE = (os.getenv("ADSENSE_REVIEW_MODE", "true") or "true").strip().lower() in {
+    "1",
+    "true",
+    "yes",
+    "on",
+}
 BLOG_INDEX_MIN_POSTS = int(os.getenv("BLOG_INDEX_MIN_POSTS", "3").strip() or "3")
 BLOG_PUBLIC_INDEXING_ENABLED = (os.getenv("BLOG_PUBLIC_INDEXING_ENABLED", "false") or "false").strip().lower() in {
     "1",
@@ -93,6 +99,7 @@ COUPANG_PARTNERS_ENABLED = (os.getenv("COUPANG_PARTNERS_ENABLED", "false") or "f
     "yes",
     "on",
 }
+ADSENSE_REVIEW_HUB_PATHS = frozenset(str(hub["path"]) for hub in HUB_PAGES)
 COUPANG_EVENT_PROMOTIONS_FILE = PROJECT_ROOT / "content" / "coupang_event_promotions.json"
 COUPANG_BABY_PROMOTIONS = [
     {
@@ -145,7 +152,11 @@ def inject_csp_nonce():
     except RuntimeError:
         pass
 
-    blog_public_count = _published_blog_count() if BLOG_PUBLIC_INDEXING_ENABLED else 0
+    blog_public_count = (
+        _published_blog_count()
+        if BLOG_PUBLIC_INDEXING_ENABLED and not ADSENSE_REVIEW_MODE
+        else 0
+    )
     blog_public_indexable = _is_blog_public_indexable(blog_public_count)
     current_page = find_page(request.endpoint, request.view_args)
     current_hub_key = (
@@ -197,10 +208,11 @@ def inject_csp_nonce():
             blog_public_indexable=blog_public_indexable,
         ),
         "adsense_client_id": ADSENSE_CLIENT_ID,
+        "adsense_review_mode": ADSENSE_REVIEW_MODE,
         "google_site_verification": GOOGLE_SITE_VERIFICATION,
         "blog_public_indexable": blog_public_indexable,
         "blog_public_count": blog_public_count,
-        "coupang_partners_enabled": COUPANG_PARTNERS_ENABLED,
+        "coupang_partners_enabled": _coupang_partners_is_enabled(),
         "coupang_active_baby_promotions": _active_coupang_baby_promotions(),
         "coupang_event_promotions": _active_coupang_event_promotions(),
         "life_hubs": HUB_PAGES,
@@ -228,6 +240,8 @@ def cleanup_session(exception=None):
 def add_security_headers(response):
     if request.path == "/minigames" or request.path.startswith("/minigames/"):
         response.headers["X-Robots-Tag"] = "noindex, nofollow"
+    elif ADSENSE_REVIEW_MODE and request.path in ADSENSE_REVIEW_HUB_PATHS:
+        response.headers["X-Robots-Tag"] = "noindex, follow"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
@@ -235,14 +249,21 @@ def add_security_headers(response):
     response.headers["X-XSS-Protection"] = "0"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     nonce = getattr(g, "csp_nonce", "")
+    coupang_image_sources = ""
+    coupang_frame_sources = ""
+    if not ADSENSE_REVIEW_MODE:
+        coupang_image_sources = " https://ads-partners.coupang.com https://*.coupangcdn.com"
+        coupang_frame_sources = " https://ads-partners.coupang.com"
     csp = (
         "default-src 'self'; "
-        "img-src 'self' data: https://c.clarity.ms https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ads-partners.coupang.com https://*.coupangcdn.com; "
+        "img-src 'self' data: https://c.clarity.ms https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net"
+        f"{coupang_image_sources}; "
         "font-src 'self' https://fonts.gstatic.com; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
         f"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com https://www.clarity.ms https://scripts.clarity.ms https://pagead2.googlesyndication.com https://ep2.adtrafficquality.google; "
         "connect-src 'self' https://www.google-analytics.com https://www.clarity.ms https://c.clarity.ms https://i.clarity.ms https://ep1.adtrafficquality.google https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net; "
-        "frame-src https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://ads-partners.coupang.com https://ep2.adtrafficquality.google https://www.google.com; "
+        "frame-src https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com"
+        f"{coupang_frame_sources} https://ep2.adtrafficquality.google https://www.google.com; "
         "frame-ancestors 'none'; "
         "base-uri 'self'; "
         "form-action 'self'"
@@ -363,7 +384,7 @@ def _published_blog_count() -> int:
 
 
 def _is_blog_public_indexable(published_count: int | None = None) -> bool:
-    if not BLOG_PUBLIC_INDEXING_ENABLED:
+    if ADSENSE_REVIEW_MODE or not BLOG_PUBLIC_INDEXING_ENABLED:
         return False
     count = _published_blog_count() if published_count is None else published_count
     return count >= BLOG_INDEX_MIN_POSTS
@@ -373,11 +394,17 @@ def _structured_blog_context(post) -> dict[str, object] | None:
     return structured_blog_article_for_slug(post.slug)
 
 
+def _coupang_partners_is_enabled() -> bool:
+    return COUPANG_PARTNERS_ENABLED and not ADSENSE_REVIEW_MODE
+
+
 def _adsense_is_enabled_for_path(path: str, *, blog_public_indexable: bool | None = None) -> bool:
     excluded_prefixes = ("/minigames", "/blog/drafts", "/blog/review")
     if any(path == prefix or path.startswith(f"{prefix}/") for prefix in excluded_prefixes):
         return False
     if path in NON_INDEXABLE_GUIDE_PATHS:
+        return False
+    if ADSENSE_REVIEW_MODE and path in ADSENSE_REVIEW_HUB_PATHS:
         return False
     if path == "/blog" or path.startswith("/blog/"):
         if blog_public_indexable is None:
@@ -995,11 +1022,20 @@ def _build_baby_month_snapshot(months: int) -> dict[str, object]:
 
 @app.get("/sitemap.xml")
 def sitemap():
+    sitemap_groups = tuple(
+        group
+        for group in SITEMAP_GROUPS
+        if indexable_pages_for_sitemap(
+            group,
+            blog_public_indexable=False if ADSENSE_REVIEW_MODE else _is_blog_public_indexable(),
+            include_hubs=not ADSENSE_REVIEW_MODE,
+        )
+    )
     entries = [
         _build_sitemap_index_entry(
             f"{SITE_BASE_URL}/sitemaps/{group}.xml",
         )
-        for group in SITEMAP_GROUPS
+        for group in sitemap_groups
     ]
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -1016,7 +1052,7 @@ def sitemap_group(group):
         abort(404)
 
     posts = []
-    if group == "guides" and BLOG_PUBLIC_INDEXING_ENABLED:
+    if group == "guides" and BLOG_PUBLIC_INDEXING_ENABLED and not ADSENSE_REVIEW_MODE:
         public_slugs = _public_blog_slugs()
         db_session = SessionLocal()
         try:
@@ -1040,6 +1076,7 @@ def sitemap_group(group):
         for page in indexable_pages_for_sitemap(
             group,
             blog_public_indexable=blog_public_indexable,
+            include_hubs=not ADSENSE_REVIEW_MODE,
         )
     ]
     if group == "guides" and blog_public_indexable:

@@ -22,6 +22,13 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 FORBIDDEN_SITEMAP_PREFIXES = ("/minigames", "/blog/drafts", "/blog/review")
+AFFILIATE_HTML_MARKERS = (
+    "link.coupang.com",
+    "ads-partners.coupang.com",
+    "coupangcdn.com",
+    'rel="sponsored',
+    "쿠팡 파트너스",
+)
 
 
 @dataclass
@@ -76,6 +83,55 @@ def _has_noindex(response, html: str) -> bool:
     return "noindex" in robots_header or 'name="robots" content="noindex' in html_lower
 
 
+def validate_review_mode_html(path: str, html: str, report: PreflightReport) -> None:
+    html_lower = html.lower()
+    present = [marker for marker in AFFILIATE_HTML_MARKERS if marker.lower() in html_lower]
+    if present:
+        report.add_issue(
+            "affiliate_material_present",
+            path,
+            f"승인 모드 공개 페이지에 제휴 요소가 있습니다: {', '.join(present)}",
+        )
+
+
+def validate_review_excluded_page(
+    path: str,
+    response,
+    html: str,
+    adsense_client_id: str,
+    report: PreflightReport,
+) -> None:
+    if response.status_code != 200:
+        report.add_issue(
+            "excluded_page_not_200",
+            path,
+            f"승인 모드 제외 페이지 응답이 {response.status_code}입니다.",
+        )
+        return
+    if not _has_noindex(response, html):
+        report.add_issue(
+            "excluded_page_indexable",
+            path,
+            "승인 모드 제외 페이지에 noindex가 없습니다.",
+        )
+
+    adsense_account = f'<meta name="google-adsense-account" content="{adsense_client_id}">'
+    adsense_script = f"pagead/js/adsbygoogle.js?client={adsense_client_id}"
+    if adsense_account in html or adsense_script in html:
+        report.add_issue(
+            "excluded_page_adsense_present",
+            path,
+            "승인 모드 제외 페이지에 AdSense 코드가 남아 있습니다.",
+        )
+    if not re.search(r'"adsense_client"\s*:\s*""', html):
+        report.add_issue(
+            "excluded_page_tracking_client_present",
+            path,
+            "승인 모드 제외 페이지의 tracking config에서 AdSense client가 비어 있지 않습니다.",
+        )
+    validate_review_mode_html(path, html, report)
+
+
 def _validate_public_page(path: str, response, html: str, adsense_client_id: str, report: PreflightReport) -> None:
     if response.status_code != 200:
         report.add_issue("page_not_200", path, f"공개 사이트맵 URL 응답이 {response.status_code}입니다.")
@@ -95,6 +151,7 @@ def _validate_public_page(path: str, response, html: str, adsense_client_id: str
         report.add_issue("description_missing", path, "공개 페이지의 meta description이 없거나 너무 짧습니다.")
     if not re.search(r"<h1[^>]*>.+?</h1>", html, re.S):
         report.add_issue("h1_missing", path, "공개 페이지에 h1이 없습니다.")
+    validate_review_mode_html(path, html, report)
 
 
 def _validate_robots_txt(robots_path: Path, site_base_url: str, report: PreflightReport) -> None:
@@ -126,7 +183,13 @@ def _validate_ads_txt(ads_path: Path, adsense_client_id: str, report: PreflightR
 
 
 def run_local_preflight() -> PreflightReport:
-    from app import ADSENSE_CLIENT_ID, SITE_BASE_URL, app
+    from app import (
+        ADSENSE_CLIENT_ID,
+        ADSENSE_REVIEW_HUB_PATHS,
+        ADSENSE_REVIEW_MODE,
+        SITE_BASE_URL,
+        app,
+    )
     from scripts.content_quality_audit import audit_local_pages
 
     report = PreflightReport()
@@ -198,13 +261,36 @@ def run_local_preflight() -> PreflightReport:
         _validate_public_page(path, response, html, ADSENSE_CLIENT_ID, report)
         report.checked_pages += 1
 
+    if ADSENSE_REVIEW_MODE:
+        for path in (*sorted(ADSENSE_REVIEW_HUB_PATHS), "/blog"):
+            response = client.get(path)
+            validate_review_excluded_page(
+                path,
+                response,
+                response.get_data(as_text=True),
+                ADSENSE_CLIENT_ID,
+                report,
+            )
+
     _validate_robots_txt(PROJECT_ROOT / "static" / "robots.txt", SITE_BASE_URL, report)
     _validate_ads_txt(PROJECT_ROOT / "static" / "ads.txt", ADSENSE_CLIENT_ID, report)
-    quality_report = audit_local_pages()
+    quality_report = audit_local_pages(paths=tuple(paths))
     report.content_quality_failures = sum(
         not result.passed for result in quality_report.results
     )
     report.content_quality_warnings = quality_report.warning_count
+    if report.content_quality_failures:
+        report.add_issue(
+            "content_quality_failure",
+            "/sitemap.xml",
+            f"승인 대상 페이지 {report.content_quality_failures}개가 콘텐츠 품질 오류 상태입니다.",
+        )
+    if report.content_quality_warnings:
+        report.add_issue(
+            "content_quality_warning",
+            "/sitemap.xml",
+            f"승인 대상 페이지에 콘텐츠 품질 경고 {report.content_quality_warnings}개가 남아 있습니다.",
+        )
     return report
 
 

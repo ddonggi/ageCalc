@@ -100,7 +100,7 @@ class PageRegistryTests(unittest.TestCase):
                 self.assertNotIn(page["endpoint"], grouped_endpoints)
                 self.assertIn(page["hub"], {hub["hub"] for hub in HUB_PAGE_REGISTRY})
 
-    def test_registry_driven_sitemap_preserves_the_fifty_url_baseline(self):
+    def test_registry_driven_sitemap_uses_review_mode_public_set(self):
         client = app.test_client()
         index_xml = client.get("/sitemap.xml").get_data(as_text=True)
         child_urls = re.findall(r"<loc>(.*?)</loc>", index_xml)
@@ -110,11 +110,11 @@ class PageRegistryTests(unittest.TestCase):
             child_xml = client.get(child_path).get_data(as_text=True)
             urls.extend(re.findall(r"<loc>(.*?)</loc>", child_xml))
 
-        self.assertEqual(54, len(urls))
-        self.assertEqual(54, len(set(urls)))
+        self.assertEqual(46, len(urls))
+        self.assertEqual(46, len(set(urls)))
         self.assertNotIn("https://agecalc.cloud/blog", urls)
         self.assertIn("https://agecalc.cloud/age", urls)
-        self.assertIn("https://agecalc.cloud/age/", urls)
+        self.assertNotIn("https://agecalc.cloud/age/", urls)
         self.assertIn(
             "https://agecalc.cloud/guides/age-calculation-2026",
             urls,

@@ -19,6 +19,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 MIN_BODY_TEXT_LENGTH = 1000
+THIN_CONTENT_EXEMPT_PATHS = frozenset({"/about", "/contact", "/privacy", "/terms"})
 
 
 class _TextExtractor(HTMLParser):
@@ -218,7 +219,7 @@ def audit_html(
         if 'class="editorial-disclaimer"' not in html:
             result.add("ymyl_disclaimer_missing", "error", "YMYL 면책문구가 없습니다.")
 
-    if len(body_text) < MIN_BODY_TEXT_LENGTH:
+    if path not in THIN_CONTENT_EXEMPT_PATHS and len(body_text) < MIN_BODY_TEXT_LENGTH:
         result.add(
             "thin_content_warning",
             "warning",
@@ -229,6 +230,7 @@ def audit_html(
 
 
 def _auditable_pages(*, paths: tuple[str, ...], hub: str | None):
+    from app import ADSENSE_REVIEW_MODE
     from content.page_registry import PUBLIC_PAGE_REGISTRY
 
     selected_paths = set(paths)
@@ -237,6 +239,7 @@ def _auditable_pages(*, paths: tuple[str, ...], hub: str | None):
         for page in PUBLIC_PAGE_REGISTRY
         if page["indexable"]
         and page["endpoint"] != "blog_list"
+        and (not ADSENSE_REVIEW_MODE or not str(page["key"]).startswith("hub:"))
         and (not selected_paths or page["path"] in selected_paths)
         and (hub is None or page["hub"] == hub)
     )
