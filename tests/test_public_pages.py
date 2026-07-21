@@ -1481,6 +1481,8 @@ class PublicPageTests(unittest.TestCase):
         self.assertIsNone(app_module._structured_blog_context(post))
 
     def test_blog_detail_route_passes_structured_article_context_for_curated_slug(self):
+        from content.blog.rendering import render_article_content_html
+
         class FakeQuery:
             def __init__(self, post):
                 self.post = post
@@ -1490,6 +1492,12 @@ class PublicPageTests(unittest.TestCase):
 
             def count(self):
                 return 1
+
+            def order_by(self, *args, **kwargs):
+                return self
+
+            def all(self):
+                return [self.post]
 
             def first(self):
                 return self.post
@@ -1501,14 +1509,15 @@ class PublicPageTests(unittest.TestCase):
             def query(self, model):
                 return FakeQuery(self.post)
 
+        article = app_module.structured_blog_article_for_slug("2026-man-age-guide")
         post = SimpleNamespace(
             id=1,
-            title="2026년 만나이 계산 기준 총정리 | 생일 전후·예외까지 정리",
-            slug="2026-man-age-guide",
-            excerpt="요약",
-            cover_image_url=None,
-            content_html="<p>레거시 본문</p>",
-            published_at=None,
+            title=article["title"],
+            slug=article["slug"],
+            excerpt=article["summary"],
+            cover_image_url=article["thumbnail"],
+            content_html=render_article_content_html(article),
+            published_at=datetime(2026, 7, 22, 12, 0),
             created_at=None,
             updated_at=None,
             status="published",
@@ -1539,7 +1548,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertEqual("2026-man-age-guide", payload["slug"])
         self.assertEqual("draft", payload["status"])
         self.assertIsNone(payload["published_at"])
-        self.assertEqual("/static/images/og-image.png", payload["cover_image_url"])
+        self.assertEqual("/static/images/blog/2026-man-age-guide.jpg", payload["cover_image_url"])
         self.assertIn("2026년 만나이 계산 기준 총정리", payload["title"])
         self.assertIn("<h2>2026년 만나이 계산은 이렇게 보면 됩니다</h2>", payload["content_html"])
 
@@ -2151,6 +2160,8 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("아직 게시된 글이 없습니다.", html)
 
     def test_blog_routes_follow_current_public_indexing_policy(self):
+        from content.blog.rendering import render_article_content_html
+
         class FakeQuery:
             def __init__(self, post):
                 self.post = post
@@ -2171,14 +2182,15 @@ class PublicPageTests(unittest.TestCase):
             def close(self):
                 pass
 
+        article = app_module.structured_blog_article_for_slug("2026-man-age-guide")
         post = SimpleNamespace(
             id=1,
-            title="승인 전 숨김 글",
-            slug="2026-man-age-guide",
-            excerpt="요약입니다.",
-            cover_image_url=None,
-            content_html="<h2>본문</h2><p>AgeCalc 계산기 안내입니다.</p>",
-            published_at=None,
+            title=article["title"],
+            slug=article["slug"],
+            excerpt=article["summary"],
+            cover_image_url=article["thumbnail"],
+            content_html=render_article_content_html(article),
+            published_at=datetime(2026, 7, 22, 12, 0),
             created_at=None,
             updated_at=None,
             status="published",
@@ -2287,7 +2299,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn('href="/blog/2026-man-age-guide"', html)
         self.assertNotIn('href="/blog/legacy-general-post"', html)
 
-    def test_blog_detail_keeps_legacy_published_post_accessible_but_noindex(self):
+    def test_blog_detail_returns_404_for_unregistered_published_post(self):
         class FakeQuery:
             def __init__(self, post):
                 self.post = post
@@ -2327,8 +2339,7 @@ class PublicPageTests(unittest.TestCase):
         ):
             response = app.test_client().get("/blog/legacy-general-post")
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers.get("X-Robots-Tag"), "noindex, nofollow")
+        self.assertEqual(response.status_code, 404)
 
     def test_guides_sitemap_excludes_legacy_published_blog_posts(self):
         from content.blog.rendering import render_article_content_html
@@ -2669,7 +2680,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertFalse(fake_session.committed)
         self.assertIn("대표 이미지가 없습니다", response.get_data(as_text=True))
 
-    def test_blog_detail_renders_legacy_published_post_as_noindex(self):
+    def test_blog_detail_returns_404_for_unregistered_review_post(self):
         class FakeQuery:
             def __init__(self, post):
                 self.post = post
@@ -2706,11 +2717,50 @@ class PublicPageTests(unittest.TestCase):
         ):
             response = app.test_client().get("/blog/review-post")
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers.get("X-Robots-Tag"), "noindex, nofollow")
-        html = response.get_data(as_text=True)
-        self.assertIn("일반 검토 글", html)
-        self.assertIn('<meta name="robots" content="noindex,nofollow" />', html)
+        self.assertEqual(response.status_code, 404)
+
+    def test_blog_detail_returns_404_when_registered_post_is_not_published(self):
+        from content.blog.rendering import render_article_content_html
+
+        class FakeQuery:
+            def __init__(self, post):
+                self.post = post
+
+            def filter(self, *args, **kwargs):
+                return self
+
+            def first(self):
+                return self.post
+
+        class FakeSession:
+            def __init__(self, post):
+                self.post = post
+
+            def query(self, model):
+                return FakeQuery(self.post)
+
+            def close(self):
+                pass
+
+        article = app_module.structured_blog_article_for_slug("2026-man-age-guide")
+        post = SimpleNamespace(
+            id=306,
+            title=article["title"],
+            slug=article["slug"],
+            excerpt=article["hero_summary"],
+            cover_image_url=article["thumbnail"],
+            content_html=render_article_content_html(article),
+            published_at=None,
+            created_at=datetime(2026, 7, 4, 12, 0),
+            updated_at=datetime(2026, 7, 4, 12, 0),
+            status="draft",
+            sources=[],
+        )
+
+        with mock.patch.object(app_module, "SessionLocal", return_value=FakeSession(post)):
+            response = app.test_client().get(f"/blog/{article['slug']}")
+
+        self.assertEqual(response.status_code, 404)
 
     def test_home_page_links_all_life_hubs(self):
         client = app.test_client()

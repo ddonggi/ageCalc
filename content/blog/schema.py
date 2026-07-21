@@ -7,7 +7,6 @@ from urllib.parse import urlparse
 
 
 SITE_ORIGIN = "https://agecalc.cloud"
-DEFAULT_THUMBNAIL = "/static/images/og-image.png"
 
 BLOG_CATEGORIES = {
     "age": "만나이·나이 제도",
@@ -104,7 +103,7 @@ def article_metadata(
         "effective_date": effective_date,
         "expires_at": expires_at,
         "source_urls": sources,
-        "thumbnail": DEFAULT_THUMBNAIL,
+        "thumbnail": f"/static/images/blog/{slug}.jpg",
         "thumbnail_alt": thumbnail_alt,
         "meta_title": meta_title,
         "meta_description": meta_description,

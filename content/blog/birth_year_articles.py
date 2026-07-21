@@ -25,8 +25,8 @@ BIRTH_YEAR_ARTICLES = {
             "나이와 띠를 함께 보되 음력 기준 혼동을 피하려는 사람",
         ],
         example_cards=[
-            {"label": "사례 1", "title": "10월 2일생의 생일 전", "description": "2026년 7월 21일에는 아직 생일 전이므로 만 25세입니다."},
-            {"label": "사례 2", "title": "3월 1일생의 생일 후", "description": "2026년 7월 21일에는 생일이 지났으므로 만 26세입니다."},
+            {"label": "사례 1", "title": "10월 2일생의 생일 전", "description": "2026년 7월 22일에는 아직 생일 전이므로 만 25세입니다."},
+            {"label": "사례 2", "title": "3월 1일생의 생일 후", "description": "2026년 7월 22일에는 생일이 지났으므로 만 26세입니다."},
             {"label": "사례 3", "title": "생일을 모를 때", "description": "2000년생이라는 정보만 있으면 만 25~26세 범위로 답하는 것이 정확합니다."},
         ],
         comparison_rows=[
@@ -85,11 +85,11 @@ BIRTH_YEAR_ARTICLES = {
             {"title": "2026년 만나이 계산 기준", "path": "/blog/2026-man-age-guide", "summary": "생일 전후 공식 계산법"},
             {"title": "만나이와 한국식 나이 차이", "path": "/blog/man-age-vs-korean-age", "summary": "나이 체계 비교"},
         ],
-        reviewed_at="2026-07-21",
+        reviewed_at="2026-07-22",
         effective_date="2026-01-01",
         expires_at="2027-01-31",
         sources=[
-            {"organization": "국가법령정보센터", "title": "민법 제158조 나이의 계산과 표시", "url": "https://www.law.go.kr/법령/민법", "checked_at": "2026-07-21"},
+            {"organization": "국가법령정보센터", "title": "민법 제158조 나이의 계산과 표시", "url": "https://www.law.go.kr/법령/민법/제158조", "checked_at": "2026-07-22"},
         ],
         meta_title="2000년생 나이 2026년 기준: 만나이·연나이·용띠 | AgeCalc",
         meta_description="2000년생의 2026년 생일 전후 만나이, 연나이 26세, 용띠 여부와 학교연도 해석 주의점을 정리합니다.",

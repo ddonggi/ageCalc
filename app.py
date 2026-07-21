@@ -2161,15 +2161,20 @@ def blog_detail(slug):
         .filter(GeneratedPost.slug == slug, GeneratedPost.status == "published")
         .first()
     )
-    if post is None:
-        abort(404)
     article = structured_blog_article_for_slug(slug)
-    blog_indexable = (
-        bool(article)
+    is_public_article = (
+        post is not None
+        and post.status == "published"
+        and bool(article)
         and _article_is_publicly_eligible(article)
         and audit_post(post, require_cover_image=True).keep
-        and _is_blog_public_indexable()
     )
+    if not is_public_article:
+        if hasattr(session, "close"):
+            session.close()
+        abort(404)
+
+    blog_indexable = _is_blog_public_indexable()
     eligible_related_slugs = (
         {eligible_post.slug for eligible_post in _published_eligible_blog_posts(session)}
         if blog_indexable

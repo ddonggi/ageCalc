@@ -66,7 +66,7 @@ HEALTH_ARTICLES = {
             {
                 "heading": "정책과 개인 자격이 바뀔 수 있어 90일 안에 재검수합니다",
                 "paragraphs": [
-                    "건강검진 안내는 고시와 사업 운영에 따라 변경될 수 있고 개인 자격도 수시로 달라질 수 있습니다. 이 글은 2026년 7월 21일 공식 경로를 확인했으며 만료일 이후에는 공단의 최신 조회 결과를 우선합니다.",
+                    "건강검진 안내는 고시와 사업 운영에 따라 변경될 수 있고 개인 자격도 수시로 달라질 수 있습니다. 이 글은 2026년 7월 22일 공식 경로를 확인했으며 만료일 이후에는 공단의 최신 조회 결과를 우선합니다.",
                     "이 페이지는 질병을 진단하거나 검진 대상자를 확정하지 않습니다. 증상, 가족력, 기존 질환 때문에 별도 검사가 필요한지는 의료진과 상의해야 합니다.",
                 ],
             },
@@ -85,12 +85,12 @@ HEALTH_ARTICLES = {
             {"title": "만 65세 혜택 확인 목록", "path": "/blog/age-65-benefits-2026", "summary": "연령별 제도 확인"},
             {"title": "국민연금 수령 나이", "path": "/blog/national-pension-receiving-age", "summary": "출생연도별 연금 시점"},
         ],
-        reviewed_at="2026-07-21",
-        effective_date="2026-07-21",
-        expires_at="2026-10-19",
+        reviewed_at="2026-07-22",
+        effective_date="2026-07-22",
+        expires_at="2026-10-20",
         sources=[
-            {"organization": "국민건강보험공단", "title": "건강검진 대상조회", "url": "https://www.nhis.or.kr/nhis/index.do", "checked_at": "2026-07-21"},
-            {"organization": "국민건강보험공단", "title": "건강검진 제도 안내", "url": "https://www.nhis.or.kr/", "checked_at": "2026-07-21"},
+            {"organization": "국민건강보험공단", "title": "건강검진 대상조회", "url": "https://www.nhis.or.kr/nhis/index.do", "checked_at": "2026-07-22"},
+            {"organization": "국민건강보험공단", "title": "2026년 건강검진 실시기준", "url": "https://www.nhis.or.kr/lm/lmxsrv/law/lawFullContent.do?SEQ=80&SEQ_HISTORY=595068", "checked_at": "2026-07-22"},
         ],
         meta_title="2026년 국가건강검진 대상자 확인과 공식 조회 방법 | AgeCalc",
         meta_description="2026년 국가건강검진 대상을 출생연도 홀짝만으로 단정하지 않고 가입자 유형과 국민건강보험공단 조회로 확인하는 방법을 안내합니다.",

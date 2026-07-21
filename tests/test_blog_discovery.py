@@ -139,7 +139,7 @@ class BlogDiscoveryTests(unittest.TestCase):
         self.assertIn("기준일", html)
         self.assertIn("재검수기한", html)
 
-    def test_public_detail_ignores_stale_db_metadata_in_favor_of_structured_source(self):
+    def test_public_detail_rejects_stale_db_snapshot(self):
         post = make_post("national-pension-receiving-age")
         post.title = "STALE DB TITLE"
         post.excerpt = "STALE DB EXCERPT"
@@ -149,12 +149,9 @@ class BlogDiscoveryTests(unittest.TestCase):
         ), mock.patch.object(app_module, "SessionLocal", return_value=FakeSession([post])), mock.patch.object(
             app_module, "_is_blog_public_indexable", return_value=True
         ):
-            html = app.test_client().get("/blog/national-pension-receiving-age").get_data(as_text=True)
+            response = app.test_client().get("/blog/national-pension-receiving-age")
 
-        self.assertNotIn("STALE DB TITLE", html)
-        self.assertNotIn("STALE DB EXCERPT", html)
-        self.assertNotIn("/static/generated/stale.png", html)
-        self.assertIn("국민연금 수령 나이", html)
+        self.assertEqual(404, response.status_code)
 
 
 if __name__ == "__main__":
