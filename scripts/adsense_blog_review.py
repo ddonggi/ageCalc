@@ -6,6 +6,7 @@ import json
 import os
 import re
 import sys
+from datetime import date
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Sequence
@@ -178,12 +179,33 @@ def audit_post(
     similar_title_count: int = 0,
     min_body_chars: int = MIN_BODY_CHARS,
     require_cover_image: bool = False,
+    article_registry: dict[str, dict[str, object]] | None = None,
+    today: date | None = None,
 ) -> BlogAuditResult:
-    content_html = getattr(post, "content_html", "") or ""
+    using_default_registry = article_registry is None
+    if article_registry is None:
+        from content.blog_articles import BLOG_ARTICLE_BLUEPRINTS
+
+        article_registry = BLOG_ARTICLE_BLUEPRINTS
+    today = today or date.today()
+    slug = getattr(post, "slug", "") or ""
+    structured_article = article_registry.get(slug)
+    if structured_article is not None:
+        from content.blog.rendering import render_article_content_html
+
+        canonical_content_html = render_article_content_html(structured_article)
+        content_html = canonical_content_html
+    else:
+        content_html = getattr(post, "content_html", "") or ""
     title = getattr(post, "title", "") or ""
     body_text = _strip_tags(content_html)
     sources = _sources(post)
-    source_text = _source_text(sources)
+    structured_sources = list(structured_article.get("source_urls", [])) if structured_article else []
+    structured_source_text = " ".join(
+        " ".join(str(source.get(field, "") or "") for field in ("organization", "title", "url", "checked_at"))
+        for source in structured_sources
+    )
+    source_text = " ".join((_source_text(sources), structured_source_text)).strip()
     issues: list[BlogAuditIssue] = []
     risk_score = 0
 
@@ -201,7 +223,7 @@ def audit_post(
     if _heading_count(content_html) < MIN_HEADINGS:
         add_issue("shallow_structure", "high", "소제목 구조가 부족합니다.", 2)
 
-    if not sources:
+    if not sources and not structured_sources:
         add_issue("missing_sources", "critical", "참고 자료가 없습니다.", 4)
 
     if require_cover_image and not (getattr(post, "cover_image_url", "") or "").strip():
@@ -219,10 +241,40 @@ def audit_post(
     if similar_title_count > 0:
         add_issue("similar_title_cluster", "high", "유사한 제목의 공개 글이 가까운 묶음으로 존재합니다.", 2)
 
+    if structured_article is not None:
+        from content.blog.schema import ContentContractError, validate_article_registry
+
+        if not using_default_registry:
+            try:
+                validate_article_registry(article_registry, today=today)
+            except ContentContractError as exc:
+                add_issue("invalid_content_contract", "critical", f"구조화 콘텐츠 계약 오류: {exc}", 5)
+        approved_snapshot = getattr(post, "content_html", "") or ""
+        metadata_matches = (
+            (getattr(post, "title", "") or "") == str(structured_article["title"])
+            and (getattr(post, "excerpt", "") or "") == str(structured_article["summary"])
+            and (getattr(post, "cover_image_url", "") or "") == str(structured_article["thumbnail"])
+        )
+        if approved_snapshot != canonical_content_html or not metadata_matches:
+            add_issue(
+                "content_snapshot_mismatch",
+                "critical",
+                "구조화 원본 또는 공개 메타데이터가 마지막 승인 스냅샷과 달라 재검수가 필요합니다.",
+                5,
+            )
+        try:
+            expires_at = date.fromisoformat(str(structured_article["expires_at"]))
+        except (KeyError, ValueError):
+            expires_at = today
+        if expires_at <= today:
+            add_issue("expired_structured_content", "critical", "구조화 글의 재검수 기한이 지났습니다.", 5)
+    elif require_cover_image or getattr(post, "status", "") == "published":
+        add_issue("unregistered_public_content", "critical", "구조화 콘텐츠에 등록되지 않은 공개 글입니다.", 5)
+
     keep = not any(issue.severity == "critical" for issue in issues) and risk_score < 4
     return BlogAuditResult(
         post_id=getattr(post, "id", None),
-        slug=getattr(post, "slug", "") or "",
+        slug=slug,
         title=title,
         keep=keep,
         issues=tuple(issues),

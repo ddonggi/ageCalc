@@ -5,22 +5,27 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-    <title>{% if review_mode %}[검토] {% elif draft_mode %}[초안] {% endif %}{{ post.title }} | AgeCalc 블로그</title>
-    <meta name="description" content="{{ post.excerpt or '' }}" />
+    <title>{% if review_mode %}[검토] {% elif draft_mode %}[초안] {% endif %}{{ structured_article.meta_title if structured_article else post.title }}{% if not structured_article %} | AgeCalc 블로그{% endif %}</title>
+    <meta name="description" content="{{ structured_article.meta_description if structured_article else (post.excerpt or '') }}" />
     {% if review_mode or draft_mode or blog_indexable is sameas false %}
     <meta name="robots" content="noindex,nofollow" />
     {% else %}
-    <link rel="canonical" href="https://agecalc.cloud/blog/{{ post.slug }}" />
+    <link rel="canonical" href="{{ structured_article.canonical_url if structured_article else 'https://agecalc.cloud/blog/' ~ post.slug }}" />
     {% endif %}
 
     <meta property="og:type" content="article" />
     <meta property="og:site_name" content="AgeCalc" />
-    <meta property="og:title" content="{{ post.title }}" />
-    <meta property="og:description" content="{{ post.excerpt or '' }}" />
+    <meta property="og:title" content="{{ structured_article.title if structured_article else post.title }}" />
+    <meta property="og:description" content="{{ structured_article.summary if structured_article else (post.excerpt or '') }}" />
     {% if not review_mode and not draft_mode %}
     <meta property="og:url" content="https://agecalc.cloud/blog/{{ post.slug }}" />
     {% endif %}
-    <meta property="og:image" content="{{ post.cover_image_url or url_for('static', filename='images/og-image.png', _external=True) }}" />
+    <meta property="og:image" content="{{ structured_image_url if structured_image_url is defined and structured_image_url else (structured_article.thumbnail if structured_article else (post.cover_image_url or url_for('static', filename='images/og-image.png', _external=True))) }}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{ structured_article.meta_title if structured_article else post.title }}" />
+    <meta name="twitter:description" content="{{ structured_article.meta_description if structured_article else (post.excerpt or '') }}" />
+    <meta name="twitter:image" content="{{ structured_image_url if structured_image_url is defined and structured_image_url else (structured_article.thumbnail if structured_article else (post.cover_image_url or url_for('static', filename='images/og-image.png', _external=True))) }}" />
+    {% if blog_indexable %}<link rel="alternate" type="application/rss+xml" title="AgeCalc 블로그 RSS" href="{{ url_for('public_rss') }}" />{% endif %}
 
     <link rel="icon" href="/favicon.ico">
     <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
@@ -34,10 +39,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=home-h1-20260710a" />
+    {% if review_mode or draft_mode %}
+    <meta name="referrer" content="no-referrer" />
+    <script nonce="{{ csp_nonce }}">window.history.replaceState({}, document.title, window.location.pathname);</script>
+    {% else %}
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
-    {% if structured_article and structured_article.faq_items %}
-    <script type="application/ld+json">
+    {% endif %}
+    {% if article_schema %}
+    <script type="application/ld+json" nonce="{{ csp_nonce }}">{{ article_schema | tojson }}</script>
+    {% endif %}
+    {% if blog_indexable and structured_article and structured_article.faq_items %}
+    <script type="application/ld+json" nonce="{{ csp_nonce }}">
         {
             "@context": "https://schema.org",
             "@type": "FAQPage",
@@ -56,6 +69,8 @@
         }
     </script>
     {% endif %}
+    {% set adsense_enabled = adsense_enabled and (blog_indexable | default(false)) %}
+    {% set coupang_partners_enabled = coupang_partners_enabled and (blog_indexable | default(false)) and not draft_mode and not review_mode %}
     {% include 'partials/adsense.html' %}
 </head>
 
@@ -70,24 +85,6 @@
         {% else %}
         <a class="back-link" href="{{ url_for('blog_list') }}">글 목록으로 돌아가기</a>
         {% endif %}
-        {% if breadcrumbs %}
-        <nav class="breadcrumbs" aria-label="현재 위치">
-            <ol>
-                {% for crumb in breadcrumbs %}
-                <li>
-                    {% if crumb.current %}
-                    <span aria-current="page">{{ crumb.label }}</span>
-                    {% else %}
-                    <a href="{{ crumb.url }}">{{ crumb.label }}</a>
-                    {% endif %}
-                </li>
-                {% endfor %}
-            </ol>
-        </nav>
-        {% endif %}
-        {% if breadcrumb_schema %}
-        <script type="application/ld+json" nonce="{{ csp_nonce }}">{{ breadcrumb_schema | tojson }}</script>
-        {% endif %}
         <article class="blog-article">
             <header class="article-header">
                 <p class="eyebrow">{{ article.eyebrow if article else '해설 글' }}</p>
@@ -99,6 +96,7 @@
                 {% endif %}
                 {% if draft_mode and post.status == "draft" %}
                 <form method="post" action="{{ url_for('blog_draft_publish', slug=post.slug) }}" style="margin: 0 0 16px;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="page-btn">이 글 공개하기</button>
                 </form>
                 {% if draft_publish_errors %}
@@ -113,7 +111,9 @@
                 {% endif %}
                 {% endif %}
                 {% if review_mode %}
-                <form method="post" action="{{ url_for('blog_review_approve', post_id=post.id, token=review_token) }}" style="margin: 0 0 16px;">
+                <form method="post" action="{{ url_for('blog_review_approve', post_id=post.id) }}" style="margin: 0 0 16px;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="review_token" value="{{ review_token }}">
                     <button type="submit" class="page-btn">이 글 승인 후 공개</button>
                 </form>
                 {% if review_errors %}
@@ -134,23 +134,31 @@
                     {{ post.created_at | blog_datetime('%Y-%m-%d %H:%M') }}
                     {% endif %}
                 </p>
+                <aside class="editorial-meta">
                 <div class="notice" style="margin-top: 16px;">
-                    <p><strong>작성</strong>: {{ author_name }}</p>
+                    <p><strong>작성</strong>: {{ article.author if article else author_name }}</p>
+                    {% if article %}
+                    <p><strong>카테고리</strong>: <a href="{{ url_for('blog_category', category_slug=article.category) }}">{{ article.category_label }}</a></p>
+                    <p><strong>기준일</strong>: {{ article.effective_date }}</p>
+                    <p><strong>검수일</strong>: {{ article.reviewed_at }} · {{ article.review_owner }}</p>
+                    <p><strong>재검수 기한</strong>: {{ article.expires_at }}</p>
+                    {% endif %}
                     {% if post.updated_at %}
                     <p><strong>최종 수정</strong>: {{ post.updated_at | blog_datetime('%Y-%m-%d %H:%M') }}</p>
                     {% endif %}
                     <p><strong>편집 기준</strong>: <a href="{{ editorial_policy_url }}">운영 원칙 보기</a></p>
                     <p><strong>문의 및 수정 요청</strong>: <a href="{{ url_for('contact') }}">문의 안내 페이지</a></p>
                 </div>
-                {% if post.excerpt %}
+                </aside>
+                {% if post.excerpt and not article %}
                 <p class="page-intro article-intro">{{ post.excerpt }}</p>
                 {% endif %}
                 {% if article and article.hero_summary %}
                 <p class="page-intro article-intro">{{ article.hero_summary }}</p>
                 {% endif %}
             </header>
-            {% if post.cover_image_url %}
-            <img class="blog-hero" src="{{ post.cover_image_url }}" alt="{{ post.title }}">
+            {% if (article and article.thumbnail) or post.cover_image_url %}
+            <img class="blog-hero" src="{{ article.thumbnail if article else post.cover_image_url }}" alt="{{ article.thumbnail_alt if article else post.title }}">
             {% endif %}
             {% if article %}
             <section class="section-shell direct-answer" aria-label="{{ article.direct_answer_title }}">
@@ -228,6 +236,13 @@
                     </table>
                 </div>
             </section>
+
+            {% for content_section in article.content_sections or [] %}
+            <section class="section-shell">
+                <div class="section-heading"><h2>{{ content_section.heading }}</h2></div>
+                {% for paragraph in content_section.paragraphs %}<p>{{ paragraph }}</p>{% endfor %}
+            </section>
+            {% endfor %}
             {% else %}
             <div class="blog-content">{{ post.content_html | safe }}</div>
             {% endif %}
@@ -249,6 +264,20 @@
                     </li>
                     {% endfor %}
                 </ul>
+            </section>
+            {% endif %}
+            {% if article and article.source_urls %}
+            <section class="notice">
+                <h2>공식 출처</h2>
+                <ul>
+                    {% for source in article.source_urls %}
+                    <li data-official-source="true">
+                        <a href="{{ source.url }}" target="_blank" rel="noopener noreferrer">{{ source.organization }} — {{ source.title }}</a>
+                        <span> · 확인일 {{ source.checked_at }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% if article.disclaimer %}<p class="editorial-disclaimer"><strong>안내:</strong> {{ article.disclaimer }}</p>{% endif %}
             </section>
             {% endif %}
             {% if article %}
@@ -273,15 +302,20 @@
                     <p class="eyebrow">다음 읽기</p>
                     <h2>다음에 읽을 글</h2>
                 </div>
+                <nav class="related-paths">
                 <div class="section-card-grid">
                     {% for related in article.related_articles %}
+                    {% set related_slug = related.path | replace('/blog/', '') %}
+                    {% if eligible_related_slugs is not defined or related_slug in eligible_related_slugs %}
                     <article class="section-card">
                         <p class="eyebrow">해설</p>
                         <h3><a href="{{ related.path }}">{{ related.title }}</a></h3>
                         <p>{{ related.summary }}</p>
                     </article>
+                    {% endif %}
                     {% endfor %}
                 </div>
+                </nav>
             </section>
 
             <section class="section-shell faq">

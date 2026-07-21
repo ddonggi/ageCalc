@@ -36,6 +36,13 @@ def _sitemap_leaf_locations(client) -> list[str]:
 
 
 class PublicPageTests(unittest.TestCase):
+    def test_unknown_adsense_review_mode_value_fails_closed(self):
+        with self.assertWarns(RuntimeWarning):
+            parsed = app_module._parse_adsense_review_mode("typo")
+
+        self.assertTrue(parsed)
+        self.assertFalse(app_module._parse_adsense_review_mode("off"))
+
     def test_adsense_review_mode_is_enabled_by_default(self):
         self.assertTrue(getattr(app_module, "ADSENSE_REVIEW_MODE", False))
 
@@ -274,15 +281,12 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("100일째 날짜", html)
         self.assertIn("오늘 기준 상태", html)
 
-    def test_hundred_day_calculator_highlights_selected_date(self):
+    def test_hundred_day_calculator_redirects_legacy_date_query(self):
         client = app.test_client()
         response = client.get("/100-day-calculator?year=2026&month=1&day=1")
 
-        self.assertEqual(response.status_code, 200)
-        html = response.get_data(as_text=True)
-        self.assertIn("2026.01.01", html)
-        self.assertIn("2026.04.10", html)
-        self.assertIn("선택한 시작일", html)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/100-day-calculator")
 
     def test_baby_months_table_page_is_public(self):
         client = app.test_client()
@@ -317,7 +321,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("아기 월령", html)
         self.assertIn("개월수와 월령은 같은 뜻인가요?", html)
         self.assertIn('id="baby-birth-input"', html)
-        self.assertIn('maxlength="6"', html)
+        self.assertIn('maxlength="8"', html)
         self.assertNotIn('id="baby-year"', html)
         self.assertNotIn('id="baby-month"', html)
         self.assertNotIn('id="baby-day"', html)
@@ -344,30 +348,22 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("올해 연나이", html)
         self.assertIn("만나이와의 차이", html)
 
-    def test_annual_age_calculator_highlights_selected_date(self):
+    def test_annual_age_calculator_highlights_selected_birth_year(self):
         client = app.test_client()
-        response = client.get("/annual-age-calculator?year=1992&month=10&day=2")
+        response = client.get("/annual-age-calculator?birth_year=1992")
 
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
-        self.assertIn("선택한 생년월일", html)
-        self.assertIn("1992.10.02", html)
+        self.assertIn("선택한 출생연도", html)
+        self.assertIn("1992년생", html)
         self.assertIn("34세", html)
 
-    def test_annual_age_calculator_accepts_six_digit_birth_date(self):
+    def test_annual_age_calculator_redirects_legacy_birth_date_query(self):
         client = app.test_client()
         response = client.get("/annual-age-calculator?birth_date=921002")
 
-        self.assertEqual(response.status_code, 200)
-        html = response.get_data(as_text=True)
-        self.assertIn('name="birth_date"', html)
-        self.assertIn('maxlength="6"', html)
-        self.assertNotIn('name="year"', html)
-        self.assertNotIn('name="month"', html)
-        self.assertNotIn('name="day"', html)
-        self.assertIn("선택한 생년월일", html)
-        self.assertIn("1992.10.02", html)
-        self.assertIn("34세", html)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/annual-age-calculator")
 
     def test_age_comparison_table_page_is_public(self):
         client = app.test_client()
@@ -1541,11 +1537,13 @@ class PublicPageTests(unittest.TestCase):
         payload = build_seed_post_payload("2026-man-age-guide")
 
         self.assertEqual("2026-man-age-guide", payload["slug"])
-        self.assertEqual("published", payload["status"])
+        self.assertEqual("draft", payload["status"])
+        self.assertIsNone(payload["published_at"])
+        self.assertEqual("/static/images/og-image.png", payload["cover_image_url"])
         self.assertIn("2026년 만나이 계산 기준 총정리", payload["title"])
-        self.assertIn("<h2>만나이는 무엇을 기준으로 계산하나</h2>", payload["content_html"])
+        self.assertIn("<h2>2026년 만나이 계산은 이렇게 보면 됩니다</h2>", payload["content_html"])
 
-    def test_seed_public_blog_posts_upsert_preserves_existing_published_at(self):
+    def test_seed_public_blog_posts_quarantines_unaudited_legacy_public_content(self):
         from scripts import seed_public_blog_posts
 
         engine = create_engine("sqlite:///:memory:", future=True)
@@ -1571,15 +1569,17 @@ class PublicPageTests(unittest.TestCase):
         with mock.patch.object(seed_public_blog_posts, "SessionLocal", Session):
             post = seed_public_blog_posts.upsert_seed_post("2026-man-age-guide")
 
-        self.assertEqual(published_at, post.published_at)
+        self.assertIsNone(post.published_at)
 
         verify_session = Session()
         stored = verify_session.query(GeneratedPost).filter(GeneratedPost.slug == "2026-man-age-guide").first()
         verify_session.close()
 
         self.assertIsNotNone(stored)
-        self.assertEqual(published_at, stored.published_at)
+        self.assertIsNone(stored.published_at)
+        self.assertEqual("draft", stored.status)
         self.assertIn("2026년 만나이 계산 기준 총정리", stored.title)
+        self.assertIn("<h2>2026년 만나이 계산은 이렇게 보면 됩니다</h2>", stored.content_html)
 
     def test_seed_public_blog_posts_main_seeds_curated_slugs(self):
         from scripts import seed_public_blog_posts
@@ -1587,17 +1587,10 @@ class PublicPageTests(unittest.TestCase):
         with mock.patch.object(seed_public_blog_posts, "upsert_seed_post") as upsert_seed_post:
             seeded = seed_public_blog_posts.main()
 
-        self.assertEqual(
-            [
-                "2026-man-age-guide",
-                "birth-year-age-interpretation",
-                "early-birth-school-grade-guide",
-                "baby-months-calculation-guide",
-                "parent-child-age-gap-guide",
-            ],
-            seeded,
-        )
-        self.assertEqual(5, upsert_seed_post.call_count)
+        from content.blog_articles import BLOG_ARTICLE_BLUEPRINTS
+
+        self.assertEqual(list(BLOG_ARTICLE_BLUEPRINTS), seeded)
+        self.assertEqual(len(BLOG_ARTICLE_BLUEPRINTS), upsert_seed_post.call_count)
 
     def test_blog_detail_renders_structured_related_tools_and_related_articles(self):
         from content.blog_articles import structured_blog_article_for_slug
@@ -1623,6 +1616,10 @@ class PublicPageTests(unittest.TestCase):
                 review_mode=False,
                 blog_indexable=True,
                 structured_article=structured_blog_article_for_slug("2026-man-age-guide"),
+                eligible_related_slugs={
+                    "birth-year-age-interpretation",
+                    "early-birth-school-grade-guide",
+                },
                 author_name="AgeCalc 편집팀",
                 editorial_policy_url="/about",
                 coupang_partners_enabled=False,
@@ -1691,6 +1688,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn('href="/blog/2026-man-age-guide"', html)
 
     def test_blog_list_shows_all_curated_public_slugs(self):
+        from content.blog.rendering import render_article_content_html
         class FakeQuery:
             def __init__(self, posts):
                 self.posts = posts
@@ -1714,30 +1712,31 @@ class PublicPageTests(unittest.TestCase):
             def close(self):
                 pass
 
-        posts = [
-            SimpleNamespace(
+        posts = []
+        for index, slug in enumerate(
+            [
+                "2026-man-age-guide",
+                "birth-year-age-interpretation",
+                "early-birth-school-grade-guide",
+                "baby-months-calculation-guide",
+                "parent-child-age-gap-guide",
+            ],
+            start=1,
+        ):
+            article = app_module.BLOG_ARTICLE_BLUEPRINTS[slug]
+            posts.append(SimpleNamespace(
                 id=index,
                 slug=slug,
-                title=slug,
-                excerpt="요약",
-                cover_image_url=None,
+                title=article["title"],
+                excerpt=article["summary"],
+                cover_image_url=article["thumbnail"],
+                content_html=render_article_content_html(article),
                 published_at=datetime(2026, 6, 26, 12, 0),
                 created_at=datetime(2026, 6, 26, 12, 0),
                 updated_at=datetime(2026, 6, 26, 12, 0),
                 status="published",
                 sources=[],
-            )
-            for index, slug in enumerate(
-                [
-                    "2026-man-age-guide",
-                    "birth-year-age-interpretation",
-                    "early-birth-school-grade-guide",
-                    "baby-months-calculation-guide",
-                    "parent-child-age-gap-guide",
-                ],
-                start=1,
-            )
-        ]
+            ))
 
         with mock.patch.object(app_module, "SessionLocal", return_value=FakeSession(posts)), mock.patch.object(
             app_module, "_is_blog_public_indexable", return_value=True
@@ -1770,6 +1769,7 @@ class PublicPageTests(unittest.TestCase):
                 post=post,
                 draft_mode=False,
                 review_mode=False,
+                blog_indexable=True,
                 coupang_partners_enabled=True,
                 author_name="AgeCalc 편집팀",
                 editorial_policy_url="/about",
@@ -2217,6 +2217,7 @@ class PublicPageTests(unittest.TestCase):
             self.assertNotIn("google-adsense-account", detail_html)
 
     def test_blog_list_hides_legacy_published_posts_from_public_index(self):
+        from content.blog.rendering import render_article_content_html
         class FakeQuery:
             def __init__(self, posts):
                 self.posts = posts
@@ -2249,12 +2250,14 @@ class PublicPageTests(unittest.TestCase):
             def close(self):
                 pass
 
+        curated_article = app_module.BLOG_ARTICLE_BLUEPRINTS["2026-man-age-guide"]
         curated_post = SimpleNamespace(
             id=1,
             slug="2026-man-age-guide",
-            title="2026년 만나이 계산 기준 총정리 | 생일 전후·예외까지 정리",
-            excerpt="요약",
-            cover_image_url=None,
+            title=curated_article["title"],
+            excerpt=curated_article["summary"],
+            cover_image_url=curated_article["thumbnail"],
+            content_html=render_article_content_html(curated_article),
             published_at=datetime(2026, 6, 26, 12, 0),
             created_at=datetime(2026, 6, 26, 12, 0),
             updated_at=datetime(2026, 6, 26, 12, 0),
@@ -2328,6 +2331,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertEqual(response.headers.get("X-Robots-Tag"), "noindex, nofollow")
 
     def test_guides_sitemap_excludes_legacy_published_blog_posts(self):
+        from content.blog.rendering import render_article_content_html
         class FakeQuery:
             def __init__(self, posts):
                 self.posts = posts
@@ -2351,15 +2355,26 @@ class PublicPageTests(unittest.TestCase):
             def close(self):
                 pass
 
+        curated_article = app_module.BLOG_ARTICLE_BLUEPRINTS["2026-man-age-guide"]
         curated_post = SimpleNamespace(
+            id=1,
             slug="2026-man-age-guide",
+            title=curated_article["title"],
+            excerpt=curated_article["summary"],
+            cover_image_url=curated_article["thumbnail"],
+            content_html=render_article_content_html(curated_article),
             published_at=datetime(2026, 6, 26, 12, 0),
             created_at=datetime(2026, 6, 26, 12, 0),
             updated_at=datetime(2026, 6, 26, 12, 0),
             status="published",
         )
         legacy_post = SimpleNamespace(
+            id=2,
             slug="legacy-general-post",
+            title="legacy",
+            excerpt="legacy",
+            cover_image_url=None,
+            content_html="<p>legacy</p>",
             published_at=datetime(2026, 6, 20, 12, 0),
             created_at=datetime(2026, 6, 20, 12, 0),
             updated_at=datetime(2026, 6, 20, 12, 0),
@@ -2424,14 +2439,20 @@ class PublicPageTests(unittest.TestCase):
         with mock.patch.object(app_module, "_review_token_is_valid", return_value=True), mock.patch.object(
             app_module, "SessionLocal", return_value=fake_session
         ), mock.patch.object(app_module, "_published_blog_count", return_value=0):
-            response = app.test_client().post("/blog/review/1/approve?token=test")
+            client = app.test_client()
+            with client.session_transaction() as flask_session:
+                flask_session[app_module.BLOG_CSRF_SESSION_KEY] = "csrf-test"
+            response = client.post(
+                "/blog/review/1/approve",
+                data={"review_token": "test", "csrf_token": "csrf-test"},
+            )
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual("needs_review", post.status)
         self.assertFalse(fake_session.committed)
         self.assertIn("공개할 수 없습니다", response.get_data(as_text=True))
 
-    def test_blog_review_approval_accepts_get_links_from_email(self):
+    def test_blog_review_approval_get_link_is_read_only(self):
         class FakeQuery:
             def __init__(self, post):
                 self.post = post
@@ -2488,11 +2509,10 @@ class PublicPageTests(unittest.TestCase):
         ), mock.patch.object(app_module, "_published_blog_count", return_value=0):
             response = app.test_client().get("/blog/review/305/approve?token=test")
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual("published", post.status)
-        self.assertIsNotNone(post.published_at)
-        self.assertTrue(fake_session.committed)
-        self.assertIn("/blog/review-post", response.headers["Location"])
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual("needs_review", post.status)
+        self.assertIsNone(post.published_at)
+        self.assertFalse(fake_session.committed)
 
     def test_blog_draft_detail_renders_publish_button_for_draft(self):
         post = SimpleNamespace(
@@ -2523,6 +2543,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("/blog/drafts/draft-post/publish", html)
 
     def test_blog_draft_publish_marks_audited_draft_as_published(self):
+        from content.blog.rendering import render_article_content_html
         class FakeQuery:
             def __init__(self, post):
                 self.post = post
@@ -2544,49 +2565,40 @@ class PublicPageTests(unittest.TestCase):
             def commit(self):
                 self.committed = True
 
-        content_html = (
-            "<h2>핵심 요약</h2><p>AgeCalc 계산기와 생활 기준을 함께 살펴보는 설명형 글입니다.</p>"
-            "<h2>배경과 맥락</h2><p>한국 독자가 이해하기 쉽도록 원문 내용을 다시 구성했습니다.</p>"
-            "<h2>한국 독자가 확인할 점</h2><p>생활 일정과 가족 기록에 맞춰 읽을 수 있습니다.</p>"
-            "<h2>AgeCalc 활용 포인트</h2>"
-            '<p><a href="/age">만 나이 계산기</a>로 날짜 기준을 먼저 확인하세요.</p>'
-            "<h2>주의할 점과 한계</h2><p>개별 상황에 따라 해석이 달라질 수 있으므로 참고용으로 활용해야 합니다.</p>"
-            "<h2>참고 링크</h2><p><a href=\"https://example.com/story\">원문 보기</a></p>"
-        ) * 24
+        article = app_module.BLOG_ARTICLE_BLUEPRINTS["2026-man-age-guide"]
+        content_html = render_article_content_html(article)
         post = SimpleNamespace(
             id=1,
-            title="초안 글",
-            slug="draft-post",
-            excerpt="요약",
-            cover_image_url="/static/generated/draft-post-cover.png",
+            title=article["title"],
+            slug="2026-man-age-guide",
+            excerpt=article["summary"],
+            cover_image_url=article["thumbnail"],
             content_html=content_html,
             published_at=None,
             created_at=None,
             updated_at=None,
             status="draft",
-            sources=[
-                SimpleNamespace(
-                    source_name="Example",
-                    source_url="https://example.com/story",
-                    attribution_text=None,
-                )
-            ],
+            sources=[],
         )
         fake_session = FakeSession(post)
         client = app.test_client()
         with client.session_transaction() as flask_session:
             flask_session[app_module.BLOG_DRAFT_ACCESS_SESSION_KEY] = True
+            flask_session[app_module.BLOG_CSRF_SESSION_KEY] = "csrf-test"
 
         with mock.patch.object(app_module, "SessionLocal", return_value=fake_session), mock.patch.object(
             app_module, "_published_blog_count", return_value=0
         ):
-            response = client.post("/blog/drafts/draft-post/publish")
+            response = client.post(
+                "/blog/drafts/2026-man-age-guide/publish",
+                data={"csrf_token": "csrf-test"},
+            )
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual("published", post.status)
         self.assertIsNotNone(post.published_at)
         self.assertTrue(fake_session.committed)
-        self.assertIn("/blog/draft-post", response.headers["Location"])
+        self.assertIn("/blog/2026-man-age-guide", response.headers["Location"])
 
     def test_blog_draft_publish_blocks_missing_cover_image(self):
         class FakeQuery:
@@ -2642,11 +2654,15 @@ class PublicPageTests(unittest.TestCase):
         client = app.test_client()
         with client.session_transaction() as flask_session:
             flask_session[app_module.BLOG_DRAFT_ACCESS_SESSION_KEY] = True
+            flask_session[app_module.BLOG_CSRF_SESSION_KEY] = "csrf-test"
 
         with mock.patch.object(app_module, "SessionLocal", return_value=fake_session), mock.patch.object(
             app_module, "_published_blog_count", return_value=0
         ):
-            response = client.post("/blog/drafts/draft-post/publish")
+            response = client.post(
+                "/blog/drafts/draft-post/publish",
+                data={"csrf_token": "csrf-test"},
+            )
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual("draft", post.status)
@@ -2815,7 +2831,7 @@ class PublicPageTests(unittest.TestCase):
     def test_other_pages_render_event_promotions_after_hero_band(self):
         client = app.test_client()
 
-        for path in ["/annual-age-calculator", "/blog"]:
+        for path in ["/annual-age-calculator"]:
             with self.subTest(path=path), mock.patch.object(
                 app_module, "ADSENSE_REVIEW_MODE", False
             ), mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
@@ -3166,6 +3182,27 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn(".mega-menu-panel {", css)
         self.assertIn("z-index: 90;", css)
 
+    def test_desktop_navigation_does_not_expand_document_width(self):
+        css = Path("static/css/style.css").read_text(encoding="utf-8")
+
+        self.assertRegex(
+            css,
+            r"\.life-hub-mega-panel\s*\{[^}]*left:\s*auto;[^}]*right:\s*0;[^}]*transform:\s*translateY\(8px\);",
+        )
+        self.assertRegex(
+            css,
+            r"\.mega-nav-item:hover\s+\.life-hub-mega-panel,[^{]*\{[^}]*transform:\s*translateY\(0\);",
+        )
+        self.assertRegex(
+            css,
+            r"\.breadcrumbs\s*\{[^}]*width:\s*min\(100%,\s*1280px\);",
+        )
+        self.assertRegex(
+            css,
+            r"\.site-header,\s*\.home-page\s+\.site-header\s*\{[^}]*"
+            r"width:\s*100%;[^}]*margin-left:\s*0;[^}]*margin-right:\s*0;",
+        )
+
     def test_home_hub_typography_has_explicit_scale_rules(self):
         css = Path("static/css/style.css").read_text(encoding="utf-8")
 
@@ -3225,7 +3262,8 @@ class PublicPageTests(unittest.TestCase):
         conf = Path("nginx/agecalc.conf").read_text(encoding="utf-8")
 
         self.assertIn("server_name www.agecalc.cloud;", conf)
-        self.assertIn("return 301 https://agecalc.cloud$request_uri;", conf)
+        self.assertIn("return 301 https://agecalc.cloud$uri;", conf)
+        self.assertIn("limit_req zone=agecalc_blog_login", conf)
 
     def test_content_security_policy_allows_coupang_affiliate_assets(self):
         client = app.test_client()

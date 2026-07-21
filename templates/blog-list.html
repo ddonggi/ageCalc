@@ -10,7 +10,8 @@
     {% if not blog_indexable %}
     <meta name="robots" content="noindex,nofollow" />
     {% endif %}
-    <link rel="canonical" href="https://agecalc.cloud/blog" />
+    <link rel="canonical" href="{{ canonical_url or 'https://agecalc.cloud/blog' }}" />
+    {% if blog_indexable %}<link rel="alternate" type="application/rss+xml" title="AgeCalc 블로그 RSS" href="{{ url_for('public_rss') }}" />{% endif %}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="AgeCalc" />
@@ -33,6 +34,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=home-h1-20260710a" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    {% set adsense_enabled = adsense_enabled and blog_indexable %}
+    {% set coupang_partners_enabled = coupang_partners_enabled and blog_indexable %}
     {% include 'partials/adsense.html' %}
 </head>
 
@@ -54,6 +57,14 @@
         </section>
         {% include 'partials/info_coupang_promotions.html' %}
 
+        {% if blog_indexable and categories %}
+        <nav class="article-links" aria-label="블로그 카테고리">
+            {% for category_slug, category_label in categories.items() %}
+            <a href="{{ url_for('blog_category', category_slug=category_slug) }}">{{ category_label }}</a>
+            {% endfor %}
+        </nav>
+        {% endif %}
+
         {% if posts %}
         <section class="section-shell">
             <div class="section-heading">
@@ -61,19 +72,20 @@
                 <p class="section-intro">요약을 먼저 보고, 필요한 글을 바로 읽을 수 있게 정리했습니다.</p>
             </div>
             <div class="blog-grid">
-            {% for post in posts %}
-            <article class="blog-card">
+                {% for post in posts %}
+                {% set article = article_by_slug.get(post.slug) %}
+                <article class="blog-card">
                 <a class="blog-card-link" href="{{ url_for('blog_detail', slug=post.slug) }}">
-                    {% if post.cover_image_url %}
-                    <img class="blog-thumb" src="{{ post.cover_image_url }}" alt="{{ post.title }}">
+                    {% if article and article.thumbnail %}
+                    <img class="blog-thumb" src="{{ article.thumbnail }}" alt="{{ article.thumbnail_alt }}">
                     {% endif %}
-                    <h3>{{ post.title }}</h3>
+                    <h3>{{ article.title if article else post.title }}</h3>
                     <p class="blog-date">
                         {% if post.published_at %}
                         {{ post.published_at | blog_datetime('%Y-%m-%d') }}
                         {% endif %}
                     </p>
-                    <p class="blog-excerpt">{{ post.excerpt or '' }}</p>
+                    <p class="blog-excerpt">{{ article.summary if article else post.excerpt }}</p>
                 </a>
             </article>
             {% endfor %}

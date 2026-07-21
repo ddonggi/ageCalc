@@ -213,6 +213,19 @@ def audit_html(
     if len(re.findall(r"<h2\b", html, re.I)) < 3:
         result.add("insufficient_h2", "error", "독립적인 H2 섹션이 3개 미만입니다.")
 
+    is_public_blog_article = (
+        path.startswith("/blog/")
+        and not path.startswith("/blog/category/")
+        and not path.startswith("/blog/drafts")
+        and not path.startswith("/blog/review")
+    )
+    if is_public_blog_article and not re.search(
+        r'["\']@type["\']\s*:\s*["\'](?:BlogPosting|Article)["\']',
+        html,
+        re.I,
+    ):
+        result.add("article_schema_missing", "error", "공개 블로그 글에 Article 구조화 데이터가 없습니다.")
+
     if ymyl:
         if 'data-official-source="true"' not in html:
             result.add("official_source_missing", "error", "공식 출처가 없습니다.")
@@ -250,7 +263,17 @@ def audit_local_pages(
     paths: tuple[str, ...] = (),
     hub: str | None = None,
 ) -> ContentQualityReport:
-    from app import app
+    from app import (
+        ADSENSE_REVIEW_MODE,
+        BLOG_ARTICLE_BLUEPRINTS,
+        BLOG_CATEGORIES,
+        BLOG_CATEGORY_INDEX_MIN_POSTS,
+        BLOG_PUBLIC_INDEXING_ENABLED,
+        SessionLocal,
+        _is_blog_public_indexable,
+        _published_eligible_blog_posts,
+        app,
+    )
     from content.editorial_metadata import OFFICIAL_SOURCE_REQUIRED_KEYS
 
     report = ContentQualityReport()
@@ -269,6 +292,58 @@ def audit_local_pages(
                 hub=str(page["hub"]),
             )
         report.add(result)
+
+    selected_paths = set(paths)
+    audit_public_blogs = (
+        not ADSENSE_REVIEW_MODE
+        and BLOG_PUBLIC_INDEXING_ENABLED
+        and (hub is None or hub == "blog")
+    )
+    if audit_public_blogs:
+        db_session = SessionLocal()
+        try:
+            blog_posts = _published_eligible_blog_posts(db_session)
+        finally:
+            db_session.close()
+        if _is_blog_public_indexable(len(blog_posts)):
+            for post in blog_posts:
+                path = f"/blog/{post.slug}"
+                if selected_paths and path not in selected_paths:
+                    continue
+                response = client.get(path)
+                if response.status_code != 200:
+                    result = PageQualityResult(path=path, hub="blog")
+                    result.add("page_not_200", "error", f"응답 코드가 {response.status_code}입니다.")
+                else:
+                    category = str(BLOG_ARTICLE_BLUEPRINTS[post.slug]["category"])
+                    result = audit_html(
+                        path,
+                        response.get_data(as_text=True),
+                        ymyl=category in {"policy-benefits", "health"},
+                        hub="blog",
+                    )
+                report.add(result)
+            category_counts: dict[str, int] = defaultdict(int)
+            for post in blog_posts:
+                category_counts[str(BLOG_ARTICLE_BLUEPRINTS[post.slug]["category"])] += 1
+            for category_slug in BLOG_CATEGORIES:
+                if category_counts[category_slug] < BLOG_CATEGORY_INDEX_MIN_POSTS:
+                    continue
+                path = f"/blog/category/{category_slug}"
+                if selected_paths and path not in selected_paths:
+                    continue
+                response = client.get(path)
+                if response.status_code != 200:
+                    result = PageQualityResult(path=path, hub="blog")
+                    result.add("page_not_200", "error", f"응답 코드가 {response.status_code}입니다.")
+                else:
+                    result = audit_html(
+                        path,
+                        response.get_data(as_text=True),
+                        ymyl=False,
+                        hub="blog",
+                    )
+                report.add(result)
     report.detect_duplicates()
     return report
 

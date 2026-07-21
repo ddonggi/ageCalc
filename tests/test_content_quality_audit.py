@@ -1,5 +1,11 @@
 import json
 import unittest
+from datetime import datetime
+from types import SimpleNamespace
+from unittest import mock
+
+import app as app_module
+import scripts.content_quality_audit as audit_module
 
 from scripts.content_quality_audit import (
     ContentQualityReport,
@@ -75,6 +81,20 @@ class ContentQualityAuditTests(unittest.TestCase):
             {issue.code for issue in result.warnings},
         )
 
+    def test_indexable_blog_article_requires_article_schema(self):
+        without_schema = audit_html("/blog/example", RICH_HTML, ymyl=False)
+        with_schema = audit_html(
+            "/blog/example",
+            RICH_HTML.replace(
+                "</head>",
+                '<script type="application/ld+json">{"@type":"BlogPosting"}</script></head>',
+            ),
+            ymyl=False,
+        )
+
+        self.assertIn("article_schema_missing", {issue.code for issue in without_schema.errors})
+        self.assertNotIn("article_schema_missing", {issue.code for issue in with_schema.errors})
+
     def test_trust_pages_are_exempt_from_thin_content_warning(self):
         result = audit_html("/about", RICH_HTML, ymyl=False)
 
@@ -136,6 +156,77 @@ class ContentQualityAuditTests(unittest.TestCase):
         self.assertEqual(0, report.error_count)
         self.assertEqual(0, report.warning_count)
         self.assertFalse(any(result.path.endswith("/") and result.path != "/" for result in report.results))
+
+    def test_public_mode_audit_includes_dynamic_ymyl_blog_articles(self):
+        class FakeQuery:
+            def __init__(self, posts):
+                self.posts = posts
+
+            def filter(self, *args, **kwargs):
+                return self
+
+            def order_by(self, *args, **kwargs):
+                return self
+
+            def all(self):
+                return self.posts
+
+            def first(self):
+                return self.posts[0] if self.posts else None
+
+            def count(self):
+                return len(self.posts)
+
+        class FakeSession:
+            def __init__(self, posts):
+                self.posts = posts
+
+            def query(self, model):
+                return FakeQuery(self.posts)
+
+            def close(self):
+                pass
+
+        article = app_module.BLOG_ARTICLE_BLUEPRINTS["national-pension-receiving-age"]
+        def make_post(slug, post_id):
+            from content.blog.rendering import render_article_content_html
+
+            structured = app_module.BLOG_ARTICLE_BLUEPRINTS[slug]
+            return SimpleNamespace(
+                id=post_id,
+                slug=slug,
+                title=structured["title"],
+                excerpt=structured["summary"],
+                content_html=render_article_content_html(structured),
+                cover_image_url=structured["thumbnail"],
+                status="published",
+                published_at=datetime(2026, 7, 1, 1, 0),
+                created_at=datetime(2026, 7, 1, 1, 0),
+                updated_at=datetime(2026, 7, 20, 1, 0),
+                sources=[],
+            )
+
+        posts = [
+            make_post("national-pension-receiving-age", 1),
+            make_post("early-birth-school-grade-guide", 2),
+            make_post("baby-months-calculation-guide", 3),
+            make_post("parent-child-age-gap-guide", 4),
+            make_post("2026-school-entry-birth-year", 5),
+        ]
+
+        with mock.patch.object(audit_module, "_auditable_pages", return_value=()), mock.patch.object(
+            app_module, "ADSENSE_REVIEW_MODE", False
+        ), mock.patch.object(app_module, "BLOG_PUBLIC_INDEXING_ENABLED", True), mock.patch.object(
+            app_module, "SessionLocal", return_value=FakeSession(posts)
+        ), mock.patch.object(
+            app_module, "_is_blog_public_indexable", return_value=True
+        ):
+            report = audit_local_pages()
+
+        paths = [result.path for result in report.results]
+        self.assertIn("/blog/national-pension-receiving-age", paths)
+        self.assertIn("/blog/category/education-family", paths)
+        self.assertEqual(0, report.error_count)
 
 
 if __name__ == "__main__":

@@ -732,7 +732,6 @@ def _send_review_email(post: GeneratedPost) -> None:
         return
 
     review_url = f"{base_url}/blog/review/{post.id}?token={urllib.parse.quote(review_token)}"
-    approve_url = f"{base_url}/blog/review/{post.id}/approve?token={urllib.parse.quote(review_token)}"
 
     msg = EmailMessage()
     msg["Subject"] = f"[AgeCalc] 블로그 초안 검토 필요: {post.title}"
@@ -748,7 +747,7 @@ def _send_review_email(post: GeneratedPost) -> None:
                 f"상태: {post.status}",
                 "",
                 f"검토 페이지: {review_url}",
-                f"즉시 승인: {approve_url}",
+                "검토 페이지에서 감사 결과를 확인한 뒤 승인 버튼을 눌러 공개하세요.",
             ]
         )
     )

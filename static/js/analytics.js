@@ -2,6 +2,19 @@
     const CONFIG_ID = 'tracking-config';
     const GA_SCRIPT_ID = 'ga-loader';
     const CLARITY_SCRIPT_ID = 'clarity-loader';
+    const sensitiveQueryKeys = new Set(['birth_date', 's', 'token', 'review_token']);
+    const url = new URL(window.location.href);
+    let removedSensitiveValue = false;
+    Array.from(url.searchParams.keys()).forEach((key) => {
+        if (sensitiveQueryKeys.has(key) || /^[pc]\d+(?:b|y|m|d)$/.test(key)) {
+            url.searchParams.delete(key);
+            removedSensitiveValue = true;
+        }
+    });
+    if (removedSensitiveValue) {
+        window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
+    }
+    const cleanPageLocation = `${url.origin}${url.pathname}${url.search}`;
 
     const getCookie = (key) =>
         document.cookie.split('; ').find((row) => row.startsWith(key + '='))?.split('=')[1];
@@ -57,6 +70,8 @@
         });
         window.gtag('config', measurementId, {
             anonymize_ip: true,
+            page_location: cleanPageLocation,
+            page_path: window.location.pathname,
         });
     };
 

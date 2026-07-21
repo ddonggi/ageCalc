@@ -29,7 +29,8 @@
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=home-h1-20260710a" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/date-rules.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/hundred-day-calculator.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
 
@@ -85,54 +86,25 @@
                 <h2 id="hundred-day-search">시작일 입력</h2>
                 <p class="section-intro">연도, 월, 일을 입력하면 100일째 날짜와 오늘 기준 상태를 바로 계산해 보여드립니다.</p>
             </div>
-            <form class="age-form" method="get" action="{{ url_for('hundred_day_calculator') }}">
+            <form class="age-form" id="hundred-day-form" data-clarity-mask="true">
                 <div class="form-group">
                     <div class="date-inputs">
-                        <input type="text" name="year" placeholder="년" inputmode="numeric" pattern="[0-9]*" maxlength="4" value="{{ year or '' }}" aria-label="시작 연도">
-                        <input type="text" name="month" placeholder="월" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="{{ month or '' }}" aria-label="시작 월">
-                        <input type="text" name="day" placeholder="일" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="{{ day or '' }}" aria-label="시작 일">
+                        <input type="text" id="hundred-day-year" placeholder="년" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" aria-label="시작 연도">
+                        <input type="text" id="hundred-day-month" placeholder="월" inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" aria-label="시작 월">
+                        <input type="text" id="hundred-day-day" placeholder="일" inputmode="numeric" pattern="[0-9]*" maxlength="2" autocomplete="off" aria-label="시작 일">
                     </div>
                     <div class="hero-actions">
                         <button class="btn btn-primary" type="submit">100일 계산</button>
-                        {% if year or month or day %}
-                        <a class="btn btn-secondary" href="{{ url_for('hundred_day_calculator') }}">입력 지우기</a>
-                        {% endif %}
+                        <button class="btn btn-secondary" id="hundred-day-clear" type="button">입력 지우기</button>
                     </div>
-                    {% if invalid_date %}
-                    <small class="error-msg">입력한 날짜를 다시 확인해 주세요. 존재하는 날짜만 계산할 수 있습니다.</small>
-                    {% endif %}
+                    <small class="error-msg" id="hundred-day-error" aria-live="polite"></small>
                 </div>
             </form>
         </section>
 
-        {% if selected_snapshot %}
-        <section class="section-shell section-card-grid">
-            <article class="section-card birth-year-summary">
-                <p class="eyebrow">선택한 시작일</p>
-                <h2>{{ selected_snapshot.start_date }} 기준 100일 안내</h2>
-                <p>{{ selected_snapshot.detail }}</p>
-                <div class="summary-grid">
-                    <div class="summary-card">
-                        <strong>시작일</strong>
-                        <span>{{ selected_snapshot.start_date }}</span>
-                    </div>
-                    <div class="summary-card">
-                        <strong>100일째 날짜</strong>
-                        <span>{{ selected_snapshot.hundredth_date }}</span>
-                    </div>
-                    <div class="summary-card">
-                        <strong>오늘 기준 상태</strong>
-                        <span>{{ selected_snapshot.status_label }}</span>
-                    </div>
-                    <div class="summary-card">
-                        <strong>현재 기준 경과</strong>
-                        <span>{{ selected_snapshot.elapsed_label }}</span>
-                    </div>
-                </div>
-                <p class="small">{{ selected_snapshot.status_note }}</p>
-            </article>
+        <section class="section-shell section-card-grid" id="hundred-day-result" hidden aria-live="polite" data-clarity-mask="true">
+            <article class="section-card birth-year-summary" id="hundred-day-result-content"></article>
         </section>
-        {% endif %}
 
         <section class="section-shell">
             <div class="section-heading">

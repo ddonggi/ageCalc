@@ -3,12 +3,18 @@ from flask import Flask, Response, render_template, request, jsonify, g, send_fr
 import json
 import os
 import threading
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 import secrets
+import warnings
+from time import monotonic
+from email.utils import format_datetime
 from zoneinfo import ZoneInfo
+from werkzeug.middleware.proxy_fix import ProxyFix
 from controllers.age_controller import AgeController
 from content.blog_articles import BLOG_ARTICLE_BLUEPRINTS, structured_blog_article_for_slug
+from content.blog.schema import BLOG_CATEGORIES
+from content.blog.rendering import render_article_content_html
 from content.editorial_metadata import editorial_metadata_for
 from content.guide_pages import (
     GUIDE_PAGE_BY_SLUG,
@@ -63,15 +69,54 @@ def _load_blog_timezone():
 
 BLOG_TIMEZONE = _load_blog_timezone()
 
+
+def _resolve_flask_secret_key(
+    value: str | None,
+    *,
+    environment: str | None = None,
+    database_url: str | None = None,
+) -> str:
+    configured = (value or "").strip()
+    if configured:
+        return configured
+    runtime_environment = (environment or "development").strip().lower()
+    production_database = (database_url or "").strip().lower().startswith(("mysql", "postgresql"))
+    if runtime_environment not in {"development", "dev", "test", "testing", "local", "production", "prod"}:
+        raise RuntimeError("AGECALC_ENV must be development, test, or production")
+    if runtime_environment in {"production", "prod"} or production_database:
+        raise RuntimeError("FLASK_SECRET_KEY must be configured in production")
+    warnings.warn(
+        "FLASK_SECRET_KEY is not configured; using the stable development-only key.",
+        RuntimeWarning,
+        stacklevel=2,
+    )
+    return "agecalc-development-only-secret-key"
+
+
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY") or os.getenv("BLOG_REVIEW_TOKEN") or "agecalc-drafts-v1"
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=8)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
+app.secret_key = _resolve_flask_secret_key(
+    os.getenv("FLASK_SECRET_KEY"),
+    environment=os.getenv("AGECALC_ENV"),
+    database_url=os.getenv("DATABASE_URL"),
+)
+app.config.update(
+    PERMANENT_SESSION_LIFETIME=timedelta(hours=8),
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+)
 _score_lock = threading.Lock()
 _score_file = os.path.join(app.root_path, "data", "snake_scores.json")
 os.makedirs(os.path.dirname(_score_file), exist_ok=True)
 init_db()
 
 BLOG_DRAFT_ACCESS_SESSION_KEY = "blog_draft_access"
+BLOG_CSRF_SESSION_KEY = "blog_csrf_token"
+BLOG_DRAFT_LOGIN_MAX_FAILURES = 5
+BLOG_DRAFT_LOGIN_WINDOW = timedelta(minutes=15)
+BLOG_DRAFT_LOGIN_FAILURES: dict[str, list[datetime]] = {}
+_blog_draft_login_lock = threading.Lock()
 SITE_BASE_URL = (os.getenv("BLOG_BASE_URL", "https://agecalc.cloud") or "https://agecalc.cloud").rstrip("/")
 SITE_AUTHOR_NAME = os.getenv("SITE_AUTHOR_NAME", "AgeCalc 편집팀").strip() or "AgeCalc 편집팀"
 SITE_CONTACT_EMAIL = os.getenv("SITE_CONTACT_EMAIL", "ldg6153@gmail.com").strip() or "ldg6153@gmail.com"
@@ -80,13 +125,23 @@ GOOGLE_SITE_VERIFICATION = os.getenv(
     "GOOGLE_SITE_VERIFICATION",
     "q0nvIaon9IVWNZZEQzTRCycYka7jIHuzYu-PwxxoKu8",
 ).strip()
-ADSENSE_REVIEW_MODE = (os.getenv("ADSENSE_REVIEW_MODE", "true") or "true").strip().lower() in {
-    "1",
-    "true",
-    "yes",
-    "on",
-}
+def _parse_adsense_review_mode(value: str | None) -> bool:
+    normalized = (value or "true").strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    warnings.warn(
+        f"Unknown ADSENSE_REVIEW_MODE={value!r}; keeping review mode enabled.",
+        RuntimeWarning,
+        stacklevel=2,
+    )
+    return True
+
+
+ADSENSE_REVIEW_MODE = _parse_adsense_review_mode(os.getenv("ADSENSE_REVIEW_MODE", "true"))
 BLOG_INDEX_MIN_POSTS = int(os.getenv("BLOG_INDEX_MIN_POSTS", "3").strip() or "3")
+BLOG_CATEGORY_INDEX_MIN_POSTS = 3
 BLOG_PUBLIC_INDEXING_ENABLED = (os.getenv("BLOG_PUBLIC_INDEXING_ENABLED", "false") or "false").strip().lower() in {
     "1",
     "true",
@@ -153,7 +208,7 @@ def inject_csp_nonce():
         pass
 
     blog_public_count = (
-        _published_blog_count()
+        _cached_published_blog_count()
         if BLOG_PUBLIC_INDEXING_ENABLED and not ADSENSE_REVIEW_MODE
         else 0
     )
@@ -200,6 +255,7 @@ def inject_csp_nonce():
 
     return {
         "csp_nonce": getattr(g, "csp_nonce", ""),
+        "csrf_token": _get_or_create_csrf_token,
         "author_name": SITE_AUTHOR_NAME,
         "contact_email": SITE_CONTACT_EMAIL,
         "editorial_policy_url": editorial_policy_url,
@@ -212,6 +268,7 @@ def inject_csp_nonce():
         "google_site_verification": GOOGLE_SITE_VERIFICATION,
         "blog_public_indexable": blog_public_indexable,
         "blog_public_count": blog_public_count,
+        "article_by_slug": BLOG_ARTICLE_BLUEPRINTS,
         "coupang_partners_enabled": _coupang_partners_is_enabled(),
         "coupang_active_baby_promotions": _active_coupang_baby_promotions(),
         "coupang_event_promotions": _active_coupang_event_promotions(),
@@ -244,7 +301,7 @@ def add_security_headers(response):
         response.headers["X-Robots-Tag"] = "noindex, follow"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
-    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
     response.headers["X-XSS-Protection"] = "0"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
@@ -330,6 +387,56 @@ def _draft_access_granted() -> bool:
     return bool(session.get(BLOG_DRAFT_ACCESS_SESSION_KEY))
 
 
+def _get_or_create_csrf_token() -> str:
+    token = str(session.get(BLOG_CSRF_SESSION_KEY, "") or "")
+    if not token:
+        token = secrets.token_urlsafe(32)
+        session[BLOG_CSRF_SESSION_KEY] = token
+    return token
+
+
+def _csrf_token_is_valid(provided_token: str) -> bool:
+    expected = str(session.get(BLOG_CSRF_SESSION_KEY, "") or "")
+    provided = str(provided_token or "")
+    return bool(expected) and secrets.compare_digest(expected, provided)
+
+
+def _require_valid_csrf() -> None:
+    provided = request.form.get("csrf_token", "") or request.headers.get("X-CSRF-Token", "")
+    if not _csrf_token_is_valid(provided):
+        abort(400, description="유효하지 않은 요청 토큰입니다.")
+
+
+def _prune_draft_login_failures(ip_address: str, *, now: datetime) -> list[datetime]:
+    cutoff = now - BLOG_DRAFT_LOGIN_WINDOW
+    failures = [timestamp for timestamp in BLOG_DRAFT_LOGIN_FAILURES.get(ip_address, []) if timestamp > cutoff]
+    if failures:
+        BLOG_DRAFT_LOGIN_FAILURES[ip_address] = failures
+    else:
+        BLOG_DRAFT_LOGIN_FAILURES.pop(ip_address, None)
+    return failures
+
+
+def _record_draft_login_failure(ip_address: str, *, now: datetime | None = None) -> None:
+    now = now or datetime.now(timezone.utc)
+    with _blog_draft_login_lock:
+        failures = _prune_draft_login_failures(ip_address, now=now)
+        failures.append(now)
+        BLOG_DRAFT_LOGIN_FAILURES[ip_address] = failures
+
+
+def _draft_login_is_limited(ip_address: str, *, now: datetime | None = None) -> bool:
+    now = now or datetime.now(timezone.utc)
+    with _blog_draft_login_lock:
+        failures = _prune_draft_login_failures(ip_address, now=now)
+        return len(failures) >= BLOG_DRAFT_LOGIN_MAX_FAILURES
+
+
+def _clear_draft_login_failures(ip_address: str) -> None:
+    with _blog_draft_login_lock:
+        BLOG_DRAFT_LOGIN_FAILURES.pop(ip_address, None)
+
+
 def _as_blog_localtime(value: datetime | None) -> datetime | None:
     if value is None:
         return None
@@ -364,34 +471,140 @@ def _independent_db_session():
     return factory() if factory is not None else SessionLocal()
 
 
+def _article_is_publicly_eligible(article: dict[str, object], *, today: date | None = None) -> bool:
+    today = today or _current_local_date()
+    try:
+        expires_at = date.fromisoformat(str(article["expires_at"]))
+    except (KeyError, ValueError):
+        return False
+    return bool(article.get("is_curated")) and bool(article.get("is_indexable")) and today < expires_at
+
+
+def _eligible_public_blog_slugs(*, today: date | None = None) -> tuple[str, ...]:
+    return tuple(
+        slug
+        for slug, article in BLOG_ARTICLE_BLUEPRINTS.items()
+        if _article_is_publicly_eligible(article, today=today)
+    )
+
+
 def _public_blog_slugs() -> tuple[str, ...]:
-    return tuple(BLOG_ARTICLE_BLUEPRINTS.keys())
+    return _eligible_public_blog_slugs()
 
 
 def _published_blog_count() -> int:
-    public_slugs = _public_blog_slugs()
-    if not public_slugs:
-        return 0
     db_session = _independent_db_session()
     try:
-        return (
-            db_session.query(GeneratedPost)
-            .filter(GeneratedPost.status == "published", GeneratedPost.slug.in_(public_slugs))
-            .count()
-        )
+        return len(_published_eligible_blog_posts(db_session))
     finally:
         db_session.close()
+
+
+BLOG_PUBLIC_COUNT_CACHE_TTL_SECONDS = 30
+_blog_public_count_cache_lock = threading.Lock()
+_blog_public_count_cache: tuple[float, int] | None = None
+
+
+def _invalidate_blog_public_count_cache() -> None:
+    global _blog_public_count_cache
+    with _blog_public_count_cache_lock:
+        _blog_public_count_cache = None
+
+
+def _cached_published_blog_count() -> int:
+    global _blog_public_count_cache
+    if app.config.get("TESTING"):
+        return _published_blog_count()
+    now = monotonic()
+    with _blog_public_count_cache_lock:
+        if _blog_public_count_cache and now - _blog_public_count_cache[0] < BLOG_PUBLIC_COUNT_CACHE_TTL_SECONDS:
+            return _blog_public_count_cache[1]
+    count = _published_blog_count()
+    with _blog_public_count_cache_lock:
+        _blog_public_count_cache = (now, count)
+    return count
+
+
+def _published_eligible_blog_posts(db_session) -> list[GeneratedPost]:
+    public_slugs = _eligible_public_blog_slugs()
+    if not public_slugs:
+        return []
+    posts = (
+        db_session.query(GeneratedPost)
+        .filter(GeneratedPost.status == "published", GeneratedPost.slug.in_(public_slugs))
+        .order_by(GeneratedPost.published_at.desc(), GeneratedPost.id.desc())
+        .all()
+    )
+    public_slug_set = set(public_slugs)
+    return [
+        post
+        for post in posts
+        if post.slug in public_slug_set and audit_post(post, require_cover_image=True).keep
+    ]
 
 
 def _is_blog_public_indexable(published_count: int | None = None) -> bool:
     if ADSENSE_REVIEW_MODE or not BLOG_PUBLIC_INDEXING_ENABLED:
         return False
-    count = _published_blog_count() if published_count is None else published_count
+    count = _cached_published_blog_count() if published_count is None else published_count
     return count >= BLOG_INDEX_MIN_POSTS
 
 
 def _structured_blog_context(post) -> dict[str, object] | None:
     return structured_blog_article_for_slug(post.slug)
+
+
+def _absolute_article_thumbnail(article: dict[str, object]) -> str:
+    thumbnail = str(article["thumbnail"])
+    return f"{SITE_BASE_URL}{thumbnail}" if thumbnail.startswith("/") else thumbnail
+
+
+def _blog_article_schema(post, article: dict[str, object]) -> dict[str, object]:
+    image_url = _absolute_article_thumbnail(article)
+    schema: dict[str, object] = {
+        "@context": "https://schema.org",
+        "@type": article["schema_type"],
+        "headline": article["h1"],
+        "description": article["meta_description"],
+        "image": [image_url],
+        "author": {"@type": "Organization", "name": article["author"], "url": f"{SITE_BASE_URL}/about"},
+        "publisher": {
+            "@type": "Organization",
+            "name": "AgeCalc",
+            "logo": {"@type": "ImageObject", "url": f"{SITE_BASE_URL}/static/images/android-chrome-512x512.png"},
+        },
+        "mainEntityOfPage": {"@type": "WebPage", "@id": article["canonical_url"]},
+        "articleSection": article["category_label"],
+        "keywords": list(article["tags"]),
+        "isAccessibleForFree": True,
+    }
+    published_at = getattr(post, "published_at", None) or getattr(post, "created_at", None)
+    modified_at = getattr(post, "updated_at", None) or published_at
+    if published_at:
+        schema["datePublished"] = _as_blog_localtime(published_at).isoformat()
+    if modified_at:
+        schema["dateModified"] = _as_blog_localtime(modified_at).isoformat()
+    return schema
+
+
+def _rss_date(value: datetime | None) -> str:
+    if value is None:
+        value = datetime.now(timezone.utc)
+    elif value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return format_datetime(value)
+
+
+def _rss_iso_date(value: datetime | None) -> str:
+    if value is None:
+        value = datetime.now(timezone.utc)
+    elif value.tzinfo is None:
+        value = value.replace(tzinfo=timezone.utc)
+    return value.isoformat()
+
+
+def _escape_rss_cdata(value: str) -> str:
+    return value.replace("]]>", "]]]]><![CDATA[>")
 
 
 def _coupang_partners_is_enabled() -> bool:
@@ -1053,17 +1266,9 @@ def sitemap_group(group):
 
     posts = []
     if group == "guides" and BLOG_PUBLIC_INDEXING_ENABLED and not ADSENSE_REVIEW_MODE:
-        public_slugs = _public_blog_slugs()
         db_session = SessionLocal()
         try:
-            if public_slugs:
-                posts = (
-                    db_session.query(GeneratedPost)
-                    .filter(GeneratedPost.status == "published", GeneratedPost.slug.in_(public_slugs))
-                    .order_by(GeneratedPost.published_at.desc(), GeneratedPost.id.desc())
-                    .all()
-                )
-                posts = [post for post in posts if post.slug in BLOG_ARTICLE_BLUEPRINTS]
+            posts = _published_eligible_blog_posts(db_session)
         finally:
             db_session.close()
 
@@ -1088,6 +1293,24 @@ def sitemap_group(group):
                     lastmod,
                 )
             )
+        for category_slug in BLOG_CATEGORIES:
+            category_posts = [
+                post
+                for post in posts
+                if BLOG_ARTICLE_BLUEPRINTS[post.slug]["category"] == category_slug
+            ]
+            if len(category_posts) < BLOG_CATEGORY_INDEX_MIN_POSTS:
+                continue
+            lastmod_value = max(
+                (post.updated_at or post.published_at or post.created_at for post in category_posts),
+                default=None,
+            )
+            entries.append(
+                _build_sitemap_entry(
+                    _absolute_url_for("blog_category", category_slug=category_slug),
+                    _format_sitemap_lastmod(lastmod_value),
+                )
+            )
 
     xml = (
         '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -1096,6 +1319,48 @@ def sitemap_group(group):
         "</urlset>\n"
     )
     return Response(xml, mimetype="application/xml")
+
+
+@app.get("/rss.xml")
+def public_rss():
+    if ADSENSE_REVIEW_MODE or not BLOG_PUBLIC_INDEXING_ENABLED:
+        abort(404)
+
+    db_session = SessionLocal()
+    try:
+        eligible_posts = _published_eligible_blog_posts(db_session)
+    finally:
+        db_session.close()
+    if not eligible_posts or not _is_blog_public_indexable(len(eligible_posts)):
+        abort(404)
+    posts = eligible_posts[:20]
+    eligible_slug_set = {post.slug for post in eligible_posts}
+
+    items = []
+    for post in posts:
+        article = BLOG_ARTICLE_BLUEPRINTS[post.slug]
+        items.append(
+            {
+                "title": article["title"],
+                "url": article["canonical_url"],
+                "description": article["summary"],
+                "content_html": _escape_rss_cdata(
+                    render_article_content_html(article, eligible_article_slugs=eligible_slug_set)
+                ),
+                "published_at": _rss_date(post.published_at or post.created_at),
+                "updated_at": _rss_iso_date(post.updated_at or post.published_at or post.created_at),
+                "category": article["category_label"],
+                "author": article["author"],
+            }
+        )
+    xml = render_template(
+        "rss.xml",
+        items=items,
+        feed_url=f"{SITE_BASE_URL}/rss.xml",
+        blog_url=f"{SITE_BASE_URL}/blog",
+        build_date=_rss_date(max((post.updated_at or post.published_at for post in posts), default=None)),
+    )
+    return Response(xml, mimetype="application/rss+xml")
 
 
 @app.get('/')
@@ -1123,61 +1388,28 @@ def life_hub(hub_key):
 @app.route('/age', methods=['GET', 'POST'])
 def age():
     """만나이 계산 페이지 - 나이 계산 폼과 결과를 표시"""
+    if request.method == 'GET' and request.args:
+        return redirect(url_for('age'))
+
     if request.method == 'POST':
-        # AJAX 요청인지 확인
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            # AJAX 요청 처리
-            result = None
-            birth_date = None
-            
-            # 개별 년/월/일 값 또는 전체 날짜 값 처리
-            if 'birth_date' in request.form and request.form['birth_date']:
-                birth_date = request.form['birth_date']
-            elif all(key in request.form for key in ['year', 'month', 'day']):
-                year = request.form['year']
-                month = request.form['month'].zfill(2)
-                day = request.form['day'].zfill(2)
-                birth_date = f"{year}-{month}-{day}"
-            
-            calendar_type = request.form.get('calendar_type', 'solar')
-            
-            if birth_date:
-                controller = AgeController()
-                result = controller.calculate_age_from_string(birth_date, calendar_type)
-                return jsonify(result)
-            else:
-                return jsonify({'success': False, 'message': '생년월일을 입력해주세요.'})
-        
-        # 일반 폼 제출 처리 (기존 코드 유지)
-        result = None
-        birth_date = None
-        year = None
-        month = None
-        day = None
-        calendar_type = 'solar'
-        
-        if 'birth_date' in request.form and request.form['birth_date']:
-            birth_date = request.form['birth_date']
-        elif all(key in request.form for key in ['year', 'month', 'day']):
-            year = request.form['year']
-            month = request.form['month'].zfill(2)
-            day = request.form['day'].zfill(2)
-            birth_date = f"{year}-{month}-{day}"
-            
         calendar_type = request.form.get('calendar_type', 'solar')
-        
-        if birth_date:
-            controller = AgeController()
-            result = controller.calculate_age_from_string(birth_date, calendar_type)
-    
-    # GET 요청 또는 일반 폼 제출 시
-    return render_template('age.html', result=result if 'result' in locals() else None, 
-                         birth_date=birth_date if 'birth_date' in locals() else None, 
-                         year=year if 'year' in locals() else None, 
-                         month=month if 'month' in locals() else None, 
-                         day=day if 'day' in locals() else None,
-                         calendar_type=calendar_type if 'calendar_type' in locals() else 'solar',
-                         page_path="/age")
+        if calendar_type != 'lunar':
+            return jsonify({
+                'success': False,
+                'client_only': True,
+                'message': '양력 생년월일은 브라우저에서만 계산합니다.',
+            }), 400
+
+        birth_date = request.form.get('birth_date', '').strip()
+        if not birth_date:
+            return jsonify({'success': False, 'message': '생년월일을 입력해주세요.'}), 400
+
+        result = AgeController().calculate_age_from_string(birth_date, 'lunar')
+        response = jsonify(result)
+        response.headers['Cache-Control'] = 'no-store'
+        return response
+
+    return render_template('age.html', result=None, calendar_type='solar', page_path="/age")
 
 @app.route('/privacy')
 def privacy():
@@ -1354,21 +1586,11 @@ def age_gap_calculator():
 @app.route('/100-day-calculator')
 def hundred_day_calculator():
     """시작일 기준 100일째 날짜 안내 페이지"""
+    if request.args:
+        return redirect(url_for('hundred_day_calculator'))
+
     today = _current_local_date()
     current_year = today.year
-    min_year = 1900
-    max_year = current_year + 5
-
-    year = request.args.get('year', type=int)
-    month = request.args.get('month', type=int)
-    day = request.args.get('day', type=int)
-
-    selected_start_date = None
-    if year is not None and month is not None and day is not None and min_year <= year <= max_year:
-        selected_start_date = _parse_calendar_date(year, month, day)
-
-    selected_snapshot = _build_hundred_day_snapshot(selected_start_date, today) if selected_start_date else None
-    invalid_date = year is not None and month is not None and day is not None and selected_snapshot is None
 
     example_inputs = [
         ("커플 100일 예시", today - timedelta(days=30)),
@@ -1385,11 +1607,6 @@ def hundred_day_calculator():
         '100-day-calculator.html',
         today=today,
         current_year=current_year,
-        selected_snapshot=selected_snapshot,
-        invalid_date=invalid_date,
-        year=year,
-        month=month,
-        day=day,
         examples=examples,
     )
 
@@ -1423,21 +1640,17 @@ def annual_age_calculator():
     min_year = 1900
     max_year = current_year
 
-    birth_date = request.args.get('birth_date', '').strip()
-    year = request.args.get('year', type=int)
-    month = request.args.get('month', type=int)
-    day = request.args.get('day', type=int)
+    if request.args.get('birth_date') or request.args.get('month') or request.args.get('day'):
+        return redirect(url_for('annual_age_calculator'))
 
-    selected_birth_date = None
-    if birth_date:
-        selected_birth_date = _parse_six_digit_birth_date(birth_date, current_year)
-    elif year is not None and month is not None and day is not None and min_year <= year <= max_year:
-        selected_birth_date = _parse_calendar_date(year, month, day)
-        if selected_birth_date:
-            birth_date = _birth_date_to_six_digits(selected_birth_date)
-
+    birth_year = request.args.get('birth_year', type=int)
+    selected_birth_date = (
+        date(birth_year, 1, 1)
+        if birth_year is not None and min_year <= birth_year <= max_year
+        else None
+    )
     selected_snapshot = _build_annual_age_snapshot(selected_birth_date, current_year) if selected_birth_date else None
-    invalid_date = (bool(birth_date) or (year is not None and month is not None and day is not None)) and selected_snapshot is None
+    invalid_date = birth_year is not None and selected_snapshot is None
 
     example_dates = [
         datetime(1990, 1, 1).date(),
@@ -1452,10 +1665,7 @@ def annual_age_calculator():
         today=today,
         selected_snapshot=selected_snapshot,
         invalid_date=invalid_date,
-        birth_date=birth_date,
-        year=year,
-        month=month,
-        day=day,
+        birth_year=birth_year,
         examples=examples,
     )
 
@@ -1833,6 +2043,8 @@ def d_day():
 @app.route('/parent-child')
 def parent_child():
     """부모·자녀 나이 관계 계산 페이지"""
+    if request.args:
+        return redirect(url_for('parent_child'))
     return render_template('parent-child.html')
 
 
@@ -1865,21 +2077,12 @@ def blog_list():
     per_page = 8
     session = SessionLocal()
 
-    public_slugs = _public_blog_slugs()
-    posts = []
-    if public_slugs:
-        posts = (
-            session.query(GeneratedPost)
-            .filter(GeneratedPost.status == "published", GeneratedPost.slug.in_(public_slugs))
-            .order_by(GeneratedPost.published_at.desc(), GeneratedPost.id.desc())
-            .all()
-        )
-        posts = [post for post in posts if post.slug in BLOG_ARTICLE_BLUEPRINTS]
+    posts = _published_eligible_blog_posts(session)
 
     total = len(posts)
     total_pages = max(1, math.ceil(total / per_page)) if total else 1
     if page > total_pages:
-        page = total_pages
+        abort(404)
 
     posts = posts[(page - 1) * per_page : page * per_page]
     blog_indexable = _is_blog_public_indexable(total)
@@ -1890,9 +2093,63 @@ def blog_list():
         total_pages=total_pages,
         total=total,
         blog_indexable=blog_indexable,
+        canonical_url=(f"{SITE_BASE_URL}/blog" if page == 1 else f"{SITE_BASE_URL}/blog?page={page}"),
+        categories=BLOG_CATEGORIES,
+        article_by_slug=BLOG_ARTICLE_BLUEPRINTS,
     ))
     if not blog_indexable:
         response.headers["X-Robots-Tag"] = "noindex, nofollow"
+    return response
+
+
+@app.route('/blog/category/<category_slug>')
+def blog_category(category_slug):
+    if category_slug not in BLOG_CATEGORIES or ADSENSE_REVIEW_MODE:
+        abort(404)
+
+    page = max(request.args.get('page', default=1, type=int), 1)
+    per_page = 8
+    category_slugs = {
+        slug
+        for slug in _eligible_public_blog_slugs()
+        if BLOG_ARTICLE_BLUEPRINTS[slug]["category"] == category_slug
+    }
+    db_session = SessionLocal()
+    try:
+        posts = [
+            post
+            for post in _published_eligible_blog_posts(db_session)
+            if post.slug in category_slugs
+        ]
+    finally:
+        db_session.close()
+
+    total = len(posts)
+    total_pages = max(1, math.ceil(total / per_page)) if total else 1
+    if page > total_pages:
+        abort(404)
+    page_posts = posts[(page - 1) * per_page : page * per_page]
+    category_indexable = _is_blog_public_indexable() and total >= BLOG_CATEGORY_INDEX_MIN_POSTS
+    canonical_url = f"{SITE_BASE_URL}/blog/category/{category_slug}"
+    if page > 1:
+        canonical_url = f"{canonical_url}?page={page}"
+
+    response = make_response(
+        render_template(
+            'blog-category.html',
+            posts=page_posts,
+            total=total,
+            page=page,
+            total_pages=total_pages,
+            category_slug=category_slug,
+            category_label=BLOG_CATEGORIES[category_slug],
+            category_indexable=category_indexable,
+            canonical_url=canonical_url,
+            article_by_slug=BLOG_ARTICLE_BLUEPRINTS,
+        )
+    )
+    if not category_indexable:
+        response.headers["X-Robots-Tag"] = "noindex, follow"
     return response
 
 
@@ -1907,11 +2164,32 @@ def blog_detail(slug):
     if post is None:
         abort(404)
     article = structured_blog_article_for_slug(slug)
-    blog_indexable = bool(article) and _is_blog_public_indexable()
+    blog_indexable = (
+        bool(article)
+        and _article_is_publicly_eligible(article)
+        and audit_post(post, require_cover_image=True).keep
+        and _is_blog_public_indexable()
+    )
+    eligible_related_slugs = (
+        {eligible_post.slug for eligible_post in _published_eligible_blog_posts(session)}
+        if blog_indexable
+        else set()
+    )
     crumb_label = article["title"] if article else post.title
     breadcrumbs = [
         {"label": "홈", "url": f"{SITE_BASE_URL}/", "current": False},
         {"label": "블로그", "url": f"{SITE_BASE_URL}/blog", "current": False},
+        *(
+            [
+                {
+                    "label": article["category_label"],
+                    "url": f"{SITE_BASE_URL}/blog/category/{article['category']}",
+                    "current": False,
+                }
+            ]
+            if article
+            else []
+        ),
         {
             "label": crumb_label,
             "url": f"{SITE_BASE_URL}/blog/{slug}",
@@ -1939,10 +2217,15 @@ def blog_detail(slug):
             review_mode=False,
             blog_indexable=blog_indexable,
             structured_article=article,
+            structured_image_url=_absolute_article_thumbnail(article) if article else None,
+            article_schema=_blog_article_schema(post, article) if article and blog_indexable else None,
             breadcrumbs=breadcrumbs,
             breadcrumb_schema=breadcrumb_schema,
+            eligible_related_slugs=eligible_related_slugs,
         )
     )
+    if hasattr(session, "close"):
+        session.close()
     if not blog_indexable:
         response.headers["X-Robots-Tag"] = "noindex, nofollow"
     return response
@@ -1953,10 +2236,21 @@ def blog_drafts():
     error = None
 
     if request.method == 'POST':
+        _require_valid_csrf()
+        ip_address = request.remote_addr or "unknown"
+        if _draft_login_is_limited(ip_address):
+            return render_template(
+                'blog-drafts.html',
+                access_granted=False,
+                error='로그인 시도가 너무 많습니다. 15분 뒤 다시 시도하세요.',
+                posts=[],
+            ), 429
         if _draft_password_is_valid(request.form.get('password', '')):
+            _clear_draft_login_failures(ip_address)
             session.permanent = True
             session[BLOG_DRAFT_ACCESS_SESSION_KEY] = True
             return redirect(url_for('blog_drafts'))
+        _record_draft_login_failure(ip_address)
         error = '비밀번호가 올바르지 않습니다.'
 
     if not _draft_access_granted():
@@ -1984,7 +2278,9 @@ def blog_drafts():
 
 @app.post('/blog/drafts/logout')
 def blog_drafts_logout():
+    _require_valid_csrf()
     session.pop(BLOG_DRAFT_ACCESS_SESSION_KEY, None)
+    session.pop(BLOG_CSRF_SESSION_KEY, None)
     return redirect(url_for('blog_drafts'))
 
 
@@ -2014,6 +2310,7 @@ def blog_draft_detail(slug):
 def blog_draft_publish(slug):
     if not _draft_access_granted():
         return redirect(url_for('blog_drafts'))
+    _require_valid_csrf()
 
     db_session = SessionLocal()
     post = (
@@ -2042,6 +2339,7 @@ def blog_draft_publish(slug):
     post.status = "published"
     post.published_at = datetime.now(timezone.utc).replace(tzinfo=None)
     db_session.commit()
+    _invalidate_blog_public_count_cache()
     return redirect(url_for('blog_detail', slug=post.slug))
 
 
@@ -2055,7 +2353,7 @@ def blog_review(post_id):
     post = db_session.query(GeneratedPost).filter(GeneratedPost.id == post_id).first()
     if post is None:
         abort(404)
-    return render_template(
+    response = make_response(render_template(
         'blog-detail.html',
         post=post,
         draft_mode=False,
@@ -2063,12 +2361,16 @@ def blog_review(post_id):
         review_token=token,
         review_errors=[],
         structured_article=_structured_blog_context(post),
-    )
+    ))
+    response.headers["Cache-Control"] = "no-store"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    return response
 
 
-@app.route('/blog/review/<int:post_id>/approve', methods=['GET', 'POST'])
+@app.post('/blog/review/<int:post_id>/approve')
 def blog_review_approve(post_id):
-    token = request.args.get("token", "")
+    _require_valid_csrf()
+    token = request.form.get("review_token", "")
     if not _review_token_is_valid(token):
         abort(403)
 
@@ -2079,7 +2381,7 @@ def blog_review_approve(post_id):
     audit_result = audit_post(post, require_cover_image=True)
     if not audit_result.keep:
         review_errors = [issue.message for issue in audit_result.issues]
-        return (
+        response = make_response(
             render_template(
                 'blog-detail.html',
                 post=post,
@@ -2088,13 +2390,16 @@ def blog_review_approve(post_id):
                 review_token=token,
                 review_errors=review_errors,
                 structured_article=_structured_blog_context(post),
-            ),
-            400,
+            ), 400,
         )
+        response.headers["Cache-Control"] = "no-store"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        return response
     if post.status != "published":
         post.status = "published"
         post.published_at = datetime.now(timezone.utc).replace(tzinfo=None)
         db_session.commit()
+        _invalidate_blog_public_count_cache()
     return redirect(url_for('blog_detail', slug=post.slug))
 
 @app.route('/minigames')

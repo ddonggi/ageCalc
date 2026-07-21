@@ -114,7 +114,7 @@ class ParentChildCalculator {
                     </ul>
                 </div>
                 <div class="date-inputs">
-                    <input type="text" data-kind="${kind}" data-id="${item.id}" data-field="birth" placeholder="921002" inputmode="numeric" pattern="[0-9]*" maxlength="6" value="${item.birth || ''}">
+                    <input type="text" data-kind="${kind}" data-id="${item.id}" data-field="birth" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" value="${item.birth || ''}" data-clarity-mask="true">
                 </div>
                 <button type="button" class="line-remove" title="삭제">-</button>
             `;
@@ -165,17 +165,14 @@ class ParentChildCalculator {
         if (data.birth || data.b) {
             const raw = data.birth || data.b;
             const digits = this.digitsOnly(raw);
-            if (digits.length === 6) return digits;
-            if (digits.length === 8) {
-                return `${digits.slice(2, 4)}${digits.slice(4, 6)}${digits.slice(6, 8)}`;
-            }
+            if (digits.length === 8) return digits;
             return String(raw);
         }
         if (data.y && data.m && data.d) {
-            const yy = String(data.y).slice(-2).padStart(2, '0');
+            const yyyy = String(data.y).padStart(4, '0');
             const mm = String(data.m).padStart(2, '0');
             const dd = String(data.d).padStart(2, '0');
-            return `${yy}${mm}${dd}`;
+            return `${yyyy}${mm}${dd}`;
         }
         return '';
     }
@@ -184,53 +181,22 @@ class ParentChildCalculator {
         return String(value || '').replace(/\D/g, '');
     }
 
-    convertYYtoYYYY(yy) {
-        const num = parseInt(yy, 10);
-        if (Number.isNaN(num)) return null;
-        const currentYY = new Date().getFullYear() % 100;
-        if (num <= currentYY) return 2000 + num;
-        return 1900 + num;
-    }
-
     validateBirth6(raw) {
         const digits = this.digitsOnly(raw);
-        if (digits.length !== 6) {
-            return { valid: false, msg: '생년월일 6자리(YYMMDD)를 입력해 주세요.' };
+        if (digits.length !== 8) {
+            return { valid: false, msg: '생년월일 8자리(YYYYMMDD)를 입력해 주세요.' };
         }
-
-        const yy = digits.slice(0, 2);
-        const mm = digits.slice(2, 4);
-        const dd = digits.slice(4, 6);
-
-        const year = this.convertYYtoYYYY(yy);
-        const month = parseInt(mm, 10);
-        const day = parseInt(dd, 10);
-
-        if (!year) {
-            return { valid: false, msg: '연도를 다시 확인해 주세요.' };
+        try {
+            const parsed = AgeCalcDateRules.parseBirthDateDigits(digits);
+            const date = new Date(parsed.getUTCFullYear(), parsed.getUTCMonth(), parsed.getUTCDate());
+            return { valid: true, msg: '', date, digits };
+        } catch (error) {
+            const message = String(error && error.message || '');
+            return {
+                valid: false,
+                msg: message.includes('future') ? '미래 날짜는 입력할 수 없습니다.' : '존재하지 않는 날짜입니다.'
+            };
         }
-        if (month < 1 || month > 12) {
-            return { valid: false, msg: '월은 1~12 사이여야 합니다.' };
-        }
-        if (day < 1 || day > 31) {
-            return { valid: false, msg: '일을 다시 확인해 주세요.' };
-        }
-
-        const date = new Date(year, month - 1, day);
-        if (
-            date.getFullYear() !== year ||
-            date.getMonth() + 1 !== month ||
-            date.getDate() !== day
-        ) {
-            return { valid: false, msg: '존재하지 않는 날짜입니다.' };
-        }
-
-        const now = new Date();
-        if (date > now) {
-            return { valid: false, msg: '미래 날짜는 입력할 수 없습니다.' };
-        }
-
-        return { valid: true, msg: '', date, digits };
     }
 
     calcAgeOn(date, birth) {
@@ -349,66 +315,13 @@ class ParentChildCalculator {
     }
 
     async buildShareLink() {
-        const params = new URLSearchParams();
-        if (typeof ShareCodec !== 'undefined') {
-            const payload = { parents: this.parents, children: this.children };
-            const encoded = await ShareCodec.encode(payload);
-            params.set('s', encoded);
-            return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
-        }
-        this.parents.forEach((p, idx) => {
-            params.set(`p${idx + 1}r`, p.role);
-            params.set(`p${idx + 1}b`, this.digitsOnly(p.birth));
-        });
-        this.children.forEach((c, idx) => {
-            params.set(`c${idx + 1}r`, c.role);
-            params.set(`c${idx + 1}b`, this.digitsOnly(c.birth));
-        });
-        return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+        return `${window.location.origin}${window.location.pathname}`;
     }
 
     async loadFromUrl() {
-        const params = new URLSearchParams(window.location.search);
-        const packed = params.get('s');
-        if (packed && typeof ShareCodec !== 'undefined') {
-            try {
-                const decoded = await ShareCodec.decode(packed);
-                const parents = Array.isArray(decoded.parents) ? decoded.parents : [];
-                const children = Array.isArray(decoded.children) ? decoded.children : [];
-                this.parents = [];
-                this.children = [];
-                parents.slice(0, this.maxParents).forEach(p => this.addParentLine(p));
-                children.slice(0, this.maxChildren).forEach(c => this.addChildLine(c));
-                return;
-            } catch {
-                // fallback below
-            }
+        if (window.location.search) {
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
-        const parents = [];
-        const children = [];
-
-        for (let i = 1; i <= this.maxParents; i += 1) {
-            const role = params.get(`p${i}r`);
-            const birth = params.get(`p${i}b`);
-            const y = params.get(`p${i}y`);
-            const m = params.get(`p${i}m`);
-            const d = params.get(`p${i}d`);
-            if (role || birth || y || m || d) parents.push({ role, birth, y, m, d });
-        }
-
-        for (let i = 1; i <= this.maxChildren; i += 1) {
-            const role = params.get(`c${i}r`);
-            const birth = params.get(`c${i}b`);
-            const y = params.get(`c${i}y`);
-            const m = params.get(`c${i}m`);
-            const d = params.get(`c${i}d`);
-            if (role || birth || y || m || d) children.push({ role, birth, y, m, d });
-        }
-
-        this.parents = [];
-        this.children = [];
-        parents.forEach(p => this.addParentLine(p));
-        children.forEach(c => this.addChildLine(c));
     }
 
     async saveResultAsImage() {

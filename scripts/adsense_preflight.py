@@ -132,6 +132,15 @@ def validate_review_excluded_page(
     validate_review_mode_html(path, html, report)
 
 
+def validate_review_mode_rss(response, report: PreflightReport) -> None:
+    if response.status_code != 404:
+        report.add_issue(
+            "review_rss_exposed",
+            "/rss.xml",
+            f"승인 모드 RSS가 404 대신 {response.status_code} 응답을 반환합니다.",
+        )
+
+
 def _validate_public_page(path: str, response, html: str, adsense_client_id: str, report: PreflightReport) -> None:
     if response.status_code != 200:
         report.add_issue("page_not_200", path, f"공개 사이트맵 URL 응답이 {response.status_code}입니다.")
@@ -194,6 +203,9 @@ def run_local_preflight() -> PreflightReport:
 
     report = PreflightReport()
     client = app.test_client()
+
+    if ADSENSE_REVIEW_MODE:
+        validate_review_mode_rss(client.get("/rss.xml"), report)
 
     sitemap_response = client.get("/sitemap.xml")
     if sitemap_response.status_code != 200:

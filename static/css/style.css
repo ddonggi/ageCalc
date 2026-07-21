@@ -142,9 +142,9 @@ button {
 .site-header,
 .home-page .site-header {
     grid-template-columns: minmax(190px, 1fr) auto auto;
-    width: 100vw;
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
     padding: 14px max(24px, calc((100vw - 1440px) / 2 + 34px));
     border-radius: 0;
     border-width: 0 0 1px;
@@ -679,7 +679,10 @@ button {
 }
 
 .life-hub-mega-panel {
+    left: auto;
+    right: 0;
     width: min(880px, calc(100vw - 48px));
+    transform: translateY(8px);
 }
 
 .life-hub-mega-links {
@@ -734,7 +737,7 @@ button {
 }
 
 .breadcrumbs {
-    width: min(1280px, calc(100vw - 32px));
+    width: min(100%, 1280px);
     margin: 14px auto 0;
     padding: 0 2px;
 }
@@ -783,6 +786,11 @@ button {
     visibility: visible;
     pointer-events: auto;
     transform: translate(-50%, 0);
+}
+
+.mega-nav-item:hover .life-hub-mega-panel,
+.mega-nav-item:focus-within .life-hub-mega-panel {
+    transform: translateY(0);
 }
 
 .mega-menu-intro {

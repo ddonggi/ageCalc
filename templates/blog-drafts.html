@@ -26,23 +26,23 @@
 </head>
 
 <body class="blog-page">
+    {% set coupang_partners_enabled = false %}
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
         <section class="hero-band blog-hero-band">
             <p class="eyebrow">검토용 목록</p>
             <h1>블로그 초안</h1>
             {% if access_granted %}
             <p class="page-intro">작성 중인 초안과 검토가 필요한 글을 한곳에 모아봤습니다.</p>
             <form method="post" action="{{ url_for('blog_drafts_logout') }}" style="margin-top: 16px;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="page-btn">잠금 해제 종료</button>
             </form>
             {% else %}
             <p class="page-intro">초안 목록을 보려면 비밀번호를 입력하세요.</p>
             {% endif %}
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
 
         {% if not access_granted %}
         <article class="blog-article">
@@ -50,6 +50,7 @@
             <p class="blog-date" style="color: #b33a3a;">{{ error }}</p>
             {% endif %}
             <form method="post" action="{{ url_for('blog_drafts') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <label for="draft-password" class="eyebrow" style="display: block; margin-bottom: 8px;">비밀번호</label>
                 <input
                     id="draft-password"

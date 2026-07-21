@@ -113,6 +113,7 @@ chmod 600 .env.rss
 
 필수 또는 권장 값:
 - `DATABASE_URL`: MySQL 연결 문자열
+- `AGECALC_ENV`: 운영에서는 반드시 `production`
 - `OPENAI_API_KEY`: OpenAI 글/이미지 생성
 - `OPENAI_MODEL`: 기본값 `gpt-4.1-mini`
 - `OPENAI_IMAGE_MODEL`: 기본값 `gpt-image-1`
@@ -122,6 +123,8 @@ chmod 600 .env.rss
 - `COUPANG_PARTNERS_ENABLED`: `true`이면 공개 블로그 글에 쿠팡 파트너스 배너와 고지 문구를 노출
 - `SMTP_*`: draft 생성 알림 메일
 - `FLASK_SECRET_KEY`: Flask 세션 서명 키
+
+기존 운영 환경도 배포 전에 `AGECALC_ENV=production`과 충분히 긴 `FLASK_SECRET_KEY`를 추가해야 합니다. MySQL 또는 PostgreSQL 연결을 사용하는데 세션 키가 없으면 앱은 안전을 위해 시작하지 않습니다.
 
 민감 정보는 저장소에 커밋하지 않습니다.
 

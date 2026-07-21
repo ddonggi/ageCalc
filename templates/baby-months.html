@@ -34,7 +34,7 @@
     <!-- Google tag (gtag.js) -->
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
 
-    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/date-rules.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 
 </head>
@@ -63,17 +63,17 @@
             </p>
         </section>
 
-        <form class="age-form" id="baby-months-form" autocomplete="off">
+        <form class="age-form" id="baby-months-form" autocomplete="off" data-clarity-mask="true">
             <div class="form-group">
-                <h3>출생일을 입력하세요 (6자리)</h3>
+                <h3>출생일을 입력하세요 (8자리)</h3>
                 <div class="date-inputs">
-                    <input type="text" id="baby-birth-input" placeholder="250615" inputmode="numeric" pattern="[0-9]*" maxlength="6" required aria-label="출생일 6자리">
+                    <input type="text" id="baby-birth-input" placeholder="20250615" inputmode="numeric" pattern="[0-9]*" maxlength="8" required aria-label="출생일 8자리" data-clarity-mask="true">
                 </div>
                 <small id="baby-error" class="error-msg" aria-live="polite"></small>
             </div>
         </form>
 
-        <div class="result-container" id="baby-result-container">
+        <div class="result-container" id="baby-result-container" data-clarity-mask="true">
             <h2>계산 결과</h2>
             <div id="baby-result-content"></div>
         </div>

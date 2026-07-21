@@ -70,7 +70,7 @@
           {"@type":"Question","name":"음력 생일은 어떻게 계산하나요?","acceptedAnswer":{"@type":"Answer","text":"음력 선택 후 생년월일을 입력하면 양력으로 환산해 만나이를 계산합니다."}},
           {"@type":"Question","name":"2월 29일에 태어났다면 만나이는 어떻게 계산되나요?","acceptedAnswer":{"@type":"Answer","text":"윤년이 아닌 해에는 통상 2월 28일 또는 3월 1일을 기준으로 간주하는 관행이 있으며, 기관별 안내를 확인하세요."}},
           {"@type":"Question","name":"결과가 법적 효력을 갖나요?","acceptedAnswer":{"@type":"Answer","text":"일반 정보 제공용입니다. 법적 판단은 관계 법령과 기관 고시를 우선합니다."}},
-          {"@type":"Question","name":"입력한 생년월일이 서버에 저장되나요?","acceptedAnswer":{"@type":"Answer","text":"계산을 위해 서버로 전송되지만 저장하지 않습니다."}},
+          {"@type":"Question","name":"입력한 생년월일이 서버에 저장되나요?","acceptedAnswer":{"@type":"Answer","text":"양력은 브라우저에서 계산합니다. 음력은 양력 변환을 위해서만 서버로 전송하며 저장하지 않습니다."}},
           {"@type":"Question","name":"국제 표준시/서머타임이 결과에 영향을 주나요?","acceptedAnswer":{"@type":"Answer","text":"날짜만 계산하므로 시·분·타임존은 반영하지 않습니다."}},
           {"@type":"Question","name":"연나이와의 차이는 무엇인가요?","acceptedAnswer":{"@type":"Answer","text":"연나이는 '올해 − 출생연도' 개념이며, 공적 영역에서는 만나이가 기준입니다."}}
          ]
@@ -88,14 +88,13 @@
     <!-- 스크립트 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
-    <script src="{{ url_for('static', filename='js/share-codec.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/date-rules.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/age-calculator.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <!-- Google tag (gtag.js) -->
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
 
-    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 
 </head>
@@ -144,9 +143,9 @@
                 정확한 결과에는 출생연도뿐 아니라 월과 일이 필요합니다.
             </p>
         </section>
-        <form class="age-form" id="age-form" action="{{ url_for('age') }}" method="post" autocomplete="off">
+        <form class="age-form" id="age-form" action="{{ url_for('age') }}" method="post" autocomplete="off" data-clarity-mask="true">
             <div class="form-group">
-                <h3>생년월일을 입력하세요 (6자리)</h3>
+                <h3>생년월일을 입력하세요 (8자리)</h3>
 
                 <!-- 음력/양력 토글 -->
                 <div class="calendar-toggle-container">
@@ -160,15 +159,15 @@
                 </div>
 
                 <div class="date-inputs">
-                    <input type="text" id="birth-input" name="birth-input" placeholder="921002" inputmode="numeric"
-                        pattern="[0-9]*" maxlength="6" required>
+                    <input type="text" id="birth-input" name="birth-input" placeholder="19921002" inputmode="numeric"
+                        pattern="[0-9]*" maxlength="8" required data-clarity-mask="true">
                 </div>
 
                 <small id="birth-error" class="error-msg" aria-live="polite"></small>
             </div>
         </form>
 
-        <div class="result-container" id="result-container">
+        <div class="result-container" id="result-container" data-clarity-mask="true">
             <h2>계산 결과</h2>
             <div id="result-content">
                 <!-- 결과 내용이 JavaScript로 동적 생성됨 -->
@@ -195,7 +194,7 @@
                 간주하는 사례가 있으므로, 실제 행정 판단이 필요하다면 관계 기관 안내를 확인하세요.
             </p>
             <ul>
-                <li>입력 형식: 6자리 생년월일(예: 921002)</li>
+                <li>입력 형식: 8자리 생년월일(예: 19921002)</li>
                 <li>계산 기준: 생일이 지나야 +1, 생일 전이면 전년도 나이 유지</li>
                 <li>결과 용도: 일반 정보 제공(법적 효력 없음)</li>
             </ul>

@@ -21,7 +21,7 @@ class BabyMonthsCalculator {
     }
 
     normalizeInputs() {
-        this.limitDigits(this.birthInput, 6);
+        this.limitDigits(this.birthInput, 8);
     }
 
     limitDigits(input, maxLength) {
@@ -32,43 +32,23 @@ class BabyMonthsCalculator {
         }
     }
 
-    convertYYtoYYYY(yy) {
-        const num = parseInt(yy, 10);
-        const currentYY = new Date().getFullYear() % 100;
-        if (num <= currentYY) return 2000 + num;
-        return 1900 + num;
-    }
-
     validate() {
         const digits = String(this.birthInput.value || '').replace(/\D/g, '');
 
-        if (digits.length !== 6) {
-            return { valid: false, msg: '출생일 6자리(YYMMDD)를 입력해 주세요.' };
+        if (digits.length !== 8) {
+            return { valid: false, msg: '출생일 8자리(YYYYMMDD)를 입력해 주세요.' };
         }
-
-        const y = this.convertYYtoYYYY(digits.slice(0, 2));
-        const m = Number(digits.slice(2, 4));
-        const d = Number(digits.slice(4, 6));
-
-        if (m < 1 || m > 12) {
-            return { valid: false, msg: '월은 1~12 사이로 입력해 주세요.' };
+        try {
+            const parsed = AgeCalcDateRules.parseBirthDateDigits(digits);
+            const birth = new Date(parsed.getUTCFullYear(), parsed.getUTCMonth(), parsed.getUTCDate());
+            return { valid: true, birth };
+        } catch (error) {
+            const message = String(error && error.message || '');
+            return {
+                valid: false,
+                msg: message.includes('future') ? '미래 날짜는 입력할 수 없습니다.' : '올바른 날짜를 입력해 주세요.'
+            };
         }
-        if (d < 1 || d > 31) {
-            return { valid: false, msg: '일은 1~31 사이로 입력해 주세요.' };
-        }
-        const birth = new Date(y, m - 1, d);
-        if (
-            Number.isNaN(birth.getTime()) ||
-            birth.getFullYear() !== y ||
-            birth.getMonth() !== m - 1 ||
-            birth.getDate() !== d
-        ) {
-            return { valid: false, msg: '올바른 날짜를 입력해 주세요.' };
-        }
-        if (birth > this.getToday()) {
-            return { valid: false, msg: '미래 날짜는 입력할 수 없습니다.' };
-        }
-        return { valid: true, birth };
     }
 
     getToday() {
@@ -78,12 +58,9 @@ class BabyMonthsCalculator {
 
     calculateMonths(birth) {
         const today = this.getToday();
-        let months = (today.getFullYear() - birth.getFullYear()) * 12;
-        months += today.getMonth() - birth.getMonth();
-        if (today.getDate() < birth.getDate()) {
-            months -= 1;
-        }
-        return Math.max(0, months);
+        const birthIso = `${birth.getFullYear()}-${String(birth.getMonth() + 1).padStart(2, '0')}-${String(birth.getDate()).padStart(2, '0')}`;
+        const todayIso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        return AgeCalcDateRules.calculateCompletedMonths(birthIso, todayIso);
     }
 
     calculateTotalDays(birth) {

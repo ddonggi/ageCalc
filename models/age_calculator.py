@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from models.date_rules import calculate_man_age
+
 class AgeCalculator:
     """만 나이 계산을 담당하는 Model 클래스"""
     
@@ -14,14 +16,8 @@ class AgeCalculator:
         Returns:
             int: 만 나이
         """
-        today = datetime.now()
-        age = today.year - birth_date.year
-        
-        # 생일이 지나지 않았으면 1살 빼기
-        if today.month < birth_date.month or (today.month == birth_date.month and today.day < birth_date.day):
-            age -= 1
-        
-        return age
+        today = datetime.now().date()
+        return calculate_man_age(birth_date.date(), today)
     
     @staticmethod
     def parse_birth_date(date_string):
@@ -38,4 +34,3 @@ class AgeCalculator:
             return datetime.strptime(date_string, '%Y-%m-%d')
         except ValueError:
             return None
-

@@ -34,7 +34,6 @@
 
     <!-- Google tag (gtag.js) -->
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 
 </head>
@@ -60,7 +59,7 @@
             </p>
         </section>
 
-        <form class="age-form" id="parent-child-form" autocomplete="off">
+        <form class="age-form" id="parent-child-form" autocomplete="off" data-clarity-mask="true">
             <div class="form-group">
                 <h3>부모</h3>
                 <div class="line-actions">
@@ -79,7 +78,7 @@
             </div>
         </form>
 
-        <div class="result-container" id="parent-child-result-container">
+        <div class="result-container" id="parent-child-result-container" data-clarity-mask="true">
             <h2>계산 결과</h2>
             <div id="parent-child-result-content"></div>
             <div class="share-section" style="margin-top:12px;">
@@ -163,9 +162,9 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="{{ url_for('static', filename='js/share-codec.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/date-rules.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/parent-child.js') }}" defer></script>
 
     <!-- 스크롤 상단 버튼 -->

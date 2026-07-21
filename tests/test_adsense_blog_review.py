@@ -1,4 +1,6 @@
 import unittest
+import copy
+from datetime import date
 from types import SimpleNamespace
 
 from scripts.adsense_blog_review import audit_post, audit_posts
@@ -41,6 +43,22 @@ def _post(**overrides):
 
 
 class AdsenseBlogReviewTests(unittest.TestCase):
+    def test_publication_gate_rejects_unregistered_draft(self):
+        from scripts.seed_public_blog_posts import build_seed_post_payload, seed_sources_for_slug
+
+        payload = build_seed_post_payload("2026-man-age-guide")
+        payload["slug"] = "unregistered-draft"
+        post = SimpleNamespace(
+            id=10,
+            sources=[SimpleNamespace(**source) for source in seed_sources_for_slug("2026-man-age-guide")],
+            **payload,
+        )
+
+        result = audit_post(post, require_cover_image=True)
+
+        self.assertFalse(result.keep)
+        self.assertIn("unregistered_public_content", result.issue_codes)
+
     def test_audit_keeps_rich_related_article(self):
         result = audit_post(_post())
 
@@ -129,6 +147,44 @@ class AdsenseBlogReviewTests(unittest.TestCase):
 
         self.assertEqual(2, len(results))
         self.assertTrue(all("similar_title_cluster" in result.issue_codes for result in results))
+
+    def test_audit_flags_expired_structured_policy_content(self):
+        from content.blog_articles import BLOG_ARTICLE_BLUEPRINTS
+        from scripts.seed_public_blog_posts import build_seed_post_payload, seed_sources_for_slug
+
+        slug = "national-pension-receiving-age"
+        registry = copy.deepcopy(BLOG_ARTICLE_BLUEPRINTS)
+        registry[slug]["expires_at"] = "2026-07-21"
+        payload = build_seed_post_payload(slug)
+        post = SimpleNamespace(
+            id=7,
+            sources=[SimpleNamespace(**source) for source in seed_sources_for_slug(slug)],
+            **payload,
+        )
+
+        result = audit_post(post, article_registry=registry, today=date(2026, 7, 21))
+
+        self.assertFalse(result.keep)
+        self.assertIn("expired_structured_content", result.critical_issue_codes)
+
+    def test_audit_flags_invalid_structured_contract(self):
+        from content.blog_articles import BLOG_ARTICLE_BLUEPRINTS
+        from scripts.seed_public_blog_posts import build_seed_post_payload, seed_sources_for_slug
+
+        slug = "2026-man-age-guide"
+        registry = copy.deepcopy(BLOG_ARTICLE_BLUEPRINTS)
+        registry[slug]["source_urls"] = []
+        payload = build_seed_post_payload(slug)
+        post = SimpleNamespace(
+            id=8,
+            sources=[SimpleNamespace(**source) for source in seed_sources_for_slug(slug)],
+            **payload,
+        )
+
+        result = audit_post(post, article_registry=registry, today=date(2026, 7, 21))
+
+        self.assertFalse(result.keep)
+        self.assertIn("invalid_content_contract", result.critical_issue_codes)
 
 
 if __name__ == "__main__":

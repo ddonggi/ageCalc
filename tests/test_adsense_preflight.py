@@ -59,6 +59,15 @@ class AdsensePreflightTests(unittest.TestCase):
         self.assertEqual(0, report.content_quality_failures)
         self.assertEqual(0, report.content_quality_warnings)
 
+    def test_review_mode_validator_requires_rss_to_be_hidden(self):
+        validator = getattr(preflight_module, "validate_review_mode_rss", None)
+        self.assertIsNotNone(validator)
+        report = PreflightReport()
+
+        validator(type("Response", (), {"status_code": 200})(), report)
+
+        self.assertIn("review_rss_exposed", format_report(report))
+
     def test_review_mode_validator_rejects_monetized_excluded_page(self):
         validator = getattr(preflight_module, "validate_review_excluded_page", None)
         self.assertIsNotNone(validator)

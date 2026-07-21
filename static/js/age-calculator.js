@@ -18,7 +18,7 @@ class AgeCalculatorUI {
      * 초기화
      */
     init() {
-        // 🔹 6자리 모드 요소
+        // 생년월일 8자리 입력 요소
         this.birthInput = document.getElementById('birth-input');
         this.birthErrorEl = document.getElementById('birth-error');
         this.form = document.querySelector('.age-form');
@@ -61,7 +61,7 @@ class AgeCalculatorUI {
         radioButtons.forEach(radio => {
             radio.addEventListener('change', () => {
                 // 값이 유효하면 재계산
-                if (this.birthInput && this.birthInput.value.length === 6) {
+                if (this.birthInput && this.birthInput.value.length === 8) {
                     const v = this.validateBirth6(this.birthInput.value);
                     if (v.valid) {
                         this.autoCalculateFromBirth6(v);
@@ -339,23 +339,21 @@ class AgeCalculatorUI {
      * 비동기 나이 계산
      */
     async calculateAgeAsync(isoBirthDate) {
-        const formData = new FormData(this.form);
-
-        // 6자리 모드: iso 인자로 넘어온 값 우선
-        if (isoBirthDate) {
-            formData.set('birth_date', isoBirthDate);
-        } else if (this.birthInput) {
-            // 혹시라도 직접 호출됐을 때 방어
-            const v = this.validateBirth6(this.birthInput.value);
-            if (!v.valid) {
-                throw new Error(v.msg || '잘못된 생년월일입니다.');
-            }
-            formData.set('birth_date', v.iso);
+        const calendarType = document.querySelector('input[name="calendar_type"]:checked').value;
+        const validated = isoBirthDate
+            ? { valid: true, iso: isoBirthDate }
+            : this.validateBirth6(this.birthInput.value);
+        if (!validated.valid) {
+            throw new Error(validated.msg || '잘못된 생년월일입니다.');
         }
 
-        // 음력/양력 선택 값 추가
-        const calendarType = document.querySelector('input[name="calendar_type"]:checked').value;
-        formData.set('calendar_type', calendarType);
+        if (calendarType === 'solar') {
+            return this.calculateSolarAgeLocally(validated.iso);
+        }
+
+        const formData = new FormData();
+        formData.set('birth_date', validated.iso);
+        formData.set('calendar_type', 'lunar');
 
         const endpoint = (this.form && this.form.getAttribute('action')) || window.location.pathname || '/age';
         const response = await fetch(endpoint, {
@@ -372,6 +370,24 @@ class AgeCalculatorUI {
 
         const result = await response.json();
         return result;
+    }
+
+    calculateSolarAgeLocally(isoBirthDate) {
+        const today = new Date();
+        const referenceDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        try {
+            const age = AgeCalcDateRules.calculateManAge(isoBirthDate, referenceDate);
+            return { success: true, message: `생년월일: ${isoBirthDate}`, age };
+        } catch (error) {
+            const message = String(error && error.message || '');
+            return {
+                success: false,
+                message: message.includes('future')
+                    ? '미래의 생년월일은 계산할 수 없습니다.'
+                    : '올바른 날짜를 입력해주세요.',
+                age: null,
+            };
+        }
     }
 
     /**
@@ -1003,34 +1019,9 @@ class AgeCalculatorUI {
         });
     }
 
-    /**
-     * 공유용 URL 생성
-     * - 6자리 모드: birth_date=YYMMDD (예: 921002)
-     * - 3필드 모드: 기존처럼 YYYY-MM-DD 유지 (백워드 호환)
-     */
+    /** 공유 링크에는 개인 입력값을 포함하지 않는다. */
     async generateShareUrl() {
-        const baseUrl = window.location.origin + window.location.pathname;
-        const params = new URLSearchParams();
-
-        // 현재 입력값 기준으로
-        if (this.birthInput) {
-            const v = this.validateBirth6(this.birthInput.value);
-            if (v.valid) {
-                const calendarType = document.querySelector('input[name=\"calendar_type\"]:checked')?.value || 'solar';
-                const payload = { birth_date: v.digits, calendar_type: calendarType };
-                if (typeof ShareCodec !== 'undefined') {
-                    const encoded = await ShareCodec.encode(payload);
-                    params.set('s', encoded);
-                    return `${baseUrl}?${params.toString()}`;
-                }
-                params.set('birth_date', v.digits);
-                params.set('calendar_type', calendarType);
-                return `${baseUrl}?${params.toString()}`;
-            }
-        }
-
-        // fallback: 그냥 base URL
-        return baseUrl;
+        return window.location.origin + window.location.pathname;
     }
 
     /**
@@ -1053,62 +1044,8 @@ class AgeCalculatorUI {
      * URL에서 결과 로드
      */
     async loadFromUrl() {
-        const params = new URLSearchParams(window.location.search);
-        const packed = params.get("s");
-        if (packed && typeof ShareCodec !== 'undefined') {
-            try {
-                const decoded = await ShareCodec.decode(packed);
-                const q = decoded.birth_date;
-                const calendarType = decoded.calendar_type || 'solar';
-                const radio = document.querySelector(`input[name="calendar_type"][value="${calendarType}"]`);
-                if (radio) radio.checked = true;
-                if (!q) return;
-                if (this.birthInput) {
-                    const digits = q.replace(/\D/g, "");
-                    if (digits.length === 6) {
-                        this.birthInput.value = digits;
-                        this.checkAndCalculate6Digit();
-                        return;
-                    }
-                }
-            } catch {
-                // fallback below
-            }
-        }
-
-        const q = params.get("birth_date");
-        if (!q) return;
-
-        // 6자리 모드
-        if (this.birthInput) {
-            const digits = q.replace(/\D/g, "");
-
-            // case 1: URL이 이미 YYMMDD (예: 921002)
-            if (digits.length === 6) {
-                this.birthInput.value = digits;
-                this.checkAndCalculate6Digit();
-                return;
-            }
-
-            // case 2: 혹시 예전 포맷(YYYY-MM-DD)으로 온 경우도 처리
-            if (DateUtils.validateDateFormat(q)) {
-                const [y, m, d] = q.split("-");
-                const yy = y.slice(-2);
-                this.birthInput.value = `${yy}${m}${d}`; // 921002 형태
-                this.checkAndCalculate6Digit();
-                return;
-            }
-
-            return;
-        }
-
-        // 3필드 모드 (기존 로직)
-        if (DateUtils.validateDateFormat(q)) {
-            const [y, m, d] = q.split("-");
-            this.yearInput.value = y;
-            this.monthInput.value = m;
-            this.dayInput.value = d;
-            this.checkAndCalculate();
+        if (window.location.search) {
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
     }
 
@@ -1152,62 +1089,25 @@ class AgeCalculatorUI {
         }
     }
 
-    // YY -> YYYY 변환
-    convertYYtoYYYY(yy) {
-        const num = parseInt(yy, 10);
-        const currentYY = new Date().getFullYear() % 100; // 예: 2025 → 25
-
-        // 00~현재년 → 2000년대, 그 외 → 1900년대
-        if (num <= currentYY) return 2000 + num;
-        return 1900 + num;
-    }
-
-    // 6자리 YYMMDD 검증
+    // 8자리 YYYYMMDD 검증. 두 자리 연도는 세기가 모호하므로 받지 않습니다.
     validateBirth6(raw) {
         const digits = (raw || '').replace(/\D/g, '');
 
-        if (digits.length !== 6) {
-            return { valid: false, msg: '생년월일 6자리(YYMMDD)를 입력해주세요.' };
+        if (digits.length !== 8) {
+            return { valid: false, msg: '생년월일 8자리(YYYYMMDD)를 입력해주세요.' };
         }
+        try {
+            const date = AgeCalcDateRules.parseBirthDateDigits(digits);
+            const iso = AgeCalcDateRules.formatIsoDate(date);
 
-        const yy = digits.slice(0, 2);
-        const mm = digits.slice(2, 4);
-        const dd = digits.slice(4, 6);
-
-        const year = this.convertYYtoYYYY(yy);
-        const month = parseInt(mm, 10);
-        const day = parseInt(dd, 10);
-
-        const now = new Date();
-
-        if (month < 1 || month > 12) {
-            return { valid: false, msg: '월은 1~12 사이여야 합니다.' };
+            return { valid: true, msg: '', iso, digits };
+        } catch (error) {
+            const message = String(error && error.message || '');
+            return {
+                valid: false,
+                msg: message.includes('future') ? '미래 날짜는 입력할 수 없습니다.' : '존재하지 않는 날짜입니다.'
+            };
         }
-        if (day < 1 || day > 31) {
-            return { valid: false, msg: '일을 다시 확인해주세요.' };
-        }
-
-        const date = new Date(year, month - 1, day);
-        if (
-            date.getFullYear() !== year ||
-            date.getMonth() + 1 !== month ||
-            date.getDate() !== day
-        ) {
-            return { valid: false, msg: '존재하지 않는 날짜입니다.' };
-        }
-
-        if (date > now) {
-            return { valid: false, msg: '미래 날짜는 입력할 수 없습니다.' };
-        }
-
-        const iso = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-
-        return {
-            valid: true,
-            msg: '',
-            iso,
-            digits
-        };
     }
 
     showBirthError(msg) {
@@ -1220,7 +1120,7 @@ class AgeCalculatorUI {
         }
     }
 
-    // 6자리 모드에서 입력 시 호출
+    // 8자리 모드에서 입력 시 호출
     checkAndCalculate6Digit() {
         const raw = this.birthInput.value;
         const digits = raw.replace(/\D/g, '');
@@ -1228,7 +1128,7 @@ class AgeCalculatorUI {
         // 입력이 바뀌면 기존 결과 숨기기
         this.hideResult();
 
-        if (digits.length < 6) {
+        if (digits.length < 8) {
             this.showBirthError('');
             return;
         }
@@ -1415,16 +1315,15 @@ class AgeCalculatorUI {
     }
 
     getBirthYear() {
-        // 6자리 모드
+        // 8자리 모드
         if (this.birthInput) {
             const iso = this.hiddenDateInput && this.hiddenDateInput.value;
             if (iso && DateUtils.validateDateFormat(iso)) {
                 return parseInt(iso.split('-')[0], 10);
             }
             const digits = this.birthInput.value.replace(/\D/g, '');
-            if (digits.length === 6) {
-                const yy = digits.slice(0, 2);
-                return this.convertYYtoYYYY(yy);
+            if (digits.length === 8) {
+                return parseInt(digits.slice(0, 4), 10);
             }
             return null;
         }

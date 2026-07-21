@@ -54,7 +54,14 @@ class AgeController:
                 }
         
         # 나이 계산
-        age = self.age_calculator.calculate_age(birth_date)
+        try:
+            age = self.age_calculator.calculate_age(birth_date)
+        except ValueError:
+            return {
+                'success': False,
+                'message': '미래의 생년월일은 계산할 수 없습니다.',
+                'age': None,
+            }
         
         message = f'생년월일: {original_birth_date_string}'
         if is_lunar:
@@ -65,4 +72,3 @@ class AgeController:
             'message': message,
             'age': age
         }
-
