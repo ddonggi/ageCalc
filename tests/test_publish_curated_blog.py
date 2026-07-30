@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 from sqlalchemy import create_engine
@@ -115,6 +115,23 @@ class PublishCuratedBlogTests(unittest.TestCase):
 
         self.assertEqual(["legacy-unregistered-post"], [post.slug for post in self.session.query(GeneratedPost).all()])
         self.assertEqual(1, self.session.query(PostSource).count())
+
+    def test_apply_uses_naive_utc_for_default_publication_time(self):
+        from scripts.publish_curated_blog import apply_release
+
+        before = datetime.now(UTC).replace(tzinfo=None)
+        with tempfile.TemporaryDirectory() as directory:
+            apply_release(self.session, backup_dir=Path(directory))
+        after = datetime.now(UTC).replace(tzinfo=None)
+
+        published_times = {
+            post.published_at
+            for post in self.session.query(GeneratedPost).filter_by(status="published").all()
+        }
+        self.assertEqual(1, len(published_times))
+        published_at = published_times.pop()
+        self.assertGreaterEqual(published_at, before)
+        self.assertLessEqual(published_at, after)
 
     def test_restore_rejects_tampering_and_recovers_rows_and_timestamps(self):
         from scripts.publish_curated_blog import (

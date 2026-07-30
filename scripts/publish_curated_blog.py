@@ -216,7 +216,7 @@ def apply_release(
     legacy_ids = [post.id for post in legacy_posts]
     linked_sources = _linked_sources(session, legacy_ids)
     backup_path = create_backup(session, backup_dir, posts=legacy_posts, sources=linked_sources)
-    publish_time = published_at or datetime.now()
+    publish_time = published_at or datetime.now(UTC).replace(tzinfo=None)
 
     try:
         if legacy_ids:
