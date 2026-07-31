@@ -139,6 +139,42 @@ class ContentQualityAuditTests(unittest.TestCase):
         self.assertGreaterEqual(len(hub_report.results), 5)
         self.assertTrue(all(result.hub == "age" for result in hub_report.results))
 
+    def test_public_hubs_and_education_family_category_have_no_thin_content_warning(self):
+        paths = (
+            "/age/",
+            "/family/",
+            "/education/",
+            "/anniversary/",
+            "/retirement/",
+            "/health/",
+            "/pets/",
+            "/generations/",
+            "/blog/category/education-family",
+        )
+        posts = [
+            SimpleNamespace(slug=slug, published_at=datetime(2026, 7, 30, 9, 0))
+            for slug in (
+                "early-birth-school-grade-guide",
+                "baby-months-calculation-guide",
+                "parent-child-age-gap-guide",
+            )
+        ]
+        session = SimpleNamespace(close=lambda: None)
+
+        with mock.patch.object(app_module, "ADSENSE_REVIEW_MODE", False), mock.patch.object(
+            app_module, "BLOG_PUBLIC_INDEXING_ENABLED", True
+        ), mock.patch.object(app_module, "SessionLocal", return_value=session), mock.patch.object(
+            app_module, "_published_eligible_blog_posts", return_value=posts
+        ), mock.patch.object(app_module, "_is_blog_public_indexable", return_value=True):
+            report = audit_local_pages(paths=paths)
+
+        thin_paths = {
+            result.path
+            for result in report.results
+            if any(issue.code == "thin_content_warning" for issue in result.warnings)
+        }
+        self.assertEqual(set(), thin_paths)
+
     def test_all_indexable_local_pages_pass_content_quality_errors(self):
         report = audit_local_pages()
         failing = {

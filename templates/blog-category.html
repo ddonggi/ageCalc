@@ -38,6 +38,38 @@
             <h2>{{ category_label }} 글을 고르는 기준</h2>
             <p>공개 감사와 재검수 기한을 통과한 글만 모으며, 각 글에서 계산기와 공식 확인 경로를 함께 제공합니다.</p>
         </section>
+        {% if category_editorial_content %}
+        <section class="section-shell blog-category-usage-guide" aria-labelledby="category-usage-guide-title">
+            <div class="section-heading">
+                <p class="eyebrow">Reading Guide</p>
+                <h2 id="category-usage-guide-title">{{ category_editorial_content.title }}</h2>
+                <p class="section-intro">{{ category_editorial_content.intro }}</p>
+            </div>
+            <div class="hub-card-grid">
+                {% for title, description in category_editorial_content.steps %}
+                <article class="hub-card calendar-card calendar-card-{{ loop.index % 4 }}">
+                    <span class="hub-card-index">0{{ loop.index }}</span>
+                    <h3>{{ title }}</h3>
+                    <p>{{ description }}</p>
+                </article>
+                {% endfor %}
+            </div>
+            <section class="life-hub-questions" aria-labelledby="category-questions-title">
+                <div class="section-heading">
+                    <p class="eyebrow">Questions</p>
+                    <h2 id="category-questions-title">자주 묻는 질문</h2>
+                </div>
+                <div class="question-list">
+                    {% for question, answer in category_editorial_content.faqs %}
+                    <article class="question-item">
+                        <h3>{{ question }}</h3>
+                        <p>{{ answer }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+        </section>
+        {% endif %}
         {% if posts %}
         <section class="section-shell">
             <div class="blog-grid">

@@ -721,6 +721,27 @@ class PublicPageTests(unittest.TestCase):
                 self.assertRegex(html, r'class="[^"]*\bdirect-answer\b[^"]*"')
                 self.assertIn('class="related-paths"', html)
 
+    def test_life_hubs_render_unique_usage_guides(self):
+        client = app.test_client()
+        expected_headings = {
+            "age": "나이 기준을 먼저 정하세요",
+            "family": "가족의 기준일을 먼저 정하세요",
+            "education": "현재 학년과 입학연도를 나눠 확인하세요",
+            "anniversary": "기념일의 시작일 포함 여부를 정하세요",
+            "retirement": "제도 이름과 기준일을 먼저 확인하세요",
+            "health": "공식 조회 전에 나이 기준을 맞추세요",
+            "pets": "반려동물의 종과 현재 연령을 확인하세요",
+            "generations": "출생연도와 비교 기준을 먼저 정하세요",
+        }
+
+        for key, heading in expected_headings.items():
+            with self.subTest(key=key):
+                html = client.get(f"/{key}/").get_data(as_text=True)
+
+                self.assertIn("life-hub-usage-guide", html)
+                self.assertIn("이렇게 시작하세요", html)
+                self.assertIn(heading, html)
+
     def test_public_pages_render_visual_and_schema_breadcrumbs(self):
         client = app.test_client()
         expected_paths = {

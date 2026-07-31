@@ -82,6 +82,24 @@
             </div>
         </section>
 
+        <section class="section-shell life-hub-usage-guide" aria-labelledby="hub-usage-guide-title">
+            <div class="section-heading">
+                <p class="eyebrow">How to Use</p>
+                <h2 id="hub-usage-guide-title">{{ hub.usage_guide.title }}</h2>
+                <p class="section-intro">{{ hub.usage_guide.intro }}</p>
+            </div>
+            <div class="hub-card-grid">
+                {% for title, description in hub.usage_guide.steps %}
+                <article class="hub-card calendar-card calendar-card-{{ loop.index % 4 }}">
+                    <span class="hub-card-index">0{{ loop.index }}</span>
+                    <h3>{{ title }}</h3>
+                    <p>{{ description }}</p>
+                </article>
+                {% endfor %}
+            </div>
+            <p class="small editorial-disclaimer">{{ hub.usage_guide.note }}</p>
+        </section>
+
         <nav class="related-paths" aria-label="{{ hub.title }} 관련 경로">
         <section class="section-shell life-hub-support">
             <div class="section-heading">

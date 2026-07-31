@@ -120,6 +120,28 @@ class BlogDiscoveryTests(unittest.TestCase):
             html,
         )
 
+    def test_education_family_category_renders_editorial_usage_guide(self):
+        posts = [
+            make_post("early-birth-school-grade-guide", 1),
+            make_post("baby-months-calculation-guide", 2),
+            make_post("parent-child-age-gap-guide", 3),
+        ]
+
+        with mock.patch.object(app_module, "ADSENSE_REVIEW_MODE", False), mock.patch.object(
+            app_module, "BLOG_PUBLIC_INDEXING_ENABLED", True
+        ), mock.patch.object(app_module, "SessionLocal", return_value=FakeSession(posts)), mock.patch.object(
+            app_module, "_published_blog_count", return_value=3
+        ):
+            response = app.test_client().get("/blog/category/education-family")
+
+        html = response.get_data(as_text=True)
+        self.assertEqual(200, response.status_code)
+        self.assertIn("blog-category-usage-guide", html)
+        self.assertIn("학교·육아 정보를 확인하는 순서", html)
+        self.assertIn("출생일과 기준일을 먼저 확인", html)
+        self.assertIn("학교와 기관의 실제 기준도 확인", html)
+        self.assertIn("자주 묻는 질문", html)
+
     def test_blog_detail_renders_twitter_article_schema_and_category_breadcrumb(self):
         post = make_post("national-pension-receiving-age")
         with mock.patch.object(app_module, "ADSENSE_REVIEW_MODE", False), mock.patch.object(

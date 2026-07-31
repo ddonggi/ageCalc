@@ -13,7 +13,7 @@ from zoneinfo import ZoneInfo
 from werkzeug.middleware.proxy_fix import ProxyFix
 from controllers.age_controller import AgeController
 from content.blog_articles import BLOG_ARTICLE_BLUEPRINTS, structured_blog_article_for_slug
-from content.blog.schema import BLOG_CATEGORIES
+from content.blog.schema import BLOG_CATEGORIES, CATEGORY_PAGE_EDITORIAL_CONTENT
 from content.blog.rendering import render_article_content_html
 from content.editorial_metadata import editorial_metadata_for
 from content.guide_pages import (
@@ -2143,6 +2143,7 @@ def blog_category(category_slug):
             total_pages=total_pages,
             category_slug=category_slug,
             category_label=BLOG_CATEGORIES[category_slug],
+            category_editorial_content=CATEGORY_PAGE_EDITORIAL_CONTENT.get(category_slug),
             category_indexable=category_indexable,
             canonical_url=canonical_url,
             article_by_slug=BLOG_ARTICLE_BLUEPRINTS,
