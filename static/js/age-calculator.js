@@ -44,7 +44,7 @@ class AgeCalculatorUI {
      * 이벤트 바인딩
      */
     bindEvents() {
-        this.bind6DigitInputEvents();
+        this.bindBirthDateInputEvents();
         this.bindAutoCalculation();
         this.bindZodiacPreview();
         this.bindShareEvents();
@@ -62,9 +62,9 @@ class AgeCalculatorUI {
             radio.addEventListener('change', () => {
                 // 값이 유효하면 재계산
                 if (this.birthInput && this.birthInput.value.length === 8) {
-                    const v = this.validateBirth6(this.birthInput.value);
+                    const v = this.validateBirthDate(this.birthInput.value);
                     if (v.valid) {
-                        this.autoCalculateFromBirth6(v);
+                        this.autoCalculateFromBirthDate(v);
                     }
                 }
             });
@@ -90,7 +90,7 @@ class AgeCalculatorUI {
         });
     }
 
-    bind6DigitInputEvents() {
+    bindBirthDateInputEvents() {
         if (!this.birthInput) return;
 
         // 숫자만 입력 허용
@@ -342,7 +342,7 @@ class AgeCalculatorUI {
         const calendarType = document.querySelector('input[name="calendar_type"]:checked').value;
         const validated = isoBirthDate
             ? { valid: true, iso: isoBirthDate }
-            : this.validateBirth6(this.birthInput.value);
+            : this.validateBirthDate(this.birthInput.value);
         if (!validated.valid) {
             throw new Error(validated.msg || '잘못된 생년월일입니다.');
         }
@@ -615,7 +615,7 @@ class AgeCalculatorUI {
      * 입력값 검증
      */
     validateInputs() {
-        const v = this.validateBirth6(this.birthInput.value);
+        const v = this.validateBirthDate(this.birthInput.value);
         if (!v.valid) {
             this.showBirthError(v.msg);
             return false;
@@ -1056,7 +1056,7 @@ class AgeCalculatorUI {
         if (!this.birthInput) return;
 
         this.birthInput.addEventListener('input', () => {
-            this.checkAndCalculate6Digit();
+            this.checkAndCalculateBirthDate();
         });
 
         // 폼 제출은 막고, 자동 계산만 사용
@@ -1090,7 +1090,7 @@ class AgeCalculatorUI {
     }
 
     // 8자리 YYYYMMDD 검증. 두 자리 연도는 세기가 모호하므로 받지 않습니다.
-    validateBirth6(raw) {
+    validateBirthDate(raw) {
         const digits = (raw || '').replace(/\D/g, '');
 
         if (digits.length !== 8) {
@@ -1121,7 +1121,7 @@ class AgeCalculatorUI {
     }
 
     // 8자리 모드에서 입력 시 호출
-    checkAndCalculate6Digit() {
+    checkAndCalculateBirthDate() {
         const raw = this.birthInput.value;
         const digits = raw.replace(/\D/g, '');
 
@@ -1133,7 +1133,7 @@ class AgeCalculatorUI {
             return;
         }
 
-        const v = this.validateBirth6(raw);
+        const v = this.validateBirthDate(raw);
         if (!v.valid) {
             this.showBirthError(v.msg);
             return;
@@ -1145,12 +1145,12 @@ class AgeCalculatorUI {
             clearTimeout(this.autoCalcTimer);
         }
         this.autoCalcTimer = setTimeout(() => {
-            this.autoCalculateFromBirth6(v);
+            this.autoCalculateFromBirthDate(v);
         }, 500);
     }
 
 
-    async autoCalculateFromBirth6(v) {
+    async autoCalculateFromBirthDate(v) {
         // 여기서 v.iso = YYYY-MM-DD
         this.showLoading(true);
         try {

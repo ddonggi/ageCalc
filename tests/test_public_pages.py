@@ -161,6 +161,16 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("강아지 나이 계산기", html)
         self.assertIn("고양이 나이 계산기", html)
 
+    def test_age_page_uses_current_year_in_age_comparison_examples(self):
+        client = app.test_client()
+        html = client.get("/age").get_data(as_text=True)
+        current_year = _current_local_date().year
+
+        self.assertIn(f"{current_year}-10-07 기준 33세", html)
+        self.assertIn(f"{current_year}년 기준 33세", html)
+        self.assertNotIn("2025-10-07 기준 33세", html)
+        self.assertNotIn("2025년 기준 33세", html)
+
     def test_birth_year_age_table_page_is_public(self):
         client = app.test_client()
         response = client.get("/birth-year-age-table")

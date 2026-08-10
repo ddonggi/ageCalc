@@ -126,6 +126,16 @@ class BirthDatePrivacyTests(unittest.TestCase):
         self.assertNotIn('maxlength="6"', age_html)
         self.assertNotIn('maxlength="6"', baby_html)
 
+    def test_age_page_busts_cached_date_calculator_assets_and_has_no_six_digit_contract(self):
+        age_html = self.client.get("/age").get_data(as_text=True)
+        age_js = Path("static/js/age-calculator.js").read_text(encoding="utf-8")
+
+        self.assertRegex(age_html, r'static/js/date-rules\.js\?v=[^" ]+')
+        self.assertRegex(age_html, r'static/js/age-calculator\.js\?v=[^" ]+')
+        self.assertNotIn("6자리", age_js)
+        self.assertNotIn("bind6DigitInputEvents", age_js)
+        self.assertNotIn("validateBirth6", age_js)
+
     def test_annual_age_uses_birth_year_only(self):
         response = self.client.get("/annual-age-calculator?birth_year=1992")
         html = response.get_data(as_text=True)
@@ -160,12 +170,32 @@ class BirthDatePrivacyTests(unittest.TestCase):
         self.assertNotIn("$http_referer", nginx_conf)
         self.assertNotIn("$request_uri", nginx_conf)
 
+    def test_javascript_assets_are_revalidated_after_deployments(self):
+        nginx_conf = Path("nginx/agecalc.conf").read_text(encoding="utf-8")
+
+        self.assertIn("location /static/js/", nginx_conf)
+        self.assertIn('add_header Cache-Control "no-cache, must-revalidate"', nginx_conf)
+
     def test_privacy_notice_describes_browser_and_lunar_processing(self):
         html = self.client.get("/privacy").get_data(as_text=True)
 
         self.assertIn("양력 생년월일은 브라우저 안에서 계산", html)
         self.assertIn("음력 생년월일은 양력 변환을 위해서만 서버로 전송", html)
         self.assertIn("공유 주소에는 생년월일을 넣지 않습니다", html)
+
+    def test_age_page_describes_solar_and_lunar_processing_accurately(self):
+        html = self.client.get("/age").get_data(as_text=True)
+
+        self.assertIn("양력 생년월일은 브라우저 안에서 계산합니다", html)
+        self.assertIn("음력 생년월일은 양력 변환을 위해서만 서버로 전송", html)
+        self.assertNotIn("입력값은 계산을 위해 서버로 전송되며 저장하지 않습니다", html)
+        self.assertNotIn("계산을 위해 서버로 전송되지만 저장하지 않습니다", html)
+
+    def test_age_page_uses_editorial_review_date_for_reference_dates(self):
+        html = self.client.get("/age").get_data(as_text=True)
+
+        self.assertIn("기준 확인일: 2026-06-22", html)
+        self.assertNotIn("마지막 기준 확인일: 2026-02-09", html)
 
 
 if __name__ == "__main__":

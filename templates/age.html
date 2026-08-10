@@ -88,8 +88,8 @@
     <!-- 스크립트 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
-    <script src="{{ url_for('static', filename='js/date-rules.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/age-calculator.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/date-rules.js') }}?v=age-input-20260810a" defer></script>
+    <script src="{{ url_for('static', filename='js/age-calculator.js') }}?v=age-input-20260810a" defer></script>
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <!-- Google tag (gtag.js) -->
@@ -231,14 +231,14 @@
                 생일과 관계없이 올해 기준 연나이를 보고 싶다면
                 <a href="{{ url_for('annual_age_calculator') }}">연나이 계산기</a>에서 바로 확인할 수 있습니다.
             </p>
-            <p class="small">마지막 기준 확인일: 2026-02-09</p>
+            <p class="small">마지막 기준 확인일: {{ editorial_metadata.reviewed_at if editorial_metadata else '2026-06-22' }}</p>
         </section>
 
         <!-- 연령별 주요 권리·제도 -->
         <div class="age-rights-section">
             <h3>🧑 연령별 주요 권리·제도 (만나이 기준)</h3>
             <p>
-                기준 확인일: 2026-06-22. 아래 내용은 연령 조건을 이해하기 위한 일반 안내입니다.
+                기준 확인일: {{ editorial_metadata.reviewed_at if editorial_metadata else '2026-06-22' }}. 아래 내용은 연령 조건을 이해하기 위한 일반 안내입니다.
                 실제 신청 가능 여부와 시행일은 정부24·국가법령정보센터·담당 기관의 최신 공고를 우선합니다.
             </p>
 
@@ -497,7 +497,7 @@
                 본 계산기는 양력 기준으로 동작하고, 시간대/서머타임에 따른 시·분 정보는 배제하여 날짜 단위만 사용합니다.
                 윤년과 말일(예: 2월 29일 출생)도 예외 없이 처리하며, 윤년이 아닌 해의 2월 29일은 통상 2월 28일 또는 3월 1일을 기준으로 간주하는 관행을 안내합니다.
                 결과는 일반 정보 제공을 목적으로 하며, 법적 판단이 필요한 경우 관계 기관의 최신 안내를 확인해야 합니다.
-                입력값은 계산을 위해 서버로 전송되며 저장하지 않습니다.
+                양력 생년월일은 브라우저 안에서 계산합니다. 음력 생년월일은 양력 변환을 위해서만 서버로 전송하며 저장하지 않습니다.
             </p>
             <ul>
                 <li>기준일: 사용자가 페이지 접속 시점의 현지 날짜</li>
@@ -550,12 +550,12 @@
                     <tr>
                         <td>만나이</td>
                         <td>생일이 지나야 +1</td>
-                        <td>2025-10-07 기준 33세</td>
+                        <td>{{ today.year }}-10-07 기준 33세</td>
                     </tr>
                     <tr>
                         <td>연나이</td>
                         <td>올해 − 출생연도</td>
-                        <td>2025년 기준 33세</td>
+                        <td>{{ today.year }}년 기준 33세</td>
                     </tr>
                 </tbody>
             </table>
@@ -577,7 +577,7 @@
             <p>A. 일반 정보 제공용입니다. 법적 판단은 관계 법령과 기관 고시를 우선합니다.</p>
 
             <h3>Q. 입력한 생년월일이 서버에 저장되나요?</h3>
-            <p>A. 아니요. 계산을 위해 서버로 전송되지만 저장하지 않습니다.</p>
+            <p>A. 양력 생년월일은 브라우저 안에서 계산합니다. 음력 생년월일은 양력 변환을 위해서만 서버로 전송하며 저장하지 않습니다.</p>
 
             <h3>Q. 국제 표준시/서머타임이 결과에 영향을 주나요?</h3>
             <p>A. 날짜만 계산하므로 시·분·타임존은 반영하지 않습니다.</p>

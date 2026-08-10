@@ -1409,7 +1409,13 @@ def age():
         response.headers['Cache-Control'] = 'no-store'
         return response
 
-    return render_template('age.html', result=None, calendar_type='solar', page_path="/age")
+    return render_template(
+        'age.html',
+        result=None,
+        calendar_type='solar',
+        page_path="/age",
+        today=_current_local_date(),
+    )
 
 @app.route('/privacy')
 def privacy():
