@@ -129,6 +129,25 @@ process.stdout.write(JSON.stringify(result));
 
         self.assertEqual({"first": [50, 75], "second": [100]}, result)
 
+    def test_mobile_browser_chrome_resize_keeps_progress_viewport_height_stable(self):
+        result = self.run_node(
+            "(() => {"
+            "const initial = progress.updateViewportMetrics(null, 390, 720);"
+            "const chromeCollapsed = progress.updateViewportMetrics(initial, 390, 810);"
+            "const rotated = progress.updateViewportMetrics(chromeCollapsed, 810, 390);"
+            "return { initial, chromeCollapsed, rotated };"
+            "})()"
+        )
+
+        self.assertEqual(
+            {
+                "initial": {"width": 390, "height": 720},
+                "chromeCollapsed": {"width": 390, "height": 720},
+                "rotated": {"width": 810, "height": 390},
+            },
+            result,
+        )
+
     def run_analytics_node(self, consent: str):
         analytics_path = PROJECT_ROOT / "static/js/analytics.js"
         program = f"""

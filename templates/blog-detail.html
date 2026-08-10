@@ -369,7 +369,7 @@
     <script src="{{ url_for('static', filename='js/page-feedback.js') }}" defer></script>
     {% endif %}
     {% if not review_mode and not draft_mode and (blog_indexable | default(false)) %}
-    <script src="{{ url_for('static', filename='js/reading-progress.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/reading-progress.js') }}?v=mobile-stable-20260810a" defer></script>
     {% endif %}
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>

@@ -22,6 +22,11 @@
     const newMilestones = (percentage, sent) =>
         MILESTONES.filter((milestone) => percentage >= milestone && !sent.has(milestone));
 
+    const updateViewportMetrics = (previous, width, height) => {
+        if (!previous || previous.width !== width) return { width, height };
+        return previous;
+    };
+
     const init = (browserWindow, browserDocument) => {
         const progress = browserDocument.querySelector('[data-reading-progress]');
         const fill = browserDocument.querySelector('[data-reading-progress-fill]');
@@ -30,6 +35,11 @@
 
         const sent = new Set();
         let frameRequested = false;
+        let viewport = updateViewportMetrics(
+            null,
+            browserWindow.innerWidth,
+            browserWindow.innerHeight
+        );
 
         const update = () => {
             frameRequested = false;
@@ -39,7 +49,7 @@
                 browserWindow.scrollY,
                 articleTop,
                 article.offsetHeight,
-                browserWindow.innerHeight
+                viewport.height
             );
             fill.style.transform = `scaleX(${percentage / 100})`;
             progress.setAttribute('aria-valuenow', String(percentage));
@@ -62,7 +72,14 @@
         };
 
         browserWindow.addEventListener('scroll', scheduleUpdate, { passive: true });
-        browserWindow.addEventListener('resize', scheduleUpdate);
+        browserWindow.addEventListener('resize', () => {
+            viewport = updateViewportMetrics(
+                viewport,
+                browserWindow.innerWidth,
+                browserWindow.innerHeight
+            );
+            scheduleUpdate();
+        });
         browserWindow.addEventListener('agecalc:tracking-ready', scheduleUpdate);
         if (typeof browserWindow.ResizeObserver === 'function') {
             new browserWindow.ResizeObserver(scheduleUpdate).observe(article);
@@ -70,5 +87,5 @@
         scheduleUpdate();
     };
 
-    return { calculateProgress, newMilestones, init };
+    return { calculateProgress, newMilestones, updateViewportMetrics, init };
 });

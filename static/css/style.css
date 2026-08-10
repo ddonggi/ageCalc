@@ -3827,12 +3827,16 @@ body.snake-page .game-panel {
     }
 
     .site-header {
-        width: 100vw;
-        margin-left: calc(50% - 50vw);
-        margin-right: calc(50% - 50vw);
+        width: auto;
+        margin-inline: -8px;
         padding: 12px 14px;
         border-radius: 0;
         border-width: 0 0 1px;
+    }
+
+    .home-page .site-header {
+        width: 100%;
+        margin-inline: 0;
     }
 
     .coupang-mobile-banner {
