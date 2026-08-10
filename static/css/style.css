@@ -3745,6 +3745,11 @@ body.snake-page .game-panel {
         grid-template-columns: 1fr;
     }
 
+    .support-qr {
+        width: 104px;
+        justify-self: start;
+    }
+
     .person-line {
         align-items: stretch;
     }
