@@ -31,18 +31,22 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=home-h1-20260710a" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=reading-progress-20260810a" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
 
 <body class="guide-detail-page">
+    {% if page.indexable %}
+    {% include 'partials/reading-progress.html' %}
+    {% endif %}
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <article class="guide-article" data-content-format="{{ page.content_format }}">
+        <article class="guide-article" data-content-format="{{ page.content_format }}"
+            {% if page.indexable %}data-reading-progress-target data-content-type="guide"{% endif %}>
             <header class="guide-article-header">
                 <p class="eyebrow">AgeCalc 기준 가이드</p>
                 <span class="guide-category-label">{{ page.category_label }}</span>
@@ -197,6 +201,9 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    {% if page.indexable %}
+    <script src="{{ url_for('static', filename='js/reading-progress.js') }}" defer></script>
+    {% endif %}
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
 </body>

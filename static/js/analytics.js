@@ -2,6 +2,7 @@
     const CONFIG_ID = 'tracking-config';
     const GA_SCRIPT_ID = 'ga-loader';
     const CLARITY_SCRIPT_ID = 'clarity-loader';
+    let googleAnalyticsReady = false;
     const sensitiveQueryKeys = new Set(['birth_date', 's', 'token', 'review_token']);
     const url = new URL(window.location.href);
     let removedSensitiveValue = false;
@@ -73,6 +74,10 @@
             page_location: cleanPageLocation,
             page_path: window.location.pathname,
         });
+        googleAnalyticsReady = true;
+        if (typeof window.dispatchEvent === 'function' && typeof window.Event === 'function') {
+            window.dispatchEvent(new window.Event('agecalc:tracking-ready'));
+        }
     };
 
     const initClarity = (projectId) => {
@@ -115,6 +120,18 @@
         }
     };
 
-    window.AgeCalcTracking = window.AgeCalcTracking || { init };
+    const trackEvent = (name, params = {}) => {
+        if (getCookie('cookieConsent') !== 'accepted') {
+            return false;
+        }
+        init();
+        if (!googleAnalyticsReady || typeof window.gtag !== 'function') {
+            return false;
+        }
+        window.gtag('event', name, params);
+        return true;
+    };
+
+    window.AgeCalcTracking = window.AgeCalcTracking || { init, trackEvent };
     init();
 })();

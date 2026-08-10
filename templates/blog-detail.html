@@ -38,7 +38,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=home-h1-20260710a" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=reading-progress-20260810a" />
     {% if review_mode or draft_mode %}
     <meta name="referrer" content="no-referrer" />
     <script nonce="{{ csp_nonce }}">window.history.replaceState({}, document.title, window.location.pathname);</script>
@@ -76,6 +76,9 @@
 
 <body class="blog-page">
     {% set article = structured_article %}
+    {% if not review_mode and not draft_mode and (blog_indexable | default(false)) %}
+    {% include 'partials/reading-progress.html' %}
+    {% endif %}
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
@@ -85,7 +88,8 @@
         {% else %}
         <a class="back-link" href="{{ url_for('blog_list') }}">글 목록으로 돌아가기</a>
         {% endif %}
-        <article class="blog-article">
+        <article class="blog-article"
+            {% if not review_mode and not draft_mode and (blog_indexable | default(false)) %}data-reading-progress-target data-content-type="blog"{% endif %}>
             <header class="article-header">
                 <p class="eyebrow">{{ article.eyebrow if article else '해설 글' }}</p>
                 <h1>{{ article.h1 if article else post.title }}</h1>
@@ -363,6 +367,9 @@
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
     {% if article %}
     <script src="{{ url_for('static', filename='js/page-feedback.js') }}" defer></script>
+    {% endif %}
+    {% if not review_mode and not draft_mode and (blog_indexable | default(false)) %}
+    <script src="{{ url_for('static', filename='js/reading-progress.js') }}" defer></script>
     {% endif %}
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
