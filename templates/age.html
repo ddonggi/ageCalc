@@ -108,8 +108,8 @@
                 <p class="eyebrow">대표 도구</p>
                 <h1>만나이 계산기</h1>
                 <p class="page-intro">
-                    양력과 음력 생일을 모두 입력할 수 있고, 계산 결과를 이해하는 데 필요한 기준과 연령별 안내까지
-                    한 번에 확인할 수 있는 대표 계산기입니다.
+                    양력과 음력 생일을 모두 입력할 수 있습니다. 계산 결과를 읽는 기준과 연령별 안내도
+                    한 화면에 담았습니다.
                 </p>
                 <div class="hero-actions">
                     <a class="btn btn-primary" href="#age-form">바로 계산하기</a>
@@ -139,7 +139,7 @@
             <h2>생일 전후를 확인하면 현재 만나이를 알 수 있습니다</h2>
             <p>
                 기준연도에서 출생연도를 뺀 뒤, 올해 생일이 아직 지나지 않았다면 1을 뺍니다.
-                따라서 같은 출생연도라도 <strong>생일이 지났는지에 따라 만나이가 한 살 달라집니다</strong>.
+                같은 출생연도라도 <strong>생일이 지났는지에 따라 만나이가 한 살 달라집니다</strong>.
                 정확한 결과에는 출생연도뿐 아니라 월과 일이 필요합니다.
             </p>
         </section>
@@ -225,11 +225,11 @@
             </div>
             <p>
                 출생년도만으로 빠르게 보고 싶다면
-                <a href="{{ url_for('birth_year_age_table') }}">출생년도별 나이표</a>에서 여러 연도를 한눈에 확인할 수 있습니다.
+                여러 연도를 나란히 보려면 <a href="{{ url_for('birth_year_age_table') }}">출생년도별 나이표</a>를 이용하세요.
             </p>
             <p>
                 생일과 관계없이 올해 기준 연나이를 보고 싶다면
-                <a href="{{ url_for('annual_age_calculator') }}">연나이 계산기</a>에서 바로 확인할 수 있습니다.
+                <a href="{{ url_for('annual_age_calculator') }}">연나이 계산기</a>에서 바로 계산하세요.
             </p>
             <p class="small">마지막 기준 확인일: {{ editorial_metadata.reviewed_at if editorial_metadata else '2026-06-22' }}</p>
         </section>

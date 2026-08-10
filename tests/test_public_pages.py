@@ -179,7 +179,7 @@ class PublicPageTests(unittest.TestCase):
         html = response.get_data(as_text=True)
         self.assertIn("출생년도별 나이표", html)
         self.assertIn("몇년생 몇살", html)
-        self.assertIn("출생년도만 선택하면", html)
+        self.assertIn("출생년도를 선택하세요", html)
         self.assertIn("만나이 범위", html)
         self.assertIn("띠", html)
         self.assertIn("세대명", html)
@@ -201,7 +201,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
         self.assertIn("학년 계산기", html)
-        self.assertIn("출생년도만 선택하면", html)
+        self.assertIn("출생년도를 선택해 현재 몇 학년인지 계산", html)
         self.assertIn("현재 학년", html)
         self.assertIn("초등학교 입학", html)
         self.assertIn("중학교 입학", html)
@@ -873,7 +873,7 @@ class PublicPageTests(unittest.TestCase):
                 "계산 결과 다음에 확인할 일",
             ),
             "/birth-year-age-table": (
-                "출생연도만 알면 연나이와 만나이 범위를 빠르게 확인할 수 있습니다",
+                "출생연도만으로 올해의 나이 범위를 찾을 수 있습니다",
                 "나이·띠·세대·학교·기념 나이",
                 "출생연도표 해석 예외",
                 "표를 본 다음 할 일",
@@ -925,13 +925,13 @@ class PublicPageTests(unittest.TestCase):
                 "조기입학·입학유예·해외 학제",
             ),
             "/grade-age-table": (
-                "학년을 선택하면 그 학년의 일반적인 나이 범위를 확인할 수 있습니다",
+                "학년을 선택하면 일반적인 나이 범위가 나옵니다",
                 "학년별 나이 해석",
                 "같은 학년의 나이가 다른 이유",
                 "조기입학·입학유예·해외 학제",
             ),
             "/grade-birth-year-table": (
-                "학년을 선택하면 일반적으로 해당하는 출생연도를 확인할 수 있습니다",
+                "학년을 선택하면 일반적으로 해당하는 출생연도가 나옵니다",
                 "학년별 출생연도 해석",
                 "빠른년생과 출생연도 예외",
                 "조기입학·입학유예·해외 학제",
@@ -3102,7 +3102,7 @@ class PublicPageTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
-        self.assertIn("반려견 나이를 사람 기준으로 얼마나 되는지 쉽게 확인할 수 있습니다.", html)
+        self.assertIn("반려견의 실제 나이를 사람 나이로 환산해 보여드립니다.", html)
         self.assertNotIn("반려견 나이를 사람 나이로 환산해 보세요", html)
 
     def test_dog_page_uses_distinct_size_icons(self):
@@ -3120,7 +3120,7 @@ class PublicPageTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
-        self.assertIn("반려묘 나이를 사람 기준으로 어느 정도인지 바로 확인할 수 있습니다.", html)
+        self.assertIn("반려묘의 실제 나이를 사람 나이로 환산해 보여드립니다.", html)
         self.assertNotIn("반려묘 나이를 사람 나이로 환산해 보세요", html)
 
     def test_baby_months_page_uses_clearer_intro_copy(self):
@@ -3129,7 +3129,7 @@ class PublicPageTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
-        self.assertIn("출생일만 입력하면 아이 개월수와 아기 월령을 바로 확인할 수 있습니다.", html)
+        self.assertIn("출생일을 입력하면 현재 아이 개월 수와 아기 월령이 바로 나옵니다.", html)
         self.assertNotIn("“우리 아이는 몇 개월?”", html)
 
     def test_d_day_page_removes_english_labels(self):
