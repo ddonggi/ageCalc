@@ -23,7 +23,7 @@
     <link rel="icon" href="/favicon.ico">
     <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=life-hubs-20260622a" />
+    <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}

@@ -38,7 +38,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=reading-progress-20260810a" />
+    <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     {% if review_mode or draft_mode %}
     <meta name="referrer" content="no-referrer" />
     <script nonce="{{ csp_nonce }}">window.history.replaceState({}, document.title, window.location.pathname);</script>

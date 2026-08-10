@@ -27,8 +27,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=home-h1-20260710a" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/nim.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/nim.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
