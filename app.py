@@ -1,8 +1,10 @@
 import math
+import hashlib
 from flask import Flask, Response, render_template, request, jsonify, g, send_from_directory, abort, redirect, session, url_for, make_response
 import json
 import os
 import threading
+from functools import lru_cache
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 import secrets
@@ -34,7 +36,30 @@ from models.blog_models import GeneratedPost, PageFeedback
 from scripts.adsense_blog_review import audit_post
 
 PROJECT_ROOT = Path(__file__).resolve().parent
+STATIC_ROOT = (PROJECT_ROOT / "static").resolve()
 ENV_FILE = PROJECT_ROOT / ".env.rss"
+
+
+def _content_hash(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()[:12]
+
+
+@lru_cache(maxsize=None)
+def _static_asset_version(filename: str) -> str | None:
+    try:
+        path = (STATIC_ROOT / filename).resolve()
+        path.relative_to(STATIC_ROOT)
+        if not path.is_file():
+            return None
+        return _content_hash(path)
+    except (OSError, ValueError):
+        return None
+
+
+def versioned_static(filename: str) -> str:
+    static_url = url_for("static", filename=filename)
+    version = _static_asset_version(filename)
+    return f"{static_url}?v={version}" if version else static_url
 
 
 def _load_env_file(path: Path) -> None:
@@ -255,6 +280,7 @@ def inject_csp_nonce():
 
     return {
         "csp_nonce": getattr(g, "csp_nonce", ""),
+        "versioned_static": versioned_static,
         "csrf_token": _get_or_create_csrf_token,
         "author_name": SITE_AUTHOR_NAME,
         "contact_email": SITE_CONTACT_EMAIL,
