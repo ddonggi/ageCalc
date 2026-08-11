@@ -98,6 +98,28 @@ class PublicPageTests(unittest.TestCase):
                 for phrase in phrases:
                     self.assertIn(phrase, html)
 
+    def test_indexable_query_variants_have_crawlable_internal_links(self):
+        client = app.test_client()
+        grade_variants = [
+            *(f"stage=elementary&amp;grade={grade}" for grade in range(1, 7)),
+            *(f"stage=middle&amp;grade={grade}" for grade in range(1, 4)),
+            *(f"stage=high&amp;grade={grade}" for grade in range(1, 4)),
+        ]
+
+        for base_path in ("/grade-age-table", "/grade-birth-year-table"):
+            html = client.get(base_path).get_data(as_text=True)
+            for query in grade_variants:
+                with self.subTest(base_path=base_path, query=query):
+                    self.assertIn(f'href="{base_path}?{query}"', html)
+
+        birth_year_html = client.get("/birth-year-age-table").get_data(as_text=True)
+        self.assertIn('href="/birth-year-age-table?year=2010"', birth_year_html)
+
+        college_html = client.get("/college-entry-year-calculator").get_data(as_text=True)
+        for year in (2026, 2025, 2024, 2022, 2020):
+            with self.subTest(year=year):
+                self.assertIn(f'href="/college-entry-year-calculator?year={year}"', college_html)
+
     def test_priority_pages_use_search_intent_metadata(self):
         client = app.test_client()
         expected = {

@@ -175,7 +175,7 @@
                     <tbody>
                         {% for row in grade_rows %}
                         <tr{% if row.is_selected %} class="is-selected"{% endif %}>
-                            <td>{{ row.query_label }}</td>
+                            <td><a href="{{ url_for('grade_birth_year_table', stage=row.stage, grade=row.grade) }}">{{ row.query_label }}</a></td>
                             <td>{{ row.label }}</td>
                             <td>{{ row.birth_year_label }}</td>
                             <td>{{ row.annual_age }}</td>

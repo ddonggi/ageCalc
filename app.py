@@ -145,6 +145,7 @@ _blog_draft_login_lock = threading.Lock()
 SITE_BASE_URL = (os.getenv("BLOG_BASE_URL", "https://agecalc.cloud") or "https://agecalc.cloud").rstrip("/")
 SITE_AUTHOR_NAME = os.getenv("SITE_AUTHOR_NAME", "AgeCalc 편집팀").strip() or "AgeCalc 편집팀"
 SITE_CONTACT_EMAIL = os.getenv("SITE_CONTACT_EMAIL", "ldg6153@gmail.com").strip() or "ldg6153@gmail.com"
+INDEXABLE_COLLEGE_ENTRY_YEARS = (2026, 2025, 2024, 2022, 2020)
 ADSENSE_CLIENT_ID = os.getenv("ADSENSE_CLIENT_ID", "ca-pub-7818333740838556").strip()
 GOOGLE_SITE_VERIFICATION = os.getenv(
     "GOOGLE_SITE_VERIFICATION",
@@ -2033,7 +2034,7 @@ def college_entry_year_calculator():
     if invalid_query or (request.args and "year" not in request.args):
         return redirect(url_for("college_entry_year_calculator"))
 
-    indexable_variant = selected_year in {2020, 2022, 2024, 2025, 2026}
+    indexable_variant = selected_year in INDEXABLE_COLLEGE_ENTRY_YEARS
     canonical_url = f"{SITE_BASE_URL}/college-entry-year-calculator"
     if indexable_variant:
         canonical_url = f"{canonical_url}?year={selected_year}"
@@ -2047,7 +2048,11 @@ def college_entry_year_calculator():
         if row["is_selected"]:
             selected_row = row
 
-    example_years = [year for year in (2026, 2025, 2022, 2019, 2018, 2009) if min_entry_year <= year <= max_entry_year]
+    example_years = [
+        year
+        for year in (*INDEXABLE_COLLEGE_ENTRY_YEARS, 2019, 2018, 2009)
+        if min_entry_year <= year <= max_entry_year
+    ]
     examples = [_build_college_entry_snapshot(year, current_year) for year in example_years]
 
     return render_template(
