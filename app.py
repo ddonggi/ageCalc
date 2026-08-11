@@ -1389,6 +1389,36 @@ def public_rss():
     return Response(xml, mimetype="application/rss+xml")
 
 
+def _validated_int_query(name, minimum, maximum):
+    """Return a strict integer query value and whether it needs normalization."""
+    if name not in request.args:
+        return None, False
+    raw_value = request.args.get(name, "").strip()
+    if not raw_value.isdigit():
+        return None, True
+    value = int(raw_value)
+    if not minimum <= value <= maximum:
+        return None, True
+    return value, False
+
+
+def _validated_grade_query(valid_stage_grades):
+    if not request.args:
+        return "elementary", None, False
+    if set(request.args) != {"stage", "grade"}:
+        return "elementary", None, True
+    stage = request.args.get("stage", "").strip()
+    if stage not in valid_stage_grades:
+        return "elementary", None, True
+    grade, invalid_grade = _validated_int_query("grade", 1, valid_stage_grades[stage])
+    return stage, grade, invalid_grade
+
+
+def _short_grade_label(stage, grade):
+    stage_labels = {"elementary": "초", "middle": "중", "high": "고"}
+    return f"{stage_labels[stage]}{grade}"
+
+
 @app.get('/')
 def index():
     """메인 페이지 - 나이 계산 도구 안내"""
@@ -1471,9 +1501,14 @@ def birth_year_age_table():
     min_year = max(1900, current_year - 100)
     max_year = current_year
 
-    selected_year = request.args.get('year', type=int)
-    if selected_year is not None and not (min_year <= selected_year <= max_year):
-        selected_year = None
+    selected_year, invalid_query = _validated_int_query("year", min_year, max_year)
+    if invalid_query or (request.args and "year" not in request.args):
+        return redirect(url_for("birth_year_age_table"))
+
+    indexable_variant = selected_year == 2010
+    canonical_url = f"{SITE_BASE_URL}/birth-year-age-table"
+    if indexable_variant:
+        canonical_url = f"{canonical_url}?year={selected_year}"
 
     rows = []
     selected_row = None
@@ -1495,6 +1530,13 @@ def birth_year_age_table():
         birth_year_rows=rows,
         year_options=range(max_year, min_year - 1, -1),
         examples=examples,
+        canonical_url=canonical_url,
+        robots_content="index,follow" if selected_year is None or indexable_variant else "noindex,follow",
+        seo_title=(
+            f"{selected_year}년생 몇살? 만나이·연나이 표 | AgeCalc"
+            if indexable_variant
+            else "몇년생 몇살? 출생연도별 만나이·연나이 표 | AgeCalc"
+        ),
     )
 
 @app.route('/school-grade-calculator')
@@ -1506,9 +1548,9 @@ def school_grade_calculator():
     min_year = max(1900, current_year - 100)
     max_year = current_year
 
-    selected_year = request.args.get('year', type=int)
-    if selected_year is not None and not (min_year <= selected_year <= max_year):
-        selected_year = None
+    selected_year, invalid_query = _validated_int_query("year", min_year, max_year)
+    if invalid_query or (request.args and "year" not in request.args):
+        return redirect(url_for("school_grade_calculator"))
 
     rows = []
     selected_row = _build_school_grade_snapshot(selected_year, school_year) if selected_year else None
@@ -1528,6 +1570,8 @@ def school_grade_calculator():
         school_grade_rows=rows,
         year_options=range(max_year, min_year - 1, -1),
         examples=examples,
+        canonical_url=f"{SITE_BASE_URL}/school-grade-calculator",
+        robots_content="index,follow" if selected_year is None else "noindex,follow",
     )
 
 
@@ -1540,9 +1584,9 @@ def school_entry_year_table():
     min_year = max(1900, current_year - 100)
     max_year = current_year
 
-    selected_year = request.args.get('year', type=int)
-    if selected_year is not None and not (min_year <= selected_year <= max_year):
-        selected_year = None
+    selected_year, invalid_query = _validated_int_query("year", min_year, max_year)
+    if invalid_query or (request.args and "year" not in request.args):
+        return redirect(url_for("school_entry_year_table"))
 
     rows = []
     selected_row = _build_school_entry_snapshot(selected_year, school_year) if selected_year is not None else None
@@ -1562,6 +1606,8 @@ def school_entry_year_table():
         school_entry_rows=rows,
         year_options=range(max_year, min_year - 1, -1),
         examples=examples,
+        canonical_url=f"{SITE_BASE_URL}/school-entry-year-table",
+        robots_content="index,follow" if selected_year is None else "noindex,follow",
     )
 
 @app.route('/age-gap-calculator')
@@ -1743,14 +1789,10 @@ def grade_age_table():
     school_year = _current_school_year(today)
     current_year = today.year
 
-    stage = request.args.get('stage', default='elementary', type=str)
-    grade = request.args.get('grade', type=int)
-
     valid_stage_grades = {"elementary": 6, "middle": 3, "high": 3}
-    if stage not in valid_stage_grades:
-        stage = "elementary"
-    if grade is not None and not (1 <= grade <= valid_stage_grades[stage]):
-        grade = None
+    stage, grade, invalid_query = _validated_grade_query(valid_stage_grades)
+    if invalid_query:
+        return redirect(url_for("grade_age_table"))
 
     rows = []
     for stage_key, max_grade in valid_stage_grades.items():
@@ -1774,6 +1816,17 @@ def grade_age_table():
         selected_row=selected_row,
         grade_rows=rows,
         examples=examples,
+        canonical_url=(
+            f"{SITE_BASE_URL}/grade-age-table?stage={stage}&grade={grade}"
+            if grade is not None
+            else f"{SITE_BASE_URL}/grade-age-table"
+        ),
+        robots_content="index,follow",
+        seo_title=(
+            f"{_short_grade_label(stage, grade)} 나이 | 몇 살·몇 년생? | AgeCalc"
+            if grade is not None
+            else "학년별 나이표 | 중1·중3·고1·고3은 몇 살? | AgeCalc"
+        ),
     )
 
 
@@ -1894,14 +1947,10 @@ def grade_birth_year_table():
     school_year = _current_school_year(today)
     current_year = today.year
 
-    stage = request.args.get('stage', default='elementary', type=str)
-    grade = request.args.get('grade', type=int)
-
     valid_stage_grades = {"elementary": 6, "middle": 3, "high": 3}
-    if stage not in valid_stage_grades:
-        stage = "elementary"
-    if grade is not None and not (1 <= grade <= valid_stage_grades[stage]):
-        grade = None
+    stage, grade, invalid_query = _validated_grade_query(valid_stage_grades)
+    if invalid_query:
+        return redirect(url_for("grade_birth_year_table"))
 
     rows = []
     for stage_key, max_grade in valid_stage_grades.items():
@@ -1925,6 +1974,17 @@ def grade_birth_year_table():
         selected_row=selected_row,
         grade_rows=rows,
         examples=examples,
+        canonical_url=(
+            f"{SITE_BASE_URL}/grade-birth-year-table?stage={stage}&grade={grade}"
+            if grade is not None
+            else f"{SITE_BASE_URL}/grade-birth-year-table"
+        ),
+        robots_content="index,follow",
+        seo_title=(
+            f"{_short_grade_label(stage, grade)} 몇 년생? 출생연도표 | AgeCalc"
+            if grade is not None
+            else "학년별 출생연도표 | 중1·고1은 몇 년생? | AgeCalc"
+        ),
     )
 
 
@@ -1969,9 +2029,14 @@ def college_entry_year_calculator():
     min_entry_year = max(1990, current_year - 20)
     max_entry_year = current_year + 1
 
-    selected_year = request.args.get('year', type=int)
-    if selected_year is not None and not (min_entry_year <= selected_year <= max_entry_year):
-        selected_year = None
+    selected_year, invalid_query = _validated_int_query("year", min_entry_year, max_entry_year)
+    if invalid_query or (request.args and "year" not in request.args):
+        return redirect(url_for("college_entry_year_calculator"))
+
+    indexable_variant = selected_year in {2020, 2022, 2024, 2025, 2026}
+    canonical_url = f"{SITE_BASE_URL}/college-entry-year-calculator"
+    if indexable_variant:
+        canonical_url = f"{canonical_url}?year={selected_year}"
 
     rows = []
     selected_row = None
@@ -1993,6 +2058,13 @@ def college_entry_year_calculator():
         college_rows=rows,
         year_options=range(max_entry_year, min_entry_year - 1, -1),
         examples=examples,
+        canonical_url=canonical_url,
+        robots_content="index,follow" if selected_year is None or indexable_variant else "noindex,follow",
+        seo_title=(
+            f"{str(selected_year)[-2:]}학번 나이·몇년생? | {selected_year}학번 계산기 | AgeCalc"
+            if indexable_variant
+            else "학번 계산기 | 몇 학번·학번 나이·몇년생 확인 | AgeCalc"
+        ),
     )
 
 

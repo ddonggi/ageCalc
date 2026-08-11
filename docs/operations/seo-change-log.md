@@ -1,0 +1,19 @@
+# SEO 변경 기록
+
+검색 메타데이터와 색인 정책을 바꿀 때 실제 변경일과 검증 결과를 기록합니다. `lastmod`는 본문·FAQ·계산 설명이 실제로 바뀐 페이지만 갱신합니다.
+
+## 2026-08-11
+
+| URL | 기존 title | 변경 title | H1·본문·FAQ | canonical / robots | lastmod |
+|---|---|---|---|---|---|
+| `/grade-birth-year-table` | 학년별 출생연도표 | 학년별 출생연도표 \| 중1·고1은 몇 년생? | 선택 학년 직답, 빠른년생·학적 예외 FAQ | 기본 URL index, 유효 학년 변형 self-canonical/index, 잘못된 값 302 | 변경 |
+| `/grade-age-table` | 학년 기준 나이표 | 학년별 나이표 \| 중1·중3·고1·고3은 몇 살? | 선택 학년 나이 직답, 생일·학적 차이 FAQ | 기본 URL index, 유효 학년 변형 self-canonical/index, 잘못된 값 302 | 변경 |
+| `/school-grade-calculator` | 학년 계산기 \| 출생년도별 현재 학년 확인 | 학년 계산기 \| 출생연도별 현재 학년 확인 | 현재 학년과 학년도 기준 설명 유지·보강 | 유효 연도 200/noindex + 기본 canonical, 잘못된 값 302 | 변경 |
+| `/school-entry-year-table` | 입학년도 계산기 \| 초중고 입학년도 계산표 | 입학년도 계산기 \| 출생연도별 초·중·고 입학년도 | 현재 학년과 다른 입학 시점 의도 명시 | 유효 연도 200/noindex + 기본 canonical, 잘못된 값 302 | 변경 |
+| `/birth-year-age-table` | 몇년생 몇살? 출생년도별 나이표 | 몇년생 몇살? 출생연도별 만나이·연나이 표 | 생일 정보가 없을 때의 만나이 범위와 FAQ 보강 | `year=2010` self-canonical/index, 다른 유효 연도 noindex, 잘못된 값 302 | 변경 |
+| `/age` | 만나이 계산기 - 양력/음력 생일 완벽 지원 | 만나이 계산기 \| 생년월일·음력 생일로 현재 나이 계산 | 기존 visible FAQ·FAQPage 유지, 양력·음력 설명 강화 | 기본 URL index/canonical 유지 | 변경 |
+| `/annual-age-calculator` | 연나이 계산기 | 연나이 계산기 \| 출생연도만으로 올해 연나이 확인 | 출생연도만 쓰는 공식과 만나이 차이 FAQ | 기본 URL index/canonical 유지 | 변경 |
+| `/100-day-calculator` | 100일 계산기 | 100일 계산기 \| 시작일 포함 100일째·기념일 날짜 계산 | 시작일 포함, 월말·윤년, 아기·커플 FAQ | 쿼리 입력은 기본 URL로 302, 기본 URL index | 변경 |
+| `/college-entry-year-calculator` | 26학번 몇년생? 26학번 나이·대학교 학번 계산기 | 학번 계산기 \| 몇 학번·학번 나이·몇년생 확인 | 허용 학번별 동적 H1·직답, 재수·편입 예외 설명 유지 | 2020·2022·2024~2026 self-canonical/index, 다른 유효 연도 noindex, 잘못된 값 302 | 변경 |
+
+사이트맵에는 기본 URL만 유지합니다. 네이버 연관검색어는 제공된 실제 목록이 생기기 전까지 자동 생성하거나 삽입하지 않으며, `content/editorial_metadata.py`의 페이지별 `primary`, `section`, `faq` 슬롯만 비워 둡니다.

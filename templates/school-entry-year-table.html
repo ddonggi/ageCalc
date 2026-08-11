@@ -5,9 +5,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-    <title>입학년도 계산기 | 초중고 입학년도 계산표 | AgeCalc</title>
+    <title>입학년도 계산기 | 출생연도별 초·중·고 입학년도 | AgeCalc</title>
     <meta name="description" content="출생년도 기준 초등학교, 중학교, 고등학교 입학년도를 확인하는 입학년도 계산기입니다. 현재 학년이 아니라 입학 시점을 빠르게 확인할 때 사용합니다." />
-    <link rel="canonical" href="https://agecalc.cloud/school-entry-year-table" />
+    {% if robots_content == 'noindex,follow' %}<meta name="robots" content="noindex,follow" />{% endif %}
+    <link rel="canonical" href="{{ canonical_url }}" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="AgeCalc" />
@@ -41,7 +42,7 @@
         <section class="hero-band">
             <div class="hero-copy">
                 <p class="eyebrow">취학 일정 빠른 안내</p>
-                <h1>입학년도 계산표</h1>
+                <h1>출생연도별 초·중·고 입학년도 계산기</h1>
                 <p class="page-intro">
                     출생년도를 선택하면 초등학교·중학교·고등학교 입학년도가 차례로 나옵니다.
                     현재 학년보다 입학 시점을 먼저 찾는 경우에 맞춰, 출생년도 기준 학년도만 간단히 정리한 페이지입니다.

@@ -5,9 +5,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-    <title>학년 계산기 | 출생년도별 현재 학년 확인 | AgeCalc</title>
+    <title>학년 계산기 | 출생연도별 현재 학년 확인 | AgeCalc</title>
     <meta name="description" content="출생년도를 선택해 현재 몇 학년인지 계산하고 초등학교·중학교·고등학교 입학 흐름까지 살펴보는 학년 계산기입니다." />
-    <link rel="canonical" href="https://agecalc.cloud/school-grade-calculator" />
+    {% if robots_content == 'noindex,follow' %}<meta name="robots" content="noindex,follow" />{% endif %}
+    <link rel="canonical" href="{{ canonical_url }}" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="AgeCalc" />

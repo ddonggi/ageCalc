@@ -12,6 +12,23 @@ INFORMATIONAL_DISCLAIMER = (
     "개별 상황은 관계 기관 또는 전문가에게 확인하세요."
 )
 
+# User-supplied Naver related queries belong in these editorial slots.  Values
+# stay empty until demand data is provided; terms are never generated here.
+RELATED_SEARCH_TERM_SLOTS = {
+    key: {"primary": (), "section": (), "faq": ()}
+    for key in (
+        "age",
+        "birth_year_age_table",
+        "annual_age_calculator",
+        "school_grade_calculator",
+        "school_entry_year_table",
+        "grade_age_table",
+        "grade_birth_year_table",
+        "hundred_day_calculator",
+        "college_entry_year_calculator",
+    )
+}
+
 OFFICIAL_SOURCE_REQUIRED_KEYS = frozenset(
     {
         "age",
@@ -76,6 +93,7 @@ def editorial_metadata_for(page: dict[str, object] | None) -> dict[str, object] 
             official_required=official_source_required,
         ),
         "disclaimer": INFORMATIONAL_DISCLAIMER if official_source_required else "",
+        "related_search_term_slots": RELATED_SEARCH_TERM_SLOTS.get(str(page["key"]), {}),
     }
     return metadata
 

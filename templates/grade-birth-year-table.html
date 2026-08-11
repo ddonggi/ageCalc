@@ -5,9 +5,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-    <title>학년별 출생연도표 | AgeCalc</title>
+    <title>{{ seo_title }}</title>
     <meta name="description" content="초1·중1·고1은 몇 년생인지 {{ school_year }}학년도 기준으로 정리한 학년별 출생연도표입니다." />
-    <link rel="canonical" href="https://agecalc.cloud/grade-birth-year-table" />
+    {% if robots_content == 'noindex,follow' %}<meta name="robots" content="noindex,follow" />{% endif %}
+    <link rel="canonical" href="{{ canonical_url }}" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="AgeCalc" />
@@ -40,7 +41,7 @@
         <section class="hero-band">
             <div class="hero-copy">
                 <p class="eyebrow">학년별 빠른 확인</p>
-                <h1>학년별 출생연도표</h1>
+                <h1>{% if selected_row %}{{ selected_row.short_label }}은 몇 년생?{% else %}학년별 출생연도표{% endif %}</h1>
                 <p class="page-intro">
                     {{ school_year }}학년도 기준으로 초1과 중1, 고1은 몇 년생인지 정리했습니다.
                     학년별 보통 출생년도와 연나이, 만나이 범위도 한 화면에 나옵니다.
@@ -70,8 +71,8 @@
 
         <section class="section-shell direct-answer" aria-label="학년별 출생연도 바로 답변">
             <p class="eyebrow">바로 답변 · 학년별 출생연도 해석</p>
-            <h2>학년에서 일반적인 출생연도를 역산합니다</h2>
-            <p><strong>학년을 선택하면 일반적으로 해당하는 출생연도가 나옵니다.</strong> {{ school_year }}학년도와 학교급별 입학 나이를 기준으로 역산합니다.</p>
+            <h2>{% if selected_row %}{{ selected_row.short_label }}은 보통 {{ selected_row.birth_year }}년생입니다{% else %}학년에서 일반적인 출생연도를 역산합니다{% endif %}</h2>
+            <p><strong>학년을 선택하면 일반적으로 해당하는 출생연도가 나옵니다.</strong> {{ school_year }}학년도와 학교급별 입학 나이를 기준으로 역산하며, 빠른년생·유급·해외 학제는 다를 수 있습니다.</p>
         </section>
 
         <section class="section-shell">
@@ -212,6 +213,12 @@
         <section class="section-shell">
             <h2>교육부와 국가법령정보센터 기준</h2>
             <p>학년도와 취학 의무의 공식 기준을 확인하며 출처 확인일은 2026-06-22입니다.</p>
+        </section>
+
+        <section class="section-shell faq" aria-labelledby="grade-birth-faq">
+            <h2 id="grade-birth-faq">학년별 출생연도 자주 묻는 질문</h2>
+            <div><strong>중1·중3·고1·고3은 몇 년생인가요?</strong><p>학년도마다 달라지므로 위 표에서 학년을 선택하면 해당 학년도의 일반적인 출생연도를 바로 확인할 수 있습니다.</p></div>
+            <div><strong>빠른년생이나 유급도 표와 같나요?</strong><p>조기입학, 입학유예, 유급, 해외 학제는 표의 일반 기준과 다를 수 있으므로 실제 학적을 우선합니다.</p></div>
         </section>
 
         {% include 'partials/footer.html' %}

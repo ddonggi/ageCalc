@@ -36,6 +36,101 @@ def _sitemap_leaf_locations(client) -> list[str]:
 
 
 class PublicPageTests(unittest.TestCase):
+    def test_seo_query_routes_redirect_invalid_values_to_clean_urls(self):
+        client = app.test_client()
+        invalid_urls = {
+            "/birth-year-age-table?year=": "/birth-year-age-table",
+            "/birth-year-age-table?year=unknown": "/birth-year-age-table",
+            "/birth-year-age-table?year=1800": "/birth-year-age-table",
+            "/school-grade-calculator?year=": "/school-grade-calculator",
+            "/school-entry-year-table?year=2024~2026": "/school-entry-year-table",
+            "/grade-age-table?stage=middle&grade=4": "/grade-age-table",
+            "/grade-birth-year-table?stage=unknown&grade=1": "/grade-birth-year-table",
+            "/college-entry-year-calculator?year=": "/college-entry-year-calculator",
+            "/college-entry-year-calculator?year=2024~2026": "/college-entry-year-calculator",
+        }
+
+        for url, expected_path in invalid_urls.items():
+            with self.subTest(url=url):
+                response = client.get(url)
+                self.assertEqual(302, response.status_code)
+                self.assertEqual(expected_path, response.headers["Location"])
+
+    def test_nonindexable_year_queries_keep_clean_canonical(self):
+        client = app.test_client()
+        cases = {
+            "/school-grade-calculator?year=2015": "/school-grade-calculator",
+            "/school-entry-year-table?year=2015": "/school-entry-year-table",
+            "/birth-year-age-table?year=2015": "/birth-year-age-table",
+            "/college-entry-year-calculator?year=2021": "/college-entry-year-calculator",
+        }
+
+        for url, canonical_path in cases.items():
+            with self.subTest(url=url):
+                response = client.get(url)
+                html = response.get_data(as_text=True)
+                self.assertEqual(200, response.status_code)
+                self.assertIn('<meta name="robots" content="noindex,follow" />', html)
+                self.assertIn(
+                    f'<link rel="canonical" href="https://agecalc.cloud{canonical_path}" />',
+                    html,
+                )
+
+    def test_indexable_query_variants_are_self_canonical_and_specific(self):
+        client = app.test_client()
+        cases = {
+            "/birth-year-age-table?year=2010": ("2010년생", "몇살"),
+            "/grade-age-table?stage=middle&grade=1": ("중1", "몇 살"),
+            "/grade-birth-year-table?stage=high&grade=1": ("고1", "몇 년생"),
+            "/college-entry-year-calculator?year=2026": ("26학번", "2026학번"),
+        }
+
+        for url, phrases in cases.items():
+            with self.subTest(url=url):
+                response = client.get(url)
+                html = response.get_data(as_text=True)
+                self.assertEqual(200, response.status_code)
+                self.assertNotIn('<meta name="robots" content="noindex,follow" />', html)
+                self.assertIn(
+                    f'<link rel="canonical" href="https://agecalc.cloud{url.replace("&", "&amp;")}" />',
+                    html,
+                )
+                for phrase in phrases:
+                    self.assertIn(phrase, html)
+
+    def test_priority_pages_use_search_intent_metadata(self):
+        client = app.test_client()
+        expected = {
+            "/grade-birth-year-table": "학년별 출생연도표 | 중1·고1은 몇 년생? | AgeCalc",
+            "/grade-age-table": "학년별 나이표 | 중1·중3·고1·고3은 몇 살? | AgeCalc",
+            "/school-grade-calculator": "학년 계산기 | 출생연도별 현재 학년 확인 | AgeCalc",
+            "/school-entry-year-table": "입학년도 계산기 | 출생연도별 초·중·고 입학년도 | AgeCalc",
+            "/birth-year-age-table": "몇년생 몇살? 출생연도별 만나이·연나이 표 | AgeCalc",
+            "/age": "만나이 계산기 | 생년월일·음력 생일로 현재 나이 계산 | AgeCalc",
+            "/annual-age-calculator": "연나이 계산기 | 출생연도만으로 올해 연나이 확인 | AgeCalc",
+            "/100-day-calculator": "100일 계산기 | 시작일 포함 100일째·기념일 날짜 계산 | AgeCalc",
+            "/college-entry-year-calculator": "학번 계산기 | 몇 학번·학번 나이·몇년생 확인 | AgeCalc",
+        }
+
+        for path, title in expected.items():
+            with self.subTest(path=path):
+                html = client.get(path).get_data(as_text=True)
+                self.assertIn(f"<title>{title}</title>", html)
+
+    def test_sitemap_contains_only_clean_base_urls(self):
+        client = app.test_client()
+        locations = _sitemap_leaf_locations(client)
+
+        self.assertTrue(locations)
+        self.assertTrue(all("?" not in location and "#" not in location for location in locations))
+        for path in (
+            "/birth-year-age-table",
+            "/grade-age-table",
+            "/grade-birth-year-table",
+            "/college-entry-year-calculator",
+        ):
+            self.assertIn(f"https://agecalc.cloud{path}", locations)
+
     def test_unknown_adsense_review_mode_value_fails_closed(self):
         with self.assertWarns(RuntimeWarning):
             parsed = app_module._parse_adsense_review_mode("typo")
