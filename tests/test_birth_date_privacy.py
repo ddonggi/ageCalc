@@ -190,6 +190,8 @@ class BirthDatePrivacyTests(unittest.TestCase):
         self.assertIn("음력 생년월일은 양력 변환을 위해서만 서버로 전송", html)
         self.assertNotIn("입력값은 계산을 위해 서버로 전송되며 저장하지 않습니다", html)
         self.assertNotIn("계산을 위해 서버로 전송되지만 저장하지 않습니다", html)
+        self.assertIn("윤달 선택은 지원하지 않으며 평달로 계산합니다", html)
+        self.assertIn("올해 돌아오는 음력 생일의 양력 날짜를 찾는 기능은 아닙니다", html)
 
     def test_age_page_uses_editorial_review_date_for_reference_dates(self):
         html = self.client.get("/age").get_data(as_text=True)

@@ -526,6 +526,40 @@ class PublicPageTests(unittest.TestCase):
                 html = client.get(path).get_data(as_text=True)
                 self.assertIn(f"<title>{title}</title>", html)
 
+    def test_age_page_clarifies_man_age_and_lunar_input_intent(self):
+        html = app.test_client().get("/age").get_data(as_text=True)
+
+        self.assertIn(
+            '<meta name="description" content="양력 또는 평달 기준 음력 생년월일 8자리를 입력해 오늘 기준 만나이를 확인하세요. 생일 전후 계산법과 윤달·2월 29일 예외도 안내합니다." />',
+            html,
+        )
+        self.assertIn("오늘 연도 - 출생연도", html)
+        self.assertIn("생일 전이면 1을 뺍니다", html)
+        self.assertIn("윤달 선택은 지원하지 않으며 평달로 계산합니다", html)
+        self.assertIn("올해 돌아오는 음력 생일의 양력 날짜를 찾는 기능은 아닙니다", html)
+        self.assertIn("음력 생일의 만나이 계산 기준", html)
+        self.assertNotIn("완벽 지원", html)
+
+        direct_answer = html.index('aria-label="만나이 바로 답변"')
+        for affiliate_marker in (
+            "info-coupang-promotions",
+            "coupang-mobile-banner",
+            "home-coupang-rail-left",
+        ):
+            if affiliate_marker in html:
+                self.assertLess(direct_answer, html.index(affiliate_marker))
+
+    def test_age_page_examples_follow_the_rendered_reference_date(self):
+        with mock.patch.object(app_module, "_current_local_date", return_value=date(2026, 10, 1)):
+            before_birthday = app.test_client().get("/age").get_data(as_text=True)
+        with mock.patch.object(app_module, "_current_local_date", return_value=date(2026, 10, 2)):
+            on_birthday = app.test_client().get("/age").get_data(as_text=True)
+
+        self.assertIn("2026-10-01 기준 33세", before_birthday)
+        self.assertIn("2026년 기준 34세", before_birthday)
+        self.assertIn("2026-10-02 기준 34세", on_birthday)
+        self.assertIn("2026년 기준 34세", on_birthday)
+
     def test_school_page_group_keeps_one_owner_for_each_search_direction(self):
         client = app.test_client()
 
@@ -751,12 +785,13 @@ class PublicPageTests(unittest.TestCase):
     def test_age_page_uses_current_year_in_age_comparison_examples(self):
         client = app.test_client()
         html = client.get("/age").get_data(as_text=True)
-        current_year = _current_local_date().year
+        current = _current_local_date()
+        current_year = current.year
+        man_age = current_year - 1992 - ((current.month, current.day) < (10, 2))
 
-        self.assertIn(f"{current_year}-10-07 기준 33세", html)
-        self.assertIn(f"{current_year}년 기준 33세", html)
-        self.assertNotIn("2025-10-07 기준 33세", html)
-        self.assertNotIn("2025년 기준 33세", html)
+        self.assertIn(f"{current.isoformat()} 기준 {man_age}세", html)
+        self.assertIn(f"{current_year}년 기준 {current_year - 1992}세", html)
+        self.assertNotIn(f"{current_year}-10-07 기준 33세", html)
 
     def test_birth_year_age_table_page_is_public(self):
         client = app.test_client()

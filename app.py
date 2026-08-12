@@ -1542,12 +1542,19 @@ def age():
         response.headers['Cache-Control'] = 'no-store'
         return response
 
+    today = _current_local_date()
+    example_birth_date = date(1992, 10, 2)
+    example_man_age = today.year - example_birth_date.year - (
+        (today.month, today.day) < (example_birth_date.month, example_birth_date.day)
+    )
     return render_template(
         'age.html',
         result=None,
         calendar_type='solar',
         page_path="/age",
-        today=_current_local_date(),
+        today=today,
+        example_man_age=example_man_age,
+        example_annual_age=today.year - example_birth_date.year,
     )
 
 @app.route('/privacy')

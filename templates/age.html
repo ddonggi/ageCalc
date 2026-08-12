@@ -7,7 +7,7 @@
 
     <!-- 필수 SEO -->
     <title>만나이 계산기 | 생년월일·음력 생일로 현재 나이 계산 | AgeCalc</title>
-    <meta name="description" content="양력 또는 음력 생년월일을 입력해 오늘 기준 만나이를 계산하고, 생일 전후 나이 차이와 계산 기준을 확인하세요." />
+    <meta name="description" content="양력 또는 평달 기준 음력 생년월일 8자리를 입력해 오늘 기준 만나이를 확인하세요. 생일 전후 계산법과 윤달·2월 29일 예외도 안내합니다." />
 
     <!-- 중복 방지: 대표 URL로 고정 -->
     <link rel="canonical" href="https://agecalc.cloud/age" />
@@ -15,13 +15,13 @@
     <!-- 소셜 미리보기 -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="만나이 계산기" />
-    <meta property="og:title" content="만나이 계산기 – 양력/음력 생일 완벽 지원" />
-    <meta property="og:description" content="양력/음력 생일로 정확한 만나이 계산 + 연령별 권리·제도 안내." />
+    <meta property="og:title" content="만나이 계산기 | 생년월일·음력 생일로 현재 나이 계산" />
+    <meta property="og:description" content="양력 또는 평달 기준 음력 생년월일 8자리를 입력해 오늘 기준 만나이를 확인하세요. 생일 전후 계산법과 예외도 안내합니다." />
     <meta property="og:url" content="https://agecalc.cloud/age" />
     <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="만나이 계산기 – 양력/음력 생일 완벽 지원" />
-    <meta name="twitter:description" content="양력/음력 생일로 정확한 만나이 계산 + 연령별 권리·제도 안내." />
+    <meta name="twitter:title" content="만나이 계산기 | 생년월일·음력 생일로 현재 나이 계산" />
+    <meta name="twitter:description" content="양력 또는 평달 기준 음력 생년월일 8자리를 입력해 오늘 기준 만나이를 확인하세요. 생일 전후 계산법과 예외도 안내합니다." />
     <meta name="twitter:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
     <!-- 네이버 웹마스터 도구 인증 -->
@@ -45,7 +45,7 @@
             "applicationCategory": "UtilitiesApplication",
             "operatingSystem": "Web",
             "url": "https://agecalc.cloud/age",
-            "description": "생년월일로 양력/음력 모두 정확한 만나이를 계산하고 연령별 권리·제도를 안내합니다.",
+            "description": "양력 또는 평달 기준 음력 생년월일로 오늘 기준 만나이를 계산하고 생일 전후 계산법과 예외를 안내합니다.",
             "inLanguage": "ko",
             "author": {
               "@type": "Organization",
@@ -67,7 +67,10 @@
          "@context": "https://schema.org",
          "@type": "FAQPage",
          "mainEntity": [
-          {"@type":"Question","name":"음력 생일은 어떻게 계산하나요?","acceptedAnswer":{"@type":"Answer","text":"음력 선택 후 생년월일을 입력하면 양력으로 환산해 만나이를 계산합니다."}},
+          {"@type":"Question","name":"만나이는 어떻게 확인하나요?","acceptedAnswer":{"@type":"Answer","text":"양력 또는 음력 생년월일 8자리를 입력하면 오늘 날짜를 기준으로 생일 전후를 반영한 만나이를 확인할 수 있습니다."}},
+          {"@type":"Question","name":"음력 생일을 입력하면 무엇을 계산하나요?","acceptedAnswer":{"@type":"Answer","text":"입력한 평달 음력 생년월일을 양력 출생일로 환산한 뒤 오늘 기준 만나이를 계산합니다."}},
+          {"@type":"Question","name":"올해 음력 생일의 양력 날짜도 확인할 수 있나요?","acceptedAnswer":{"@type":"Answer","text":"아니요. 이 도구는 출생 당시의 음력 생년월일로 만나이를 계산하며, 올해 돌아오는 음력 생일 날짜를 찾는 기념일 변환기는 아닙니다."}},
+          {"@type":"Question","name":"윤달 생일도 계산할 수 있나요?","acceptedAnswer":{"@type":"Answer","text":"현재 윤달 선택은 지원하지 않으며 입력한 음력 날짜를 평달로 계산합니다."}},
           {"@type":"Question","name":"2월 29일에 태어났다면 만나이는 어떻게 계산되나요?","acceptedAnswer":{"@type":"Answer","text":"윤년이 아닌 해에는 통상 2월 28일 또는 3월 1일을 기준으로 간주하는 관행이 있으며, 기관별 안내를 확인하세요."}},
           {"@type":"Question","name":"결과가 법적 효력을 갖나요?","acceptedAnswer":{"@type":"Answer","text":"일반 정보 제공용입니다. 법적 판단은 관계 법령과 기관 고시를 우선합니다."}},
           {"@type":"Question","name":"입력한 생년월일이 서버에 저장되나요?","acceptedAnswer":{"@type":"Answer","text":"양력 생년월일은 브라우저 안에서 계산합니다. 음력 생년월일은 양력 변환을 위해서만 서버로 전송하며 저장하지 않습니다."}},
@@ -131,18 +134,17 @@
                 </article>
             </div>
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
-
         <section class="section-shell direct-answer" aria-label="만나이 바로 답변">
             <p class="eyebrow">바로 답변</p>
-            <h2>생일 전후를 확인하면 현재 만나이를 알 수 있습니다</h2>
+            <h2>생년월일을 입력하면 오늘 기준 만나이를 확인할 수 있습니다</h2>
             <p>
-                기준연도에서 출생연도를 뺀 뒤, 올해 생일이 아직 지나지 않았다면 1을 뺍니다.
+                만나이는 <strong>오늘 연도 - 출생연도</strong>로 계산한 뒤, 생일 전이면 1을 뺍니다.
                 같은 출생연도라도 <strong>생일이 지났는지에 따라 만나이가 한 살 달라집니다</strong>.
-                정확한 결과에는 출생연도뿐 아니라 월과 일이 필요합니다.
+                정확한 결과에는 연·월·일이 모두 필요하며, 이 페이지에 표시된 {{ today.isoformat() }}이 기준일입니다.
             </p>
         </section>
+        {% include 'partials/info_coupang_promotions.html' %}
+        {% include 'partials/home_coupang_rails.html' %}
         <form class="age-form" id="age-form" action="{{ url_for('age') }}" method="post" autocomplete="off" data-clarity-mask="true">
             <div class="form-group">
                 <h3>생년월일을 입력하세요 (8자리)</h3>
@@ -162,6 +164,12 @@
                     <input type="text" id="birth-input" name="birth-input" placeholder="19921002" inputmode="numeric"
                         pattern="[0-9]*" maxlength="8" required data-clarity-mask="true">
                 </div>
+
+                <p class="input-help">
+                    음력 입력은 출생 당시의 음력 날짜를 양력 출생일로 환산해 만나이를 계산합니다.
+                    윤달 선택은 지원하지 않으며 평달로 계산합니다. 올해 돌아오는 음력 생일의 양력 날짜를 찾는 기능은 아닙니다.
+                    자세한 기준은 <a href="{{ url_for('guide_detail', slug='lunar-birthday-age-guide') }}">음력 생일의 만나이 계산 기준</a>에서 확인하세요.
+                </p>
 
                 <small id="birth-error" class="error-msg" aria-live="polite"></small>
             </div>
@@ -550,12 +558,12 @@
                     <tr>
                         <td>만나이</td>
                         <td>생일이 지나야 +1</td>
-                        <td>{{ today.year }}-10-07 기준 33세</td>
+                        <td>{{ today.isoformat() }} 기준 {{ example_man_age }}세</td>
                     </tr>
                     <tr>
                         <td>연나이</td>
                         <td>올해 − 출생연도</td>
-                        <td>{{ today.year }}년 기준 33세</td>
+                        <td>{{ today.year }}년 기준 {{ example_annual_age }}세</td>
                     </tr>
                 </tbody>
             </table>
@@ -567,8 +575,17 @@
         <section aria-labelledby="faq">
             <h2 id="faq">자주 묻는 질문</h2>
 
-            <h3>Q. 음력 생일은 어떻게 계산하나요?</h3>
-            <p>A. 음력 선택 후 생년월일을 입력하면 양력으로 환산해 만나이를 계산합니다.</p>
+            <h3>Q. 만나이는 어떻게 확인하나요?</h3>
+            <p>A. 양력 또는 음력 생년월일 8자리를 입력하면 오늘 날짜를 기준으로 생일 전후를 반영한 만나이를 확인할 수 있습니다.</p>
+
+            <h3>Q. 음력 생일을 입력하면 무엇을 계산하나요?</h3>
+            <p>A. 입력한 평달 음력 생년월일을 양력 출생일로 환산한 뒤 오늘 기준 만나이를 계산합니다.</p>
+
+            <h3>Q. 올해 음력 생일의 양력 날짜도 확인할 수 있나요?</h3>
+            <p>A. 아니요. 이 도구는 출생 당시의 음력 생년월일로 만나이를 계산하며, 올해 돌아오는 음력 생일 날짜를 찾는 기념일 변환기는 아닙니다.</p>
+
+            <h3>Q. 윤달 생일도 계산할 수 있나요?</h3>
+            <p>A. 현재 윤달 선택은 지원하지 않으며 입력한 음력 날짜를 평달로 계산합니다.</p>
 
             <h3>Q. 2월 29일에 태어났다면 만나이는 어떻게 계산되나요?</h3>
             <p>A. 윤년이 아닌 해에는 통상 2월 28일 또는 3월 1일을 기준으로 간주하는 관행이 있으며, 기관별 안내를 확인하세요.</p>

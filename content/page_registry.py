@@ -103,7 +103,7 @@ STATIC_PAGE_REGISTRY = (
             "annual_age_calculator",
             "birthday_dday_calculator",
         ),
-        lastmod="2026-08-11",
+        lastmod="2026-08-13",
     ),
     _page(
         "about",
