@@ -60,13 +60,38 @@ class PageRegistryTests(unittest.TestCase):
         )
         self.assertEqual(
             "hub:family",
-            find_page("life_hub", {"hub_key": "family"})["key"],
+            find_page("life_hub", {"hub_slug": "family"})["key"],
+        )
+        self.assertEqual(
+            "hub:age",
+            find_page("life_hub", {"hub_slug": "age-tools"})["key"],
+        )
+        self.assertEqual(
+            "hub:health",
+            find_page("life_hub", {"hub_slug": "health-tools"})["key"],
         )
         self.assertEqual(
             "guide:age-calculation-2026",
             find_page("guide_detail", {"slug": "age-calculation-2026"})["key"],
         )
         self.assertIsNone(find_page("guide_detail", {"slug": "missing"}))
+
+    def test_hub_keys_slugs_paths_and_canonicals_are_unique(self):
+        values = {
+            field: [page[field] for page in HUB_PAGE_REGISTRY]
+            for field in ("key", "path")
+        }
+        for field, candidates in values.items():
+            with self.subTest(field=field):
+                self.assertEqual(len(candidates), len(set(candidates)))
+
+        by_key = {page["key"]: page for page in HUB_PAGE_REGISTRY}
+        self.assertEqual("/age-tools/", by_key["hub:age"]["path"])
+        self.assertEqual("/health-tools/", by_key["hub:health"]["path"])
+        self.assertEqual(
+            {"hub_slug": "age-tools"},
+            by_key["hub:age"]["route_values"],
+        )
 
     def test_core_pages_have_contextual_links(self):
         core_pages = [

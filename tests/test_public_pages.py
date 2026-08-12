@@ -11,6 +11,8 @@ from sqlalchemy.orm import sessionmaker
 
 import app as app_module
 import content.guide_pages as guide_pages_module
+from content.hub_pages import HUB_PAGES
+from content.page_registry import PUBLIC_PAGE_REGISTRY
 from app import PUBLIC_SITEMAP_ENDPOINTS, app, _current_local_date
 from db import Base
 from content.guide_pages import (
@@ -36,6 +38,95 @@ def _sitemap_leaf_locations(client) -> list[str]:
 
 
 class PublicPageTests(unittest.TestCase):
+    def test_conflicting_legacy_hub_urls_redirect_to_dedicated_hub_paths(self):
+        client = app.test_client()
+        cases = {
+            "/age/": "/age-tools/",
+            "/health/": "/health-tools/",
+        }
+
+        for source, target in cases.items():
+            with self.subTest(source=source):
+                response = client.get(source, follow_redirects=False)
+                self.assertEqual(301, response.status_code)
+                self.assertEqual(target, response.headers["Location"])
+
+                query_response = client.get(
+                    f"{source}?source=legacy", follow_redirects=False
+                )
+                self.assertEqual(301, query_response.status_code)
+                self.assertEqual(
+                    f"{target}?source=legacy", query_response.headers["Location"]
+                )
+
+    def test_public_canonical_trailing_slash_variants_redirect_permanently(self):
+        client = app.test_client()
+        cases = {
+            "/about/": "/about",
+            "/birth-year-age-table/": "/birth-year-age-table",
+            "/guides/age-calculation-2026/": "/guides/age-calculation-2026",
+        }
+
+        for source, target in cases.items():
+            with self.subTest(source=source):
+                response = client.get(source, follow_redirects=False)
+                self.assertEqual(301, response.status_code)
+                self.assertEqual(target, response.headers["Location"])
+
+                query_response = client.get(
+                    f"{source}?utm_source=test", follow_redirects=False
+                )
+                self.assertEqual(
+                    f"{target}?utm_source=test", query_response.headers["Location"]
+                )
+
+        self.assertEqual(404, client.get("/unknown/", follow_redirects=False).status_code)
+        self.assertEqual(404, client.get("/llms.txt/", follow_redirects=False).status_code)
+
+        for page in PUBLIC_PAGE_REGISTRY:
+            path = str(page["path"])
+            with self.subTest(canonical_path=path):
+                self.assertEqual(200, client.get(path).status_code)
+                if path == "/" or path.endswith("/") or path in {"/age", "/health"}:
+                    continue
+                slash_response = client.head(f"{path}/", follow_redirects=False)
+                self.assertEqual(301, slash_response.status_code)
+                self.assertEqual(path, slash_response.headers["Location"])
+
+    def test_hub_canonical_paths_and_slashless_redirects_are_consistent(self):
+        client = app.test_client()
+        cases = {
+            "age-tools": "나이 계산",
+            "family": "가족·육아",
+            "health-tools": "건강·검진",
+        }
+
+        for slug, title in cases.items():
+            with self.subTest(slug=slug):
+                canonical_path = f"/{slug}/"
+                response = client.get(canonical_path)
+                self.assertEqual(200, response.status_code)
+                self.assertIn(f"<h1>{title}</h1>", response.get_data(as_text=True))
+                self.assertIn(
+                    f'<link rel="canonical" href="https://agecalc.cloud{canonical_path}" />',
+                    response.get_data(as_text=True),
+                )
+
+                slashless = client.get(f"/{slug}", follow_redirects=False)
+                self.assertEqual(308, slashless.status_code)
+                self.assertTrue(slashless.headers["Location"].endswith(canonical_path))
+
+    def test_non_review_sitemaps_use_only_dedicated_conflict_free_hub_paths(self):
+        client = app.test_client()
+        with mock.patch.object(app_module, "ADSENSE_REVIEW_MODE", False):
+            age_xml = client.get("/sitemaps/age.xml").get_data(as_text=True)
+            health_xml = client.get("/sitemaps/health.xml").get_data(as_text=True)
+
+        self.assertIn("https://agecalc.cloud/age-tools/", age_xml)
+        self.assertNotIn("https://agecalc.cloud/age/</loc>", age_xml)
+        self.assertIn("https://agecalc.cloud/health-tools/", health_xml)
+        self.assertNotIn("https://agecalc.cloud/health/</loc>", health_xml)
+
     def test_llms_txt_is_served_at_root_as_plain_text(self):
         client = app.test_client()
         response = client.get("/llms.txt")
@@ -230,18 +321,9 @@ class PublicPageTests(unittest.TestCase):
     def test_adsense_review_mode_keeps_hubs_accessible_but_not_indexable(self):
         client = app.test_client()
 
-        for key in (
-            "age",
-            "family",
-            "education",
-            "anniversary",
-            "retirement",
-            "health",
-            "pets",
-            "generations",
-        ):
-            with self.subTest(key=key):
-                response = client.get(f"/{key}/")
+        for hub in HUB_PAGES:
+            with self.subTest(key=hub["key"]):
+                response = client.get(hub["path"])
                 html = response.get_data(as_text=True)
 
                 self.assertEqual(response.status_code, 200)
@@ -252,8 +334,8 @@ class PublicPageTests(unittest.TestCase):
                 self.assertIn('"adsense_client": ""', html)
 
         home_html = client.get("/").get_data(as_text=True)
-        for key in ("age", "family", "education", "anniversary"):
-            self.assertIn(f'href="/{key}/"', home_html)
+        for path in ("/age-tools/", "/family/", "/education/", "/anniversary/"):
+            self.assertIn(f'href="{path}"', home_html)
 
     def test_adsense_review_mode_exposes_only_46_sitemap_urls(self):
         client = app.test_client()
@@ -826,26 +908,17 @@ class PublicPageTests(unittest.TestCase):
 
     def test_life_hub_pages_remain_accessible_but_noindex_during_review(self):
         client = app.test_client()
-        expected_hubs = {
-            "age": "나이 계산",
-            "family": "가족·육아",
-            "education": "학교·교육",
-            "anniversary": "생일·기념일",
-            "retirement": "은퇴·노후",
-            "health": "건강·검진",
-            "pets": "반려동물",
-            "generations": "세대·추억",
-        }
+        expected_hubs = {str(hub["path"]): str(hub["title"]) for hub in HUB_PAGES}
 
-        for key, title in expected_hubs.items():
-            with self.subTest(key=key):
-                response = client.get(f"/{key}/")
+        for path, title in expected_hubs.items():
+            with self.subTest(path=path):
+                response = client.get(path)
 
                 self.assertEqual(response.status_code, 200)
                 html = response.get_data(as_text=True)
                 self.assertIn(f"<h1>{title}</h1>", html)
                 self.assertIn(
-                    f'<link rel="canonical" href="https://agecalc.cloud/{key}/" />',
+                    f'<link rel="canonical" href="https://agecalc.cloud{path}" />',
                     html,
                 )
                 self.assertIn('name="description"', html)
@@ -858,34 +931,16 @@ class PublicPageTests(unittest.TestCase):
 
     def test_life_hubs_are_excluded_from_review_mode_sitemap(self):
         locations = _sitemap_leaf_locations(app.test_client())
-        for key in (
-            "age",
-            "family",
-            "education",
-            "anniversary",
-            "retirement",
-            "health",
-            "pets",
-            "generations",
-        ):
-            self.assertNotIn(f"https://agecalc.cloud/{key}/", locations)
+        for hub in HUB_PAGES:
+            self.assertNotIn(f"https://agecalc.cloud{hub['path']}", locations)
         self.assertEqual(46, len(locations))
 
     def test_life_hubs_render_direct_answers_and_contextual_paths(self):
         client = app.test_client()
 
-        for key in (
-            "age",
-            "family",
-            "education",
-            "anniversary",
-            "retirement",
-            "health",
-            "pets",
-            "generations",
-        ):
-            with self.subTest(key=key):
-                html = client.get(f"/{key}/").get_data(as_text=True)
+        for hub in HUB_PAGES:
+            with self.subTest(key=hub["key"]):
+                html = client.get(hub["path"]).get_data(as_text=True)
 
                 self.assertRegex(html, r'class="[^"]*\bdirect-answer\b[^"]*"')
                 self.assertIn('class="related-paths"', html)
@@ -903,9 +958,10 @@ class PublicPageTests(unittest.TestCase):
             "generations": "출생연도와 비교 기준을 먼저 정하세요",
         }
 
+        hubs_by_key = {str(hub["key"]): hub for hub in HUB_PAGES}
         for key, heading in expected_headings.items():
             with self.subTest(key=key):
-                html = client.get(f"/{key}/").get_data(as_text=True)
+                html = client.get(hubs_by_key[key]["path"]).get_data(as_text=True)
 
                 self.assertIn("life-hub-usage-guide", html)
                 self.assertIn("이렇게 시작하세요", html)
@@ -2287,18 +2343,9 @@ class PublicPageTests(unittest.TestCase):
         for label in ["나이", "가족", "교육", "기념일"]:
             self.assertIn('class="hub-nav-direct"', html)
             self.assertIn(f">{label}</a>", html)
-        for key in [
-            "age",
-            "family",
-            "education",
-            "anniversary",
-            "retirement",
-            "health",
-            "pets",
-            "generations",
-        ]:
-            self.assertIn(f'data-hub-key="{key}"', html)
-            self.assertIn(f'href="/{key}/"', html)
+        for hub in HUB_PAGES:
+            self.assertIn(f'data-hub-key="{hub["key"]}"', html)
+            self.assertIn(f'href="{hub["path"]}"', html)
         self.assertIn("전체 허브", html)
         self.assertIn("블로그", html)
         self.assertIn("메뉴 열기", html)
@@ -2960,17 +3007,8 @@ class PublicPageTests(unittest.TestCase):
         html = response.get_data(as_text=True)
         self.assertIn("8개의 생활 영역", html)
         self.assertEqual(8, html.count('class="home-life-hub-card'))
-        for key in [
-            "age",
-            "family",
-            "education",
-            "anniversary",
-            "retirement",
-            "health",
-            "pets",
-            "generations",
-        ]:
-            self.assertIn(f'href="/{key}/"', html)
+        for hub in HUB_PAGES:
+            self.assertIn(f'href="{hub["path"]}"', html)
         self.assertNotIn("표·비교 모음", html)
 
     def test_home_page_renders_coupang_side_rails_when_enabled(self):

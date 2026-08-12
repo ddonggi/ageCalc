@@ -21,9 +21,12 @@ def _hub(
     questions: tuple[tuple[str, str], ...],
     *,
     accent: str,
+    slug: str | None = None,
 ) -> dict[str, object]:
+    url_slug = slug or key
     return {
         "key": key,
+        "slug": url_slug,
         "title": title,
         "nav_label": nav_label,
         "eyebrow": eyebrow,
@@ -33,8 +36,8 @@ def _hub(
         "supporting_links": supporting_links,
         "questions": questions,
         "accent": accent,
-        "path": f"/{key}/",
-        "canonical": f"https://agecalc.cloud/{key}/",
+        "path": f"/{url_slug}/",
+        "canonical": f"https://agecalc.cloud/{url_slug}/",
     }
 
 
@@ -62,6 +65,7 @@ HUB_PAGES = (
             ("정확한 만나이는 무엇이 필요한가요?", "출생연도뿐 아니라 월과 일까지 입력해야 생일 전후를 반영할 수 있습니다."),
         ),
         accent="terracotta",
+        slug="age-tools",
     ),
     _hub(
         "family",
@@ -182,6 +186,7 @@ HUB_PAGES = (
             ("아이 발달 상태도 확인할 수 있나요?", "월령만 계산하며 발달과 건강 판단은 의료 전문가의 안내가 필요합니다."),
         ),
         accent="mustard",
+        slug="health-tools",
     ),
     _hub(
         "pets",
@@ -322,4 +327,5 @@ HUB_PAGES = tuple(
 )
 
 HUB_PAGE_BY_KEY = {hub["key"]: hub for hub in HUB_PAGES}
+HUB_PAGE_BY_SLUG = {hub["slug"]: hub for hub in HUB_PAGES}
 HUB_KEYS = tuple(hub["key"] for hub in HUB_PAGES)

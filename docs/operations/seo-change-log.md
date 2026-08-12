@@ -2,6 +2,21 @@
 
 검색 메타데이터와 색인 정책을 바꿀 때 실제 변경일과 검증 결과를 기록합니다. `lastmod`는 본문·FAQ·계산 설명이 실제로 바뀐 페이지만 갱신합니다.
 
+## 2026-08-13
+
+### 공개 URL 정규화
+
+| 유형 | 기존 URL | 대표 URL | 처리 |
+|---|---|---|---|
+| 만나이 계산기 | `/age` | `/age` | 기존 계산기 URL 유지 |
+| 나이 도구 허브 | `/age/` | `/age-tools/` | 기존 URL에서 신규 허브로 301 |
+| 상태 확인 API | `/health` | `/health` | 기존 API URL 유지 |
+| 건강 도구 허브 | `/health/` | `/health-tools/` | 기존 URL에서 신규 허브로 301 |
+| 슬래시 없는 공개 페이지 | `/about/` 등 | `/about` 등 registry canonical | GET·HEAD 요청을 301로 정규화하고 쿼리 문자열 유지 |
+| 기존 trailing-slash 허브 | `/family` 등 | `/family/` 등 | Flask의 기존 308 유지 |
+
+알 수 없는 trailing-slash URL과 `/llms.txt/`는 404를 유지합니다. 내부 메뉴·홈·breadcrumb·관련 도구와 비검토 모드 사이트맵은 신규 허브 canonical만 사용합니다. 본문·FAQ·계산 설명은 바뀌지 않아 registry `lastmod`는 갱신하지 않았습니다.
+
 ## 2026-08-11
 
 | URL | 기존 title | 변경 title | H1·본문·FAQ | canonical / robots | lastmod |

@@ -23,8 +23,9 @@ from content.guide_pages import (
     INDEXABLE_GUIDE_PAGES,
     NON_INDEXABLE_GUIDE_PATHS,
 )
-from content.hub_pages import HUB_PAGE_BY_KEY, HUB_PAGES
+from content.hub_pages import HUB_PAGE_BY_KEY, HUB_PAGE_BY_SLUG, HUB_PAGES
 from content.page_registry import (
+    PUBLIC_PAGE_REGISTRY,
     PUBLIC_SITEMAP_ENDPOINTS,
     SITEMAP_GROUPS,
     contextual_links_for,
@@ -224,6 +225,35 @@ FOOTER_POLICY_LINKS = [
 @app.before_request
 def set_csp_nonce():
     g.csp_nonce = secrets.token_urlsafe(16)
+
+
+def _redirect_with_query(target: str, code: int = 301):
+    if request.query_string:
+        target = f"{target}?{request.query_string.decode('latin-1')}"
+    return redirect(target, code=code)
+
+
+LEGACY_HUB_REDIRECTS = {
+    "/age/": "/age-tools/",
+    "/health/": "/health-tools/",
+}
+TRAILING_SLASH_REDIRECTS = {
+    f"{page['path']}/": str(page["path"])
+    for page in PUBLIC_PAGE_REGISTRY
+    if page["path"] != "/" and not str(page["path"]).endswith("/")
+}
+
+
+@app.before_request
+def normalize_public_page_url():
+    if request.method not in {"GET", "HEAD"}:
+        return None
+    target = LEGACY_HUB_REDIRECTS.get(request.path)
+    if target is None:
+        target = TRAILING_SLASH_REDIRECTS.get(request.path)
+    if target is None:
+        return None
+    return _redirect_with_query(target)
 
 @app.context_processor
 def inject_csp_nonce():
@@ -1431,9 +1461,9 @@ def index():
     return render_template('index.html', today=_current_local_date())
 
 
-@app.get("/<hub_key>/")
-def life_hub(hub_key):
-    hub = HUB_PAGE_BY_KEY.get(hub_key)
+@app.get("/<hub_slug>/")
+def life_hub(hub_slug):
+    hub = HUB_PAGE_BY_SLUG.get(hub_slug)
     if hub is None:
         abort(404)
     return render_template(
@@ -1442,7 +1472,7 @@ def life_hub(hub_key):
         hub_number=next(
             index
             for index, candidate in enumerate(HUB_PAGES, start=1)
-            if candidate["key"] == hub_key
+            if candidate["key"] == hub["key"]
         ),
     )
 

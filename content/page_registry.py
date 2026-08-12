@@ -402,7 +402,7 @@ HUB_PAGE_REGISTRY = tuple(
     {
         "key": f"hub:{hub['key']}",
         "endpoint": "life_hub",
-        "route_values": {"hub_key": hub["key"]},
+        "route_values": {"hub_slug": hub["slug"]},
         "path": hub["path"],
         "hub": hub["key"],
         "title": hub["title"],
