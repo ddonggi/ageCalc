@@ -196,7 +196,7 @@ STATIC_PAGE_REGISTRY = (
         "연나이 계산기",
         "출생연도만으로 올해 연나이 계산",
         related_endpoints=("age", "age_comparison_table", "birth_year_age_table"),
-        lastmod="2026-08-11",
+        lastmod="2026-08-13",
     ),
     _page(
         "age_comparison_table",

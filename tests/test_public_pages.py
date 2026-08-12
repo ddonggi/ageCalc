@@ -994,6 +994,36 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("올해 연나이", html)
         self.assertIn("만나이와의 차이", html)
 
+    def test_annual_age_calculator_hero_matches_birth_year_only_input(self):
+        client = app.test_client()
+
+        with mock.patch.object(
+            app_module, "_current_local_date", return_value=date(2026, 8, 13)
+        ):
+            html = client.get("/annual-age-calculator").get_data(as_text=True)
+
+        hero_html = re.search(r'<section class="hero-band">.*?</section>', html, re.S).group(0)
+        self.assertIn("출생연도만 입력하면", hero_html)
+        self.assertIn("2026년에서 출생연도를 빼", hero_html)
+        self.assertIn(">출생연도 입력</a>", hero_html)
+        self.assertNotIn("생년월일을 입력하면", hero_html)
+        self.assertEqual(
+            ["birth_year"],
+            re.findall(r'<(?:input|select)[^>]+name="([^"]+)"', html),
+        )
+
+        self.assertIn(
+            "<title>연나이 계산기 | 출생연도만으로 올해 연나이 확인 | AgeCalc</title>",
+            html,
+        )
+        self.assertIn("<h1>연나이 계산기</h1>", html)
+        self.assertIn(
+            '<meta name="description" content="출생연도만 입력해 올해 연나이를 계산하고, 생일에 따라 달라지는 만나이와의 차이를 확인하세요." />',
+            html,
+        )
+        for path in ("/age", "/birth-year-age-table", "/age-comparison-table"):
+            self.assertIn(f'href="{path}"', html)
+
     def test_annual_age_calculator_highlights_selected_birth_year(self):
         client = app.test_client()
         response = client.get("/annual-age-calculator?birth_year=1992")
@@ -1004,12 +1034,17 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("1992년생", html)
         self.assertIn("34세", html)
 
-    def test_annual_age_calculator_redirects_legacy_birth_date_query(self):
+    def test_annual_age_calculator_redirects_legacy_queries(self):
         client = app.test_client()
-        response = client.get("/annual-age-calculator?birth_date=921002")
 
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], "/annual-age-calculator")
+        for path in (
+            "/annual-age-calculator?birth_date=921002",
+            "/annual-age-calculator?year=&month=&day=",
+        ):
+            with self.subTest(path=path):
+                response = client.get(path)
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(response.headers["Location"], "/annual-age-calculator")
 
     def test_age_comparison_table_page_is_public(self):
         client = app.test_client()

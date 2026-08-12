@@ -43,11 +43,12 @@
                 <p class="eyebrow">연도 기준 계산</p>
                 <h1>연나이 계산기</h1>
                 <p class="page-intro">
-                    생년월일을 입력하면 생일과 관계없이 올해 기준 연나이가 바로 나옵니다.
-                    공적 기준은 만나이가 중심이지만, 학교·또래 비교나 연도 단위 안내에서는 연나이를 함께 찾는 경우가 많습니다.
+                    출생연도만 입력하면 {{ current_year }}년 기준 연나이가 바로 나옵니다.
+                    연나이는 {{ current_year }}년에서 출생연도를 빼 계산하며 월·일이나 생일이 지났는지는 반영하지 않습니다.
+                    생년월일과 기준일로 정확한 만나이를 확인하려면 만나이 계산기를 이용하세요.
                 </p>
                 <div class="hero-actions">
-                    <a class="btn btn-primary" href="#annual-age-search">생년월일 입력</a>
+                    <a class="btn btn-primary" href="#annual-age-search">출생연도 입력</a>
                     <a class="btn btn-secondary" href="{{ url_for('age') }}">만나이 계산기 보기</a>
                 </div>
             </div>
