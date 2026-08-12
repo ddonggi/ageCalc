@@ -17,6 +17,8 @@
 
 알 수 없는 trailing-slash URL과 `/llms.txt/`는 404를 유지합니다. 내부 메뉴·홈·breadcrumb·관련 도구와 비검토 모드 사이트맵은 신규 허브 canonical만 사용합니다. 본문·FAQ·계산 설명은 바뀌지 않아 registry `lastmod`는 갱신하지 않았습니다.
 
+상태 확인 API `/health`는 기존 `200 application/json` 응답을 유지하면서 GET·HEAD 응답에 `X-Robots-Tag: noindex, nofollow`를 추가했습니다. 사용자용 건강 도구 허브 `/health-tools/`와 사이트맵 정책은 변경하지 않았습니다.
+
 ## 2026-08-11
 
 | URL | 기존 title | 변경 title | H1·본문·FAQ | canonical / robots | lastmod |

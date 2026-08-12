@@ -352,7 +352,9 @@ def cleanup_session(exception=None):
 
 @app.after_request
 def add_security_headers(response):
-    if request.path == "/minigames" or request.path.startswith("/minigames/"):
+    if request.path == "/health":
+        response.headers["X-Robots-Tag"] = "noindex, nofollow"
+    elif request.path == "/minigames" or request.path.startswith("/minigames/"):
         response.headers["X-Robots-Tag"] = "noindex, nofollow"
     elif ADSENSE_REVIEW_MODE and request.path in ADSENSE_REVIEW_HUB_PATHS:
         response.headers["X-Robots-Tag"] = "noindex, follow"

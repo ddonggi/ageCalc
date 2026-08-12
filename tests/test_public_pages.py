@@ -38,6 +38,19 @@ def _sitemap_leaf_locations(client) -> list[str]:
 
 
 class PublicPageTests(unittest.TestCase):
+    def test_health_api_is_available_but_blocked_from_indexing(self):
+        client = app.test_client()
+
+        for method in (client.get, client.head):
+            with self.subTest(method=method.__name__):
+                response = method("/health")
+
+                self.assertEqual(200, response.status_code)
+                self.assertTrue(response.content_type.startswith("application/json"))
+                self.assertEqual("noindex, nofollow", response.headers.get("X-Robots-Tag"))
+
+        self.assertEqual({"ok": True}, client.get("/health").get_json())
+
     def test_conflicting_legacy_hub_urls_redirect_to_dedicated_hub_paths(self):
         client = app.test_client()
         cases = {

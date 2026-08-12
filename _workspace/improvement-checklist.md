@@ -57,6 +57,7 @@
 - 대상: `app.py`, `content/page_registry.py`, `content/hub_pages.py`, `templates/partials/header.html`, 관련 테스트
 - 완료 조건: 공개 indexable URL마다 대표 URL이 하나이며 sitemap·canonical·내부 링크가 이를 가리킴
 - 완료 기록: 2026-08-13, `/age-tools/`·`/health-tools/` 도입 및 기존 `/age/`·`/health/` 301 적용
+- 후속 보완: 상태 확인 API `/health`의 GET·HEAD 응답에 `X-Robots-Tag: noindex, nofollow` 적용
 - 검증 결과: registry canonical 59개, legacy redirect, query 보존, sitemap·내부 링크 계약 및 전체 테스트 325개 통과
 - 상태: 로컬 구현·검증 완료, 운영 배포 미수행
 
