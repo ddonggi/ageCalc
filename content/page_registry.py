@@ -141,7 +141,7 @@ STATIC_PAGE_REGISTRY = (
         "몇년생 몇살인지 출생연도별 만나이와 연나이 확인",
         priority="core",
         related_endpoints=("age", "annual_age_calculator", "birth_year_zodiac_table"),
-        lastmod="2026-08-11",
+        lastmod="2026-08-13",
     ),
     _page(
         "school_grade_calculator",

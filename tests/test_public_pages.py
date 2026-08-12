@@ -1160,6 +1160,45 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("2002년", html)
         self.assertIn("출생연도만으로는 경계일의 띠를 확정할 수 없습니다", html)
 
+    def test_birth_year_age_table_answers_age_to_year_and_selected_year_above_the_form(self):
+        client = app.test_client()
+
+        with mock.patch.object(
+            app_module, "_current_local_date", return_value=date(2026, 8, 13)
+        ):
+            base_html = client.get("/birth-year-age-table").get_data(as_text=True)
+            selected_html = client.get(
+                "/birth-year-age-table?year=2010"
+            ).get_data(as_text=True)
+
+        self.assertIn("2026년 20살은 연나이 기준 2006년생입니다", base_html)
+        self.assertIn(
+            "만 20세는 생일과 기준일에 따라 2005년생 또는 2006년생",
+            base_html,
+        )
+        self.assertIn(
+            "2010년생은 2026년 연나이 16세이며, 만나이는 만 15~16세입니다",
+            selected_html,
+        )
+        self.assertLess(
+            base_html.index('class="section-shell direct-answer"'),
+            base_html.index('id="birth-year-search"'),
+        )
+        self.assertLess(
+            selected_html.index('class="section-shell direct-answer"'),
+            selected_html.index('id="birth-year-search"'),
+        )
+
+        self.assertIn(
+            "<title>몇년생 몇살? 출생연도별 만나이·연나이 표 | AgeCalc</title>",
+            base_html,
+        )
+        self.assertIn("<h1>몇년생 몇살? 출생연도별 나이표</h1>", base_html)
+        self.assertIn(
+            '<meta name="description" content="몇년생 몇살인지 궁금할 때 출생년도를 선택해 현재 연나이와 만나이 범위, 띠, 세대명을 한눈에 보는 나이표입니다." />',
+            base_html,
+        )
+
     def test_college_entry_year_calculator_page_is_public(self):
         client = app.test_client()
         response = client.get("/college-entry-year-calculator")
@@ -1491,7 +1530,7 @@ class PublicPageTests(unittest.TestCase):
                 "계산 결과 다음에 확인할 일",
             ),
             "/birth-year-age-table": (
-                "출생연도만으로 올해의 나이 범위를 찾을 수 있습니다",
+                "20살은 연나이 기준",
                 "나이·띠·세대·학교·기념 나이",
                 "출생연도표 해석 예외",
                 "표를 본 다음 할 일",

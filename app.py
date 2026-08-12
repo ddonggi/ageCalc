@@ -1601,6 +1601,11 @@ def birth_year_age_table():
 
     example_years = [year for year in (1990, 2000, 2010) if min_year <= year <= max_year]
     examples = [_build_birth_year_snapshot(year, current_year) for year in example_years]
+    featured_age_lookup = {
+        "age": 20,
+        "annual_birth_year": current_year - 20,
+        "man_birth_years": (current_year - 21, current_year - 20),
+    }
 
     return render_template(
         'birth-year-age-table.html',
@@ -1610,6 +1615,7 @@ def birth_year_age_table():
         birth_year_rows=rows,
         year_options=range(max_year, min_year - 1, -1),
         examples=examples,
+        featured_age_lookup=featured_age_lookup,
         canonical_url=canonical_url,
         robots_content="index,follow" if selected_year is None or indexable_variant else "noindex,follow",
         seo_title=(
