@@ -202,6 +202,77 @@ class PublicPageTests(unittest.TestCase):
                 self.assertEqual(302, response.status_code)
                 self.assertEqual(expected_path, response.headers["Location"])
 
+    def test_result_queries_reject_ambiguous_or_noncanonical_inputs(self):
+        client = app.test_client()
+        invalid_urls = {
+            "/birth-year-age-table?year=2010&year=2011": "/birth-year-age-table",
+            "/school-grade-calculator?year=02010": "/school-grade-calculator",
+            "/school-entry-year-table?year=2019&utm_source=test": "/school-entry-year-table",
+            "/grade-age-table?stage=middle&grade=1&grade=2": "/grade-age-table",
+            "/grade-birth-year-table?stage=middle&grade=1&extra=1": "/grade-birth-year-table",
+            "/college-entry-year-calculator?year=2026&year=2025": "/college-entry-year-calculator",
+            "/age-gap-calculator?year_a=2000": "/age-gap-calculator",
+            "/age-gap-calculator?year_a=2000&year_b=": "/age-gap-calculator",
+            "/baby-months-table?months=-1": "/baby-months-table",
+            "/annual-age-calculator?birth_year=unknown": "/annual-age-calculator",
+            "/age-comparison-table?year=2010&extra=1": "/age-comparison-table",
+            "/pet-age-table?pet=dog&years=2": "/pet-age-table",
+            "/pet-months-table?pet=bird&months=6&size=small": "/pet-months-table",
+            "/birth-year-zodiac-table?year=2024~2026": "/birth-year-zodiac-table",
+            "/birthday-dday-calculator?month=2&day=30": "/birthday-dday-calculator",
+        }
+
+        for url, expected_path in invalid_urls.items():
+            with self.subTest(url=url):
+                response = client.get(url, follow_redirects=False)
+
+                self.assertEqual(302, response.status_code)
+                self.assertEqual(expected_path, response.headers["Location"])
+
+    def test_valid_result_queries_use_clean_canonical_and_noindex_header(self):
+        client = app.test_client()
+        cases = {
+            "/school-grade-calculator?year=2019": "/school-grade-calculator",
+            "/school-entry-year-table?year=2019": "/school-entry-year-table",
+            "/grade-age-table?stage=middle&grade=1": "/grade-age-table",
+            "/grade-birth-year-table?stage=high&grade=1": "/grade-birth-year-table",
+            "/age-gap-calculator?year_a=2000&year_b=2002": "/age-gap-calculator",
+            "/baby-months-table?months=12": "/baby-months-table",
+            "/annual-age-calculator?birth_year=1992": "/annual-age-calculator",
+            "/age-comparison-table?year=1992": "/age-comparison-table",
+            "/pet-age-table?pet=dog&years=2&size=small": "/pet-age-table",
+            "/pet-months-table?pet=cat&months=6&size=small": "/pet-months-table",
+            "/birth-year-zodiac-table?year=1990": "/birth-year-zodiac-table",
+            "/birthday-dday-calculator?month=5&day=10": "/birthday-dday-calculator",
+        }
+
+        for url, canonical_path in cases.items():
+            with self.subTest(url=url):
+                response = client.get(url)
+                html = response.get_data(as_text=True)
+
+                self.assertEqual(200, response.status_code)
+                self.assertEqual("noindex, follow", response.headers.get("X-Robots-Tag"))
+                self.assertIn(
+                    f'<link rel="canonical" href="https://agecalc.cloud{canonical_path}" />',
+                    html,
+                )
+
+    def test_indexable_query_allowlist_is_not_marked_noindex(self):
+        client = app.test_client()
+
+        for url in (
+            "/birth-year-age-table?year=2010",
+            "/college-entry-year-calculator?year=2024",
+            "/college-entry-year-calculator?year=2025",
+            "/college-entry-year-calculator?year=2026",
+        ):
+            with self.subTest(url=url):
+                response = client.get(url)
+
+                self.assertEqual(200, response.status_code)
+                self.assertIsNone(response.headers.get("X-Robots-Tag"))
+
     def test_nonindexable_year_queries_keep_clean_canonical(self):
         client = app.test_client()
         cases = {

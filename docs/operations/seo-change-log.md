@@ -23,6 +23,10 @@
 
 실제 URL별 성과가 확인된 `/birth-year-age-table?year=2010`과 학번 2024·2025·2026만 self-canonical/index로 유지했습니다. 학년별 결과 URL과 그 외 유효 결과 URL은 기본 canonical과 `noindex,follow`로 통합했습니다. 학번 예시 콘텐츠는 색인 allowlist와 분리해 유지하며, 자세한 근거는 `docs/operations/seo-query-index-policy.md`에 기록했습니다. 본문과 계산 기준은 바뀌지 않아 sitemap `lastmod`는 갱신하지 않았습니다.
 
+### 결과형 쿼리 정규화
+
+결과형 GET URL 전반에 허용 키, 단일 값, 정규 정수 형식과 범위 검사를 적용했습니다. 완전한 유효 결과만 200으로 제공하고 P0-2 allowlist 외 결과에는 기본 canonical과 `X-Robots-Tag: noindex, follow`를 함께 적용합니다. 빈 값, 일부 입력, 중복·추가 키, 범위 밖 값과 모호한 표기는 기본 URL로 302 처리합니다. 계산 결과와 표의 산식은 변경하지 않았으며 sitemap `lastmod`도 유지했습니다.
+
 ## 2026-08-11
 
 | URL | 기존 title | 변경 title | H1·본문·FAQ | canonical / robots | lastmod |

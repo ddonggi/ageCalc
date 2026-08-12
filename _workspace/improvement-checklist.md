@@ -78,13 +78,16 @@
 
 ### P0-3. 결과형 쿼리 처리 일관성
 
-- [ ] `/annual-age-calculator?birth_year=YYYY`의 canonical·robots 상태 점검
-- [ ] 유효 결과형 URL에 기본 canonical만 있고 noindex가 빠진 페이지 전수 조사
-- [ ] 예상하지 않은 추가 파라미터와 중복 파라미터 처리 검사
-- [ ] 빈 값, 공백, 음수, 범위 밖 숫자, `2024~2026` 같은 모호한 값 처리 통일
-- [ ] 기본값과 같은 파라미터는 기본 URL로 정규화할지 결정
+- [x] `/annual-age-calculator?birth_year=YYYY`의 canonical·robots 상태 점검
+- [x] 유효 결과형 URL에 기본 canonical만 있고 noindex가 빠진 페이지 전수 조사
+- [x] 예상하지 않은 추가 파라미터와 중복 파라미터 처리 검사
+- [x] 빈 값, 공백, 음수, 범위 밖 숫자, `2024~2026` 같은 모호한 값 처리 통일
+- [x] 기본값과 같은 파라미터는 기본 URL로 정규화할지 결정
 - 대상: `app.py`, `tests/test_public_pages.py`
 - 완료 조건: 쿼리 유형별 200·302, canonical, robots 계약 테스트 통과
+- 완료 기록: 2026-08-13, 결과형 쿼리의 정확한 키·단일 값·정규 정수 형식 검증과 `X-Robots-Tag` 계약 통일
+- 처리 결과: 완전한 유효 결과는 200, P0-2 allowlist 외 결과는 기본 canonical + `noindex, follow`; 빈 값·중복·추가·모호한 값은 기본 URL로 302
+- 상태: 로컬 구현·검증 완료, 운영 배포 미수행
 
 ### P0-4. Google 색인 제외·404 원인 분류
 

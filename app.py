@@ -357,6 +357,8 @@ def add_security_headers(response):
         response.headers["X-Robots-Tag"] = "noindex, nofollow"
     elif request.path == "/minigames" or request.path.startswith("/minigames/"):
         response.headers["X-Robots-Tag"] = "noindex, nofollow"
+    elif getattr(g, "result_query_noindex", False):
+        response.headers["X-Robots-Tag"] = "noindex, follow"
     elif ADSENSE_REVIEW_MODE and request.path in ADSENSE_REVIEW_HUB_PATHS:
         response.headers["X-Robots-Tag"] = "noindex, follow"
     response.headers["X-Content-Type-Options"] = "nosniff"
@@ -1432,19 +1434,33 @@ def _validated_int_query(name, minimum, maximum):
     """Return a strict integer query value and whether it needs normalization."""
     if name not in request.args:
         return None, False
+    if len(request.args.getlist(name)) != 1:
+        return None, True
     raw_value = request.args.get(name, "").strip()
     if not raw_value.isdigit():
         return None, True
     value = int(raw_value)
+    if raw_value != str(value):
+        return None, True
     if not minimum <= value <= maximum:
         return None, True
     return value, False
 
 
+def _query_keys_are_exact(*expected_keys):
+    return set(request.args) == set(expected_keys) and all(
+        len(request.args.getlist(key)) == 1 for key in expected_keys
+    )
+
+
+def _mark_result_query_noindex():
+    g.result_query_noindex = True
+
+
 def _validated_grade_query(valid_stage_grades):
     if not request.args:
         return "elementary", None, False
-    if set(request.args) != {"stage", "grade"}:
+    if not _query_keys_are_exact("stage", "grade"):
         return "elementary", None, True
     stage = request.args.get("stage", "").strip()
     if stage not in valid_stage_grades:
@@ -1541,13 +1557,15 @@ def birth_year_age_table():
     max_year = current_year
 
     selected_year, invalid_query = _validated_int_query("year", min_year, max_year)
-    if invalid_query or (request.args and "year" not in request.args):
+    if invalid_query or (request.args and not _query_keys_are_exact("year")):
         return redirect(url_for("birth_year_age_table"))
 
     indexable_variant = selected_year == 2010
     canonical_url = f"{SITE_BASE_URL}/birth-year-age-table"
     if indexable_variant:
         canonical_url = f"{canonical_url}?year={selected_year}"
+    elif selected_year is not None:
+        _mark_result_query_noindex()
 
     rows = []
     selected_row = None
@@ -1588,8 +1606,10 @@ def school_grade_calculator():
     max_year = current_year
 
     selected_year, invalid_query = _validated_int_query("year", min_year, max_year)
-    if invalid_query or (request.args and "year" not in request.args):
+    if invalid_query or (request.args and not _query_keys_are_exact("year")):
         return redirect(url_for("school_grade_calculator"))
+    if selected_year is not None:
+        _mark_result_query_noindex()
 
     rows = []
     selected_row = _build_school_grade_snapshot(selected_year, school_year) if selected_year else None
@@ -1624,8 +1644,10 @@ def school_entry_year_table():
     max_year = current_year
 
     selected_year, invalid_query = _validated_int_query("year", min_year, max_year)
-    if invalid_query or (request.args and "year" not in request.args):
+    if invalid_query or (request.args and not _query_keys_are_exact("year")):
         return redirect(url_for("school_entry_year_table"))
+    if selected_year is not None:
+        _mark_result_query_noindex()
 
     rows = []
     selected_row = _build_school_entry_snapshot(selected_year, school_year) if selected_year is not None else None
@@ -1656,17 +1678,17 @@ def age_gap_calculator():
     min_year = max(1900, current_year - 100)
     max_year = current_year
 
-    year_a = request.args.get('year_a', type=int)
-    year_b = request.args.get('year_b', type=int)
-
-    if year_a is not None and not (min_year <= year_a <= max_year):
-        year_a = None
-    if year_b is not None and not (min_year <= year_b <= max_year):
-        year_b = None
+    if request.args and not _query_keys_are_exact("year_a", "year_b"):
+        return redirect(url_for("age_gap_calculator"))
+    year_a, invalid_year_a = _validated_int_query("year_a", min_year, max_year)
+    year_b, invalid_year_b = _validated_int_query("year_b", min_year, max_year)
+    if invalid_year_a or invalid_year_b:
+        return redirect(url_for("age_gap_calculator"))
 
     selected_gap = None
     if year_a is not None and year_b is not None:
         selected_gap = _build_age_gap_snapshot(year_a, year_b)
+        _mark_result_query_noindex()
 
     example_pairs = [(1990, 1995), (2000, 2002), (2010, 2015)]
     examples = [
@@ -1731,9 +1753,13 @@ def hundred_day_calculator():
 @app.route('/baby-months-table')
 def baby_months_table():
     """생후 개월 수 기준 안내 페이지"""
-    selected_months = request.args.get('months', type=int)
-    if selected_months is not None and not (0 <= selected_months <= 36):
-        selected_months = None
+    if request.args and not _query_keys_are_exact("months"):
+        return redirect(url_for("baby_months_table"))
+    selected_months, invalid_query = _validated_int_query("months", 0, 36)
+    if invalid_query:
+        return redirect(url_for("baby_months_table"))
+    if selected_months is not None:
+        _mark_result_query_noindex()
 
     month_rows = [_build_baby_month_snapshot(months) for months in range(0, 37)]
     selected_row = _build_baby_month_snapshot(selected_months) if selected_months is not None else None
@@ -1757,10 +1783,11 @@ def annual_age_calculator():
     min_year = 1900
     max_year = current_year
 
-    if request.args.get('birth_date') or request.args.get('month') or request.args.get('day'):
+    if request.args and not _query_keys_are_exact("birth_year"):
         return redirect(url_for('annual_age_calculator'))
-
-    birth_year = request.args.get('birth_year', type=int)
+    birth_year, invalid_query = _validated_int_query("birth_year", min_year, max_year)
+    if invalid_query:
+        return redirect(url_for("annual_age_calculator"))
     selected_birth_date = (
         date(birth_year, 1, 1)
         if birth_year is not None and min_year <= birth_year <= max_year
@@ -1768,6 +1795,8 @@ def annual_age_calculator():
     )
     selected_snapshot = _build_annual_age_snapshot(selected_birth_date, current_year) if selected_birth_date else None
     invalid_date = birth_year is not None and selected_snapshot is None
+    if selected_snapshot is not None:
+        _mark_result_query_noindex()
 
     example_dates = [
         datetime(1990, 1, 1).date(),
@@ -1794,9 +1823,13 @@ def age_comparison_table():
     min_year = max(1900, current_year - 100)
     max_year = current_year
 
-    selected_year = request.args.get('year', type=int)
-    if selected_year is not None and not (min_year <= selected_year <= max_year):
-        selected_year = None
+    if request.args and not _query_keys_are_exact("year"):
+        return redirect(url_for("age_comparison_table"))
+    selected_year, invalid_query = _validated_int_query("year", min_year, max_year)
+    if invalid_query:
+        return redirect(url_for("age_comparison_table"))
+    if selected_year is not None:
+        _mark_result_query_noindex()
 
     rows = []
     selected_row = None
@@ -1841,6 +1874,8 @@ def grade_age_table():
             rows.append(row)
 
     selected_row = _build_grade_age_snapshot(stage, grade, school_year, current_year) if grade is not None else None
+    if selected_row is not None:
+        _mark_result_query_noindex()
     examples = [
         _build_grade_age_snapshot("elementary", 1, school_year, current_year),
         _build_grade_age_snapshot("middle", 1, school_year, current_year),
@@ -1870,16 +1905,15 @@ def grade_age_table():
 @app.route('/pet-age-table')
 def pet_age_table():
     """반려동물 나이표 페이지"""
-    pet = request.args.get('pet', default='dog', type=str)
-    years = request.args.get('years', type=int)
-    size = request.args.get('size', default='small', type=str)
-
-    if pet not in {"dog", "cat"}:
-        pet = "dog"
-    if size not in DOG_HUMAN_AGE_TABLE:
-        size = "small"
-    if years is not None and not (1 <= years <= 20):
-        years = None
+    if request.args and not _query_keys_are_exact("pet", "years", "size"):
+        return redirect(url_for("pet_age_table"))
+    pet = request.args.get("pet", "dog").strip()
+    size = request.args.get("size", "small").strip()
+    years, invalid_years = _validated_int_query("years", 1, 20)
+    if invalid_years or pet not in {"dog", "cat"} or size not in DOG_HUMAN_AGE_TABLE:
+        return redirect(url_for("pet_age_table"))
+    if years is not None:
+        _mark_result_query_noindex()
 
     selected_row = _build_pet_age_snapshot(pet, years, size) if years is not None else None
 
@@ -1927,16 +1961,15 @@ def korean_age_guide():
 @app.route('/pet-months-table')
 def pet_months_table():
     """반려동물 월령표 페이지"""
-    pet = request.args.get('pet', default='dog', type=str)
-    months = request.args.get('months', type=int)
-    size = request.args.get('size', default='small', type=str)
-
-    if pet not in {"dog", "cat"}:
-        pet = "dog"
-    if size not in DOG_HUMAN_AGE_TABLE:
-        size = "small"
-    if months is not None and not (1 <= months <= 24):
-        months = None
+    if request.args and not _query_keys_are_exact("pet", "months", "size"):
+        return redirect(url_for("pet_months_table"))
+    pet = request.args.get("pet", "dog").strip()
+    size = request.args.get("size", "small").strip()
+    months, invalid_months = _validated_int_query("months", 1, 24)
+    if invalid_months or pet not in {"dog", "cat"} or size not in DOG_HUMAN_AGE_TABLE:
+        return redirect(url_for("pet_months_table"))
+    if months is not None:
+        _mark_result_query_noindex()
 
     selected_row = _build_pet_month_snapshot(pet, months, size) if months is not None else None
 
@@ -1997,6 +2030,8 @@ def grade_birth_year_table():
             rows.append(row)
 
     selected_row = _build_grade_birth_year_snapshot(stage, grade, school_year, current_year) if grade is not None else None
+    if selected_row is not None:
+        _mark_result_query_noindex()
     examples = [
         _build_grade_birth_year_snapshot("elementary", 1, school_year, current_year),
         _build_grade_birth_year_snapshot("middle", 1, school_year, current_year),
@@ -2030,9 +2065,13 @@ def birth_year_zodiac_table():
     min_year = max(1900, current_year - 100)
     max_year = current_year
 
-    selected_year = request.args.get('year', type=int)
-    if selected_year is not None and not (min_year <= selected_year <= max_year):
-        selected_year = None
+    if request.args and not _query_keys_are_exact("year"):
+        return redirect(url_for("birth_year_zodiac_table"))
+    selected_year, invalid_query = _validated_int_query("year", min_year, max_year)
+    if invalid_query:
+        return redirect(url_for("birth_year_zodiac_table"))
+    if selected_year is not None:
+        _mark_result_query_noindex()
 
     rows = []
     selected_row = None
@@ -2065,13 +2104,15 @@ def college_entry_year_calculator():
     max_entry_year = current_year + 1
 
     selected_year, invalid_query = _validated_int_query("year", min_entry_year, max_entry_year)
-    if invalid_query or (request.args and "year" not in request.args):
+    if invalid_query or (request.args and not _query_keys_are_exact("year")):
         return redirect(url_for("college_entry_year_calculator"))
 
     indexable_variant = selected_year in INDEXABLE_COLLEGE_ENTRY_YEARS
     canonical_url = f"{SITE_BASE_URL}/college-entry-year-calculator"
     if indexable_variant:
         canonical_url = f"{canonical_url}?year={selected_year}"
+    elif selected_year is not None:
+        _mark_result_query_noindex()
 
     rows = []
     selected_row = None
@@ -2111,15 +2152,22 @@ def college_entry_year_calculator():
 def birthday_dday_calculator():
     """생일 D-day 계산기 페이지"""
     today = _current_local_date()
-    month = request.args.get('month', type=int)
-    day = request.args.get('day', type=int)
+    if request.args and not _query_keys_are_exact("month", "day"):
+        return redirect(url_for("birthday_dday_calculator"))
+    month, invalid_month = _validated_int_query("month", 1, 12)
+    day, invalid_day = _validated_int_query("day", 1, 31)
+    if invalid_month or invalid_day:
+        return redirect(url_for("birthday_dday_calculator"))
 
     selected_month_day = _parse_month_day(month, day)
     selected_snapshot = None
     invalid_date = month is not None and day is not None and selected_month_day is None
+    if invalid_date:
+        return redirect(url_for("birthday_dday_calculator"))
 
     if selected_month_day is not None:
         selected_snapshot = _build_birthday_dday_snapshot(selected_month_day[0], selected_month_day[1], today)
+        _mark_result_query_noindex()
 
     example_inputs = [(1, 1), (5, 10), (12, 25)]
     examples = [
