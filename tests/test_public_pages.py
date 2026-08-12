@@ -547,6 +547,47 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("만 13세라는 정보만으로 현재 학년을 확정할 수 있나요?", school_grade_html)
         self.assertIn("이 계산기는 생년월일이나 현재 나이가 아닌 출생연도를 입력받습니다", school_grade_html)
 
+    def test_school_table_base_pages_render_current_year_snippet_answers(self):
+        client = app.test_client()
+
+        with mock.patch.object(
+            app_module, "_current_local_date", return_value=date(2026, 8, 13)
+        ):
+            grade_birth_html = client.get("/grade-birth-year-table").get_data(as_text=True)
+            grade_age_html = client.get("/grade-age-table").get_data(as_text=True)
+
+        self.assertIn(
+            '<meta name="description" content="2026학년도 중1은 2013년생, 고1은 2010년생, 고3은 2008년생입니다. 학년별 일반 출생연도와 빠른년생·입학유예 예외를 확인하세요." />',
+            grade_birth_html,
+        )
+        self.assertIn(
+            "2026학년도 중1은 2013년생, 고1은 2010년생, 고3은 2008년생입니다",
+            grade_birth_html,
+        )
+        self.assertIn(
+            '<meta name="description" content="2026학년도 중1 13세, 중3 15세, 고1 16세, 고3 18세의 연나이와 생일 전후 만나이 범위를 확인하는 학년별 나이표입니다." />',
+            grade_age_html,
+        )
+        self.assertIn(
+            "2026학년도 중1은 연나이 13세, 중3은 15세, 고1은 16세, 고3은 18세입니다",
+            grade_age_html,
+        )
+        self.assertIn(
+            "중1은 만 12~13세, 중3은 만 14~15세, 고1은 만 15~16세, 고3은 만 17~18세",
+            grade_age_html,
+        )
+
+        self.assertIn(
+            "<title>학년별 출생연도표 | 중1·고1은 몇 년생? | AgeCalc</title>",
+            grade_birth_html,
+        )
+        self.assertIn("<h1>학년별 출생연도표</h1>", grade_birth_html)
+        self.assertIn(
+            "<title>학년별 나이표 | 중1·중3·고1·고3은 몇 살? | AgeCalc</title>",
+            grade_age_html,
+        )
+        self.assertIn("<h1>학년별 나이표</h1>", grade_age_html)
+
     def test_school_page_group_uses_directional_related_tool_anchors(self):
         client = app.test_client()
         expectations = {

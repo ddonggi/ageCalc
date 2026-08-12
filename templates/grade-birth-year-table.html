@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
     <title>{{ seo_title }}</title>
-    <meta name="description" content="초1·중1·고1은 몇 년생인지 {{ school_year }}학년도 기준으로 정리한 학년별 출생연도표입니다." />
+    <meta name="description" content="{{ seo_description }}" />
     {% if robots_content == 'noindex,follow' %}<meta name="robots" content="noindex,follow" />{% endif %}
     <link rel="canonical" href="{{ canonical_url }}" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="AgeCalc" />
     <meta property="og:title" content="학년별 출생연도표 | AgeCalc" />
-    <meta property="og:description" content="학년별 보통 출생년도와 연나이, 만나이 범위를 한 화면에서 정리했습니다." />
+    <meta property="og:description" content="{{ seo_description }}" />
     <meta property="og:url" content="{{ canonical_url }}" />
     <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
@@ -71,8 +71,8 @@
 
         <section class="section-shell direct-answer" aria-label="학년별 출생연도 바로 답변">
             <p class="eyebrow">바로 답변 · 학년별 출생연도 해석</p>
-            <h2>{% if selected_row %}{{ selected_row.short_label }}은 보통 {{ selected_row.birth_year }}년생입니다{% else %}학년에서 일반적인 출생연도를 역산합니다{% endif %}</h2>
-            <p><strong>학년을 선택하면 일반적으로 해당하는 출생연도가 나옵니다.</strong> {{ school_year }}학년도와 학교급별 입학 나이를 기준으로 역산하며, 빠른년생·유급·해외 학제는 다를 수 있습니다.</p>
+            <h2>{% if selected_row %}{{ selected_row.short_label }}은 보통 {{ selected_row.birth_year }}년생입니다{% else %}{{ school_year }}학년도 중1은 {{ faq_grade_rows[0].birth_year_label }}, 고1은 {{ faq_grade_rows[1].birth_year_label }}, 고3은 {{ faq_grade_rows[2].birth_year_label }}입니다{% endif %}</h2>
+            <p><strong>학년을 선택하면 일반적으로 해당하는 출생연도가 나옵니다.</strong> {{ school_year }}학년도와 학교급별 입학 나이를 기준으로 역산하며, 빠른년생·조기입학·입학유예·유급·해외 학제는 다를 수 있습니다.</p>
         </section>
 
         <section class="section-shell">

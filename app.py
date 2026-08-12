@@ -1904,6 +1904,19 @@ def grade_age_table():
         _build_grade_age_snapshot("middle", 1, school_year, current_year),
         _build_grade_age_snapshot("high", 1, school_year, current_year),
     ]
+    featured_grade_rows = [
+        _build_grade_age_snapshot("middle", 1, school_year, current_year),
+        _build_grade_age_snapshot("middle", 3, school_year, current_year),
+        _build_grade_age_snapshot("high", 1, school_year, current_year),
+        _build_grade_age_snapshot("high", 3, school_year, current_year),
+    ]
+    seo_description = (
+        f"{school_year}학년도 중1 {featured_grade_rows[0]['annual_age']}, "
+        f"중3 {featured_grade_rows[1]['annual_age']}, "
+        f"고1 {featured_grade_rows[2]['annual_age']}, "
+        f"고3 {featured_grade_rows[3]['annual_age']}의 연나이와 생일 전후 만나이 범위를 "
+        "확인하는 학년별 나이표입니다."
+    )
 
     return render_template(
         'grade-age-table.html',
@@ -1913,6 +1926,8 @@ def grade_age_table():
         selected_row=selected_row,
         grade_rows=rows,
         examples=examples,
+        featured_grade_rows=featured_grade_rows,
+        seo_description=seo_description,
         canonical_url=(
             f"{SITE_BASE_URL}/grade-age-table"
         ),
@@ -2065,6 +2080,12 @@ def grade_birth_year_table():
         _build_grade_birth_year_snapshot("high", 1, school_year, current_year),
         _build_grade_birth_year_snapshot("high", 3, school_year, current_year),
     ]
+    seo_description = (
+        f"{school_year}학년도 중1은 {faq_grade_rows[0]['birth_year_label']}, "
+        f"고1은 {faq_grade_rows[1]['birth_year_label']}, "
+        f"고3은 {faq_grade_rows[2]['birth_year_label']}입니다. "
+        "학년별 일반 출생연도와 빠른년생·입학유예 예외를 확인하세요."
+    )
 
     return render_template(
         'grade-birth-year-table.html',
@@ -2075,6 +2096,7 @@ def grade_birth_year_table():
         grade_rows=rows,
         examples=examples,
         faq_grade_rows=faq_grade_rows,
+        seo_description=seo_description,
         canonical_url=(
             f"{SITE_BASE_URL}/grade-birth-year-table"
         ),
