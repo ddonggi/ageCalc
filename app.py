@@ -271,6 +271,9 @@ def inject_csp_nonce():
     )
     blog_public_indexable = _is_blog_public_indexable(blog_public_count)
     current_page = find_page(request.endpoint, request.view_args)
+    page_canonical_url = getattr(g, "page_canonical_url", None)
+    if page_canonical_url is None and current_page:
+        page_canonical_url = f"{SITE_BASE_URL}{current_page['path']}"
     current_hub_key = (
         str(current_page["hub"])
         if current_page and current_page["hub"] in HUB_PAGE_BY_KEY
@@ -292,7 +295,7 @@ def inject_csp_nonce():
         breadcrumbs.append(
             {
                 "label": current_page["title"],
-                "url": f"{SITE_BASE_URL}{current_page['path']}",
+                "url": page_canonical_url,
                 "current": True,
             }
         )
@@ -334,6 +337,7 @@ def inject_csp_nonce():
         "primary_life_hubs": HUB_PAGES[:4],
         "current_hub_key": current_hub_key,
         "current_page": current_page,
+        "page_canonical_url": page_canonical_url,
         "site_base_url": SITE_BASE_URL,
         "editorial_metadata": editorial_metadata_for(current_page),
         "related_paths": contextual_links_for(
@@ -1566,6 +1570,7 @@ def birth_year_age_table():
         canonical_url = f"{canonical_url}?year={selected_year}"
     elif selected_year is not None:
         _mark_result_query_noindex()
+    g.page_canonical_url = canonical_url
 
     rows = []
     selected_row = None
@@ -2113,6 +2118,7 @@ def college_entry_year_calculator():
         canonical_url = f"{canonical_url}?year={selected_year}"
     elif selected_year is not None:
         _mark_result_query_noindex()
+    g.page_canonical_url = canonical_url
 
     rows = []
     selected_row = None
@@ -2201,6 +2207,7 @@ def guide_detail(slug):
     page = GUIDE_PAGE_BY_SLUG.get(slug)
     if page is None:
         abort(404)
+    g.page_canonical_url = f"{SITE_BASE_URL}{page['canonical_path']}"
     response = make_response(render_template('guide-detail.html', page=page))
     if not page["indexable"]:
         response.headers["X-Robots-Tag"] = "noindex, follow"

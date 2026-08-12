@@ -286,11 +286,14 @@
 
 ### P2-5. 구조화 데이터 전수 검증
 
-- [ ] JSON-LD 문법과 화면 콘텐츠 일치 검사
-- [ ] FAQPage 질문·답변이 실제 페이지에 보이는지 확인
-- [ ] canonical URL과 WebPage·SoftwareApplication URL 일치
-- [ ] 중복 Organization·WebPage 엔터티 정리 필요성 확인
+- [x] JSON-LD 문법과 화면 콘텐츠 일치 검사
+- [x] FAQPage 질문·답변이 실제 페이지에 보이는지 확인
+- [x] canonical URL과 WebPage·SoftwareApplication URL 일치
+- [x] 중복 Organization·WebPage 엔터티 정리 필요성 확인
 - 완료 조건: 핵심 공개 페이지 구조화 데이터 계약 테스트 통과
+- 완료 기록: 2026-08-13, registry 59페이지와 self-canonical 쿼리 변형의 JSON-LD·canonical·OG·breadcrumb 계약 추가
+- 수정 결과: 병합 가이드와 self-canonical 결과의 WebPage·breadcrumb URL 정렬, `/age`·`/faq` FAQPage를 실제 표시 문구와 일치
+- 상태: 로컬 구현·검증 완료, 운영 배포 미수행
 
 ### P2-6. 이미지 SEO·접근성
 

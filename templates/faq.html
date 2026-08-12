@@ -37,16 +37,16 @@
       "@context": "https://schema.org",
       "@type": "FAQPage",
       "mainEntity": [
-        {"@type":"Question","name":"만나이와 연나이는 어떻게 다른가요?","acceptedAnswer":{"@type":"Answer","text":"만나이는 생일이 지나야 1살 증가하며, 연나이는 '올해 − 출생연도'로 계산합니다. 공적 영역의 기준은 만나이입니다."}},
-        {"@type":"Question","name":"특정 날짜 기준 나이도 계산할 수 있나요?","acceptedAnswer":{"@type":"Answer","text":"향후 특정 기준일(예: 계약일, 행사일)을 입력해 나이를 계산하는 기능을 제공할 예정입니다."}},
-        {"@type":"Question","name":"2월 29일(윤년) 출생은 어떻게 처리하나요?","acceptedAnswer":{"@type":"Answer","text":"윤년이 아닌 해에는 통상 2월 28일 또는 3월 1일을 기준으로 간주하는 관행이 있습니다. 최종 판단은 관계 기관 지침을 확인하세요."}},
+        {"@type":"Question","name":"만나이와 연나이는 어떻게 다른가요?","acceptedAnswer":{"@type":"Answer","text":"만나이는 생일이 지나야 1살 증가하며, 연나이는 올해 − 출생연도로 계산합니다. 공적 영역의 기준은 만나이입니다."}},
+        {"@type":"Question","name":"특정 날짜 기준 나이도 계산할 수 있나요?","acceptedAnswer":{"@type":"Answer","text":"향후 계약일/행사일 같은 기준일을 입력해 나이를 계산하는 기능을 제공할 예정입니다."}},
+        {"@type":"Question","name":"2월 29일(윤년) 출생은 어떻게 처리하나요?","acceptedAnswer":{"@type":"Answer","text":"윤년이 아닌 해에는 통상 2월 28일 또는 3월 1일을 기준으로 간주하는 관행이 있습니다. 기관·서비스별 안내가 다를 수 있으므로 최종 판단은 관계 기관 지침을 확인하세요."}},
         {"@type":"Question","name":"음력 생일은 지원하나요?","acceptedAnswer":{"@type":"Answer","text":"만나이 계산 페이지에서는 음력 생일을 양력으로 환산해 계산할 수 있습니다."}},
-        {"@type":"Question","name":"결과 값에 법적 효력이 있나요?","acceptedAnswer":{"@type":"Answer","text":"본 서비스 결과는 일반 정보 제공용이며, 법적 판단은 관계 법령과 기관 고시를 우선합니다."}},
+        {"@type":"Question","name":"결과 값에 법적 효력이 있나요?","acceptedAnswer":{"@type":"Answer","text":"본 서비스의 결과는 일반 정보 제공을 목적으로 하며, 법적 판단이나 권리 행사에는 관계 법령과 기관 고시를 우선해 주세요."}},
         {"@type":"Question","name":"입력한 생년월일이 서버에 저장되나요?","acceptedAnswer":{"@type":"Answer","text":"계산을 위해 서버로 전송되지만 저장하지 않습니다. 보안 목적의 최소한의 접속 로그는 제한 기간 보관될 수 있습니다."}},
-        {"@type":"Question","name":"시간대/서머타임은 계산에 영향을 주나요?","acceptedAnswer":{"@type":"Answer","text":"영향을 주지 않습니다. 날짜(연·월·일)만 계산하며 시·분·타임존은 반영하지 않습니다."}},
-        {"@type":"Question","name":"모바일에서도 정확히 동작하나요?","acceptedAnswer":{"@type":"Answer","text":"네. 반응형 레이아웃을 지원하며 주요 모바일 브라우저에서 정상 동작하도록 설계했습니다."}},
-        {"@type":"Question","name":"잘못 입력했을 때는 어떻게 하나요?","acceptedAnswer":{"@type":"Answer","text":"비정상 날짜는 오류로 안내되며, 올바른 날짜를 다시 입력하면 즉시 재계산됩니다."}},
-        {"@type":"Question","name":"나이 관련 제도·정책은 어디서 확인하나요?","acceptedAnswer":{"@type":"Answer","text":"정부24, 보건복지부, 국민연금공단 등 공식 사이트에서 최신 안내를 확인하세요."}}
+        {"@type":"Question","name":"시간대/서머타임은 계산에 영향을 주나요?","acceptedAnswer":{"@type":"Answer","text":"영향을 주지 않습니다. 본 계산기는 날짜(연·월·일)만 사용하며 시·분·타임존은 반영하지 않습니다."}},
+        {"@type":"Question","name":"모바일에서도 정확히 동작하나요?","acceptedAnswer":{"@type":"Answer","text":"네, 반응형 레이아웃을 지원하며 주요 모바일 브라우저에서 정상 동작하도록 테스트하고 있습니다."}},
+        {"@type":"Question","name":"잘못 입력했을 때는 어떻게 하나요?","acceptedAnswer":{"@type":"Answer","text":"비정상 날짜(예: 2025-13-40)는 오류로 안내되며, 올바른 날짜를 다시 입력하면 즉시 재계산됩니다."}},
+        {"@type":"Question","name":"나이 관련 제도·정책은 어디서 확인하나요?","acceptedAnswer":{"@type":"Answer","text":"정책·제도는 기관·지자체별로 상이할 수 있습니다. 아래 공식 사이트에서 최신 안내를 확인하세요."}}
       ]
     }
   </script>
@@ -91,7 +91,7 @@
 
     <section class="faq">
       <div><strong>1) 만나이와 연나이는 어떻게 다른가요?</strong>
-        <p>만나이는 생일이 지나야 1살 증가하며, 연나이는 <em>올해 − 출생연도</em>로 계산합니다. 공적 영역의 기준은 만나이입니다.</p>
+        <p>만나이는 생일이 지나야 1살 증가하며, 연나이는 올해 − 출생연도로 계산합니다. 공적 영역의 기준은 만나이입니다.</p>
       </div>
 
       <div><strong>2) 특정 날짜 기준 나이도 계산할 수 있나요?</strong>

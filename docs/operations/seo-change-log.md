@@ -27,6 +27,10 @@
 
 결과형 GET URL 전반에 허용 키, 단일 값, 정규 정수 형식과 범위 검사를 적용했습니다. 완전한 유효 결과만 200으로 제공하고 P0-2 allowlist 외 결과에는 기본 canonical과 `X-Robots-Tag: noindex, follow`를 함께 적용합니다. 빈 값, 일부 입력, 중복·추가 키, 범위 밖 값과 모호한 표기는 기본 URL로 302 처리합니다. 계산 결과와 표의 산식은 변경하지 않았으며 sitemap `lastmod`도 유지했습니다.
 
+### 구조화 데이터 정합성
+
+공개 registry 59페이지와 self-canonical 결과 URL의 JSON-LD 문법, WebPage 단일성, canonical·Open Graph·breadcrumb URL 일치를 계약 테스트로 고정했습니다. 병합 예정 가이드는 대표 페이지 canonical에 구조화 데이터도 맞췄고, `/age`와 `/faq`의 FAQPage 답변은 화면에 실제 표시되는 문구와 동일하게 정리했습니다. 사용자에게 보이는 의미와 계산 콘텐츠는 바뀌지 않아 sitemap `lastmod`는 유지했습니다.
+
 ## 2026-08-11
 
 | URL | 기존 title | 변경 title | H1·본문·FAQ | canonical / robots | lastmod |

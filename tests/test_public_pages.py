@@ -1,6 +1,8 @@
+import json
 import re
 import unittest
 from datetime import date, datetime
+from html.parser import HTMLParser
 from types import SimpleNamespace
 from pathlib import Path
 from unittest import mock
@@ -37,7 +39,89 @@ def _sitemap_leaf_locations(client) -> list[str]:
     return locations
 
 
+class _PageMarkupParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.in_json_ld = False
+        self.json_ld_buffer = []
+        self.json_ld_blocks = []
+        self.text_parts = []
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+        if tag == "script" and attributes.get("type") == "application/ld+json":
+            self.in_json_ld = True
+            self.json_ld_buffer = []
+
+    def handle_data(self, data):
+        if self.in_json_ld:
+            self.json_ld_buffer.append(data)
+        else:
+            self.text_parts.append(data)
+
+    def handle_endtag(self, tag):
+        if tag == "script" and self.in_json_ld:
+            self.json_ld_blocks.append("".join(self.json_ld_buffer))
+            self.in_json_ld = False
+
+
+def _parse_page_markup(html):
+    parser = _PageMarkupParser()
+    parser.feed(html)
+    return [json.loads(block) for block in parser.json_ld_blocks], " ".join(parser.text_parts)
+
+
 class PublicPageTests(unittest.TestCase):
+    def test_public_structured_data_uses_the_page_canonical(self):
+        client = app.test_client()
+        urls = [
+            *(str(page["path"]) for page in PUBLIC_PAGE_REGISTRY),
+            "/birth-year-age-table?year=2010",
+            "/college-entry-year-calculator?year=2024",
+            "/college-entry-year-calculator?year=2025",
+            "/college-entry-year-calculator?year=2026",
+        ]
+
+        for url in urls:
+            with self.subTest(url=url):
+                response = client.get(url)
+                html = response.get_data(as_text=True)
+                canonical = re.search(r'<link rel="canonical" href="([^"]+)"', html).group(1)
+                schemas, _ = _parse_page_markup(html)
+                web_pages = [schema for schema in schemas if schema.get("@type") == "WebPage"]
+
+                self.assertEqual(1, len(web_pages))
+                self.assertEqual(canonical, web_pages[0]["url"])
+                self.assertIn(f'<meta property="og:url" content="{canonical}"', html)
+
+                breadcrumbs = [
+                    schema for schema in schemas if schema.get("@type") == "BreadcrumbList"
+                ]
+                if url != "/":
+                    self.assertEqual(1, len(breadcrumbs))
+                    self.assertEqual(
+                        canonical,
+                        breadcrumbs[0]["itemListElement"][-1]["item"],
+                    )
+
+    def test_faq_structured_data_is_visible_on_the_same_page(self):
+        client = app.test_client()
+
+        for url in ("/age", "/faq"):
+            with self.subTest(url=url):
+                html = client.get(url).get_data(as_text=True)
+                schemas, visible_text = _parse_page_markup(html)
+                visible_text = re.sub(r"\s+", " ", visible_text)
+                faq_pages = [schema for schema in schemas if schema.get("@type") == "FAQPage"]
+
+                self.assertEqual(1, len(faq_pages))
+                for question in faq_pages[0]["mainEntity"]:
+                    self.assertIn(re.sub(r"\s+", " ", question["name"]), visible_text)
+                    self.assertIn(
+                        re.sub(r"\s+", " ", question["acceptedAnswer"]["text"]),
+                        visible_text,
+                    )
+
     def test_health_api_is_available_but_blocked_from_indexing(self):
         client = app.test_client()
 

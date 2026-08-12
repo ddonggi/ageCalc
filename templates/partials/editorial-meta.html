@@ -48,7 +48,7 @@
     "@context": "https://schema.org",
     "@type": "WebPage",
     "name": current_page.title,
-    "url": site_base_url ~ current_page.path,
+    "url": page_canonical_url,
     "dateModified": editorial_metadata.modified_at,
     "author": {"@type": "Organization", "name": editorial_metadata.author},
     "reviewedBy": {"@type": "Organization", "name": editorial_metadata.reviewer}
