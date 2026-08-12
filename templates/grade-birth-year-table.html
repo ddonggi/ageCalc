@@ -202,9 +202,9 @@
                 <p class="eyebrow">같이 보기</p>
                 <h2>연관 페이지</h2>
                 <div class="footer-links">
-                    <a href="{{ url_for('grade_age_table') }}">학년 기준 나이표</a>
-                    <a href="{{ url_for('school_grade_calculator') }}">학년 계산기</a>
-                    <a href="{{ url_for('school_entry_year_table') }}">입학년도 계산표</a>
+                    <a href="{{ url_for('grade_age_table') }}">학년을 알 때 나이 범위 확인</a>
+                    <a href="{{ url_for('school_grade_calculator') }}">출생연도로 현재 학년 확인</a>
+                    <a href="{{ url_for('school_entry_year_table') }}">출생연도로 입학년도 확인</a>
                     <a href="{{ url_for('references') }}">계산 기준과 참고 자료</a>
                 </div>
             </article>
@@ -217,7 +217,7 @@
 
         <section class="section-shell faq" aria-labelledby="grade-birth-faq">
             <h2 id="grade-birth-faq">학년별 출생연도 자주 묻는 질문</h2>
-            <div><strong>중1·중3·고1·고3은 몇 년생인가요?</strong><p>학년도마다 달라지므로 위 표에서 학년을 선택하면 해당 학년도의 일반적인 출생연도를 바로 확인할 수 있습니다.</p></div>
+            <div><strong>중1·고1·고3은 몇 년생인가요?</strong><p>{{ school_year }}학년도 일반 기준으로 {% for row in faq_grade_rows %}{{ row.short_label }}은 보통 {{ row.birth_year }}년생{% if not loop.last %}, {% endif %}{% endfor %}입니다. 조기입학이나 입학유예가 있으면 실제 학적은 다를 수 있습니다.</p></div>
             <div><strong>빠른년생이나 유급도 표와 같나요?</strong><p>조기입학, 입학유예, 유급, 해외 학제는 표의 일반 기준과 다를 수 있으므로 실제 학적을 우선합니다.</p></div>
         </section>
 

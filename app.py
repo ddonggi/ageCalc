@@ -1918,7 +1918,7 @@ def grade_age_table():
         ),
         robots_content="index,follow" if grade is None else "noindex,follow",
         seo_title=(
-            f"{_short_grade_label(stage, grade)} 나이 | 몇 살·몇 년생? | AgeCalc"
+            f"{_short_grade_label(stage, grade)} 나이 | 연나이·만나이 범위 | AgeCalc"
             if grade is not None
             else "학년별 나이표 | 중1·중3·고1·고3은 몇 살? | AgeCalc"
         ),
@@ -2060,6 +2060,11 @@ def grade_birth_year_table():
         _build_grade_birth_year_snapshot("middle", 1, school_year, current_year),
         _build_grade_birth_year_snapshot("high", 1, school_year, current_year),
     ]
+    faq_grade_rows = [
+        _build_grade_birth_year_snapshot("middle", 1, school_year, current_year),
+        _build_grade_birth_year_snapshot("high", 1, school_year, current_year),
+        _build_grade_birth_year_snapshot("high", 3, school_year, current_year),
+    ]
 
     return render_template(
         'grade-birth-year-table.html',
@@ -2069,6 +2074,7 @@ def grade_birth_year_table():
         selected_row=selected_row,
         grade_rows=rows,
         examples=examples,
+        faq_grade_rows=faq_grade_rows,
         canonical_url=(
             f"{SITE_BASE_URL}/grade-birth-year-table"
         ),

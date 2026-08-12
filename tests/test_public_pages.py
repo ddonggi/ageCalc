@@ -526,6 +526,57 @@ class PublicPageTests(unittest.TestCase):
                 html = client.get(path).get_data(as_text=True)
                 self.assertIn(f"<title>{title}</title>", html)
 
+    def test_school_page_group_keeps_one_owner_for_each_search_direction(self):
+        client = app.test_client()
+
+        grade_age_html = client.get(
+            "/grade-age-table?stage=middle&grade=1"
+        ).get_data(as_text=True)
+        self.assertIn(
+            "<title>중1 나이 | 연나이·만나이 범위 | AgeCalc</title>",
+            grade_age_html,
+        )
+        self.assertNotIn("<title>중1 나이 | 몇 살·몇 년생?", grade_age_html)
+
+        grade_birth_html = client.get("/grade-birth-year-table").get_data(as_text=True)
+        for phrase in ("중1은 보통 2013년생", "고1은 보통 2010년생", "고3은 보통 2008년생"):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase, grade_birth_html)
+
+        school_grade_html = client.get("/school-grade-calculator").get_data(as_text=True)
+        self.assertIn("만 13세라는 정보만으로 현재 학년을 확정할 수 있나요?", school_grade_html)
+        self.assertIn("이 계산기는 생년월일이나 현재 나이가 아닌 출생연도를 입력받습니다", school_grade_html)
+
+    def test_school_page_group_uses_directional_related_tool_anchors(self):
+        client = app.test_client()
+        expectations = {
+            "/grade-birth-year-table": (
+                ('href="/grade-age-table"', "학년을 알 때 나이 범위 확인"),
+                ('href="/school-grade-calculator"', "출생연도로 현재 학년 확인"),
+                ('href="/school-entry-year-table"', "출생연도로 입학년도 확인"),
+            ),
+            "/grade-age-table": (
+                ('href="/grade-birth-year-table"', "학년을 알 때 출생연도 확인"),
+                ('href="/school-grade-calculator"', "출생연도로 현재 학년 확인"),
+                ('href="/school-entry-year-table"', "출생연도로 입학년도 확인"),
+            ),
+            "/school-grade-calculator": (
+                ('href="/grade-age-table"', "학년을 알 때 나이 범위 확인"),
+                ('href="/grade-birth-year-table"', "학년을 알 때 출생연도 확인"),
+                ('href="/school-entry-year-table"', "출생연도로 입학년도 확인"),
+            ),
+            "/school-entry-year-table": (
+                ('href="/school-grade-calculator"', "출생연도로 현재 학년 확인"),
+                ('href="/grade-birth-year-table"', "학년을 알 때 출생연도 확인"),
+            ),
+        }
+
+        for path, links in expectations.items():
+            html = client.get(path).get_data(as_text=True)
+            for href, label in links:
+                with self.subTest(path=path, label=label):
+                    self.assertIn(f"{href}>{label}</a>", html)
+
     def test_sitemap_contains_only_clean_base_urls(self):
         client = app.test_client()
         locations = _sitemap_leaf_locations(client)

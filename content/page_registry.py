@@ -148,10 +148,10 @@ STATIC_PAGE_REGISTRY = (
         "/school-grade-calculator",
         "education",
         "학년 계산기",
-        "출생연도별 현재 학년과 입학년도 계산",
+        "출생연도 기준 현재 학년 확인",
         priority="core",
         related_endpoints=("grade_age_table", "grade_birth_year_table", "school_entry_year_table"),
-        lastmod="2026-08-11",
+        lastmod="2026-08-13",
     ),
     _page(
         "school_entry_year_table",
@@ -161,7 +161,7 @@ STATIC_PAGE_REGISTRY = (
         "출생연도 기준 초·중·고 입학년도 확인",
         priority="core",
         related_endpoints=("school_grade_calculator", "college_entry_year_calculator", "grade_birth_year_table"),
-        lastmod="2026-08-11",
+        lastmod="2026-08-13",
     ),
     _page(
         "age_gap_calculator",
@@ -213,7 +213,7 @@ STATIC_PAGE_REGISTRY = (
         "학년별 나이표",
         "중1·중3·고1·고3 등 학년별 일반 나이 확인",
         related_endpoints=("school_grade_calculator", "grade_birth_year_table", "school_entry_year_table"),
-        lastmod="2026-08-11",
+        lastmod="2026-08-13",
     ),
     _page(
         "pet_age_table",
@@ -247,7 +247,7 @@ STATIC_PAGE_REGISTRY = (
         "학년별 출생연도표",
         "중1·중3·고1·고3 등 학년별 일반 출생연도 확인",
         related_endpoints=("school_grade_calculator", "grade_age_table", "school_entry_year_table"),
-        lastmod="2026-08-11",
+        lastmod="2026-08-13",
     ),
     _page(
         "birth_year_zodiac_table",

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
     <title>학년 계산기 | 출생연도별 현재 학년 확인 | AgeCalc</title>
-    <meta name="description" content="출생년도를 선택해 현재 몇 학년인지 계산하고 초등학교·중학교·고등학교 입학 흐름까지 살펴보는 학년 계산기입니다." />
+    <meta name="description" content="출생년도를 선택해 현재 몇 학년인지 계산하는 학년 계산기입니다. 초등학교·중학교·고등학교 입학 흐름은 보조 정보로 제공합니다." />
     {% if robots_content == 'noindex,follow' %}<meta name="robots" content="noindex,follow" />{% endif %}
     <link rel="canonical" href="{{ canonical_url }}" />
 
@@ -44,7 +44,7 @@
                 <p class="eyebrow">취학 기준 안내</p>
                 <h1>학년 계산기</h1>
                 <p class="page-intro">
-                    출생년도를 선택하면 {{ school_year }}학년도 기준 현재 학년과 초등학교·중학교·고등학교 입학 시점이 바로 나옵니다.
+                    출생년도를 선택하면 {{ school_year }}학년도 기준 현재 학년이 바로 나옵니다. 초등학교·중학교·고등학교 입학 시점은 결과를 이해하기 위한 보조 정보로 함께 보여줍니다.
                     한국 학교의 3월 학년 시작 흐름에 맞춰 현재 학년 확인을 먼저 돕는 안내 페이지입니다.
                 </p>
                 <div class="hero-actions">
@@ -206,7 +206,9 @@
                 <p class="small">현재 몇 학년인지 확인한 뒤 입학 시점만 따로 보고 싶다면 입학년도 계산표로 이어가세요.</p>
                 <div class="footer-links">
                     <a href="{{ url_for('baby_months') }}">아이 개월 수 계산기</a>
-                    <a href="{{ url_for('school_entry_year_table') }}">입학년도 계산표</a>
+                    <a href="{{ url_for('grade_age_table') }}">학년을 알 때 나이 범위 확인</a>
+                    <a href="{{ url_for('grade_birth_year_table') }}">학년을 알 때 출생연도 확인</a>
+                    <a href="{{ url_for('school_entry_year_table') }}">출생연도로 입학년도 확인</a>
                     <a href="{{ url_for('parent_child') }}">부모·자녀 계산기</a>
                     <a href="{{ url_for('birth_year_age_table') }}">출생년도별 나이표</a>
                     <a href="{{ url_for('references') }}">계산 기준과 참고 자료</a>
@@ -220,6 +222,7 @@
                 <h2>현재 학년 계산 기준</h2>
                 <ul>
                     <li><strong>2019년생은 몇 학년인가요?</strong> {{ school_year }}학년도 일반 학제에서 초등학교 입학 전인지 저학년 구간인지 결과 카드에 표시됩니다.</li>
+                    <li><strong>만 13세라는 정보만으로 현재 학년을 확정할 수 있나요?</strong> 생일과 입학유예·조기입학 여부에 따라 달라 확정할 수 없습니다. 이 계산기는 생년월일이나 현재 나이가 아닌 출생연도를 입력받습니다.</li>
                     <li><strong>1월과 2월에도 같은 학년으로 보나요?</strong> 한국 학교 학년도는 3월에 시작하므로 1월과 2월은 직전 학년도를 기준으로 해석합니다.</li>
                 </ul>
             </article>
