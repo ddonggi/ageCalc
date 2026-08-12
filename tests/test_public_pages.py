@@ -46,9 +46,15 @@ class _PageMarkupParser(HTMLParser):
         self.json_ld_buffer = []
         self.json_ld_blocks = []
         self.text_parts = []
+        self.link_stack = []
+        self.images = []
 
     def handle_starttag(self, tag, attrs):
         attributes = dict(attrs)
+        if tag == "a":
+            self.link_stack.append(attributes)
+        if tag == "img":
+            self.images.append((attributes, self.link_stack[-1] if self.link_stack else None))
         if tag == "script" and attributes.get("type") == "application/ld+json":
             self.in_json_ld = True
             self.json_ld_buffer = []
@@ -63,6 +69,8 @@ class _PageMarkupParser(HTMLParser):
         if tag == "script" and self.in_json_ld:
             self.json_ld_blocks.append("".join(self.json_ld_buffer))
             self.in_json_ld = False
+        if tag == "a" and self.link_stack:
+            self.link_stack.pop()
 
 
 def _parse_page_markup(html):
@@ -72,6 +80,63 @@ def _parse_page_markup(html):
 
 
 class PublicPageTests(unittest.TestCase):
+    def test_public_images_reserve_space_and_have_accessible_text(self):
+        client = app.test_client()
+
+        for page in PUBLIC_PAGE_REGISTRY:
+            path = str(page["path"])
+            with self.subTest(path=path):
+                parser = _PageMarkupParser()
+                parser.feed(client.get(path).get_data(as_text=True))
+
+                for image, parent_link in parser.images:
+                    self.assertGreater(int(image.get("width", "0")), 0)
+                    self.assertGreater(int(image.get("height", "0")), 0)
+                    self.assertIn("alt", image)
+                    if image["alt"] == "" and parent_link is not None:
+                        self.assertTrue(parent_link.get("aria-label"))
+
+    def test_optional_affiliate_images_follow_decorative_image_contract(self):
+        partials = (
+            "partials/coupang_age_affiliate.html",
+            "partials/coupang_anniversary_affiliate.html",
+            "partials/coupang_baby_promotions.html",
+            "partials/coupang_carousel.html",
+            "partials/coupang_pet_affiliate.html",
+            "partials/coupang_student_affiliate.html",
+            "partials/info_coupang_promotions.html",
+        )
+        promotion = {
+            "title": "테스트 프로모션",
+            "url": "https://example.com/promotion",
+            "image_url": "https://example.com/promotion.png",
+            "alt": "테스트 프로모션 이미지",
+            "width": 800,
+            "height": 800,
+        }
+
+        with app.test_request_context("/"):
+            for partial in partials:
+                with self.subTest(partial=partial):
+                    html = render_template(
+                        partial,
+                        coupang_partners_enabled=True,
+                        coupang_carousel_enabled=True,
+                        coupang_active_baby_promotions=[promotion],
+                        coupang_event_promotions=[promotion],
+                    )
+                    parser = _PageMarkupParser()
+                    parser.feed(html)
+
+                    self.assertTrue(parser.images)
+                    for image, parent_link in parser.images:
+                        self.assertGreater(int(image.get("width", "0")), 0)
+                        self.assertGreater(int(image.get("height", "0")), 0)
+                        self.assertIn("alt", image)
+                        if image["alt"] == "":
+                            self.assertIsNotNone(parent_link)
+                            self.assertTrue(parent_link.get("aria-label"))
+
     def test_public_structured_data_uses_the_page_canonical(self):
         client = app.test_client()
         urls = [

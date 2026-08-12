@@ -3,7 +3,7 @@
     <div class="info-coupang-promo-grid">
         {% for promotion in coupang_event_promotions %}
         <a class="info-coupang-promo" href="{{ promotion.url }}" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
-            <img src="{{ promotion.image_url }}" alt="{{ promotion.alt }}" loading="lazy">
+            <img src="{{ promotion.image_url }}" alt="{{ promotion.alt }}" width="{{ promotion.width }}" height="{{ promotion.height }}" loading="lazy">
         </a>
         {% endfor %}
     </div>

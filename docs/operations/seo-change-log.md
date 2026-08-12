@@ -31,6 +31,10 @@
 
 공개 registry 59페이지와 self-canonical 결과 URL의 JSON-LD 문법, WebPage 단일성, canonical·Open Graph·breadcrumb URL 일치를 계약 테스트로 고정했습니다. 병합 예정 가이드는 대표 페이지 canonical에 구조화 데이터도 맞췄고, `/age`와 `/faq`의 FAQPage 답변은 화면에 실제 표시되는 문구와 동일하게 정리했습니다. 사용자에게 보이는 의미와 계산 콘텐츠는 바뀌지 않아 sitemap `lastmod`는 유지했습니다.
 
+### 이미지 SEO·접근성
+
+공개 페이지 공통 후원 QR에 실제 500×500 크기를 지정하고, 블로그 목록·카테고리·상세 대표 이미지는 1200×630으로 예약했습니다. 외부 프로모션은 확인한 실제 크기를 데이터로 관리하며, 장식용 제휴 배너는 빈 alt를 유지하는 대신 링크에 접근 가능한 이름을 추가했습니다. 일반 도구의 1200×630 브랜드 OG fallback과 블로그 고유 대표 이미지 정책은 유지했습니다. 본문 의미는 바뀌지 않아 sitemap `lastmod`는 갱신하지 않았습니다.
+
 ## 2026-08-11
 
 | URL | 기존 title | 변경 title | H1·본문·FAQ | canonical / robots | lastmod |

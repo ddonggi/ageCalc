@@ -73,7 +73,7 @@
             <article class="blog-card">
                 <a class="blog-card-link" href="{{ url_for('blog_draft_detail', slug=post.slug) }}">
                     {% if post.cover_image_url %}
-                    <img class="blog-thumb" src="{{ post.cover_image_url }}" alt="{{ post.title }}">
+                    <img class="blog-thumb" src="{{ post.cover_image_url }}" alt="{{ post.title }}" width="1200" height="630" loading="lazy">
                     {% endif %}
                     <div>
                         <p class="blog-date">

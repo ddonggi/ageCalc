@@ -190,6 +190,8 @@ COUPANG_BABY_PROMOTIONS = [
         "category": "출산/유아동",
         "url": "https://link.coupang.com/a/eDoP3hEASq",
         "image_url": "https://img1c.coupangcdn.com/image/affiliate/event/promotion/2026/06/15/1bb95dbd7f98002701a8fc22bbf631aa.png",
+        "width": 800,
+        "height": 800,
         "end_date": datetime(2026, 6, 21).date(),
         "end_label": "2026.06.21",
     },
@@ -198,6 +200,8 @@ COUPANG_BABY_PROMOTIONS = [
         "category": "출산/유아동",
         "url": "https://link.coupang.com/a/eDoUqmShXM",
         "image_url": "https://image11.coupangcdn.com/image/affiliate/event/promotion/2026/06/15/10b97ebd229800b901a80422bcf7b22c.png",
+        "width": 800,
+        "height": 800,
         "end_date": datetime(2026, 6, 28).date(),
         "end_label": "2026.06.28",
     },
@@ -743,7 +747,16 @@ def _active_coupang_event_promotions(today=None):
             continue
         url = str(item.get("url") or "").strip()
         image_url = str(item.get("image_url") or "").strip()
-        if not url or not image_url:
+        width = item.get("width")
+        height = item.get("height")
+        if (
+            not url
+            or not image_url
+            or not isinstance(width, int)
+            or not isinstance(height, int)
+            or width <= 0
+            or height <= 0
+        ):
             continue
 
         start_date = _parse_optional_date(item.get("start_date"))
@@ -759,6 +772,8 @@ def _active_coupang_event_promotions(today=None):
                 "url": url,
                 "image_url": image_url,
                 "alt": str(item.get("alt") or "쿠팡 이벤트 프로모션").strip(),
+                "width": width,
+                "height": height,
             }
         )
 

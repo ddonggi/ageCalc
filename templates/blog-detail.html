@@ -162,7 +162,7 @@
                 {% endif %}
             </header>
             {% if (article and article.thumbnail) or post.cover_image_url %}
-            <img class="blog-hero" src="{{ article.thumbnail if article else post.cover_image_url }}" alt="{{ article.thumbnail_alt if article else post.title }}">
+            <img class="blog-hero" src="{{ article.thumbnail if article else post.cover_image_url }}" alt="{{ article.thumbnail_alt if article else post.title }}" width="1200" height="630">
             {% endif %}
             {% if article %}
             <section class="section-shell direct-answer" aria-label="{{ article.direct_answer_title }}">

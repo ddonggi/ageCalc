@@ -4,6 +4,8 @@
     "url": "https://link.coupang.com/a/fhcWUfwBBQ",
     "image_url": "https://img3c.coupangcdn.com/image/affiliate/event/promotion/2026/07/09/b309e489be3a00f20124db161debbeda.png",
     "alt": "쿠팡 이벤트 프로모션",
+    "width": 1000,
+    "height": 1000,
     "start_date": "2026-07-09",
     "end_date": null
   },
@@ -12,6 +14,8 @@
     "url": "https://link.coupang.com/a/fhcYeZ1ti8",
     "image_url": "https://img5c.coupangcdn.com/image/affiliate/event/promotion/2026/07/08/439574a9d2e5003001888f4b03d111bd.png",
     "alt": "쿠팡 이벤트 프로모션",
+    "width": 1000,
+    "height": 1000,
     "start_date": "2026-07-08",
     "end_date": null
   },
@@ -20,6 +24,8 @@
     "url": "https://link.coupang.com/a/fhcYPGOPIa",
     "image_url": "https://image12.coupangcdn.com/image/affiliate/event/promotion/2026/07/08/5b33d0e4f0c900490128625e29f06934.png",
     "alt": "쿠팡 이벤트 프로모션",
+    "width": 800,
+    "height": 800,
     "start_date": "2026-07-08",
     "end_date": null
   }
