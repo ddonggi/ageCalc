@@ -398,6 +398,11 @@ def favicon():
     return send_from_directory(app.root_path, "favicon.ico")
 
 
+@app.get("/llms.txt")
+def llms_txt():
+    return send_from_directory(STATIC_ROOT, "llms.txt", mimetype="text/plain")
+
+
 def _review_token_is_valid(token: str) -> bool:
     expected = (os.getenv("BLOG_REVIEW_TOKEN", "") or "").strip()
     provided = (token or "").strip()

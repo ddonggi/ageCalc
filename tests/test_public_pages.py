@@ -36,6 +36,48 @@ def _sitemap_leaf_locations(client) -> list[str]:
 
 
 class PublicPageTests(unittest.TestCase):
+    def test_llms_txt_is_served_at_root_as_plain_text(self):
+        client = app.test_client()
+        response = client.get("/llms.txt")
+        body = response.get_data(as_text=True)
+        response.close()
+        expected_body = (Path(app.root_path) / "static" / "llms.txt").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertEqual(200, response.status_code)
+        self.assertTrue(response.content_type.startswith("text/plain"))
+        self.assertEqual(expected_body, body)
+        self.assertTrue(body.startswith("# AgeCalc\n"))
+        self.assertNotIn("?", body)
+        self.assertNotIn("localhost", body)
+
+        links = re.findall(r"\]\((https://agecalc\.cloud[^)]+)\)", body)
+        self.assertEqual(len(links), len(set(links)))
+        self.assertTrue(all("?" not in link and "#" not in link for link in links))
+        for path in (
+            "/age",
+            "/birth-year-age-table",
+            "/school-grade-calculator",
+            "/college-entry-year-calculator",
+            "/100-day-calculator",
+            "/pet-age-table",
+            "/references",
+        ):
+            self.assertIn(f"https://agecalc.cloud{path}", links)
+
+        head_response = client.head("/llms.txt")
+        head_response.close()
+        self.assertEqual(200, head_response.status_code)
+        self.assertNotIn("Location", head_response.headers)
+
+    def test_llms_txt_trailing_slash_is_not_a_duplicate(self):
+        response = app.test_client().get("/llms.txt/", follow_redirects=False)
+        response.close()
+
+        self.assertEqual(404, response.status_code)
+        self.assertNotIn("Location", response.headers)
+
     def test_seo_query_routes_redirect_invalid_values_to_clean_urls(self):
         client = app.test_client()
         invalid_urls = {

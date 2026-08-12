@@ -1,0 +1,41 @@
+# AgeCalc
+
+> AgeCalc는 생년월일과 기준일을 바탕으로 만나이, 연나이, 학년, 입학연도, 월령, 기념일, 반려동물 환산 나이를 계산하고 기준과 출처를 설명하는 한국어 생활 계산 서비스입니다.
+
+계산 결과는 일반적인 참고 정보입니다. 행정, 법률, 의료 판단에는 관계 기관의 공식 안내를 우선하고 각 페이지에 표시된 계산 기준과 출처를 함께 확인하세요.
+
+## 핵심 나이 계산
+
+- [AgeCalc 홈](https://agecalc.cloud/): 주요 나이 및 생활 계산 도구를 주제별로 안내합니다.
+- [만나이 계산기](https://agecalc.cloud/age): 생년월일과 기준일로 현재 만나이를 계산합니다.
+- [출생연도별 나이표](https://agecalc.cloud/birth-year-age-table): 출생연도에 따른 만나이와 연나이를 표로 확인합니다.
+- [연나이 계산기](https://agecalc.cloud/annual-age-calculator): 출생연도와 기준연도로 연나이를 계산합니다.
+
+## 학교와 학번
+
+- [학년 계산기](https://agecalc.cloud/school-grade-calculator): 생년월일을 기준으로 현재 학년을 확인합니다.
+- [학년별 나이표](https://agecalc.cloud/grade-age-table): 초등학교, 중학교, 고등학교 학년별 나이를 확인합니다.
+- [학년별 출생연도표](https://agecalc.cloud/grade-birth-year-table): 각 학년에 해당하는 출생연도를 확인합니다.
+- [입학년도 계산표](https://agecalc.cloud/school-entry-year-table): 출생연도에 따른 초중고 입학 연도를 확인합니다.
+- [학번 계산기](https://agecalc.cloud/college-entry-year-calculator): 출생연도 또는 입학연도로 대학 학번과 입학 시점을 확인합니다.
+
+## 가족과 기념일
+
+- [아이 개월수 계산기](https://agecalc.cloud/baby-months): 생년월일과 기준일로 아이의 월령을 계산합니다.
+- [100일 계산기](https://agecalc.cloud/100-day-calculator): 시작일을 포함한 100일째 날짜와 주요 기념일을 계산합니다.
+- [디데이 계산기](https://agecalc.cloud/d-day): 두 날짜 사이의 남은 날과 지난 날을 계산합니다.
+- [생일 디데이 계산기](https://agecalc.cloud/birthday-dday-calculator): 다음 생일까지 남은 날짜를 확인합니다.
+
+## 반려동물
+
+- [강아지 나이 계산기](https://agecalc.cloud/dog): 강아지의 나이를 사람 나이로 환산합니다.
+- [고양이 나이 계산기](https://agecalc.cloud/cat): 고양이의 나이를 사람 나이로 환산합니다.
+- [반려동물 나이표](https://agecalc.cloud/pet-age-table): 강아지와 고양이의 연령별 환산 나이를 비교합니다.
+
+## 기준과 운영
+
+- [공식 기준과 출처](https://agecalc.cloud/references): 계산에 사용한 공식 자료와 기준을 설명합니다.
+- [AgeCalc 소개](https://agecalc.cloud/about): 서비스 목적과 운영 원칙을 안내합니다.
+- [자주 묻는 질문](https://agecalc.cloud/faq): 계산 방식과 이용 방법에 관한 답변을 제공합니다.
+- [개인정보처리방침](https://agecalc.cloud/privacy): 개인정보 처리 원칙을 안내합니다.
+- [이용약관](https://agecalc.cloud/terms): 서비스 이용 조건과 책임 범위를 안내합니다.
