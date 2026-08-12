@@ -862,6 +862,59 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("입학년도 계산기", html)
         self.assertIn("현재 학년이 아니라 입학 시점을 빠르게 확인할 때 사용합니다.", html)
 
+    def test_school_entry_year_table_leads_with_current_entry_year_answers(self):
+        client = app.test_client()
+        with mock.patch.object(app_module, "_current_local_date", return_value=date(2026, 8, 13)):
+            html = client.get("/school-entry-year-table").get_data(as_text=True)
+
+        self.assertIn("2026학년도 초등학교 입학생은 보통 2019년생", html)
+        self.assertIn("중학교는 2013년생", html)
+        self.assertIn("고등학교는 2010년생", html)
+        self.assertIn("출생연도 + 7·13·16", html)
+        self.assertIn("정확한 입학식 날짜는 학교 일정을 확인하세요", html)
+
+        direct_answer = html.index('aria-label="입학년도 바로 답변"')
+        for affiliate_marker in (
+            "info-coupang-promotions",
+            "coupang-mobile-banner",
+            "home-coupang-rail-left",
+        ):
+            if affiliate_marker in html:
+                self.assertLess(direct_answer, html.index(affiliate_marker))
+
+    def test_school_entry_year_table_uses_previous_school_year_in_january(self):
+        with mock.patch.object(app_module, "_current_local_date", return_value=date(2026, 1, 15)):
+            html = app.test_client().get("/school-entry-year-table").get_data(as_text=True)
+
+        self.assertIn("2025학년도 초등학교 입학생은 보통 2018년생", html)
+        self.assertIn("중학교는 2012년생", html)
+        self.assertIn("고등학교는 2009년생", html)
+
+    def test_school_entry_year_selected_result_is_an_entry_year_answer(self):
+        html = app.test_client().get(
+            "/school-entry-year-table?year=2018"
+        ).get_data(as_text=True)
+
+        self.assertIn(
+            "2018년생은 초등학교 2025학년도, 중학교 2031학년도, 고등학교 2034학년도 입학",
+            html,
+        )
+        self.assertIn("현재 학년은 학년 계산기에서 따로 확인하세요", html)
+
+    def test_school_entry_year_faq_matches_visible_copy(self):
+        html = app.test_client().get("/school-entry-year-table").get_data(as_text=True)
+        schemas, visible_text = _parse_page_markup(html)
+        visible_text = re.sub(r"\s+", " ", visible_text)
+        faq_pages = [schema for schema in schemas if schema.get("@type") == "FAQPage"]
+
+        self.assertEqual(1, len(faq_pages))
+        for question in faq_pages[0]["mainEntity"]:
+            self.assertIn(re.sub(r"\s+", " ", question["name"]), visible_text)
+            self.assertIn(
+                re.sub(r"\s+", " ", question["acceptedAnswer"]["text"]),
+                visible_text,
+            )
+
     def test_school_entry_year_table_highlights_selected_year(self):
         client = app.test_client()
         response = client.get("/school-entry-year-table?year=2018")

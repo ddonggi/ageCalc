@@ -1698,6 +1698,11 @@ def school_entry_year_table():
     return render_template(
         'school-entry-year-table.html',
         school_year=school_year,
+        current_entry_birth_years={
+            "elementary": school_year - 7,
+            "middle": school_year - 13,
+            "high": school_year - 16,
+        },
         selected_year=selected_year,
         selected_row=selected_row,
         school_entry_rows=rows,
