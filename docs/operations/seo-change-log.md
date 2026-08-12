@@ -4,6 +4,45 @@
 
 ## 2026-08-13
 
+### 네이버 TOP 30 검색어 대표 URL 매핑
+
+네이버 검색어 원문은 2026-08-12 확인 자료를 기준으로 `content/editorial_metadata.py`에 보존했습니다. 각 검색어는 대표 URL 하나에만 배정하며, 띄어쓰기가 어색하거나 질문 의도가 생략된 원문은 검색어 데이터로만 보존하고 공개 문구에 반영할 때 자연스러운 한국어로 고칩니다.
+
+| 순위 | 검색어 | 클릭 | 노출 | CTR | 대표 URL | 슬롯 | 결정 |
+|---:|---|---:|---:|---:|---|---|---|
+| 1 | 26학번 년생 | 243 | 1,443 | 16.8% | `/college-entry-year-calculator` | section | 학번별 출생연도 설명에 자연어로 반영 |
+| 2 | 학년 계산기 | 137 | 266 | 51.5% | `/school-grade-calculator` | primary | 대표 의도로 유지 |
+| 3 | 22학번 나이 | 130 | 725 | 17.9% | `/college-entry-year-calculator` | section | 학번별 나이 설명에 반영 |
+| 4 | 26학번 | 115 | 714 | 16.1% | `/college-entry-year-calculator` | section | 최근 학번 설명에 반영 |
+| 5 | 아이 개월수 계산기 | 110 | 2,161 | 5.1% | `/baby-months` | primary | 대표 의도로 유지 |
+| 6 | 26학번 나이 | 104 | 461 | 22.6% | `/college-entry-year-calculator` | section | 학번별 나이 설명에 반영 |
+| 7 | 20학번 나이 | 100 | 560 | 17.9% | `/college-entry-year-calculator` | section | 학번별 나이 설명에 반영 |
+| 8 | 20살 몇년생 | 89 | 5,770 | 1.5% | `/birth-year-age-table` | faq | 질문형 의도로 반영 후보 지정 |
+| 9 | 만나이 폐지 | 89 | 1,577 | 5.6% | `/korean-age-guide` | section | 폐지 오해를 바로잡는 설명에 반영 |
+| 10 | 연도별 띠 | 89 | 1,043 | 8.5% | `/birth-year-zodiac-table` | primary | 대표 의도로 지정 |
+| 11 | 18학번 나이 | 88 | 565 | 15.6% | `/college-entry-year-calculator` | section | 학번별 나이 설명에 반영 |
+| 12 | 중1 몇년생 | 87 | 300 | 29.0% | `/grade-birth-year-table` | faq | 학년→출생연도 질문으로 유지 |
+| 13 | 나이차이 계산 | 84 | 273 | 30.8% | `/age-gap-calculator` | section | 자연스러운 띄어쓰기로 반영 |
+| 14 | 입학년도 계산 | 75 | 641 | 11.7% | `/school-entry-year-table` | primary | 대표 의도로 지정 |
+| 15 | 19학번 나이 | 71 | 531 | 13.4% | `/college-entry-year-calculator` | section | 학번별 나이 설명에 반영 |
+| 16 | 고1 몇년생 | 69 | 360 | 19.2% | `/grade-birth-year-table` | faq | 학년→출생연도 질문으로 유지 |
+| 17 | 나이차이 계산기 | 59 | 222 | 26.6% | `/age-gap-calculator` | primary | 자연스러운 띄어쓰기로 대표 의도 유지 |
+| 18 | 2026년 20살 몇년생 | 57 | 1,475 | 3.9% | `/birth-year-age-table` | faq | 기준연도가 있는 질문으로 반영 후보 지정 |
+| 19 | 09학번 몇살 | 51 | 396 | 12.9% | `/college-entry-year-calculator` | faq | 자연스러운 질문으로 반영 |
+| 20 | 연나이 계산기 | 46 | 3,919 | 1.2% | `/annual-age-calculator` | primary | 대표 의도로 유지 |
+| 21 | 26학번 몇년생 | 46 | 129 | 35.7% | `/college-entry-year-calculator` | faq | 자연스러운 질문으로 반영 |
+| 22 | 나이차이계산 | 45 | 169 | 26.6% | `/age-gap-calculator` | section | 자연스러운 띄어쓰기로 반영 |
+| 23 | 고3 몇년생 | 43 | 218 | 19.7% | `/grade-birth-year-table` | faq | 학년→출생연도 질문으로 유지 |
+| 24 | 학번 계산기 | 43 | 85 | 50.6% | `/college-entry-year-calculator` | primary | 대표 의도로 유지 |
+| 25 | 23학번 년생 | 39 | 222 | 17.6% | `/college-entry-year-calculator` | section | 학번별 출생연도 설명에 자연어로 반영 |
+| 26 | 27학번 | 39 | 212 | 18.4% | `/college-entry-year-calculator` | section | 미래 학번 설명에 반영 |
+| 27 | 21학번 년생 | 37 | 234 | 15.8% | `/college-entry-year-calculator` | section | 학번별 출생연도 설명에 자연어로 반영 |
+| 28 | 23학번 나이 | 37 | 182 | 20.3% | `/college-entry-year-calculator` | section | 학번별 나이 설명에 반영 |
+| 29 | 21학번 나이 | 36 | 201 | 17.9% | `/college-entry-year-calculator` | section | 학번별 나이 설명에 반영 |
+| 30 | 만13세 몇학년 | 32 | 1,487 | 2.2% | `/school-grade-calculator` | faq | 나이만으로 학년을 확정할 수 없다는 설명 후보로 지정 |
+
+이번 작업은 검색어 소유권과 후속 삽입 위치만 확정했습니다. 2026-08-11 변경 효과 관찰을 방해하지 않도록 title, meta description, H1, 본문과 FAQ는 바꾸지 않았으며 canonical, robots, 쿼리 색인 정책, sitemap도 그대로 유지합니다. 공개 콘텐츠가 바뀌지 않아 registry `lastmod`도 갱신하지 않았습니다.
+
 ### 공개 URL 정규화
 
 | 유형 | 기존 URL | 대표 URL | 처리 |
