@@ -1,0 +1,3140 @@
+{
+  "change_date": "2026-08-11",
+  "generated_for": "2026-08-12",
+  "google": {
+    "countries": {
+      "rows": [
+        {
+          "clicks": 1494,
+          "ctr_percent": 0.602857,
+          "impressions": 247820,
+          "key": "한국",
+          "position": 6.8
+        },
+        {
+          "clicks": 26,
+          "ctr_percent": 0.142794,
+          "impressions": 18208,
+          "key": "미국",
+          "position": 6.76
+        },
+        {
+          "clicks": 9,
+          "ctr_percent": 0.579151,
+          "impressions": 1554,
+          "key": "일본",
+          "position": 6.84
+        },
+        {
+          "clicks": 5,
+          "ctr_percent": 0.984252,
+          "impressions": 508,
+          "key": "베트남",
+          "position": 5.98
+        },
+        {
+          "clicks": 4,
+          "ctr_percent": 1.476015,
+          "impressions": 271,
+          "key": "중국",
+          "position": 6.75
+        },
+        {
+          "clicks": 3,
+          "ctr_percent": 0.308642,
+          "impressions": 972,
+          "key": "캐나다",
+          "position": 6.61
+        },
+        {
+          "clicks": 3,
+          "ctr_percent": 1.020408,
+          "impressions": 294,
+          "key": "독일",
+          "position": 6.47
+        },
+        {
+          "clicks": 2,
+          "ctr_percent": 1.06383,
+          "impressions": 188,
+          "key": "태국",
+          "position": 6.45
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 0.222717,
+          "impressions": 449,
+          "key": "호주",
+          "position": 6.71
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 0.323625,
+          "impressions": 309,
+          "key": "영국",
+          "position": 6.62
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 0.413223,
+          "impressions": 242,
+          "key": "필리핀",
+          "position": 6.29
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 0.505051,
+          "impressions": 198,
+          "key": "말레이시아",
+          "position": 6.02
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 0.526316,
+          "impressions": 190,
+          "key": "싱가포르",
+          "position": 6.29
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 0.613497,
+          "impressions": 163,
+          "key": "홍콩",
+          "position": 5.88
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 0.78125,
+          "impressions": 128,
+          "key": "이탈리아",
+          "position": 7.18
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 2.941176,
+          "impressions": 34,
+          "key": "칠레",
+          "position": 6.65
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 3.846154,
+          "impressions": 26,
+          "key": "남아프리카",
+          "position": 7.08
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 8.333333,
+          "impressions": 12,
+          "key": "북마리아나 군도",
+          "position": 6.33
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 9.090909,
+          "impressions": 11,
+          "key": "카타르",
+          "position": 6.09
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 25.0,
+          "impressions": 4,
+          "key": "탄자니아",
+          "position": 5.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 303,
+          "key": "브라질",
+          "position": 6.72
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 268,
+          "key": "프랑스",
+          "position": 6.89
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 255,
+          "key": "인도네시아",
+          "position": 6.49
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 206,
+          "key": "뉴질랜드",
+          "position": 5.77
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 149,
+          "key": "인도",
+          "position": 6.79
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 149,
+          "key": "멕시코",
+          "position": 7.1
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 138,
+          "key": "러시아",
+          "position": 7.3
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 133,
+          "key": "아랍에미리트 연합",
+          "position": 4.94
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 102,
+          "key": "대만",
+          "position": 7.05
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 99,
+          "key": "네덜란드",
+          "position": 6.67
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 96,
+          "key": "스페인",
+          "position": 7.08
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 66,
+          "key": "아르헨티나",
+          "position": 5.82
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 62,
+          "key": "폴란드",
+          "position": 7.6
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 54,
+          "key": "콜롬비아",
+          "position": 6.81
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 46,
+          "key": "터키",
+          "position": 6.7
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 38,
+          "key": "스위스",
+          "position": 6.37
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 36,
+          "key": "사우디 아라비아",
+          "position": 7.06
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 32,
+          "key": "캄보디아",
+          "position": 6.72
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 31,
+          "key": "벨기에",
+          "position": 5.55
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 30,
+          "key": "몽골",
+          "position": 5.3
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 30,
+          "key": "헝가리",
+          "position": 6.23
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 30,
+          "key": "에콰도르",
+          "position": 6.6
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 30,
+          "key": "체코",
+          "position": 6.83
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 30,
+          "key": "파키스탄",
+          "position": 6.87
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 29,
+          "key": "스웨덴",
+          "position": 6.62
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 26,
+          "key": "이집트",
+          "position": 5.88
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 26,
+          "key": "괌",
+          "position": 6.81
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 25,
+          "key": "카자흐스탄",
+          "position": 6.12
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 25,
+          "key": "베네주엘라",
+          "position": 7.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 24,
+          "key": "아일랜드",
+          "position": 6.96
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 24,
+          "key": "가나",
+          "position": 7.21
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 23,
+          "key": "우크라이나",
+          "position": 7.09
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 23,
+          "key": "페루",
+          "position": 8.09
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 22,
+          "key": "오스트리아",
+          "position": 7.64
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 20,
+          "key": "루마니아",
+          "position": 6.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 19,
+          "key": "방글라데시",
+          "position": 5.37
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 19,
+          "key": "핀란드",
+          "position": 6.47
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 19,
+          "key": "우즈베키스탄",
+          "position": 6.47
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 18,
+          "key": "그리스",
+          "position": 5.17
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 18,
+          "key": "덴마크",
+          "position": 6.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 18,
+          "key": "이란",
+          "position": 7.39
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 18,
+          "key": "라오스",
+          "position": 8.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 17,
+          "key": "슬로바키아",
+          "position": 6.12
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 17,
+          "key": "포르투갈",
+          "position": 6.53
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 17,
+          "key": "미얀마(버마)",
+          "position": 7.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 16,
+          "key": "이라크",
+          "position": 8.12
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 15,
+          "key": "파나마",
+          "position": 6.27
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 15,
+          "key": "불가리아",
+          "position": 7.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 15,
+          "key": "모로코",
+          "position": 7.07
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 13,
+          "key": "파라과이",
+          "position": 6.08
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 13,
+          "key": "키르기스",
+          "position": 7.62
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 12,
+          "key": "과테말라",
+          "position": 6.25
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 11,
+          "key": "도미니카 공화국",
+          "position": 6.36
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 11,
+          "key": "이스라엘",
+          "position": 6.64
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 11,
+          "key": "케냐",
+          "position": 6.91
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 11,
+          "key": "벨로루시",
+          "position": 9.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 10,
+          "key": "알제리",
+          "position": 7.2
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 9,
+          "key": "노르웨이",
+          "position": 5.11
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 9,
+          "key": "코스타리카",
+          "position": 6.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 9,
+          "key": "자메이카",
+          "position": 6.11
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 9,
+          "key": "스리랑카",
+          "position": 6.44
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 9,
+          "key": "팔레스타인",
+          "position": 6.44
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 9,
+          "key": "나이지리아",
+          "position": 6.56
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 8,
+          "key": "볼리비아",
+          "position": 7.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 7,
+          "key": "몰타",
+          "position": 6.71
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 7,
+          "key": "네팔",
+          "position": 6.71
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 7,
+          "key": "튀니지",
+          "position": 6.71
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 7,
+          "key": "요르단",
+          "position": 8.43
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 7,
+          "key": "세르비아",
+          "position": 9.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 6,
+          "key": "아제르바이잔",
+          "position": 6.17
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 6,
+          "key": "우루과이",
+          "position": 7.67
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 6,
+          "key": "레바논",
+          "position": 9.67
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 5,
+          "key": "니카라과",
+          "position": 5.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 5,
+          "key": "그루지아",
+          "position": 5.8
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 5,
+          "key": "알바니아",
+          "position": 6.6
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 5,
+          "key": "크로아티아",
+          "position": 7.8
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 5,
+          "key": "북한",
+          "position": 7.8
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 4,
+          "key": "마카오",
+          "position": 4.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 4,
+          "key": "온두라스",
+          "position": 4.75
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 4,
+          "key": "쿠웨이트",
+          "position": 6.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 4,
+          "key": "시리아",
+          "position": 7.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 4,
+          "key": "바베이도스",
+          "position": 8.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 4,
+          "key": "파푸아 뉴기니",
+          "position": 8.75
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "라트비아",
+          "position": 4.33
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "스와질랜드",
+          "position": 5.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "바레인",
+          "position": 5.33
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "앙골라",
+          "position": 6.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "콩고-킨샤사",
+          "position": 6.33
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "룩셈부르크",
+          "position": 6.67
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "세네갈",
+          "position": 6.67
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "적도 기니",
+          "position": 7.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "코트디부아르",
+          "position": 7.67
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "예멘",
+          "position": 7.67
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "오만",
+          "position": 8.33
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "피지",
+          "position": 3.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "모리타니",
+          "position": 3.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "카메룬",
+          "position": 5.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "아르메니아",
+          "position": 5.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "팔라우",
+          "position": 5.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "아프가니스탄",
+          "position": 6.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "몬테네그로",
+          "position": 7.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "남수단",
+          "position": 7.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "바하마",
+          "position": 7.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "리투아니아",
+          "position": 7.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "슬로베니아",
+          "position": 7.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "카보 베르데",
+          "position": 8.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "우간다",
+          "position": 8.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "보스니아 헤르체고비나",
+          "position": 8.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "에스토니아",
+          "position": 8.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "모리셔스",
+          "position": 10.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "기니",
+          "position": 3.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "마다카스카르",
+          "position": 3.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "라이베리아",
+          "position": 4.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "투르크멘",
+          "position": 4.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "짐바브웨",
+          "position": 4.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "보츠와나",
+          "position": 5.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "콩고-브라자빌",
+          "position": 5.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "토고",
+          "position": 5.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "그라나다",
+          "position": 6.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "리비아",
+          "position": 6.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "사이프러스",
+          "position": 7.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "지브랄타",
+          "position": 7.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "르완다",
+          "position": 7.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "수단",
+          "position": 7.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "잠비아",
+          "position": 7.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "아루바",
+          "position": 8.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "알 수 없는 지역",
+          "position": 8.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "니제르",
+          "position": 9.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "코소보",
+          "position": 9.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "앙귈라",
+          "position": 10.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "파로에 군도",
+          "position": 10.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "모잠비크",
+          "position": 10.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "브루나이",
+          "position": 11.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "퀴라소",
+          "position": 11.0
+        }
+      ],
+      "total": {
+        "average_position": 6.790638,
+        "clicks": 1558,
+        "ctr_percent": 0.566861,
+        "impressions": 274847,
+        "row_count": 154
+      }
+    },
+    "devices": {
+      "query_device_cross_dimension": "not_available",
+      "rows": [
+        {
+          "clicks": 871,
+          "ctr_percent": 0.611589,
+          "impressions": 142416,
+          "key": "모바일",
+          "position": 6.67
+        },
+        {
+          "clicks": 654,
+          "ctr_percent": 0.513787,
+          "impressions": 127290,
+          "key": "데스크톱",
+          "position": 6.93
+        },
+        {
+          "clicks": 33,
+          "ctr_percent": 0.641898,
+          "impressions": 5141,
+          "key": "태블릿",
+          "position": 6.37
+        }
+      ],
+      "total": {
+        "average_position": 6.784802,
+        "clicks": 1558,
+        "ctr_percent": 0.566861,
+        "impressions": 274847,
+        "row_count": 3
+      }
+    },
+    "page_table": {
+      "comparison_to_property": "expected_aggregation_difference",
+      "grain": "canonical_page",
+      "purpose": "URL 우선순위와 페이지별 CTR 비교",
+      "rows": [
+        {
+          "clicks": 198,
+          "ctr_percent": 0.43383,
+          "impressions": 45640,
+          "key": "https://agecalc.cloud/grade-birth-year-table",
+          "position": 5.77
+        },
+        {
+          "clicks": 173,
+          "ctr_percent": 0.557867,
+          "impressions": 31011,
+          "key": "https://agecalc.cloud/school-grade-calculator",
+          "position": 6.54
+        },
+        {
+          "clicks": 165,
+          "ctr_percent": 0.468391,
+          "impressions": 35227,
+          "key": "https://agecalc.cloud/age",
+          "position": 7.97
+        },
+        {
+          "clicks": 139,
+          "ctr_percent": 2.790604,
+          "impressions": 4981,
+          "key": "https://agecalc.cloud/cat",
+          "position": 5.02
+        },
+        {
+          "clicks": 124,
+          "ctr_percent": 0.487383,
+          "impressions": 25442,
+          "key": "https://agecalc.cloud/grade-age-table",
+          "position": 5.46
+        },
+        {
+          "clicks": 121,
+          "ctr_percent": 4.060403,
+          "impressions": 2980,
+          "key": "https://agecalc.cloud/parent-child",
+          "position": 4.91
+        },
+        {
+          "clicks": 119,
+          "ctr_percent": 0.703268,
+          "impressions": 16921,
+          "key": "https://agecalc.cloud/100-day-calculator",
+          "position": 6.47
+        },
+        {
+          "clicks": 90,
+          "ctr_percent": 0.215817,
+          "impressions": 41702,
+          "key": "https://agecalc.cloud/birth-year-age-table",
+          "position": 7.72
+        },
+        {
+          "clicks": 83,
+          "ctr_percent": 1.552272,
+          "impressions": 5347,
+          "key": "https://agecalc.cloud/dog",
+          "position": 7.33
+        },
+        {
+          "clicks": 54,
+          "ctr_percent": 1.439232,
+          "impressions": 3752,
+          "key": "https://agecalc.cloud/annual-age-calculator",
+          "position": 7.64
+        },
+        {
+          "clicks": 48,
+          "ctr_percent": 0.643345,
+          "impressions": 7461,
+          "key": "https://agecalc.cloud/baby-months",
+          "position": 6.93
+        },
+        {
+          "clicks": 44,
+          "ctr_percent": 0.183036,
+          "impressions": 24039,
+          "key": "https://agecalc.cloud/school-entry-year-table",
+          "position": 7.5
+        },
+        {
+          "clicks": 37,
+          "ctr_percent": 0.484674,
+          "impressions": 7634,
+          "key": "https://agecalc.cloud/",
+          "position": 7.48
+        },
+        {
+          "clicks": 28,
+          "ctr_percent": 3.114572,
+          "impressions": 899,
+          "key": "https://agecalc.cloud/age-gap-calculator",
+          "position": 3.23
+        },
+        {
+          "clicks": 24,
+          "ctr_percent": 0.459594,
+          "impressions": 5222,
+          "key": "https://agecalc.cloud/college-entry-year-calculator",
+          "position": 6.13
+        },
+        {
+          "clicks": 21,
+          "ctr_percent": 0.213068,
+          "impressions": 9856,
+          "key": "https://agecalc.cloud/guide",
+          "position": 8.95
+        },
+        {
+          "clicks": 15,
+          "ctr_percent": 0.960922,
+          "impressions": 1561,
+          "key": "https://agecalc.cloud/birthday-dday-calculator",
+          "position": 7.58
+        },
+        {
+          "clicks": 13,
+          "ctr_percent": 0.34337,
+          "impressions": 3786,
+          "key": "https://agecalc.cloud/baby-months-table",
+          "position": 7.56
+        },
+        {
+          "clicks": 12,
+          "ctr_percent": 0.3564,
+          "impressions": 3367,
+          "key": "https://agecalc.cloud/d-day",
+          "position": 7.38
+        },
+        {
+          "clicks": 10,
+          "ctr_percent": 0.274273,
+          "impressions": 3646,
+          "key": "https://agecalc.cloud/age-comparison-table",
+          "position": 6.68
+        },
+        {
+          "clicks": 6,
+          "ctr_percent": 2.12766,
+          "impressions": 282,
+          "key": "https://www.agecalc.cloud/age-gap-calculator",
+          "position": 4.01
+        },
+        {
+          "clicks": 5,
+          "ctr_percent": 0.539957,
+          "impressions": 926,
+          "key": "https://agecalc.cloud/guides/age-calculation-2026",
+          "position": 7.73
+        },
+        {
+          "clicks": 5,
+          "ctr_percent": 2.04918,
+          "impressions": 244,
+          "key": "https://agecalc.cloud/pet-months-table",
+          "position": 6.85
+        },
+        {
+          "clicks": 4,
+          "ctr_percent": 0.275672,
+          "impressions": 1451,
+          "key": "https://agecalc.cloud/pet-age-table",
+          "position": 7.77
+        },
+        {
+          "clicks": 4,
+          "ctr_percent": 0.28551,
+          "impressions": 1401,
+          "key": "https://agecalc.cloud/guides/sixtieth-seventieth-eightieth-age-guide",
+          "position": 10.08
+        },
+        {
+          "clicks": 3,
+          "ctr_percent": 0.28463,
+          "impressions": 1054,
+          "key": "https://agecalc.cloud/guides/school-entry-year-guide",
+          "position": 8.53
+        },
+        {
+          "clicks": 3,
+          "ctr_percent": 0.385109,
+          "impressions": 779,
+          "key": "https://agecalc.cloud/guides/elementary-school-entry-target-2026",
+          "position": 6.44
+        },
+        {
+          "clicks": 3,
+          "ctr_percent": 0.887574,
+          "impressions": 338,
+          "key": "https://agecalc.cloud/blog/early-birth-school-grade-guide",
+          "position": 7.84
+        },
+        {
+          "clicks": 2,
+          "ctr_percent": 0.293255,
+          "impressions": 682,
+          "key": "https://agecalc.cloud/guides/birth-year-age-table-guide",
+          "position": 9.66
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 0.381679,
+          "impressions": 262,
+          "key": "https://agecalc.cloud/blog/2026-man-age-guide",
+          "position": 7.95
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 0.529101,
+          "impressions": 189,
+          "key": "https://agecalc.cloud/guides/parent-child-age-gap-guide",
+          "position": 8.77
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 0.819672,
+          "impressions": 122,
+          "key": "https://agecalc.cloud/guides/early-birth-school-grade-guide",
+          "position": 9.23
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 1.408451,
+          "impressions": 71,
+          "key": "https://agecalc.cloud/guides/baby-anniversary-calculation-guide",
+          "position": 9.77
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 4.166667,
+          "impressions": 24,
+          "key": "https://agecalc.cloud/references",
+          "position": 5.58
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 4.545455,
+          "impressions": 22,
+          "key": "https://agecalc.cloud/blog/100세-시대-50세-이후-건강하게-나이-드는-법-생활습관과-예방-관리의-중요성",
+          "position": 8.64
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 5.555556,
+          "impressions": 18,
+          "key": "https://agecalc.cloud/blog/반려견-수명-연장-신약-개발-현황과-활용법-loyal의-혁신과-agecalc의-역할",
+          "position": 6.78
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 6.666667,
+          "impressions": 15,
+          "key": "https://agecalc.cloud/blog/반려동물-건강수명-시대-우리는-무엇을-준비해야-할까",
+          "position": 7.2
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 8.333333,
+          "impressions": 12,
+          "key": "https://agecalc.cloud/blog/지역별-건강수명의-격차-왜-우리-삶에-중요한가",
+          "position": 8.92
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 16.666667,
+          "impressions": 6,
+          "key": "https://agecalc.cloud/blog/팔순잔치-만나이-계산법과-의미-이해하기",
+          "position": 7.0
+        },
+        {
+          "clicks": 1,
+          "ctr_percent": 33.333333,
+          "impressions": 3,
+          "key": "https://agecalc.cloud/blog/아동-발달-단계별-생성형-ai의-장점과-위험성-이해하기",
+          "position": 12.67
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2571,
+          "key": "https://agecalc.cloud/korean-age-guide",
+          "position": 9.12
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 153,
+          "key": "https://agecalc.cloud/guides/generation-by-birth-year-guide",
+          "position": 9.53
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 134,
+          "key": "https://agecalc.cloud/education/",
+          "position": 9.04
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 105,
+          "key": "https://agecalc.cloud/guides/lunar-birthday-age-guide",
+          "position": 17.55
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 77,
+          "key": "https://agecalc.cloud/guides/korean-age-vs-annual-age",
+          "position": 15.08
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 76,
+          "key": "https://agecalc.cloud/blog/나이-들면서-더-행복해지는-비결-막공나만의-의미와-실천법",
+          "position": 6.96
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 73,
+          "key": "https://agecalc.cloud/blog/팔순잔치-만나이로-제대로-이해하고-준비하는-한국의-장수-축하-문화",
+          "position": 7.73
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 66,
+          "key": "https://agecalc.cloud/age/",
+          "position": 9.42
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 47,
+          "key": "https://www.agecalc.cloud/pet-age-table",
+          "position": 7.19
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 42,
+          "key": "https://agecalc.cloud/blog/parent-child-age-gap-guide",
+          "position": 11.29
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 40,
+          "key": "https://agecalc.cloud/guides/100-day-calculation-guide",
+          "position": 9.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 38,
+          "key": "https://agecalc.cloud/anniversary/",
+          "position": 6.76
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 32,
+          "key": "https://agecalc.cloud/blog/2026년-미국-펫케어-신제품과-한국-반려인이-꼭-알아야-할-최신-트렌드와-활용법",
+          "position": 5.62
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 32,
+          "key": "https://agecalc.cloud/blog/birth-year-age-interpretation",
+          "position": 8.59
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 25,
+          "key": "https://agecalc.cloud/guides/reference-date-age-guide",
+          "position": 9.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 17,
+          "key": "https://agecalc.cloud/faq",
+          "position": 6.88
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 15,
+          "key": "https://agecalc.cloud/family/",
+          "position": 8.4
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 13,
+          "key": "https://agecalc.cloud/privacy",
+          "position": 4.38
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 12,
+          "key": "https://agecalc.cloud/contact",
+          "position": 2.75
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 11,
+          "key": "https://agecalc.cloud/terms",
+          "position": 4.82
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 11,
+          "key": "https://agecalc.cloud/blog/노화-피할-수-없는-숙명인가-세포-재설계로-나이-시계를-되돌리는-새로운-가능성",
+          "position": 6.64
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 11,
+          "key": "https://agecalc.cloud/pets/",
+          "position": 7.91
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 10,
+          "key": "https://agecalc.cloud/blog/반려동물-건강관리의-핵심-정기-검진과-맞춤-영양의-중요성",
+          "position": 1.9
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 10,
+          "key": "https://agecalc.cloud/guides/pet-age-table-guide",
+          "position": 8.9
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 10,
+          "key": "https://agecalc.cloud/blog/baby-months-calculation-guide",
+          "position": 13.3
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 8,
+          "key": "https://agecalc.cloud/blog/man-age-vs-korean-age",
+          "position": 7.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 8,
+          "key": "https://agecalc.cloud/blog/15개월-아동-발달-이정표와-올바른-가정-내-지도-방법-한국-부모를-위한-종합-안내",
+          "position": 10.75
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 6,
+          "key": "https://agecalc.cloud/blog/ai-시대-한국-기업-정신건강-관리의-변화와-미래-전략-2026-apear-국제-콘퍼런스-주요-내용과-시사점",
+          "position": 4.83
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 6,
+          "key": "https://agecalc.cloud/about",
+          "position": 6.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 6,
+          "key": "https://agecalc.cloud/blog/종로구-쪽방주민-대상-통합-지원-사업-건강문화교육안전으로-삶의-질-높이기",
+          "position": 7.33
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 5,
+          "key": "https://agecalc.cloud/retirement/",
+          "position": 5.6
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 5,
+          "key": "https://agecalc.cloud/blog/송파구-신생아-가정-방문-건강관리-서비스-확대-산모와-아기의-건강을-위한-첫걸음",
+          "position": 6.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 4,
+          "key": "https://agecalc.cloud/minigames/war",
+          "position": 8.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 4,
+          "key": "https://agecalc.cloud/blog/ai-육아앱-쑥쑥찰칵의-새로운-아기-수면-예측-기능-살펴보기",
+          "position": 8.25
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 4,
+          "key": "https://agecalc.cloud/blog/송파구-신생아-가정-방문-간호사-인력-4배-확대-출산-가정-돌봄-강화의-핵심과-활용법",
+          "position": 9.75
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 4,
+          "key": "https://agecalc.cloud/blog/2026-school-entry-birth-year",
+          "position": 13.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 4,
+          "key": "https://agecalc.cloud/blog/2000-birth-year-age",
+          "position": 18.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "https://agecalc.cloud/blog/강아지와-고양이-나이에-따른-주요-질병-관리법과-예방-전략",
+          "position": 5.33
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "https://agecalc.cloud/minigames",
+          "position": 5.67
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "https://agecalc.cloud/blog/송파구-초보-부모-위한-생애초기-건강관리-서비스-확대-2",
+          "position": 6.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "https://agecalc.cloud/blog/fatty15-건강하게-나이-들기-위한-구미의-효과와-특징",
+          "position": 7.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "https://agecalc.cloud/blog/노년의-건강수명-왜-중요할까-한국-사회와-개인이-함께-알아야-할-건강관리-비결",
+          "position": 7.67
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "https://agecalc.cloud/blog/일루마-전문-간호사와-11-매칭하는-일루맘-클럽-서비스-운영-시작",
+          "position": 7.67
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "https://agecalc.cloud/blog/송파구-신생아-가정-생애초기-건강관리-서비스-확대-건강한-출산과-육아를-위한-체계적-지원-방안",
+          "position": 8.33
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 3,
+          "key": "https://agecalc.cloud/blog/우리-아이-발달의-골든타임-6세-이전-뇌-성장의-중요성",
+          "position": 8.67
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "https://agecalc.cloud/blog/백세-시대-운동과-건강-증진을-위한-새로운-사회적-도전-백세-행복-골프-재단",
+          "position": 2.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "https://agecalc.cloud/blog/반려동물과-함께하는-삶의-변화-펫-시장-어디까지-확대될까",
+          "position": 5.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "https://agecalc.cloud/blog/경기동물의료원-줄기세포센터-개소로-반려동물-재생의학-시대-본격-개막",
+          "position": 6.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "https://agecalc.cloud/blog/우리-반려동물-건강-생애주기에-맞춘-맞춤-관리의-시작",
+          "position": 6.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "https://agecalc.cloud/blog/반려동물의-역노화-가능성-노화와-영양-콘퍼런스에서-논의되다",
+          "position": 7.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "https://agecalc.cloud/blog/국민운동가-윤현-백세-행복-골프-재단-추진으로-건강한-백세시대-앞장서다",
+          "position": 8.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "https://agecalc.cloud/blog/펫리퍼블릭과-서울대-반려동물-수명-연장을-위한-혁신적-협력-시작",
+          "position": 8.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "https://agecalc.cloud/blog/고양이-건강-수명-연장-줄기세포-치료의-가능성-탐구",
+          "position": 9.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "https://agecalc.cloud/blog",
+          "position": 10.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 2,
+          "key": "https://agecalc.cloud/blog/우리-반려동물의-건강-나이에-따른-질병-관리법",
+          "position": 10.5
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "https://agecalc.cloud/blog/건강한-노년을-위한-합리적인-건강-관리-도구-키트와-agecalc-활용법",
+          "position": 3.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "https://agecalc.cloud/blog/육아-정보-홍수-시대-11-맞춤-간호사-매칭-서비스-일루맘-클럽-소개",
+          "position": 4.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "https://agecalc.cloud/blog/배당금-계산-시-주의해야-할-위험-요소와-효과적인-예방-전략",
+          "position": 5.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "https://agecalc.cloud/blog/반려동물-역노화-시대-노화와-영양-콘퍼런스가-제시하는-가능성",
+          "position": 6.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "https://agecalc.cloud/blog/ai-기술로-아이의-언어-발달을-확인하는-새로운-육아법",
+          "position": 6.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "https://agecalc.cloud/blog/2026년-aibio와-장수-생태계의-핵심-rejuve-디지털-항노화-플랫폼",
+          "position": 9.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "https://agecalc.cloud/health/",
+          "position": 9.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "https://agecalc.cloud/blog/일본에서-확산-중인-펫-휴머니제이션-트렌드와-그-의미",
+          "position": 10.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "https://agecalc.cloud/blog/장-건강과-노화-방지-항산화-단백질의-중요한-역할과-우리의-생활에의-적용",
+          "position": 10.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "https://agecalc.cloud/blog/육아-정보-홍수-시대-11-간호사-매칭-일루맘-클럽의-역할과-가치",
+          "position": 11.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "https://agecalc.cloud/blog/반려동물-나이에-따른-건강-관리-개와-고양이의-주요-질병과-예방-전략",
+          "position": 22.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "https://agecalc.cloud/blog/category/education-family",
+          "position": 34.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "https://agecalc.cloud/blog/national-pension-receiving-age",
+          "position": 38.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "https://agecalc.cloud/blog/dog-age-calculation-guide",
+          "position": 40.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "https://agecalc.cloud/blog/age-65-benefits-2026",
+          "position": 41.0
+        },
+        {
+          "clicks": 0,
+          "ctr_percent": 0.0,
+          "impressions": 1,
+          "key": "https://agecalc.cloud/blog/2026-national-health-checkup-eligibility",
+          "position": 53.0
+        }
+      ],
+      "total": {
+        "average_position": 6.936775,
+        "clicks": 1564,
+        "ctr_percent": 0.535378,
+        "impressions": 292130,
+        "row_count": 111
+      }
+    },
+    "property_total": {
+      "average_position": 6.787355,
+      "clicks": 1558,
+      "ctr_percent": 0.566861,
+      "end_date": "2026-08-09",
+      "grain": "property/day",
+      "impressions": 274847,
+      "row_count": 92,
+      "start_date": "2026-05-10"
+    },
+    "query_table": {
+      "coverage": "partial_top_rows",
+      "grain": "reported_query",
+      "purpose": "검색 의도 탐색용이며 전체 KPI 합계로 사용하지 않음",
+      "segments": {
+        "known_brand": {
+          "average_position": 12.0,
+          "clicks": 1,
+          "ctr_percent": 33.333333,
+          "impressions": 3,
+          "row_count": 1
+        },
+        "known_nonbrand": {
+          "average_position": 6.845666,
+          "clicks": 499,
+          "ctr_percent": 0.55101,
+          "impressions": 90561,
+          "row_count": 999
+        },
+        "unclassified_or_unreported": {
+          "reason": "익명 검색어와 상위 1,000행 밖 검색어는 원본 표에 없습니다.",
+          "status": "not_quantifiable_from_export"
+        }
+      },
+      "total": {
+        "average_position": 6.845837,
+        "clicks": 500,
+        "ctr_percent": 0.552096,
+        "impressions": 90564,
+        "row_count": 1000
+      }
+    }
+  },
+  "historical_summary": {
+    "allowed_use": "context_only",
+    "average_position": 8.1,
+    "clicks": 139,
+    "ctr_percent": 1.1,
+    "impressions": 12608,
+    "source": "user_provided_summary_without_date_range_or_raw_export"
+  },
+  "naver": {
+    "daily_rows": [
+      {
+        "clicks": 54,
+        "ctr_percent": 3.214286,
+        "date": "2026-05-14",
+        "impressions": 1680
+      },
+      {
+        "clicks": 59,
+        "ctr_percent": 3.215259,
+        "date": "2026-05-15",
+        "impressions": 1835
+      },
+      {
+        "clicks": 42,
+        "ctr_percent": 2.524038,
+        "date": "2026-05-16",
+        "impressions": 1664
+      },
+      {
+        "clicks": 35,
+        "ctr_percent": 2.078385,
+        "date": "2026-05-17",
+        "impressions": 1684
+      },
+      {
+        "clicks": 83,
+        "ctr_percent": 3.410025,
+        "date": "2026-05-18",
+        "impressions": 2434
+      },
+      {
+        "clicks": 58,
+        "ctr_percent": 2.546093,
+        "date": "2026-05-19",
+        "impressions": 2278
+      },
+      {
+        "clicks": 50,
+        "ctr_percent": 2.738226,
+        "date": "2026-05-20",
+        "impressions": 1826
+      },
+      {
+        "clicks": 69,
+        "ctr_percent": 2.296937,
+        "date": "2026-05-21",
+        "impressions": 3004
+      },
+      {
+        "clicks": 76,
+        "ctr_percent": 1.836636,
+        "date": "2026-05-22",
+        "impressions": 4138
+      },
+      {
+        "clicks": 89,
+        "ctr_percent": 1.614952,
+        "date": "2026-05-23",
+        "impressions": 5511
+      },
+      {
+        "clicks": 59,
+        "ctr_percent": 0.827141,
+        "date": "2026-05-24",
+        "impressions": 7133
+      },
+      {
+        "clicks": 79,
+        "ctr_percent": 1.210172,
+        "date": "2026-05-25",
+        "impressions": 6528
+      },
+      {
+        "clicks": 102,
+        "ctr_percent": 1.340694,
+        "date": "2026-05-26",
+        "impressions": 7608
+      },
+      {
+        "clicks": 90,
+        "ctr_percent": 1.052878,
+        "date": "2026-05-27",
+        "impressions": 8548
+      },
+      {
+        "clicks": 90,
+        "ctr_percent": 0.98533,
+        "date": "2026-05-28",
+        "impressions": 9134
+      },
+      {
+        "clicks": 104,
+        "ctr_percent": 1.266131,
+        "date": "2026-05-29",
+        "impressions": 8214
+      },
+      {
+        "clicks": 83,
+        "ctr_percent": 1.004356,
+        "date": "2026-05-30",
+        "impressions": 8264
+      },
+      {
+        "clicks": 87,
+        "ctr_percent": 0.962177,
+        "date": "2026-05-31",
+        "impressions": 9042
+      },
+      {
+        "clicks": 113,
+        "ctr_percent": 1.061731,
+        "date": "2026-06-01",
+        "impressions": 10643
+      },
+      {
+        "clicks": 104,
+        "ctr_percent": 1.030315,
+        "date": "2026-06-02",
+        "impressions": 10094
+      },
+      {
+        "clicks": 75,
+        "ctr_percent": 0.898742,
+        "date": "2026-06-03",
+        "impressions": 8345
+      },
+      {
+        "clicks": 105,
+        "ctr_percent": 1.106661,
+        "date": "2026-06-04",
+        "impressions": 9488
+      },
+      {
+        "clicks": 101,
+        "ctr_percent": 0.944543,
+        "date": "2026-06-05",
+        "impressions": 10693
+      },
+      {
+        "clicks": 130,
+        "ctr_percent": 1.302214,
+        "date": "2026-06-06",
+        "impressions": 9983
+      },
+      {
+        "clicks": 177,
+        "ctr_percent": 1.597617,
+        "date": "2026-06-07",
+        "impressions": 11079
+      },
+      {
+        "clicks": 174,
+        "ctr_percent": 1.299963,
+        "date": "2026-06-08",
+        "impressions": 13385
+      },
+      {
+        "clicks": 195,
+        "ctr_percent": 1.371212,
+        "date": "2026-06-09",
+        "impressions": 14221
+      },
+      {
+        "clicks": 222,
+        "ctr_percent": 1.698546,
+        "date": "2026-06-10",
+        "impressions": 13070
+      },
+      {
+        "clicks": 205,
+        "ctr_percent": 1.323007,
+        "date": "2026-06-11",
+        "impressions": 15495
+      },
+      {
+        "clicks": 177,
+        "ctr_percent": 1.296798,
+        "date": "2026-06-12",
+        "impressions": 13649
+      },
+      {
+        "clicks": 158,
+        "ctr_percent": 1.315242,
+        "date": "2026-06-13",
+        "impressions": 12013
+      },
+      {
+        "clicks": 159,
+        "ctr_percent": 1.363052,
+        "date": "2026-06-14",
+        "impressions": 11665
+      },
+      {
+        "clicks": 191,
+        "ctr_percent": 1.197943,
+        "date": "2026-06-15",
+        "impressions": 15944
+      },
+      {
+        "clicks": 212,
+        "ctr_percent": 1.358974,
+        "date": "2026-06-16",
+        "impressions": 15600
+      },
+      {
+        "clicks": 216,
+        "ctr_percent": 1.337627,
+        "date": "2026-06-17",
+        "impressions": 16148
+      },
+      {
+        "clicks": 165,
+        "ctr_percent": 1.206405,
+        "date": "2026-06-18",
+        "impressions": 13677
+      },
+      {
+        "clicks": 156,
+        "ctr_percent": 1.292139,
+        "date": "2026-06-19",
+        "impressions": 12073
+      },
+      {
+        "clicks": 149,
+        "ctr_percent": 1.216624,
+        "date": "2026-06-20",
+        "impressions": 12247
+      },
+      {
+        "clicks": 159,
+        "ctr_percent": 1.250787,
+        "date": "2026-06-21",
+        "impressions": 12712
+      },
+      {
+        "clicks": 232,
+        "ctr_percent": 1.280636,
+        "date": "2026-06-22",
+        "impressions": 18116
+      },
+      {
+        "clicks": 230,
+        "ctr_percent": 1.318656,
+        "date": "2026-06-23",
+        "impressions": 17442
+      },
+      {
+        "clicks": 213,
+        "ctr_percent": 1.233424,
+        "date": "2026-06-24",
+        "impressions": 17269
+      },
+      {
+        "clicks": 179,
+        "ctr_percent": 1.145893,
+        "date": "2026-06-25",
+        "impressions": 15621
+      },
+      {
+        "clicks": 182,
+        "ctr_percent": 1.214467,
+        "date": "2026-06-26",
+        "impressions": 14986
+      },
+      {
+        "clicks": 132,
+        "ctr_percent": 1.110177,
+        "date": "2026-06-27",
+        "impressions": 11890
+      },
+      {
+        "clicks": 162,
+        "ctr_percent": 1.269792,
+        "date": "2026-06-28",
+        "impressions": 12758
+      },
+      {
+        "clicks": 204,
+        "ctr_percent": 1.080051,
+        "date": "2026-06-29",
+        "impressions": 18888
+      },
+      {
+        "clicks": 200,
+        "ctr_percent": 0.896097,
+        "date": "2026-06-30",
+        "impressions": 22319
+      },
+      {
+        "clicks": 211,
+        "ctr_percent": 0.932885,
+        "date": "2026-07-01",
+        "impressions": 22618
+      },
+      {
+        "clicks": 157,
+        "ctr_percent": 0.702367,
+        "date": "2026-07-02",
+        "impressions": 22353
+      },
+      {
+        "clicks": 165,
+        "ctr_percent": 0.710105,
+        "date": "2026-07-03",
+        "impressions": 23236
+      },
+      {
+        "clicks": 122,
+        "ctr_percent": 0.61863,
+        "date": "2026-07-04",
+        "impressions": 19721
+      },
+      {
+        "clicks": 140,
+        "ctr_percent": 0.719831,
+        "date": "2026-07-05",
+        "impressions": 19449
+      },
+      {
+        "clicks": 193,
+        "ctr_percent": 0.774043,
+        "date": "2026-07-06",
+        "impressions": 24934
+      },
+      {
+        "clicks": 208,
+        "ctr_percent": 0.837292,
+        "date": "2026-07-07",
+        "impressions": 24842
+      },
+      {
+        "clicks": 217,
+        "ctr_percent": 0.918985,
+        "date": "2026-07-08",
+        "impressions": 23613
+      },
+      {
+        "clicks": 199,
+        "ctr_percent": 0.855178,
+        "date": "2026-07-09",
+        "impressions": 23270
+      },
+      {
+        "clicks": 188,
+        "ctr_percent": 0.803453,
+        "date": "2026-07-10",
+        "impressions": 23399
+      },
+      {
+        "clicks": 159,
+        "ctr_percent": 0.785418,
+        "date": "2026-07-11",
+        "impressions": 20244
+      },
+      {
+        "clicks": 139,
+        "ctr_percent": 0.682041,
+        "date": "2026-07-12",
+        "impressions": 20380
+      },
+      {
+        "clicks": 239,
+        "ctr_percent": 0.937549,
+        "date": "2026-07-13",
+        "impressions": 25492
+      },
+      {
+        "clicks": 195,
+        "ctr_percent": 0.74167,
+        "date": "2026-07-14",
+        "impressions": 26292
+      },
+      {
+        "clicks": 197,
+        "ctr_percent": 0.760677,
+        "date": "2026-07-15",
+        "impressions": 25898
+      },
+      {
+        "clicks": 136,
+        "ctr_percent": 0.630301,
+        "date": "2026-07-16",
+        "impressions": 21577
+      },
+      {
+        "clicks": 92,
+        "ctr_percent": 0.511794,
+        "date": "2026-07-17",
+        "impressions": 17976
+      },
+      {
+        "clicks": 98,
+        "ctr_percent": 0.499439,
+        "date": "2026-07-18",
+        "impressions": 19622
+      },
+      {
+        "clicks": 94,
+        "ctr_percent": 0.450148,
+        "date": "2026-07-19",
+        "impressions": 20882
+      },
+      {
+        "clicks": 171,
+        "ctr_percent": 0.654671,
+        "date": "2026-07-20",
+        "impressions": 26120
+      },
+      {
+        "clicks": 137,
+        "ctr_percent": 0.538501,
+        "date": "2026-07-21",
+        "impressions": 25441
+      },
+      {
+        "clicks": 160,
+        "ctr_percent": 0.601165,
+        "date": "2026-07-22",
+        "impressions": 26615
+      },
+      {
+        "clicks": 151,
+        "ctr_percent": 0.5916,
+        "date": "2026-07-23",
+        "impressions": 25524
+      },
+      {
+        "clicks": 132,
+        "ctr_percent": 0.530057,
+        "date": "2026-07-24",
+        "impressions": 24903
+      },
+      {
+        "clicks": 102,
+        "ctr_percent": 0.510485,
+        "date": "2026-07-25",
+        "impressions": 19981
+      },
+      {
+        "clicks": 100,
+        "ctr_percent": 0.502588,
+        "date": "2026-07-26",
+        "impressions": 19897
+      },
+      {
+        "clicks": 155,
+        "ctr_percent": 0.615348,
+        "date": "2026-07-27",
+        "impressions": 25189
+      },
+      {
+        "clicks": 165,
+        "ctr_percent": 0.621984,
+        "date": "2026-07-28",
+        "impressions": 26528
+      },
+      {
+        "clicks": 167,
+        "ctr_percent": 0.661203,
+        "date": "2026-07-29",
+        "impressions": 25257
+      },
+      {
+        "clicks": 177,
+        "ctr_percent": 0.754926,
+        "date": "2026-07-30",
+        "impressions": 23446
+      },
+      {
+        "clicks": 161,
+        "ctr_percent": 0.717885,
+        "date": "2026-07-31",
+        "impressions": 22427
+      },
+      {
+        "clicks": 132,
+        "ctr_percent": 0.632638,
+        "date": "2026-08-01",
+        "impressions": 20865
+      },
+      {
+        "clicks": 114,
+        "ctr_percent": 0.544621,
+        "date": "2026-08-02",
+        "impressions": 20932
+      },
+      {
+        "clicks": 218,
+        "ctr_percent": 0.825257,
+        "date": "2026-08-03",
+        "impressions": 26416
+      },
+      {
+        "clicks": 213,
+        "ctr_percent": 0.858594,
+        "date": "2026-08-04",
+        "impressions": 24808
+      },
+      {
+        "clicks": 207,
+        "ctr_percent": 0.840336,
+        "date": "2026-08-05",
+        "impressions": 24633
+      },
+      {
+        "clicks": 213,
+        "ctr_percent": 0.861964,
+        "date": "2026-08-06",
+        "impressions": 24711
+      },
+      {
+        "clicks": 213,
+        "ctr_percent": 0.87557,
+        "date": "2026-08-07",
+        "impressions": 24327
+      },
+      {
+        "clicks": 152,
+        "ctr_percent": 0.713917,
+        "date": "2026-08-08",
+        "impressions": 21291
+      },
+      {
+        "clicks": 192,
+        "ctr_percent": 0.829947,
+        "date": "2026-08-09",
+        "impressions": 23134
+      },
+      {
+        "clicks": 285,
+        "ctr_percent": 0.970411,
+        "date": "2026-08-10",
+        "impressions": 29369
+      },
+      {
+        "clicks": 231,
+        "ctr_percent": 0.763636,
+        "date": "2026-08-11",
+        "impressions": 30250
+      }
+    ],
+    "property_total": {
+      "clicks": 13483,
+      "ctr_percent": 0.90496,
+      "end_date": "2026-08-11",
+      "impressions": 1489900,
+      "row_count": 90,
+      "start_date": "2026-05-14"
+    },
+    "query_top30": {
+      "coverage": "top_30_partial",
+      "rows": [
+        {
+          "clicks": 243,
+          "ctr_percent": 16.839917,
+          "impressions": 1443,
+          "rank": 1,
+          "검색 키워드": "26학번 년생"
+        },
+        {
+          "clicks": 137,
+          "ctr_percent": 51.503759,
+          "impressions": 266,
+          "rank": 2,
+          "검색 키워드": "학년 계산기"
+        },
+        {
+          "clicks": 130,
+          "ctr_percent": 17.931034,
+          "impressions": 725,
+          "rank": 3,
+          "검색 키워드": "22학번 나이"
+        },
+        {
+          "clicks": 115,
+          "ctr_percent": 16.106443,
+          "impressions": 714,
+          "rank": 4,
+          "검색 키워드": "26학번"
+        },
+        {
+          "clicks": 110,
+          "ctr_percent": 5.090236,
+          "impressions": 2161,
+          "rank": 5,
+          "검색 키워드": "아이 개월수 계산기"
+        },
+        {
+          "clicks": 104,
+          "ctr_percent": 22.559653,
+          "impressions": 461,
+          "rank": 6,
+          "검색 키워드": "26학번 나이"
+        },
+        {
+          "clicks": 100,
+          "ctr_percent": 17.857143,
+          "impressions": 560,
+          "rank": 7,
+          "검색 키워드": "20학번 나이"
+        },
+        {
+          "clicks": 89,
+          "ctr_percent": 1.542461,
+          "impressions": 5770,
+          "rank": 8,
+          "검색 키워드": "20살 몇년생"
+        },
+        {
+          "clicks": 89,
+          "ctr_percent": 5.643627,
+          "impressions": 1577,
+          "rank": 9,
+          "검색 키워드": "만나이 폐지"
+        },
+        {
+          "clicks": 89,
+          "ctr_percent": 8.533078,
+          "impressions": 1043,
+          "rank": 10,
+          "검색 키워드": "연도별 띠"
+        },
+        {
+          "clicks": 88,
+          "ctr_percent": 15.575221,
+          "impressions": 565,
+          "rank": 11,
+          "검색 키워드": "18학번 나이"
+        },
+        {
+          "clicks": 87,
+          "ctr_percent": 29.0,
+          "impressions": 300,
+          "rank": 12,
+          "검색 키워드": "중1 몇년생"
+        },
+        {
+          "clicks": 84,
+          "ctr_percent": 30.769231,
+          "impressions": 273,
+          "rank": 13,
+          "검색 키워드": "나이차이 계산"
+        },
+        {
+          "clicks": 75,
+          "ctr_percent": 11.700468,
+          "impressions": 641,
+          "rank": 14,
+          "검색 키워드": "입학년도 계산"
+        },
+        {
+          "clicks": 71,
+          "ctr_percent": 13.370998,
+          "impressions": 531,
+          "rank": 15,
+          "검색 키워드": "19학번 나이"
+        },
+        {
+          "clicks": 69,
+          "ctr_percent": 19.166667,
+          "impressions": 360,
+          "rank": 16,
+          "검색 키워드": "고1 몇년생"
+        },
+        {
+          "clicks": 59,
+          "ctr_percent": 26.576577,
+          "impressions": 222,
+          "rank": 17,
+          "검색 키워드": "나이차이 계산기"
+        },
+        {
+          "clicks": 57,
+          "ctr_percent": 3.864407,
+          "impressions": 1475,
+          "rank": 18,
+          "검색 키워드": "2026년 20살 몇년생"
+        },
+        {
+          "clicks": 51,
+          "ctr_percent": 12.878788,
+          "impressions": 396,
+          "rank": 19,
+          "검색 키워드": "09학번 몇살"
+        },
+        {
+          "clicks": 46,
+          "ctr_percent": 1.173769,
+          "impressions": 3919,
+          "rank": 20,
+          "검색 키워드": "연나이 계산기"
+        },
+        {
+          "clicks": 46,
+          "ctr_percent": 35.658915,
+          "impressions": 129,
+          "rank": 21,
+          "검색 키워드": "26학번 몇년생"
+        },
+        {
+          "clicks": 45,
+          "ctr_percent": 26.627219,
+          "impressions": 169,
+          "rank": 22,
+          "검색 키워드": "나이차이계산"
+        },
+        {
+          "clicks": 43,
+          "ctr_percent": 19.724771,
+          "impressions": 218,
+          "rank": 23,
+          "검색 키워드": "고3 몇년생"
+        },
+        {
+          "clicks": 43,
+          "ctr_percent": 50.588235,
+          "impressions": 85,
+          "rank": 24,
+          "검색 키워드": "학번 계산기"
+        },
+        {
+          "clicks": 39,
+          "ctr_percent": 17.567568,
+          "impressions": 222,
+          "rank": 25,
+          "검색 키워드": "23학번 년생"
+        },
+        {
+          "clicks": 39,
+          "ctr_percent": 18.396226,
+          "impressions": 212,
+          "rank": 26,
+          "검색 키워드": "27학번"
+        },
+        {
+          "clicks": 37,
+          "ctr_percent": 15.811966,
+          "impressions": 234,
+          "rank": 27,
+          "검색 키워드": "21학번 년생"
+        },
+        {
+          "clicks": 37,
+          "ctr_percent": 20.32967,
+          "impressions": 182,
+          "rank": 28,
+          "검색 키워드": "23학번 나이"
+        },
+        {
+          "clicks": 36,
+          "ctr_percent": 17.910448,
+          "impressions": 201,
+          "rank": 29,
+          "검색 키워드": "21학번 나이"
+        },
+        {
+          "clicks": 32,
+          "ctr_percent": 2.151984,
+          "impressions": 1487,
+          "rank": 30,
+          "검색 키워드": "만13세 몇학년"
+        }
+      ],
+      "total": {
+        "clicks": 2290,
+        "ctr_percent": 8.62816,
+        "impressions": 26541,
+        "row_count": 30
+      }
+    },
+    "web_documents": {
+      "coverage": "top_30_partial",
+      "path_groups": [
+        {
+          "clicks": 3441,
+          "ctr_percent": 0.853876,
+          "impressions": 402986,
+          "path": "/college-entry-year-calculator",
+          "url_count": 4
+        },
+        {
+          "clicks": 3634,
+          "ctr_percent": 1.399458,
+          "impressions": 259672,
+          "path": "/birth-year-age-table",
+          "url_count": 2
+        },
+        {
+          "clicks": 412,
+          "ctr_percent": 0.166321,
+          "impressions": 247714,
+          "path": "/birth-year-zodiac-table",
+          "url_count": 1
+        },
+        {
+          "clicks": 324,
+          "ctr_percent": 0.380228,
+          "impressions": 85212,
+          "path": "/baby-months",
+          "url_count": 1
+        },
+        {
+          "clicks": 44,
+          "ctr_percent": 0.052816,
+          "impressions": 83308,
+          "path": "/d-day",
+          "url_count": 1
+        },
+        {
+          "clicks": 48,
+          "ctr_percent": 0.08685,
+          "impressions": 55268,
+          "path": "/guides/sixtieth-seventieth-eightieth-age-guide",
+          "url_count": 1
+        },
+        {
+          "clicks": 129,
+          "ctr_percent": 0.238924,
+          "impressions": 53992,
+          "path": "/100-day-calculator",
+          "url_count": 1
+        },
+        {
+          "clicks": 282,
+          "ctr_percent": 0.559557,
+          "impressions": 50397,
+          "path": "/age-comparison-table",
+          "url_count": 1
+        },
+        {
+          "clicks": 1011,
+          "ctr_percent": 2.158366,
+          "impressions": 46841,
+          "path": "/school-grade-calculator",
+          "url_count": 1
+        },
+        {
+          "clicks": 1535,
+          "ctr_percent": 3.983805,
+          "impressions": 38531,
+          "path": "/grade-birth-year-table",
+          "url_count": 1
+        },
+        {
+          "clicks": 545,
+          "ctr_percent": 2.259161,
+          "impressions": 24124,
+          "path": "/age-gap-calculator",
+          "url_count": 3
+        },
+        {
+          "clicks": 514,
+          "ctr_percent": 2.377318,
+          "impressions": 21621,
+          "path": "/grade-age-table",
+          "url_count": 1
+        },
+        {
+          "clicks": 697,
+          "ctr_percent": 3.46387,
+          "impressions": 20122,
+          "path": "/school-entry-year-table",
+          "url_count": 5
+        },
+        {
+          "clicks": 55,
+          "ctr_percent": 0.471132,
+          "impressions": 11674,
+          "path": "/guides/lunar-birthday-age-guide",
+          "url_count": 1
+        },
+        {
+          "clicks": 87,
+          "ctr_percent": 0.777897,
+          "impressions": 11184,
+          "path": "/guides/birth-year-age-table-guide",
+          "url_count": 1
+        },
+        {
+          "clicks": 160,
+          "ctr_percent": 1.62453,
+          "impressions": 9849,
+          "path": "/korean-age-guide",
+          "url_count": 1
+        },
+        {
+          "clicks": 43,
+          "ctr_percent": 0.61915,
+          "impressions": 6945,
+          "path": "/guides/baby-months-calculation-guide",
+          "url_count": 1
+        },
+        {
+          "clicks": 46,
+          "ctr_percent": 0.788887,
+          "impressions": 5831,
+          "path": "/pet-months-table",
+          "url_count": 1
+        },
+        {
+          "clicks": 53,
+          "ctr_percent": 0.928521,
+          "impressions": 5708,
+          "path": "/annual-age-calculator",
+          "url_count": 1
+        },
+        {
+          "clicks": 50,
+          "ctr_percent": 1.883949,
+          "impressions": 2654,
+          "path": "/birthday-dday-calculator",
+          "url_count": 1
+        }
+      ],
+      "rows": [
+        {
+          "clicks": 2485,
+          "ctr_percent": 1.524493,
+          "impressions": 163005,
+          "rank": 1,
+          "url": "https://agecalc.cloud/birth-year-age-table?year=2010"
+        },
+        {
+          "clicks": 1535,
+          "ctr_percent": 3.983805,
+          "impressions": 38531,
+          "rank": 2,
+          "url": "https://agecalc.cloud/grade-birth-year-table"
+        },
+        {
+          "clicks": 1375,
+          "ctr_percent": 2.872843,
+          "impressions": 47862,
+          "rank": 3,
+          "url": "https://agecalc.cloud/college-entry-year-calculator?year="
+        },
+        {
+          "clicks": 1149,
+          "ctr_percent": 1.188617,
+          "impressions": 96667,
+          "rank": 4,
+          "url": "https://agecalc.cloud/birth-year-age-table"
+        },
+        {
+          "clicks": 1011,
+          "ctr_percent": 2.158366,
+          "impressions": 46841,
+          "rank": 5,
+          "url": "https://agecalc.cloud/school-grade-calculator"
+        },
+        {
+          "clicks": 881,
+          "ctr_percent": 0.446273,
+          "impressions": 197413,
+          "rank": 6,
+          "url": "https://agecalc.cloud/college-entry-year-calculator?year=2026"
+        },
+        {
+          "clicks": 620,
+          "ctr_percent": 1.471181,
+          "impressions": 42143,
+          "rank": 7,
+          "url": "https://agecalc.cloud/college-entry-year-calculator?year=2025"
+        },
+        {
+          "clicks": 565,
+          "ctr_percent": 0.48889,
+          "impressions": 115568,
+          "rank": 8,
+          "url": "https://agecalc.cloud/college-entry-year-calculator?year=2024"
+        },
+        {
+          "clicks": 514,
+          "ctr_percent": 2.377318,
+          "impressions": 21621,
+          "rank": 9,
+          "url": "https://agecalc.cloud/grade-age-table?stage=elementary&grade="
+        },
+        {
+          "clicks": 412,
+          "ctr_percent": 0.166321,
+          "impressions": 247714,
+          "rank": 10,
+          "url": "https://agecalc.cloud/birth-year-zodiac-table"
+        },
+        {
+          "clicks": 324,
+          "ctr_percent": 0.380228,
+          "impressions": 85212,
+          "rank": 11,
+          "url": "https://agecalc.cloud/baby-months"
+        },
+        {
+          "clicks": 282,
+          "ctr_percent": 0.559557,
+          "impressions": 50397,
+          "rank": 12,
+          "url": "https://agecalc.cloud/age-comparison-table"
+        },
+        {
+          "clicks": 251,
+          "ctr_percent": 5.62276,
+          "impressions": 4464,
+          "rank": 13,
+          "url": "https://agecalc.cloud/age-gap-calculator?year_a=2010&year_b=2015"
+        },
+        {
+          "clicks": 233,
+          "ctr_percent": 4.442326,
+          "impressions": 5245,
+          "rank": 14,
+          "url": "https://agecalc.cloud/school-entry-year-table?year=2017"
+        },
+        {
+          "clicks": 213,
+          "ctr_percent": 1.870061,
+          "impressions": 11390,
+          "rank": 15,
+          "url": "https://agecalc.cloud/age-gap-calculator?year_a=2000&year_b=2002"
+        },
+        {
+          "clicks": 160,
+          "ctr_percent": 1.62453,
+          "impressions": 9849,
+          "rank": 16,
+          "url": "https://agecalc.cloud/korean-age-guide"
+        },
+        {
+          "clicks": 147,
+          "ctr_percent": 2.774632,
+          "impressions": 5298,
+          "rank": 17,
+          "url": "https://agecalc.cloud/school-entry-year-table?year=2019"
+        },
+        {
+          "clicks": 133,
+          "ctr_percent": 2.551314,
+          "impressions": 5213,
+          "rank": 18,
+          "url": "https://agecalc.cloud/school-entry-year-table"
+        },
+        {
+          "clicks": 129,
+          "ctr_percent": 0.238924,
+          "impressions": 53992,
+          "rank": 19,
+          "url": "https://agecalc.cloud/100-day-calculator"
+        },
+        {
+          "clicks": 107,
+          "ctr_percent": 5.030559,
+          "impressions": 2127,
+          "rank": 20,
+          "url": "https://agecalc.cloud/school-entry-year-table?year=2020"
+        },
+        {
+          "clicks": 87,
+          "ctr_percent": 0.777897,
+          "impressions": 11184,
+          "rank": 21,
+          "url": "https://agecalc.cloud/guides/birth-year-age-table-guide"
+        },
+        {
+          "clicks": 81,
+          "ctr_percent": 0.979444,
+          "impressions": 8270,
+          "rank": 22,
+          "url": "https://agecalc.cloud/age-gap-calculator?year_a=1990&year_b=1995"
+        },
+        {
+          "clicks": 77,
+          "ctr_percent": 3.439035,
+          "impressions": 2239,
+          "rank": 23,
+          "url": "https://agecalc.cloud/school-entry-year-table?year=2018"
+        },
+        {
+          "clicks": 55,
+          "ctr_percent": 0.471132,
+          "impressions": 11674,
+          "rank": 24,
+          "url": "https://agecalc.cloud/guides/lunar-birthday-age-guide"
+        },
+        {
+          "clicks": 53,
+          "ctr_percent": 0.928521,
+          "impressions": 5708,
+          "rank": 25,
+          "url": "https://agecalc.cloud/annual-age-calculator?year=&month=&day="
+        },
+        {
+          "clicks": 50,
+          "ctr_percent": 1.883949,
+          "impressions": 2654,
+          "rank": 26,
+          "url": "https://agecalc.cloud/birthday-dday-calculator?month=&day="
+        },
+        {
+          "clicks": 48,
+          "ctr_percent": 0.08685,
+          "impressions": 55268,
+          "rank": 27,
+          "url": "https://agecalc.cloud/guides/sixtieth-seventieth-eightieth-age-guide"
+        },
+        {
+          "clicks": 46,
+          "ctr_percent": 0.788887,
+          "impressions": 5831,
+          "rank": 28,
+          "url": "https://agecalc.cloud/pet-months-table"
+        },
+        {
+          "clicks": 44,
+          "ctr_percent": 0.052816,
+          "impressions": 83308,
+          "rank": 29,
+          "url": "https://agecalc.cloud/d-day"
+        },
+        {
+          "clicks": 43,
+          "ctr_percent": 0.61915,
+          "impressions": 6945,
+          "rank": 30,
+          "url": "https://agecalc.cloud/guides/baby-months-calculation-guide"
+        }
+      ],
+      "total": {
+        "clicks": 13110,
+        "ctr_percent": 0.908126,
+        "impressions": 1443633,
+        "row_count": 30
+      }
+    }
+  },
+  "observation_schedule": {
+    "change_date_excluded": "2026-08-11",
+    "day_14": {
+      "after": "2026-08-12~2026-08-25",
+      "before": "2026-07-28~2026-08-10",
+      "collect_on_or_after": "2026-08-28"
+    },
+    "day_28": {
+      "after": "2026-08-12~2026-09-08",
+      "before": "2026-07-14~2026-08-10",
+      "collect_on_or_after": "2026-09-11"
+    },
+    "filters": {
+      "country_and_device": "비교 양쪽에 동일 적용",
+      "property": "agecalc.cloud",
+      "search_type": "웹"
+    }
+  },
+  "quality": {
+    "google_country_matches_property": true,
+    "google_device_matches_property": true,
+    "google_noncanonical_www_page_rows": 2,
+    "google_noncanonical_www_page_severity": "medium_for_url_normalization",
+    "google_page_difference_severity": "low_expected",
+    "google_query_coverage_severity": "medium_for_query_share_analysis",
+    "naver_top30_coverage_severity": "medium_partial",
+    "status": "fit_for_baseline_with_documented_partial_tables"
+  },
+  "schema_version": 1,
+  "source_files": {
+    "google": "_data/google_agecalc.cloud-Performance-on-Search-2026-08-12",
+    "naver_daily": "_data/naver_export_chart.csv",
+    "naver_queries": "_data/naver_top30_2026-08-12.csv",
+    "naver_web_documents": "_data/naver_web_documents_top30_2026-08-12.csv"
+  }
+}
