@@ -842,6 +842,55 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("09학번 몇살", html)
         self.assertIn("26학번 나이", html)
 
+        for cohort in (18, 19, 20, 21, 22, 23, 26, 27):
+            with self.subTest(cohort=cohort):
+                self.assertIn(f"{cohort}학번 나이·몇년생", html)
+
+    def test_indexable_college_cohorts_render_unique_search_metadata(self):
+        client = app.test_client()
+        cases = {
+            2024: ("24학번", "2005년생", "21세", "만 20~21세"),
+            2025: ("25학번", "2006년생", "20세", "만 19~20세"),
+            2026: ("26학번", "2007년생", "19세", "만 18~19세"),
+        }
+
+        for year, (cohort, birth_year, annual_age, man_age) in cases.items():
+            with self.subTest(year=year):
+                response = client.get(f"/college-entry-year-calculator?year={year}")
+                html = response.get_data(as_text=True)
+
+                self.assertEqual(200, response.status_code)
+                self.assertIn(f"<title>{cohort} 나이·몇년생 | 학번 계산기 | AgeCalc</title>", html)
+                self.assertIn(f"<h1>{cohort} 나이·몇년생 확인</h1>", html)
+                self.assertIn(
+                    f"{cohort}은 일반적인 진학 기준으로 {birth_year}이며, 2026년 기준 연나이 {annual_age}·{man_age}입니다.",
+                    html,
+                )
+                self.assertIn(
+                    f'<meta name="description" content="{cohort}은 일반적인 진학 기준으로 {birth_year}이며, 2026년 기준 연나이 {annual_age}·{man_age}입니다. 재수·편입·학교별 학번 차이도 안내합니다."',
+                    html,
+                )
+
+    def test_college_cohort_result_links_to_distinct_followup_intents(self):
+        client = app.test_client()
+        response = client.get("/college-entry-year-calculator?year=2026")
+        html = response.get_data(as_text=True)
+
+        self.assertEqual(200, response.status_code)
+        self.assertIn('href="/school-entry-year-table?year=2007"', html)
+        self.assertIn("2007년생 초·중·고 입학연도 확인", html)
+        self.assertIn('href="/birth-year-age-table?year=2007"', html)
+        self.assertIn("2007년생 현재 나이 확인", html)
+
+    def test_past_college_cohort_does_not_claim_enrollment_year(self):
+        client = app.test_client()
+        response = client.get("/college-entry-year-calculator?year=2022")
+        html = response.get_data(as_text=True)
+
+        self.assertEqual(200, response.status_code)
+        self.assertIn("2022년 입학 기준이며 2026년은 입학연도보다 4년 뒤입니다", html)
+        self.assertNotIn("입학 후 4년차", html)
+
     def test_annual_age_calculator_page_is_public(self):
         client = app.test_client()
         response = client.get("/annual-age-calculator")

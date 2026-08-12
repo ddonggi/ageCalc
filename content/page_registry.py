@@ -264,8 +264,8 @@ STATIC_PAGE_REGISTRY = (
         "education",
         "학번 계산기",
         "대학 학번 기준 출생연도와 현재 나이 확인",
-        related_endpoints=("school_entry_year_table", "birth_year_age_table", "annual_age_calculator"),
-        lastmod="2026-08-11",
+        related_endpoints=("school_entry_year_table", "birth_year_age_table", "grade_birth_year_table"),
+        lastmod="2026-08-13",
     ),
     _page(
         "birthday_dday_calculator",

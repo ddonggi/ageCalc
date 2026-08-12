@@ -146,8 +146,9 @@ _blog_draft_login_lock = threading.Lock()
 SITE_BASE_URL = (os.getenv("BLOG_BASE_URL", "https://agecalc.cloud") or "https://agecalc.cloud").rstrip("/")
 SITE_AUTHOR_NAME = os.getenv("SITE_AUTHOR_NAME", "AgeCalc 편집팀").strip() or "AgeCalc 편집팀"
 SITE_CONTACT_EMAIL = os.getenv("SITE_CONTACT_EMAIL", "ldg6153@gmail.com").strip() or "ldg6153@gmail.com"
+# Search-index allowlist: update only after reviewing exact URL performance data.
 INDEXABLE_COLLEGE_ENTRY_YEARS = (2026, 2025, 2024)
-COLLEGE_ENTRY_EXAMPLE_YEARS = (2026, 2025, 2024, 2022, 2020, 2019, 2018, 2009)
+COLLEGE_ENTRY_EXAMPLE_YEARS = (2027, 2026, 2023, 2022, 2021, 2020, 2019, 2018, 2009)
 ADSENSE_CLIENT_ID = os.getenv("ADSENSE_CLIENT_ID", "ca-pub-7818333740838556").strip()
 GOOGLE_SITE_VERIFICATION = os.getenv(
     "GOOGLE_SITE_VERIFICATION",
@@ -1263,7 +1264,7 @@ def _build_college_entry_snapshot(entry_year: int, current_year: int) -> dict[st
         status_note = f"{cohort_label}은 올해 입학하는 신입생 기준이며, 보통 {birth_year}년생이 해당합니다."
     else:
         elapsed = current_year - entry_year
-        status_note = f"{cohort_label}은 입학 후 {elapsed}년차 기준으로 보통 {birth_year}년생이 해당합니다."
+        status_note = f"{cohort_label}은 {entry_year}년 입학 기준이며 {current_year}년은 입학연도보다 {elapsed}년 뒤입니다. 보통 {birth_year}년생이 해당합니다."
 
     return {
         "entry_year": entry_year,
@@ -1273,7 +1274,7 @@ def _build_college_entry_snapshot(entry_year: int, current_year: int) -> dict[st
         "annual_age": f"{annual_age}세",
         "man_age_range": man_age_range,
         "detail": status_note,
-        "query_label": f"{cohort_label}은 보통 몇 년생",
+        "query_label": f"{cohort_label} 나이·몇년생",
         "high_graduation_date": f"{high_graduation_year}년 2월",
     }
 
@@ -2153,6 +2154,22 @@ def college_entry_year_calculator():
     ]
     examples = [_build_college_entry_snapshot(year, current_year) for year in example_years]
 
+    if selected_row is not None:
+        cohort_label = str(selected_row["cohort_label"])
+        seo_title = f"{cohort_label} 나이·몇년생 | 학번 계산기 | AgeCalc"
+        seo_description = (
+            f"{cohort_label}은 일반적인 진학 기준으로 {selected_row['birth_year_label']}이며, "
+            f"{current_year}년 기준 연나이 {selected_row['annual_age']}·{selected_row['man_age_range']}입니다. "
+            "재수·편입·학교별 학번 차이도 안내합니다."
+        )
+        og_title = seo_title
+        og_description = seo_description
+    else:
+        seo_title = "학번 계산기 | 몇 학번·학번 나이·몇년생 확인 | AgeCalc"
+        seo_description = "26학번 몇년생, 26학번 나이, 22학번 나이, 09학번 몇살처럼 학번 기준 출생연도와 현재 나이를 확인하는 대학 학번 계산기입니다."
+        og_title = "대학 학번 계산기 | AgeCalc"
+        og_description = "26학번 몇년생, 26학번 나이, 22학번 나이처럼 학번 기준 출생연도와 현재 나이를 한 화면에서 정리했습니다."
+
     return render_template(
         'college-entry-year-calculator.html',
         current_year=current_year,
@@ -2161,13 +2178,13 @@ def college_entry_year_calculator():
         college_rows=rows,
         year_options=range(max_entry_year, min_entry_year - 1, -1),
         examples=examples,
+        indexable_years=INDEXABLE_COLLEGE_ENTRY_YEARS,
         canonical_url=canonical_url,
         robots_content="index,follow" if selected_year is None or indexable_variant else "noindex,follow",
-        seo_title=(
-            f"{str(selected_year)[-2:]}학번 나이·몇년생? | {selected_year}학번 계산기 | AgeCalc"
-            if indexable_variant
-            else "학번 계산기 | 몇 학번·학번 나이·몇년생 확인 | AgeCalc"
-        ),
+        seo_title=seo_title,
+        seo_description=seo_description,
+        og_title=og_title,
+        og_description=og_description,
     )
 
 
