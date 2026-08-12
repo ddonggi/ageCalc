@@ -19,6 +19,10 @@
 
 상태 확인 API `/health`는 기존 `200 application/json` 응답을 유지하면서 GET·HEAD 응답에 `X-Robots-Tag: noindex, nofollow`를 추가했습니다. 사용자용 건강 도구 허브 `/health-tools/`와 사이트맵 정책은 변경하지 않았습니다.
 
+### 쿼리 URL 색인 범위 축소
+
+실제 URL별 성과가 확인된 `/birth-year-age-table?year=2010`과 학번 2024·2025·2026만 self-canonical/index로 유지했습니다. 학년별 결과 URL과 그 외 유효 결과 URL은 기본 canonical과 `noindex,follow`로 통합했습니다. 학번 예시 콘텐츠는 색인 allowlist와 분리해 유지하며, 자세한 근거는 `docs/operations/seo-query-index-policy.md`에 기록했습니다. 본문과 계산 기준은 바뀌지 않아 sitemap `lastmod`는 갱신하지 않았습니다.
+
 ## 2026-08-11
 
 | URL | 기존 title | 변경 title | H1·본문·FAQ | canonical / robots | lastmod |

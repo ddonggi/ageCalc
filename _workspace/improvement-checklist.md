@@ -63,15 +63,18 @@
 
 ### P0-2. 쿼리 URL 색인 정책 재검토
 
-- [ ] 현재 모든 학년 변형을 self-canonical·index하는 정책의 근거 확인
-- [ ] `/grade-age-table?stage=...&grade=...`의 네이버 실제 유입 학년을 식별
-- [ ] `/grade-birth-year-table?stage=...&grade=...`의 네이버 실제 유입 학년을 식별
-- [ ] `/college-entry-year-calculator?year=YYYY` allowlist를 실제 네이버·구글 수요로 재작성
-- [ ] `/birth-year-age-table?year=2010` 단독 색인 근거 재검증
-- [ ] 색인 후보마다 고유 title·description·H1·즉답·FAQ·내부링크가 충분한지 검사
-- [ ] 근거가 약한 변형은 기본 canonical + `noindex,follow` 후보로 분류
+- [x] 현재 모든 학년 변형을 self-canonical·index하는 정책의 근거 확인
+- [x] `/grade-age-table?stage=...&grade=...`의 네이버 실제 유입 학년을 식별
+- [x] `/grade-birth-year-table?stage=...&grade=...`의 네이버 실제 유입 학년을 식별
+- [x] `/college-entry-year-calculator?year=YYYY` allowlist를 실제 네이버·구글 수요로 재작성
+- [x] `/birth-year-age-table?year=2010` 단독 색인 근거 재검증
+- [x] 색인 후보마다 고유 title·description·H1·즉답·FAQ·내부링크가 충분한지 검사
+- [x] 근거가 약한 변형은 기본 canonical + `noindex,follow` 후보로 분류
 - 대상: `app.py`의 `INDEXABLE_COLLEGE_ENTRY_YEARS`, `birth_year_age_table()`, `grade_age_table()`, `grade_birth_year_table()`, `college_entry_year_calculator()`
 - 완료 조건: 색인 허용 쿼리마다 수요 근거와 고유 콘텐츠가 문서·테스트로 남음
+- 완료 기록: 2026-08-13, `docs/operations/seo-query-index-policy.md`에 URL별 수요 근거와 정책 기록
+- 적용 결과: `year=2010`, 학번 2024~2026만 self-canonical/index 유지; 학년 변형과 그 외 결과는 기본 canonical + `noindex,follow`
+- 상태: 로컬 구현·검증 완료, 운영 배포 미수행
 
 ### P0-3. 결과형 쿼리 처리 일관성
 

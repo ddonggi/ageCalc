@@ -209,6 +209,8 @@ class PublicPageTests(unittest.TestCase):
             "/school-entry-year-table?year=2015": "/school-entry-year-table",
             "/birth-year-age-table?year=2015": "/birth-year-age-table",
             "/college-entry-year-calculator?year=2021": "/college-entry-year-calculator",
+            "/college-entry-year-calculator?year=2022": "/college-entry-year-calculator",
+            "/college-entry-year-calculator?year=2020": "/college-entry-year-calculator",
         }
 
         for url, canonical_path in cases.items():
@@ -226,8 +228,8 @@ class PublicPageTests(unittest.TestCase):
         client = app.test_client()
         cases = {
             "/birth-year-age-table?year=2010": ("2010년생", "몇살"),
-            "/grade-age-table?stage=middle&grade=1": ("중1", "몇 살"),
-            "/grade-birth-year-table?stage=high&grade=1": ("고1", "몇 년생"),
+            "/college-entry-year-calculator?year=2024": ("24학번", "2024학번"),
+            "/college-entry-year-calculator?year=2025": ("25학번", "2025학번"),
             "/college-entry-year-calculator?year=2026": ("26학번", "2026학번"),
         }
 
@@ -244,7 +246,26 @@ class PublicPageTests(unittest.TestCase):
                 for phrase in phrases:
                     self.assertIn(phrase, html)
 
-    def test_indexable_query_variants_have_crawlable_internal_links(self):
+    def test_grade_result_queries_are_noindex_with_clean_canonicals(self):
+        client = app.test_client()
+        cases = {
+            "/grade-age-table?stage=middle&grade=1": "/grade-age-table",
+            "/grade-birth-year-table?stage=high&grade=1": "/grade-birth-year-table",
+        }
+
+        for url, canonical_path in cases.items():
+            with self.subTest(url=url):
+                response = client.get(url)
+                html = response.get_data(as_text=True)
+
+                self.assertEqual(200, response.status_code)
+                self.assertIn('<meta name="robots" content="noindex,follow" />', html)
+                self.assertIn(
+                    f'<link rel="canonical" href="https://agecalc.cloud{canonical_path}" />',
+                    html,
+                )
+
+    def test_query_results_have_crawlable_navigation_paths(self):
         client = app.test_client()
         grade_variants = [
             *(f"stage=elementary&amp;grade={grade}" for grade in range(1, 7)),

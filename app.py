@@ -146,7 +146,8 @@ _blog_draft_login_lock = threading.Lock()
 SITE_BASE_URL = (os.getenv("BLOG_BASE_URL", "https://agecalc.cloud") or "https://agecalc.cloud").rstrip("/")
 SITE_AUTHOR_NAME = os.getenv("SITE_AUTHOR_NAME", "AgeCalc 편집팀").strip() or "AgeCalc 편집팀"
 SITE_CONTACT_EMAIL = os.getenv("SITE_CONTACT_EMAIL", "ldg6153@gmail.com").strip() or "ldg6153@gmail.com"
-INDEXABLE_COLLEGE_ENTRY_YEARS = (2026, 2025, 2024, 2022, 2020)
+INDEXABLE_COLLEGE_ENTRY_YEARS = (2026, 2025, 2024)
+COLLEGE_ENTRY_EXAMPLE_YEARS = (2026, 2025, 2024, 2022, 2020, 2019, 2018, 2009)
 ADSENSE_CLIENT_ID = os.getenv("ADSENSE_CLIENT_ID", "ca-pub-7818333740838556").strip()
 GOOGLE_SITE_VERIFICATION = os.getenv(
     "GOOGLE_SITE_VERIFICATION",
@@ -1855,11 +1856,9 @@ def grade_age_table():
         grade_rows=rows,
         examples=examples,
         canonical_url=(
-            f"{SITE_BASE_URL}/grade-age-table?stage={stage}&grade={grade}"
-            if grade is not None
-            else f"{SITE_BASE_URL}/grade-age-table"
+            f"{SITE_BASE_URL}/grade-age-table"
         ),
-        robots_content="index,follow",
+        robots_content="index,follow" if grade is None else "noindex,follow",
         seo_title=(
             f"{_short_grade_label(stage, grade)} 나이 | 몇 살·몇 년생? | AgeCalc"
             if grade is not None
@@ -2013,11 +2012,9 @@ def grade_birth_year_table():
         grade_rows=rows,
         examples=examples,
         canonical_url=(
-            f"{SITE_BASE_URL}/grade-birth-year-table?stage={stage}&grade={grade}"
-            if grade is not None
-            else f"{SITE_BASE_URL}/grade-birth-year-table"
+            f"{SITE_BASE_URL}/grade-birth-year-table"
         ),
-        robots_content="index,follow",
+        robots_content="index,follow" if grade is None else "noindex,follow",
         seo_title=(
             f"{_short_grade_label(stage, grade)} 몇 년생? 출생연도표 | AgeCalc"
             if grade is not None
@@ -2087,7 +2084,7 @@ def college_entry_year_calculator():
 
     example_years = [
         year
-        for year in (*INDEXABLE_COLLEGE_ENTRY_YEARS, 2019, 2018, 2009)
+        for year in COLLEGE_ENTRY_EXAMPLE_YEARS
         if min_entry_year <= year <= max_entry_year
     ]
     examples = [_build_college_entry_snapshot(year, current_year) for year in example_years]
