@@ -1240,7 +1240,9 @@ def _build_birth_year_zodiac_snapshot(year: int, current_year: int) -> dict[str,
     snapshot = _build_birth_year_snapshot(year, current_year)
     zodiac_label = f"{snapshot['zodiac']}띠"
     snapshot["zodiac_label"] = zodiac_label
-    snapshot["detail"] = f"{snapshot['label']}은 {zodiac_label}이며, {snapshot['detail']}"
+    snapshot["previous_same_zodiac_year"] = year - 12
+    snapshot["next_same_zodiac_year"] = year + 12
+    snapshot["detail"] = f"{snapshot['label']}은 {zodiac_label}이며, 같은 띠는 12년 간격으로 반복됩니다."
     return snapshot
 
 

@@ -996,10 +996,15 @@ class PublicPageTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
-        self.assertIn("출생연도별 띠표", html)
+        self.assertIn("<title>연도별 띠표 | 출생연도로 무슨 띠인지 확인 | AgeCalc</title>", html)
+        self.assertIn('<h1>연도별 띠표</h1>', html)
+        self.assertIn("같은 띠의 12년 주기", html)
         self.assertIn("12간지", html)
         self.assertIn("띠", html)
         self.assertIn("말띠", html)
+        self.assertIn("1월·2월생은 어느 띠인가요?", html)
+        self.assertNotIn('<th scope="col">연나이</th>', html)
+        self.assertNotIn('<th scope="col">만나이 범위</th>', html)
 
     def test_birth_year_zodiac_table_highlights_selected_year(self):
         client = app.test_client()
@@ -1010,6 +1015,9 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("선택한 출생연도", html)
         self.assertIn("1990년생", html)
         self.assertIn("말띠", html)
+        self.assertIn("1978년", html)
+        self.assertIn("2002년", html)
+        self.assertIn("출생연도만으로는 경계일의 띠를 확정할 수 없습니다", html)
 
     def test_college_entry_year_calculator_page_is_public(self):
         client = app.test_client()

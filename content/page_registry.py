@@ -253,9 +253,10 @@ STATIC_PAGE_REGISTRY = (
         "birth_year_zodiac_table",
         "/birth-year-zodiac-table",
         "age",
-        "출생연도별 띠표",
-        "출생연도별 띠와 현재 나이 확인",
-        related_endpoints=("birth_year_age_table", "age", "age_comparison_table"),
+        "연도별 띠표",
+        "출생연도로 띠와 같은 띠 연도 확인",
+        related_endpoints=("birth_year_age_table", "age", "annual_age_calculator"),
+        lastmod="2026-08-13",
     ),
     _page(
         "college_entry_year_calculator",
