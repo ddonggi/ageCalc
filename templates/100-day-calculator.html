@@ -11,8 +11,8 @@
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="AgeCalc" />
-    <meta property="og:title" content="100일 계산기 | AgeCalc" />
-    <meta property="og:description" content="커플 100일, 아기 백일, 프로젝트 시작일 기준 100일째 날짜를 한눈에 계산합니다." />
+    <meta property="og:title" content="100일 계산기 | 시작일 포함 100일째·기념일 날짜 계산" />
+    <meta property="og:description" content="시작일을 1일째로 포함해 100일째 날짜를 계산합니다. 아기 백일, 커플 100일, 월말·윤년 기념일 계산 기준도 확인하세요." />
     <meta property="og:url" content="https://agecalc.cloud/100-day-calculator" />
     <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
@@ -67,19 +67,19 @@
                 </article>
             </div>
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
-
         <section class="section-shell direct-answer" aria-label="100일 계산 바로 답변">
             <div class="section-heading">
                 <p class="eyebrow">바로 답변</p>
-                <h2>100일째는 시작일을 1일째로 포함해 시작일에 99일을 더한 날짜입니다</h2>
+                <h2>오늘({{ today_snapshot.start_date }})을 1일째로 세면 100일째는 {{ today_snapshot.hundredth_date }}입니다</h2>
             </div>
             <p>
-                출생일, 연애 시작일, 프로젝트 시작일처럼 첫날을 1일째로 세는 상황에 맞춘 계산입니다.
-                첫날을 제외하고 100일 뒤를 찾는 일정 계산과는 결과가 하루 다릅니다.
+                <strong>100일째는 시작일 +99일, 100일 후는 시작일 +100일입니다.</strong>
+                출생일, 연애 시작일처럼 첫날을 1일째로 세는 백일과 커플 100일에는 100일째 기준을 사용합니다.
             </p>
+            <p class="small">100일째는 시작일을 1일째로 포함해 시작일에 99일을 더한 날짜입니다.</p>
         </section>
+        {% include 'partials/info_coupang_promotions.html' %}
+        {% include 'partials/home_coupang_rails.html' %}
 
         <section class="section-shell">
             <div class="section-heading">
@@ -160,6 +160,7 @@
         <section class="section-shell faq" aria-labelledby="hundred-day-faq">
             <h2 id="hundred-day-faq">100일 계산 자주 묻는 질문</h2>
             <div><strong>시작일을 100일 계산에 포함하나요?</strong><p>네. 이 계산기는 시작일을 1일째로 보므로 시작일에 99일을 더한 날짜가 100일째입니다.</p></div>
+            <div><strong>100일째와 100일 후는 같은 날짜인가요?</strong><p>아니요. 시작일을 1일째로 세는 100일째는 시작일에 99일을 더하고, 첫날을 제외한 100일 후는 100일을 더하므로 하루 차이가 납니다.</p></div>
             <div><strong>아기 백일과 커플 100일에 모두 쓸 수 있나요?</strong><p>네. 같은 시작일 포함 방식을 쓰며 월말과 윤년도 실제 달력 날짜 수로 계산합니다.</p></div>
         </section>
 

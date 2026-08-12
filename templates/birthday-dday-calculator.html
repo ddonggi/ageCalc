@@ -65,17 +65,21 @@
                 </article>
             </div>
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
-
         <section class="section-shell direct-answer" aria-label="생일 D-day 바로 답변">
             <p class="eyebrow">바로 답변</p>
+            {% if selected_snapshot %}
+            <h2>{{ selected_snapshot.birthday_label }}의 다음 생일은 {{ selected_snapshot.next_birthday_date }}입니다</h2>
+            <p><strong>{{ selected_snapshot.status_note }}</strong> 오늘이면 D-Day, 아직 남았다면 가장 가까운 생일까지의 날짜 차이를 표시합니다.</p>
+            {% else %}
             <h2>올해 생일이 지났다면 내년 생일까지 계산합니다</h2>
             <p>
                 <strong>다음 생일까지 남은 날짜는 올해 생일과 내년 생일을 차례로 비교해 계산합니다.</strong>
                 오늘이 생일이면 D-Day, 아직 남았다면 올해 생일까지, 이미 지났다면 내년 생일까지의 날짜 차이를 표시합니다.
             </p>
+            {% endif %}
         </section>
+        {% include 'partials/info_coupang_promotions.html' %}
+        {% include 'partials/home_coupang_rails.html' %}
 
         <section class="section-shell">
             <div class="section-heading">
@@ -139,6 +143,13 @@
             </article>
         </section>
         {% endif %}
+
+        <section class="section-shell faq" aria-labelledby="birthday-dday-faq">
+            <h2 id="birthday-dday-faq">생일 D-day 자주 묻는 질문</h2>
+            <div><strong>올해 생일이 이미 지났으면 어떻게 계산하나요?</strong><p>다음 해의 같은 월·일을 목표 날짜로 정해 남은 일수를 계산합니다.</p></div>
+            <div><strong>2월 29일 생일은 어떻게 계산하나요?</strong><p>다음 실제 2월 29일까지 계산하며, 평년의 2월 28일이나 3월 1일로 자동 변경하지 않습니다.</p></div>
+            <div><strong>기념일 계산기나 만나이 계산기와 무엇이 다른가요?</strong><p>생일 D-day는 월·일로 다음 생일을 찾습니다. 한 번 정한 목표 날짜는 기념일 계산기, 현재 만나이는 만나이 계산기를 사용하세요.</p></div>
+        </section>
 
         <section class="section-shell">
             <div class="section-heading">

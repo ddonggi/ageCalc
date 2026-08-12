@@ -163,7 +163,7 @@ class DDayCalculator {
             <div class="result success">
                 <p class="message">${eventName}</p>
                 <div class="count-pill ${primary.tone}">${primary.label}</div>
-                <p class="result-kicker">${mode === "since" ? "Elapsed Date" : "Countdown"}</p>
+                <p class="result-kicker">${mode === "since" ? "경과 일수" : "남은 일수"}</p>
                 <p>${this.formatDate(validation.date)} 기준으로 ${primary.caption}</p>
                 <div class="summary-grid">
                     <div class="summary-card">

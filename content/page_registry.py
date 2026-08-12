@@ -179,7 +179,7 @@ STATIC_PAGE_REGISTRY = (
         "시작일 기준 백일째 날짜 계산",
         priority="core",
         related_endpoints=("d_day", "baby_months", "birthday_dday_calculator"),
-        lastmod="2026-08-11",
+        lastmod="2026-08-13",
     ),
     _page(
         "baby_months_table",
@@ -275,6 +275,7 @@ STATIC_PAGE_REGISTRY = (
         "다음 생일까지 남은 날짜 계산",
         priority="core",
         related_endpoints=("age", "d_day", "hundred_day_calculator"),
+        lastmod="2026-08-13",
     ),
     _page(
         "privacy",
@@ -347,6 +348,7 @@ STATIC_PAGE_REGISTRY = (
         "특정 날짜까지 남은 일수와 지난 일수 계산",
         priority="core",
         related_endpoints=("hundred_day_calculator", "birthday_dday_calculator", "baby_months"),
+        lastmod="2026-08-13",
     ),
     _page(
         "parent_child",

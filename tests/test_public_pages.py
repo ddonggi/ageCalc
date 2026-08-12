@@ -973,6 +973,46 @@ class PublicPageTests(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], "/100-day-calculator")
 
+    def test_hundred_day_calculator_leads_with_today_answer_and_distinguishes_after(self):
+        with mock.patch.object(app_module, "_current_local_date", return_value=date(2026, 8, 13)):
+            html = app.test_client().get("/100-day-calculator").get_data(as_text=True)
+
+        self.assertIn("오늘(2026.08.13)을 1일째로 세면 100일째는 2026.11.20입니다", html)
+        self.assertIn("100일째는 시작일 +99일", html)
+        self.assertIn("100일 후는 시작일 +100일", html)
+        direct_answer = html.index('aria-label="100일 계산 바로 답변"')
+        for affiliate_marker in ("info-coupang-promotions", "home-coupang-rail-left"):
+            if affiliate_marker in html:
+                self.assertLess(direct_answer, html.index(affiliate_marker))
+
+    def test_anniversary_calculator_uses_distinct_metadata_and_rejects_queries(self):
+        client = app.test_client()
+        response = client.get("/d-day")
+        html = response.get_data(as_text=True)
+
+        self.assertEqual(200, response.status_code)
+        self.assertIn(
+            "<title>기념일 계산기 | D-day·남은 일수 계산 | AgeCalc</title>",
+            html,
+        )
+        self.assertIn(
+            "목표 날짜를 입력해 오늘 기준 D-day와 지난 날짜의 경과 일수를 계산합니다.",
+            html,
+        )
+        self.assertIn("<h1>기념일 계산기</h1>", html)
+        javascript = Path("static/js/d-day.js").read_text(encoding="utf-8")
+        self.assertNotIn("Elapsed Date", javascript)
+        self.assertNotIn("Countdown", javascript)
+        self.assertIn('"경과 일수"', javascript)
+        self.assertIn('"남은 일수"', javascript)
+        self.assertEqual(302, client.get("/d-day?year=2026").status_code)
+        self.assertEqual("/d-day", client.get("/d-day?year=2026").headers["Location"])
+
+        direct_answer = html.index('aria-label="기념일 D-day 바로 답변"')
+        for affiliate_marker in ("info-coupang-promotions", "home-coupang-rail-left"):
+            if affiliate_marker in html:
+                self.assertLess(direct_answer, html.index(affiliate_marker))
+
     def test_baby_months_table_page_is_public(self):
         client = app.test_client()
         response = client.get("/baby-months-table")
@@ -1367,6 +1407,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("생일까지 며칠 남았는지", html)
         self.assertIn("다음 생일", html)
         self.assertIn("생일 선택", html)
+        self.assertIn("생일 D-day 자주 묻는 질문", html)
 
     def test_birthday_dday_calculator_highlights_selected_birthday(self):
         client = app.test_client()
@@ -1385,6 +1426,19 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("5월 10일", html)
         self.assertIn(expected_date, html)
         self.assertIn("다음 생일", html)
+
+    def test_birthday_dday_selected_result_leads_with_direct_answer(self):
+        with mock.patch.object(app_module, "_current_local_date", return_value=date(2026, 8, 13)):
+            html = app.test_client().get(
+                "/birthday-dday-calculator?month=12&day=25"
+            ).get_data(as_text=True)
+
+        self.assertIn("12월 25일의 다음 생일은 2026.12.25입니다", html)
+        self.assertIn("다음 생일까지 134일 남았습니다", html)
+        direct_answer = html.index('aria-label="생일 D-day 바로 답변"')
+        for affiliate_marker in ("info-coupang-promotions", "home-coupang-rail-left"):
+            if affiliate_marker in html:
+                self.assertLess(direct_answer, html.index(affiliate_marker))
 
     def test_age_page_renders_feedback_widget(self):
         client = app.test_client()

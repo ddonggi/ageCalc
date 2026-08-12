@@ -1771,6 +1771,7 @@ def hundred_day_calculator():
 
     today = _current_local_date()
     current_year = today.year
+    today_snapshot = _build_hundred_day_snapshot(today, today)
 
     example_inputs = [
         ("커플 100일 예시", today - timedelta(days=30)),
@@ -1787,6 +1788,7 @@ def hundred_day_calculator():
         '100-day-calculator.html',
         today=today,
         current_year=current_year,
+        today_snapshot=today_snapshot,
         examples=examples,
     )
 
@@ -2316,6 +2318,8 @@ def baby_months():
 @app.route('/d-day')
 def d_day():
     """기념일/D-Day 계산 페이지"""
+    if request.args:
+        return redirect(url_for("d_day"))
     return render_template('d-day.html')
 
 @app.route('/parent-child')
