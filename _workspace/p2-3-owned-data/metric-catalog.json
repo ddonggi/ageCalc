@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "as_of": "2026-08-16",
+  "collection_state": "policy_only_no_new_collection",
+  "approved_sources": [
+    "ga4",
+    "page_feedback_db"
+  ],
+  "excluded_sources": {
+    "server_logs": "보안·장애 대응 목적으로 생성되며 IP와 user-agent가 포함될 수 있어 공개 통계 원천에서 제외한다.",
+    "clarity": "정성적 UX 진단 도구이며 대표성 있는 공개 통계 원천으로 사용하지 않는다.",
+    "blog_rss_db": "콘텐츠 발행 상태 데이터이며 계산 도구 이용 통계를 설명하는 원천이 아니다."
+  },
+  "retention_months": {
+    "monthly_aggregates": 14,
+    "page_feedback_raw": 12
+  },
+  "publication_gate": {
+    "minimum_denominator": 100,
+    "minimum_coverage_days": 28,
+    "minimum_cell_count": 20
+  },
+  "forbidden_fields": [
+    "birth_date",
+    "birth_year",
+    "age_result",
+    "school_grade",
+    "college_entry_year",
+    "anniversary_date",
+    "anniversary_label",
+    "family_relationship",
+    "pet_age",
+    "query_string",
+    "ip_address",
+    "user_agent",
+    "user_id",
+    "session_id",
+    "event_timestamp"
+  ],
+  "events": [
+    {
+      "name": "ga4_page_view",
+      "source": "ga4",
+      "status": "existing_consent_only",
+      "consent_required": true,
+      "allowed_dimensions": ["month", "canonical_path"],
+      "aggregate_fields": ["event_count"]
+    },
+    {
+      "name": "page_feedback_vote",
+      "source": "page_feedback_db",
+      "status": "existing_no_current_sample",
+      "consent_required": false,
+      "allowed_dimensions": ["month", "canonical_path", "vote"],
+      "aggregate_fields": ["event_count"]
+    },
+    {
+      "name": "tool_calculation_started",
+      "source": "ga4",
+      "status": "planned",
+      "consent_required": true,
+      "allowed_dimensions": ["month", "tool_key"],
+      "aggregate_fields": ["event_count"]
+    },
+    {
+      "name": "tool_calculation_completed",
+      "source": "ga4",
+      "status": "planned",
+      "consent_required": true,
+      "allowed_dimensions": ["month", "tool_key"],
+      "aggregate_fields": ["event_count"]
+    },
+    {
+      "name": "tool_validation_error",
+      "source": "ga4",
+      "status": "planned",
+      "consent_required": true,
+      "allowed_dimensions": ["month", "tool_key", "error_code"],
+      "aggregate_fields": ["event_count"]
+    },
+    {
+      "name": "related_tool_click",
+      "source": "ga4",
+      "status": "planned",
+      "consent_required": true,
+      "allowed_dimensions": ["month", "source_tool_key", "target_tool_key"],
+      "aggregate_fields": ["event_count"]
+    }
+  ],
+  "public_metrics": [
+    {
+      "name": "monthly_tool_popularity",
+      "numerator_event": "ga4_page_view",
+      "denominator_event": "ga4_page_view",
+      "formula": "특정 도구의 동의 사용자 page_view / 공개 대상 전체 도구의 동의 사용자 page_view × 100",
+      "unit": "percent",
+      "publication_gate": "catalog_default",
+      "bias_disclosure": "분석 쿠키에 동의한 방문만 포함하므로 전체 방문자를 대표하지 않는다."
+    },
+    {
+      "name": "calculation_completion_rate",
+      "numerator_event": "tool_calculation_completed",
+      "denominator_event": "tool_calculation_started",
+      "formula": "계산 완료 이벤트 / 계산 시작 이벤트 × 100",
+      "unit": "percent",
+      "publication_gate": "catalog_default",
+      "bias_disclosure": "분석 쿠키 동의 사용자만 포함하며 반복 계산과 이벤트 차단의 영향을 받는다."
+    },
+    {
+      "name": "validation_error_rate",
+      "numerator_event": "tool_validation_error",
+      "denominator_event": "tool_calculation_started",
+      "formula": "입력 검증 오류 이벤트 / 계산 시작 이벤트 × 100",
+      "unit": "percent",
+      "publication_gate": "catalog_default",
+      "bias_disclosure": "오류 코드는 입력값을 포함하지 않으며 동의 사용자와 계측 가능한 오류만 반영한다."
+    },
+    {
+      "name": "helpful_share",
+      "numerator_event": "page_feedback_vote",
+      "denominator_event": "page_feedback_vote",
+      "formula": "도움됨 응답 수 / 전체 피드백 응답 수 × 100",
+      "unit": "percent",
+      "publication_gate": "catalog_default",
+      "bias_disclosure": "자발적으로 피드백을 제출한 사용자만 포함하는 자기선택 표본이다."
+    },
+    {
+      "name": "related_tool_navigation_rate",
+      "numerator_event": "related_tool_click",
+      "denominator_event": "ga4_page_view",
+      "formula": "관련 도구 클릭 이벤트 / 해당 출발 도구의 page_view × 100",
+      "unit": "percent",
+      "publication_gate": "catalog_default",
+      "bias_disclosure": "분석 쿠키 동의 사용자만 포함하며 브라우저 차단과 반복 클릭의 영향을 받는다."
+    }
+  ]
+}
