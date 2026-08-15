@@ -381,6 +381,24 @@ class PublicPageTests(unittest.TestCase):
                 self.assertEqual(302, response.status_code)
                 self.assertEqual(expected_path, response.headers["Location"])
 
+    def test_client_side_pet_calculators_redirect_all_query_variants(self):
+        client = app.test_client()
+        cases = {
+            "/dog?years=2": "/dog",
+            "/dog?utm_source=test": "/dog",
+            "/dog?years=&years=2": "/dog",
+            "/cat?months=6": "/cat",
+            "/cat?utm_source=test": "/cat",
+            "/cat?months=&extra=1": "/cat",
+        }
+
+        for url, expected_path in cases.items():
+            with self.subTest(url=url):
+                response = client.get(url, follow_redirects=False)
+
+                self.assertEqual(302, response.status_code)
+                self.assertEqual(expected_path, response.headers["Location"])
+
     def test_valid_result_queries_use_clean_canonical_and_noindex_header(self):
         client = app.test_client()
         cases = {
@@ -1971,6 +1989,62 @@ class PublicPageTests(unittest.TestCase):
                 self.assertIn("수의학적 진단을 대신하지 않습니다", html)
                 for phrase in phrases:
                     self.assertIn(phrase, html)
+
+    def test_high_ctr_hub_pages_preserve_metadata_and_contextual_links(self):
+        client = app.test_client()
+        cases = {
+            "/dog": {
+                "title": "강아지 나이 계산기 | AgeCalc",
+                "description": "강아지의 실제 나이를 사람 나이로 환산하고 체형별 차이를 비교하는 계산기입니다.",
+                "h1": "강아지 나이 계산기",
+                "links": (
+                    '<a href="/pet-age-table">체형별 강아지 나이표 비교</a>',
+                    '<a href="/pet-months-table">1살 미만 강아지 월령표 보기</a>',
+                    '<a href="/cat">고양이 나이 계산기</a>',
+                ),
+            },
+            "/cat": {
+                "title": "고양이 나이 계산기 | AgeCalc",
+                "description": "고양이의 실제 나이를 사람 나이로 환산하고 생애 단계를 살펴보는 계산기입니다.",
+                "h1": "고양이 나이 계산기",
+                "links": (
+                    '<a href="/pet-age-table">고양이 연령별 나이표 보기</a>',
+                    '<a href="/pet-months-table">어린 고양이 월령표 보기</a>',
+                    '<a href="/dog">강아지 나이 계산기</a>',
+                ),
+            },
+            "/parent-child": {
+                "title": "부모·자녀 나이 관계 계산기 | AgeCalc",
+                "description": "부모와 자녀의 생년월일을 입력하면 출산 당시 나이, 현재 나이 차이, 환갑·칠순 시점의 자녀 나이를 함께 계산합니다.",
+                "h1": "부모·자녀 나이 관계 계산기",
+                "links": (
+                    '<a href="/age-gap-calculator">두 출생연도의 나이 차이 비교</a>',
+                    '<a href="/school-grade-calculator">자녀의 현재 학년 확인</a>',
+                    '<a href="/school-entry-year-table">자녀의 초·중·고 입학년도 확인</a>',
+                    '<a href="/guides/sixtieth-seventieth-eightieth-age-guide">환갑·칠순·팔순 기준 읽기</a>',
+                ),
+            },
+        }
+
+        for path, expected in cases.items():
+            with self.subTest(path=path):
+                response = client.get(path)
+                html = response.get_data(as_text=True)
+
+                self.assertEqual(200, response.status_code)
+                self.assertIsNone(response.headers.get("X-Robots-Tag"))
+                self.assertEqual(1, html.count(f"<title>{expected['title']}</title>"))
+                self.assertEqual(1, html.count(f"<h1>{expected['h1']}</h1>"))
+                self.assertIn(
+                    f'<meta name="description" content="{expected["description"]}" />',
+                    html,
+                )
+                self.assertIn(
+                    f'<link rel="canonical" href="https://agecalc.cloud{path}" />',
+                    html,
+                )
+                for link in expected["links"]:
+                    self.assertIn(link, html)
 
     def test_pet_calculator_result_separates_conversion_from_diagnosis(self):
         script = Path("static/js/pet-age.js").read_text(encoding="utf-8")

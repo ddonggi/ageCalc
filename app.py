@@ -2303,11 +2303,15 @@ def faq():
 @app.route('/dog')
 def dog():
     """강아지 나이 계산 페이지"""
+    if request.args:
+        return redirect(url_for('dog'))
     return render_template('dog.html')
 
 @app.route('/cat')
 def cat():
     """고양이 나이 계산 페이지"""
+    if request.args:
+        return redirect(url_for('cat'))
     return render_template('cat.html')
 
 @app.route('/baby-months')
