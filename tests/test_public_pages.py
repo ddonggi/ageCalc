@@ -1051,6 +1051,35 @@ class PublicPageTests(unittest.TestCase):
         self.assertNotIn('id="baby-month"', html)
         self.assertNotIn('id="baby-day"', html)
 
+    def test_baby_months_page_connects_month_day_and_school_intents(self):
+        client = app.test_client()
+        response = client.get("/baby-months")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.get_data(as_text=True)
+        self.assertIn("생후 100일과 3개월은 같은 날인가요?", html)
+        self.assertIn("아이 개월 수로 현재 학년을 알 수 있나요?", html)
+        self.assertIn('href="/baby-months-table"', html)
+        self.assertIn('href="/100-day-calculator"', html)
+        self.assertIn('href="/school-grade-calculator"', html)
+        self.assertIn("개월수를 연·개월 표현으로 확인", html)
+        self.assertIn("출생일 포함 100일째 날짜 계산", html)
+        self.assertIn("생년월일로 현재 학년 확인", html)
+
+    def test_baby_months_query_urls_redirect_to_clean_canonical(self):
+        client = app.test_client()
+
+        for url in (
+            "/baby-months?birth=20250101",
+            "/baby-months?utm_source=test",
+            "/baby-months?birth=20250101&birth=20250202",
+        ):
+            with self.subTest(url=url):
+                response = client.get(url, follow_redirects=False)
+
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual("/baby-months", response.headers["Location"])
+
     def test_college_entry_year_calculator_targets_top_queries(self):
         client = app.test_client()
         response = client.get("/college-entry-year-calculator")

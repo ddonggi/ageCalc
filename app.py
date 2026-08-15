@@ -2313,6 +2313,8 @@ def cat():
 @app.route('/baby-months')
 def baby_months():
     """아기 개월 수 계산 페이지"""
+    if request.args:
+        return redirect(url_for('baby_months'))
     return render_template('baby-months.html')
 
 @app.route('/d-day')

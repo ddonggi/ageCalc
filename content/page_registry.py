@@ -338,7 +338,8 @@ STATIC_PAGE_REGISTRY = (
         "아이 개월 수 계산기",
         "출생일 기준 현재 아이 월령 계산",
         priority="core",
-        related_endpoints=("baby_months_table", "hundred_day_calculator", "birthday_dday_calculator"),
+        related_endpoints=("baby_months_table", "hundred_day_calculator", "school_grade_calculator"),
+        lastmod="2026-08-15",
     ),
     _page(
         "d_day",

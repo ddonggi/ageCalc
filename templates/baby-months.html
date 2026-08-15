@@ -118,6 +118,8 @@
                 <ul>
                     <li><strong>아이 개월수는 어떻게 계산하나요?</strong> 출생일에서 기준일까지 완료된 달 수를 계산합니다. 아직 같은 일자에 도달하지 않았다면 마지막 한 달은 완료되지 않은 것으로 봅니다.</li>
                     <li><strong>개월수와 월령은 같은 뜻인가요?</strong> 일상적으로는 거의 같은 뜻으로 쓰며, 이 페이지에서도 아이 개월수와 아기 월령을 같은 날짜 계산 결과로 안내합니다.</li>
+                    <li><strong>생후 100일과 3개월은 같은 날인가요?</strong> 항상 같은 날은 아닙니다. 100일째는 출생일을 1일째로 포함해 계산하지만 3개월은 출생일에서 완료된 달 수로 계산합니다. 정확한 날짜는 100일 계산기에서 확인하세요.</li>
+                    <li><strong>아이 개월 수로 현재 학년을 알 수 있나요?</strong> 개월 수만으로는 현재 학년을 정할 수 없습니다. 학교 학년은 생년월일과 해당 학년도 기준으로 확인하며 조기입학이나 입학유예 같은 예외가 있습니다. 학년 계산기에 생년월일을 입력해 확인하세요.</li>
                 </ul>
             </article>
             <article class="section-card">
@@ -137,8 +139,9 @@
                 <p class="section-intro">계산한 월령을 실제 일정에 사용할 때는 목적별 공식 기준을 이어서 확인하세요.</p>
             </div>
             <div class="footer-links">
-                <a href="{{ url_for('baby_months_table') }}">개월수 계산표로 연·개월 표현 보기</a>
-                <a href="{{ url_for('hundred_day_calculator') }}">출생일 포함 백일 날짜 계산</a>
+                <a href="{{ url_for('baby_months_table') }}">개월수를 연·개월 표현으로 확인</a>
+                <a href="{{ url_for('hundred_day_calculator') }}">출생일 포함 100일째 날짜 계산</a>
+                <a href="{{ url_for('school_grade_calculator') }}">생년월일로 현재 학년 확인</a>
                 <a href="https://nip.kdca.go.kr/" target="_blank" rel="noopener noreferrer">질병관리청 예방접종도우미 확인</a>
                 <a href="https://www.nhis.or.kr/" target="_blank" rel="noopener noreferrer">국민건강보험공단 영유아 건강검진 확인</a>
             </div>
