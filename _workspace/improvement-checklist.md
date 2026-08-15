@@ -377,11 +377,17 @@
 
 ### P2-4. Core Web Vitals 실측
 
-- [ ] Search Console CWV 보고서 또는 CrUX URL별 데이터 확보
-- [ ] 모바일 LCP·INP·CLS가 나쁜 URL과 템플릿 공통 원인 분리
-- [ ] 광고·폰트·이미지·스크립트가 각 지표에 미치는 영향 확인
-- [ ] 실측값 없이 성능 코드를 바꾸지 않음
+- [x] Search Console CWV 보고서 또는 CrUX URL별 데이터 확보
+- [x] 모바일 LCP·INP·CLS가 나쁜 URL과 템플릿 공통 원인 분리
+- [x] 광고·폰트·이미지·스크립트가 각 지표에 미치는 영향 확인
+- [x] 실측값 없이 성능 코드를 바꾸지 않음
 - 완료 조건: URL군별 문제와 재현 가능한 로컬 측정 방법이 포함된 별도 계획 작성
+- 현장 데이터: Search Console 모바일 `Valid`, 2026-05-17~08-14, 예시 `/birth-year-age-table`, 그룹 URL 36개. 내보내기에 URL별 p75·지표별 수치가 없어 `not_available`로 기록
+- 실험실 데이터: PageSpeed Insights API 모바일, 운영 URL 9개×3회 중앙값. LCP 6.5~10.5초, CLS 0~0.084, TBT 31~349ms
+- 공통 후보: 9개 URL 모두 실험실 LCP 4초 초과, 4개 URL TBT 200ms 초과, CLS 0.1 초과 없음. 광고 323~784KB·폰트 282~396KB가 전 URL에서 관측됨
+- 예외 후보: `/age` 중앙 전송량 14.1MB 중 13.2MB가 미분류 `other`로 관측되어 후속 네트워크 요청 원인 분리가 필요
+- 결과물: `_workspace/p2-4-core-web-vitals/`, 재현 도구 `scripts/core_web_vitals_baseline.py`
+- 상태: 성능 코드·광고·폰트·이미지·운영 설정 변경 없이 기준선 수집 완료. 전체 370개 테스트 검증 완료, 운영 배포 미수행
 
 ### P2-5. 구조화 데이터 전수 검증
 
