@@ -782,6 +782,74 @@ class PublicPageTests(unittest.TestCase):
         for phrase in ["설명형 콘텐츠", "설명형 글만 공개합니다."]:
             self.assertNotIn(phrase, html)
 
+    def test_about_page_discloses_actual_review_and_correction_process(self):
+        html = app.test_client().get("/about").get_data(as_text=True)
+
+        for phrase in (
+            "AgeCalc 운영자가 자체 검수합니다",
+            "대표값과 경계값을 자동 테스트",
+            "계산 결과와 화면 설명을 대조",
+            "매년 1월·7월",
+            "공식 변경 공지 확인 시 수시로",
+            "오류 접수",
+            "재현·공식 근거 확인",
+            "수정 또는 비공개",
+            "최종 수정일과 내부 변경 기록 갱신",
+            "법률·의료·수의학 전문가의 감수를 의미하지 않습니다",
+        ):
+            self.assertIn(phrase, html)
+
+    def test_editorial_display_matches_webpage_structured_data(self):
+        client = app.test_client()
+        core_paths = (
+            "/age",
+            "/birth-year-age-table",
+            "/school-grade-calculator",
+            "/school-entry-year-table",
+            "/age-gap-calculator",
+            "/100-day-calculator",
+            "/annual-age-calculator",
+            "/age-comparison-table",
+            "/grade-age-table",
+            "/pet-age-table",
+            "/korean-age-guide",
+            "/pet-months-table",
+            "/grade-birth-year-table",
+            "/college-entry-year-calculator",
+            "/birthday-dday-calculator",
+            "/dog",
+            "/cat",
+            "/baby-months",
+            "/d-day",
+            "/parent-child",
+        )
+
+        for path in core_paths:
+            with self.subTest(path=path):
+                html = client.get(path).get_data(as_text=True)
+                structured_data, visible_text = _parse_page_markup(html)
+                visible_text = " ".join(visible_text.split())
+                webpage = next(
+                    item for item in structured_data if item.get("@type") == "WebPage"
+                )
+
+                self.assertIn("작성 AgeCalc 편집팀", visible_text)
+                self.assertIn("검수 AgeCalc 운영자 (자체 검수)", visible_text)
+                self.assertIn(
+                    f"최종 수정일 {webpage['dateModified']}",
+                    visible_text,
+                )
+                self.assertEqual("AgeCalc 편집팀", webpage["author"]["name"])
+                self.assertEqual("AgeCalc 운영자", webpage["reviewedBy"]["name"])
+
+    def test_about_sitemap_lastmod_tracks_editorial_policy_change(self):
+        xml = app.test_client().get("/sitemaps/core.xml").get_data(as_text=True)
+
+        self.assertRegex(
+            xml,
+            r"<loc>https://agecalc\.cloud/about</loc>\s*<lastmod>2026-08-16</lastmod>",
+        )
+
     def test_contact_page_is_public(self):
         client = app.test_client()
         response = client.get("/contact")

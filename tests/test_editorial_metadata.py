@@ -1,7 +1,11 @@
 import unittest
 
 from content import editorial_metadata
-from content.editorial_metadata import RELATED_SEARCH_TERM_SLOTS, editorial_metadata_for
+from content.editorial_metadata import (
+    RELATED_SEARCH_TERM_SLOTS,
+    editorial_metadata_for,
+    validate_editorial_metadata,
+)
 from content.page_registry import find_page
 
 
@@ -46,6 +50,28 @@ NAVER_RELATED_SEARCH_TERMS = getattr(
 
 
 class EditorialMetadataTests(unittest.TestCase):
+    def test_editorial_metadata_identifies_internal_review_and_cadence(self):
+        page = find_page("age", {})
+        metadata = editorial_metadata_for(page)
+
+        self.assertEqual("AgeCalc 편집팀", metadata["author"])
+        self.assertEqual("AgeCalc 운영자", metadata["reviewer"])
+        self.assertEqual("자체 검수", metadata["review_method"])
+        self.assertEqual(
+            "매년 1월·7월 및 공식 변경 공지 확인 시",
+            metadata["policy_review_cadence"],
+        )
+
+    def test_editorial_metadata_validation_rejects_missing_review_disclosure(self):
+        page = find_page("age", {})
+        metadata = editorial_metadata_for(page)
+        metadata.pop("review_method", None)
+
+        self.assertIn(
+            "missing review_method",
+            validate_editorial_metadata(page, metadata),
+        )
+
     def test_naver_mapping_preserves_every_supplied_top_30_query_once(self):
         self.assertEqual(tuple(range(1, 31)), tuple(row["rank"] for row in NAVER_RELATED_SEARCH_TERMS))
         self.assertEqual(EXPECTED_NAVER_TOP_30, tuple(row["term"] for row in NAVER_RELATED_SEARCH_TERMS))

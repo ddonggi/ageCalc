@@ -113,6 +113,7 @@ STATIC_PAGE_REGISTRY = (
         "AgeCalc 콘텐츠 작성과 검수 원칙 확인",
         content_action="keep",
         related_endpoints=("references", "contact", "privacy"),
+        lastmod="2026-08-16",
     ),
     _page(
         "contact",

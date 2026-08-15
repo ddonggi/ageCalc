@@ -4,7 +4,9 @@ from content.official_sources import SOURCE_CHECKED_AT, sources_for_hub
 
 
 EDITORIAL_AUTHOR = "AgeCalc 편집팀"
-EDITORIAL_REVIEWER = "AgeCalc 편집팀"
+EDITORIAL_REVIEWER = "AgeCalc 운영자"
+EDITORIAL_REVIEW_METHOD = "자체 검수"
+POLICY_REVIEW_CADENCE = "매년 1월·7월 및 공식 변경 공지 확인 시"
 DEFAULT_MODIFIED_AT = "2026-06-22"
 CORE_AGE_CONTENT_REVIEWED_AT = "2026-06-22"
 INFORMATIONAL_DISCLAIMER = (
@@ -128,6 +130,8 @@ def editorial_metadata_for(page: dict[str, object] | None) -> dict[str, object] 
     metadata = {
         "author": EDITORIAL_AUTHOR,
         "reviewer": EDITORIAL_REVIEWER,
+        "review_method": EDITORIAL_REVIEW_METHOD,
+        "policy_review_cadence": POLICY_REVIEW_CADENCE,
         "reviewed_at": (
             CORE_AGE_CONTENT_REVIEWED_AT
             if str(page["key"]) in {
@@ -159,7 +163,15 @@ def validate_editorial_metadata(
     if metadata is None:
         return ("missing editorial metadata",)
 
-    for field in ("author", "reviewer", "reviewed_at", "modified_at", "sources"):
+    for field in (
+        "author",
+        "reviewer",
+        "review_method",
+        "policy_review_cadence",
+        "reviewed_at",
+        "modified_at",
+        "sources",
+    ):
         if not metadata.get(field):
             errors.append(f"missing {field}")
 

@@ -11,7 +11,7 @@
         </div>
         <div>
             <dt>검수</dt>
-            <dd>{{ editorial_metadata.reviewer }}</dd>
+            <dd>{{ editorial_metadata.reviewer }} ({{ editorial_metadata.review_method }})</dd>
         </div>
         <div>
             <dt>기준 확인일</dt>
@@ -40,7 +40,8 @@
     <p class="editorial-disclaimer">{{ editorial_metadata.disclaimer }}</p>
     {% endif %}
     <p class="editorial-correction">
-        기준 오류나 수정 제안은 <a href="{{ url_for('contact') }}">문의 페이지</a>로 보내주세요.
+        <a href="{{ url_for('about') }}">검수 절차</a>를 확인하거나,
+        기준 오류와 수정 제안은 <a href="{{ url_for('contact') }}">문의 페이지</a>로 보내주세요.
     </p>
 </aside>
 <script type="application/ld+json" nonce="{{ csp_nonce }}">
