@@ -362,6 +362,9 @@ class PublicPageTests(unittest.TestCase):
             "/college-entry-year-calculator?year=2026&year=2025": "/college-entry-year-calculator",
             "/age-gap-calculator?year_a=2000": "/age-gap-calculator",
             "/age-gap-calculator?year_a=2000&year_b=": "/age-gap-calculator",
+            "/age-gap-calculator?year_a=2000&year_a=2001&year_b=2002": "/age-gap-calculator",
+            "/age-gap-calculator?year_a=2000&year_b=2002&extra=1": "/age-gap-calculator",
+            "/age-gap-calculator?year_a=1899&year_b=2002": "/age-gap-calculator",
             "/baby-months-table?months=-1": "/baby-months-table",
             "/annual-age-calculator?birth_year=unknown": "/annual-age-calculator",
             "/age-comparison-table?year=2010&extra=1": "/age-comparison-table",
@@ -386,6 +389,8 @@ class PublicPageTests(unittest.TestCase):
             "/grade-age-table?stage=middle&grade=1": "/grade-age-table",
             "/grade-birth-year-table?stage=high&grade=1": "/grade-birth-year-table",
             "/age-gap-calculator?year_a=2000&year_b=2002": "/age-gap-calculator",
+            "/age-gap-calculator?year_a=1990&year_b=1995": "/age-gap-calculator",
+            "/age-gap-calculator?year_a=2010&year_b=2015": "/age-gap-calculator",
             "/baby-months-table?months=12": "/baby-months-table",
             "/annual-age-calculator?birth_year=1992": "/annual-age-calculator",
             "/age-comparison-table?year=1992": "/age-comparison-table",
@@ -954,6 +959,35 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("1990년생과 1995년생", html)
         self.assertIn("선택한 비교", html)
         self.assertIn("5년 차이", html)
+
+    def test_age_gap_calculator_preserves_search_intent_and_links_to_adjacent_tools(self):
+        response = app.test_client().get("/age-gap-calculator")
+
+        self.assertEqual(200, response.status_code)
+        self.assertIsNone(response.headers.get("X-Robots-Tag"))
+        html = response.get_data(as_text=True)
+        self.assertEqual(1, html.count("<title>나이 차이 계산기 | AgeCalc</title>"))
+        self.assertEqual(1, html.count("<h1>나이 차이 계산기</h1>"))
+        self.assertIn(
+            '<meta name="description" content="두 출생년도를 선택해 연도 차이와 생일 전후 만나이 차이 범위를 비교하는 나이 차이 계산기입니다." />',
+            html,
+        )
+        self.assertIn(
+            '<link rel="canonical" href="https://agecalc.cloud/age-gap-calculator" />',
+            html,
+        )
+        self.assertIn(
+            '<a href="/parent-child">부모·자녀 나이 차이와 주요 시점 계산</a>',
+            html,
+        )
+        self.assertIn(
+            '<a href="/age">생년월일로 정확한 만나이 확인</a>',
+            html,
+        )
+        self.assertIn(
+            '<a href="/birth-year-age-table">출생연도별 만나이·연나이 확인</a>',
+            html,
+        )
 
     def test_hundred_day_calculator_page_is_public(self):
         client = app.test_client()

@@ -170,6 +170,7 @@ STATIC_PAGE_REGISTRY = (
         "나이 차이 계산기",
         "두 출생연도의 나이 차이와 만나이 범위 비교",
         related_endpoints=("parent_child", "age", "birth_year_age_table"),
+        lastmod="2026-08-16",
     ),
     _page(
         "hundred_day_calculator",

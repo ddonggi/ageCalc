@@ -12,6 +12,7 @@
 | 학년표의 유효 `stage+grade` | 기본 canonical, `noindex,follow` | 네이버에서 확인된 URL이 빈 `grade`였으며 유효 학년별 URL 성과는 미확인 |
 | 학번 `year=2024`, `2025`, `2026` | self-canonical, index | 네이버에서 각 URL의 클릭·노출 확인: 합계 2,066클릭·355,124노출·CTR 0.582% |
 | 그 외 유효한 학번 연도 | 기본 canonical, `noindex,follow` | 검색어 수요는 일부 확인됐지만 URL별 성과와 고유 콘텐츠 근거가 부족 |
+| 나이 차이의 유효 `year_a+year_b` | 기본 canonical, `noindex,follow` | 선택 결과만 달라지고 URL별 고유 title·description·H1·본문이 없음 |
 
 빈 값, 중복·추가 파라미터, 범위 밖 값과 `2024~2026` 같은 모호한 값은 별도 문서가 되지 않도록 기본 URL로 정규화합니다. 학번 예시 콘텐츠는 색인 allowlist와 분리해 유지합니다. 2026-08-13 P1-4에서는 학번별 메타데이터·본문·FAQ·내부링크가 바뀌어 기본 URL의 sitemap `lastmod`도 실제 변경일로 갱신했습니다.
 
@@ -27,3 +28,9 @@
 - 생일 결과는 실제 달력에 존재하는 월·일 조합만 허용합니다.
 - 유효 결과는 200으로 제공하되 allowlist 외에는 기본 canonical과 `X-Robots-Tag: noindex, follow`를 함께 사용합니다.
 - 유효하지 않거나 모호한 값은 해당 도구의 기본 URL로 302 정규화합니다.
+
+### 나이 차이 결과 URL
+
+네이버 2026-05-14~08-11 자료에서 `year_a=2010&year_b=2015`는 251클릭·4,464노출·CTR 5.6%, `year_a=2000&year_b=2002`는 213클릭·11,390노출·CTR 1.9%, `year_a=1990&year_b=1995`는 81클릭·8,270노출·CTR 1.0%였습니다. 세 URL 합계는 545클릭·24,124노출·가중 CTR 2.26%입니다.
+
+성과가 확인됐더라도 세 URL은 선택 연도와 계산 결과만 달라지고 고유한 title·description·H1·설명 본문을 제공하지 않습니다. 따라서 self-canonical 색인 페이지로 전환하지 않고 기본 `/age-gap-calculator` canonical과 `noindex,follow`를 유지합니다. 두 연도가 허용 범위의 정규 정수이고 각 파라미터가 한 번씩만 존재할 때 200으로 제공하며, 일부·빈·중복·추가·범위 밖 값은 기본 URL로 302 정규화합니다. 사이트맵에는 기본 URL만 등록합니다.
