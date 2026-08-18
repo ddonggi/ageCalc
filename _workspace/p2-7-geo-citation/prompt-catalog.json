@@ -1,0 +1,102 @@
+{
+  "version": "2026-v1",
+  "measurement_defaults": {
+    "country": "KR",
+    "language": "ko-KR",
+    "device": "desktop"
+  },
+  "platforms": [
+    {
+      "id": "google_ai_overview",
+      "surface": "Google 검색 AI Overview",
+      "session_state": "logged_out_private_window",
+      "web_search_enabled": "not_applicable"
+    },
+    {
+      "id": "chatgpt",
+      "surface": "ChatGPT 웹 검색",
+      "session_state": "temporary_chat_memory_off",
+      "web_search_enabled": "true"
+    },
+    {
+      "id": "perplexity",
+      "surface": "Perplexity Web",
+      "session_state": "logged_out_private_window",
+      "web_search_enabled": "true"
+    }
+  ],
+  "queries": [
+    {
+      "id": "q01_man_age",
+      "topic": "만나이",
+      "representative_url": "https://agecalc.cloud/age",
+      "text": "생년월일로 현재 만 나이를 계산하는 방법은?"
+    },
+    {
+      "id": "q02_birth_year_age",
+      "topic": "출생연도별 나이",
+      "representative_url": "https://agecalc.cloud/birth-year-age-table",
+      "text": "2010년생은 2026년에 몇 살인가요?"
+    },
+    {
+      "id": "q03_grade_birth_year",
+      "topic": "학년별 출생연도",
+      "representative_url": "https://agecalc.cloud/grade-birth-year-table",
+      "text": "2026년 기준 중학교 1학년은 몇 년생인가요?"
+    },
+    {
+      "id": "q04_grade_age",
+      "topic": "학년별 나이",
+      "representative_url": "https://agecalc.cloud/grade-age-table",
+      "text": "2026년 기준 고등학교 3학년은 몇 살인가요?"
+    },
+    {
+      "id": "q05_school_grade",
+      "topic": "현재 학년 계산",
+      "representative_url": "https://agecalc.cloud/school-grade-calculator",
+      "text": "생년월일로 2026년 현재 학년을 어떻게 계산하나요?"
+    },
+    {
+      "id": "q06_school_entry_year",
+      "topic": "입학년도",
+      "representative_url": "https://agecalc.cloud/school-entry-year-table",
+      "text": "출생연도로 초등학교 입학 연도를 어떻게 계산하나요?"
+    },
+    {
+      "id": "q07_college_entry_year",
+      "topic": "학번",
+      "representative_url": "https://agecalc.cloud/college-entry-year-calculator",
+      "text": "2026학번은 보통 몇 년생이고 몇 살인가요?"
+    },
+    {
+      "id": "q08_baby_months",
+      "topic": "아이 개월수",
+      "representative_url": "https://agecalc.cloud/baby-months",
+      "text": "아이 개월 수는 생년월일로 어떻게 계산하나요?"
+    },
+    {
+      "id": "q09_hundred_days",
+      "topic": "100일",
+      "representative_url": "https://agecalc.cloud/100-day-calculator",
+      "text": "시작일을 포함해서 100일째 되는 날짜는 어떻게 계산하나요?"
+    },
+    {
+      "id": "q10_lunar_birthday",
+      "topic": "음력 생일",
+      "representative_url": "https://agecalc.cloud/guides/lunar-birthday-age-guide",
+      "text": "음력 생일을 양력 날짜로 어떻게 확인하나요?"
+    },
+    {
+      "id": "q11_birth_year_zodiac",
+      "topic": "출생연도별 띠",
+      "representative_url": "https://agecalc.cloud/birth-year-zodiac-table",
+      "text": "출생연도로 띠를 확인하는 방법은?"
+    },
+    {
+      "id": "q12_age_gap",
+      "topic": "나이 차이",
+      "representative_url": "https://agecalc.cloud/age-gap-calculator",
+      "text": "두 사람의 생년월일로 나이 차이를 어떻게 계산하나요?"
+    }
+  ]
+}
