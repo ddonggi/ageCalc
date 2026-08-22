@@ -4,7 +4,7 @@
 - 대상 URL: `/life-timeline`
 - MVP 운영 반영 커밋: `1150473`
 - 출시 게이트 계측·표본 검증 커밋: `558eb98`
-- 운영 상태: MVP 운영 반영 완료, 계측 커밋은 다음 운영 배포 대상
+- 운영 상태: MVP와 계측 커밋 운영 반영 완료
 
 ## 검증 결과
 
@@ -36,7 +36,7 @@ life_timeline_related_tool_click
 
 - 계산 완료율: `life_timeline_complete` ÷ `/life-timeline` 계산 시작 기준 모수
 - 관련 도구 이동률: `life_timeline_related_tool_click` ÷ `life_timeline_complete`
-- 관찰 기간: 계측 커밋 운영 반영일부터 14일
-- 상태: 관찰 시작 전
+- 관찰 기간: 2026-08-23~2026-09-06 (14일)
+- 상태: 관찰 중
 
 14일 데이터가 쌓이기 전에는 배치 1의 관찰 게이트를 완료 처리하거나 배치 2 진입 근거로 사용하지 않는다.
