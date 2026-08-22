@@ -4,6 +4,8 @@
 대상 서비스: https://agecalc.cloud  
 전략 방향: **AdSense 승인 우선 혼합형 — 기존 품질 개선 후 검증된 클러스터만 확장**
 
+> **운영 상태 갱신 (2026-08-23):** AdSense 승인이 완료되었다. 이 문서의 승인·재심사 항목은 과거 전략 기록으로 유지하며, 현재 배포 판정은 `docs/operations/adsense-baseline-2026-06.md`의 승인 이후 운영 기준을 따른다.
+
 > 이 문서의 검색 수요는 Search Console·Google Ads Keyword Planner 원본 데이터가 없는 상태에서 공개 검색 의도와 일반적인 한국어 키워드 수요를 기준으로 추정한 범위다. 실제 개발 착수 전 Search Console과 Keyword Planner로 다시 보정해야 한다.
 
 ## 1. 현재 사이트 진단

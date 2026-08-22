@@ -85,9 +85,6 @@
             {% endif %}
         </section>
 
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
-
         <section class="section-shell">
             <div class="section-heading">
                 <h2 id="birth-year-search">출생년도 선택</h2>
@@ -112,6 +109,8 @@
                 </div>
             </form>
         </section>
+        {% include 'partials/info_coupang_promotions.html' %}
+        {% include 'partials/home_coupang_rails.html' %}
 
         {% if selected_row %}
         <section class="section-shell section-card-grid">

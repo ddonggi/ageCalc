@@ -1166,7 +1166,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("아기 월령", html)
         self.assertIn("개월수와 월령은 같은 뜻인가요?", html)
         self.assertIn('id="baby-birth-input"', html)
-        self.assertIn('maxlength="8"', html)
+        self.assertIn('maxlength="10"', html)
         self.assertNotIn('id="baby-year"', html)
         self.assertNotIn('id="baby-month"', html)
         self.assertNotIn('id="baby-day"', html)
@@ -2120,6 +2120,89 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("환산 나이는 건강 상태나 기대수명을 판정하지 않습니다.", script)
         self.assertNotIn("건강 관리 방향을 잡기 위한 참고치", script)
         self.assertNotIn("체감 나이", script)
+
+    def test_pet_calculators_offer_date_age_and_together_modes(self):
+        client = app.test_client()
+
+        for path in ("/dog", "/cat"):
+            with self.subTest(path=path):
+                html = client.get(path).get_data(as_text=True)
+                self.assertIn('value="birth-date"', html)
+                self.assertIn('value="known-age"', html)
+                self.assertIn('value="adoption-date"', html)
+                self.assertIn('id="pet-birth-date"', html)
+                self.assertIn('id="pet-adoption-date"', html)
+                self.assertIn('aria-live="polite"', html)
+
+    def test_dog_size_selector_uses_distinct_generated_illustrations(self):
+        html = app.test_client().get("/dog").get_data(as_text=True)
+
+        for size in ("small", "medium", "large", "giant"):
+            self.assertIn(f'images/dog-size-{size}.png', html)
+            self.assertIn(f'class="dog-size-illustration dog-size-illustration-{size}"', html)
+
+    def test_dog_adoption_mode_explains_why_size_conversion_is_unavailable(self):
+        html = app.test_client().get("/dog").get_data(as_text=True)
+
+        self.assertIn('id="pet-size-explanation"', html)
+        self.assertIn("데려온 날만으로는 실제 나이를 알 수 없어", html)
+        self.assertIn('aria-describedby="pet-size-explanation"', html)
+
+    def test_priority_calculator_forms_precede_promotions(self):
+        client = app.test_client()
+        page_forms = {
+            "/age": 'id="age-form"',
+            "/baby-months": 'id="baby-months-form"',
+            "/parent-child": 'id="parent-child-form"',
+            "/dog": 'id="pet-age-form"',
+            "/cat": 'id="pet-age-form"',
+            "/d-day": 'id="dday-form"',
+            "/100-day-calculator": 'id="hundred-day-form"',
+            "/birthday-dday-calculator": 'id="birthday-dday-form"',
+            "/birth-year-age-table": 'action="/birth-year-age-table"',
+            "/school-grade-calculator": 'action="/school-grade-calculator"',
+            "/school-entry-year-table": 'action="/school-entry-year-table"',
+            "/age-gap-calculator": 'action="/age-gap-calculator"',
+            "/baby-months-table": 'action="/baby-months-table"',
+            "/annual-age-calculator": 'action="/annual-age-calculator"',
+            "/age-comparison-table": 'action="/age-comparison-table"',
+            "/grade-age-table": 'action="/grade-age-table"',
+            "/pet-age-table": 'action="/pet-age-table"',
+            "/pet-months-table": 'action="/pet-months-table"',
+            "/grade-birth-year-table": 'action="/grade-birth-year-table"',
+            "/birth-year-zodiac-table": 'action="/birth-year-zodiac-table"',
+            "/college-entry-year-calculator": 'action="/college-entry-year-calculator"',
+        }
+
+        with mock.patch.object(app_module, "ADSENSE_REVIEW_MODE", False), mock.patch.object(
+            app_module, "COUPANG_PARTNERS_ENABLED", True
+        ):
+            for path, form_marker in page_forms.items():
+                with self.subTest(path=path):
+                    html = client.get(path).get_data(as_text=True)
+                    self.assertIn(form_marker, html)
+                    form_position = html.index(form_marker)
+                    promotion_positions = [
+                        html.index(marker)
+                        for marker in ("info-coupang-promotions", "home-coupang-rail-left")
+                        if marker in html
+                    ]
+                    self.assertTrue(promotion_positions)
+                    self.assertLess(form_position, min(promotion_positions))
+
+    def test_exact_date_forms_use_single_accessible_formatted_inputs(self):
+        client = app.test_client()
+        expectations = {
+            "/100-day-calculator": ('id="hundred-day-date"', 'aria-label="시작일 8자리"'),
+            "/d-day": ('id="dday-date"', 'aria-label="기준 날짜 8자리"'),
+            "/birthday-dday-calculator": ('id="birthday-dday-input"', 'aria-label="생일 월일 4자리"'),
+        }
+
+        for path, markers in expectations.items():
+            with self.subTest(path=path):
+                html = client.get(path).get_data(as_text=True)
+                for marker in markers:
+                    self.assertIn(marker, html)
 
     def test_guide_content_policy_covers_all_twenty_guides(self):
         self.assertTrue(hasattr(guide_pages_module, "GUIDE_CONTENT_POLICY"))

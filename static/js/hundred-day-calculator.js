@@ -1,9 +1,7 @@
 class HundredDayCalculator {
     constructor() {
         this.form = document.getElementById('hundred-day-form');
-        this.yearInput = document.getElementById('hundred-day-year');
-        this.monthInput = document.getElementById('hundred-day-month');
-        this.dayInput = document.getElementById('hundred-day-day');
+        this.dateInput = document.getElementById('hundred-day-date');
         this.error = document.getElementById('hundred-day-error');
         this.result = document.getElementById('hundred-day-result');
         this.resultContent = document.getElementById('hundred-day-result-content');
@@ -13,33 +11,30 @@ class HundredDayCalculator {
     }
 
     bindEvents() {
-        this.form.addEventListener('submit', (event) => {
-            event.preventDefault();
-            this.calculate();
-        });
+        this.form.addEventListener('submit', (event) => event.preventDefault());
         this.clearButton.addEventListener('click', () => {
-            [this.yearInput, this.monthInput, this.dayInput].forEach((input) => { input.value = ''; });
+            this.dateInput.value = '';
             this.error.textContent = '';
             this.result.hidden = true;
             this.resultContent.innerHTML = '';
-            this.yearInput.focus();
+            this.dateInput.focus();
         });
-        [this.yearInput, this.monthInput, this.dayInput].forEach((input) => {
-            input.addEventListener('input', () => {
-                input.value = input.value.replace(/\D/g, '').slice(0, input.maxLength);
-            });
+        this.dateInput.addEventListener('input', () => {
+            this.dateInput.value = AgeCalcDateRules.formatDateDigits(this.dateInput.value);
+            const digits = this.dateInput.value.replace(/\D/g, '');
+            if (digits.length < 8) {
+                this.error.textContent = '';
+                this.result.hidden = true;
+                this.resultContent.innerHTML = '';
+                return;
+            }
+            this.calculate();
         });
     }
 
     parseStartDate() {
-        const year = Number(this.yearInput.value);
-        const month = Number(this.monthInput.value);
-        const day = Number(this.dayInput.value);
-        if (!year || !month || !day) return null;
         try {
-            return AgeCalcDateRules.parseIsoDate(
-                `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-            );
+            return AgeCalcDateRules.parseDateDigits(this.dateInput.value);
         } catch {
             return null;
         }

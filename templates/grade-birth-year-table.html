@@ -66,9 +66,6 @@
                 </article>
             </div>
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
-
         <section class="section-shell direct-answer" aria-label="학년별 출생연도 바로 답변">
             <p class="eyebrow">바로 답변 · 학년별 출생연도 해석</p>
             <h2>{% if selected_row %}{{ selected_row.short_label }}은 보통 {{ selected_row.birth_year }}년생입니다{% else %}{{ school_year }}학년도 중1은 {{ faq_grade_rows[0].birth_year_label }}, 고1은 {{ faq_grade_rows[1].birth_year_label }}, 고3은 {{ faq_grade_rows[2].birth_year_label }}입니다{% endif %}</h2>
@@ -110,6 +107,8 @@
                 </div>
             </form>
         </section>
+        {% include 'partials/info_coupang_promotions.html' %}
+        {% include 'partials/home_coupang_rails.html' %}
 
         {% if selected_row %}
         <section class="section-shell section-card-grid">

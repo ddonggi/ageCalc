@@ -7,7 +7,6 @@ class BabyMonthsCalculator {
 
         if (this.birthInput) {
             this.bindEvents();
-            this.updateResult();
         }
     }
 
@@ -21,7 +20,7 @@ class BabyMonthsCalculator {
     }
 
     normalizeInputs() {
-        this.limitDigits(this.birthInput, 8);
+        this.birthInput.value = AgeCalcDateRules.formatDateDigits(this.birthInput.value);
     }
 
     limitDigits(input, maxLength) {
@@ -70,6 +69,12 @@ class BabyMonthsCalculator {
     }
 
     updateResult() {
+        const digits = String(this.birthInput.value || '').replace(/\D/g, '');
+        if (digits.length < 8) {
+            this.showError('');
+            this.clearResult();
+            return;
+        }
         const v = this.validate();
         if (!v.valid) {
             this.showError(v.msg);

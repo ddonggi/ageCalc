@@ -1,8 +1,22 @@
+function getPetModeUiState(mode, petType) {
+    const isDog = petType === 'dog';
+    const isAdoptionDate = mode === 'adoption-date';
+    return {
+        showSizeOptions: isDog,
+        disableSizeOptions: isDog && isAdoptionDate,
+        showSizeExplanation: isDog && isAdoptionDate
+    };
+}
+
 class PetAgeCalculator {
     constructor() {
         this.form = document.getElementById('pet-age-form');
         this.yearsInput = document.getElementById('pet-years');
         this.monthsInput = document.getElementById('pet-months');
+        this.birthDateInput = document.getElementById('pet-birth-date');
+        this.adoptionDateInput = document.getElementById('pet-adoption-date');
+        this.modeInputs = Array.from(document.querySelectorAll('input[name="pet-age-mode"]'));
+        this.inputPanels = Array.from(document.querySelectorAll('[data-pet-panel]'));
         this.errorEl = document.getElementById('pet-error');
         this.resultContainer = document.getElementById('pet-result-container');
         this.resultContent = document.getElementById('pet-result-content');
@@ -18,18 +32,31 @@ class PetAgeCalculator {
 
         if (this.form) {
             this.bindEvents();
-            this.updateResult();
         }
     }
 
     bindEvents() {
         ['input', 'change'].forEach(evt => {
-            this.yearsInput.addEventListener(evt, () => {
+            this.yearsInput?.addEventListener(evt, () => {
                 this.normalizeInputs();
                 this.updateResult();
             });
-            this.monthsInput.addEventListener(evt, () => {
+            this.monthsInput?.addEventListener(evt, () => {
                 this.normalizeInputs();
+                this.updateResult();
+            });
+        });
+
+        [this.birthDateInput, this.adoptionDateInput].forEach(input => {
+            input?.addEventListener('input', () => {
+                input.value = AgeCalcDateRules.formatDateDigits(input.value);
+                this.updateResult();
+            });
+        });
+
+        this.modeInputs.forEach(input => {
+            input.addEventListener('change', () => {
+                this.updateModeUI();
                 this.updateResult();
             });
         });
@@ -42,6 +69,7 @@ class PetAgeCalculator {
         });
 
         this.updateSizeUI();
+        this.updateModeUI();
     }
 
     normalizeInputs() {
@@ -63,7 +91,44 @@ class PetAgeCalculator {
         return years + months / 12;
     }
 
+    getMode() {
+        return this.modeInputs.find(input => input.checked)?.value || 'birth-date';
+    }
+
+    todayUtc() {
+        const today = new Date();
+        return new Date(Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()));
+    }
+
+    completedMonthsFromDate(input) {
+        const date = AgeCalcDateRules.parseDateDigits(input.value);
+        const today = this.todayUtc();
+        if (date > today) throw new Error('future');
+        const months = AgeCalcDateRules.calculateCompletedMonths(
+            AgeCalcDateRules.formatIsoDate(date),
+            AgeCalcDateRules.formatIsoDate(today)
+        );
+        return { date, months };
+    }
+
     validate() {
+        const mode = this.getMode();
+        if (mode === 'birth-date' || mode === 'adoption-date') {
+            const input = mode === 'birth-date' ? this.birthDateInput : this.adoptionDateInput;
+            const digits = String(input?.value || '').replace(/\D/g, '');
+            if (digits.length < 8) return { valid: false, incomplete: true };
+            try {
+                const value = this.completedMonthsFromDate(input);
+                return { valid: true, mode, ...value, ageYears: value.months / 12 };
+            } catch (error) {
+                return {
+                    valid: false,
+                    msg: String(error?.message || '').includes('future')
+                        ? '미래 날짜는 입력할 수 없습니다.'
+                        : '존재하는 날짜를 입력해 주세요.'
+                };
+            }
+        }
         const years = Number(this.yearsInput.value || 0);
         const months = Number(this.monthsInput.value || 0);
 
@@ -76,13 +141,16 @@ class PetAgeCalculator {
         if (months >= 12) {
             return { valid: false, msg: '개월은 0~11 사이로 입력해 주세요.' };
         }
+        if (String(this.yearsInput.value || '') === '' && String(this.monthsInput.value || '') === '') {
+            return { valid: false, incomplete: true };
+        }
         if (years === 0 && months === 0) {
-            return { valid: false, msg: '나이를 입력해 주세요.' };
+            return { valid: false, msg: '0개월보다 큰 나이를 입력해 주세요.' };
         }
         if (years > 30) {
             return { valid: false, msg: '30세 이하로 입력해 주세요.' };
         }
-        return { valid: true };
+        return { valid: true, mode, ageYears: years + months / 12 };
     }
 
     calculateHumanAge(ageYears) {
@@ -130,13 +198,26 @@ class PetAgeCalculator {
     updateResult() {
         const v = this.validate();
         if (!v.valid) {
-            this.showError(v.msg);
+            this.showError(v.incomplete ? '' : v.msg);
             this.clearResult();
             return;
         }
 
         this.showError('');
-        const ageYears = this.getAgeInYears();
+        if (v.mode === 'adoption-date') {
+            const years = Math.floor(v.months / 12);
+            const months = v.months % 12;
+            const label = years > 0 ? `${years}년 ${months}개월` : `${months}개월`;
+            this.resultContent.innerHTML = `
+                <div class="result success">
+                    <p class="message">오늘까지 함께한 기간</p>
+                    <div class="age-info"><p class="age"><span class="age-number">${label}</span></p></div>
+                    <p class="small">데려온 날부터 오늘까지 완료된 달 수입니다. 실제 나이나 사람 나이 환산값은 아닙니다.</p>
+                </div>`;
+            this.resultContainer.classList.add('show');
+            return;
+        }
+        const ageYears = v.ageYears;
         const humanAge = this.calculateHumanAge(ageYears);
         const rounded = Math.round(humanAge);
 
@@ -169,9 +250,9 @@ class PetAgeCalculator {
         if (!this.errorEl) return;
         this.errorEl.textContent = msg || '';
         if (msg) {
-            this.yearsInput.classList.add('error');
+            this.activeInput()?.classList.add('error');
         } else {
-            this.yearsInput.classList.remove('error');
+            [this.yearsInput, this.birthDateInput, this.adoptionDateInput].forEach(input => input?.classList.remove('error'));
         }
     }
 
@@ -200,8 +281,44 @@ class PetAgeCalculator {
             option.classList.toggle('active', input && input.checked);
         });
     }
+
+    activeInput() {
+        const mode = this.getMode();
+        if (mode === 'birth-date') return this.birthDateInput;
+        if (mode === 'adoption-date') return this.adoptionDateInput;
+        return this.yearsInput;
+    }
+
+    updateModeUI() {
+        const mode = this.getMode();
+        const uiState = getPetModeUiState(mode, this.petType);
+        this.inputPanels.forEach(panel => {
+            panel.hidden = panel.getAttribute('data-pet-panel') !== mode;
+        });
+        const sizeOptions = document.getElementById('pet-size-options');
+        const sizeExplanation = document.getElementById('pet-size-explanation');
+        if (sizeOptions) {
+            sizeOptions.hidden = !uiState.showSizeOptions;
+            sizeOptions.classList.toggle('is-disabled', uiState.disableSizeOptions);
+            sizeOptions.setAttribute('aria-disabled', String(uiState.disableSizeOptions));
+        }
+        this.sizeRadios.forEach(radio => {
+            radio.disabled = uiState.disableSizeOptions;
+        });
+        if (sizeExplanation) {
+            sizeExplanation.hidden = !uiState.showSizeExplanation;
+        }
+        this.modeInputs.forEach(input => {
+            input.closest('label')?.classList.toggle('active', input.checked);
+        });
+        this.showError('');
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     new PetAgeCalculator();
 });
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { getPetModeUiState };
+}

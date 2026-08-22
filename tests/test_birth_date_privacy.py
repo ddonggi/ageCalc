@@ -27,6 +27,13 @@ assert.strictEqual(rules.calculateCompletedMonths('2025-01-31', '2025-02-28'), 1
 assert.strictEqual(rules.calculateCompletedMonths('2024-02-29', '2025-02-28'), 12);
 assert.strictEqual(rules.calculateCompletedMonths('2025-06-15', '2026-02-14'), 7);
 assert.strictEqual(rules.calculateCompletedMonths('2025-06-15', '2026-02-15'), 8);
+assert.strictEqual(rules.formatDateDigits('19921002'), '1992.10.02');
+assert.strictEqual(rules.formatDateDigits('1992-10-0'), '1992.10.0');
+assert.strictEqual(rules.formatMonthDayDigits('0510'), '05.10');
+assert.strictEqual(rules.formatIsoDate(rules.parseDateDigits('20260228')), '2026-02-28');
+assert.deepStrictEqual(rules.parseMonthDayDigits('0229'), { month: 2, day: 29 });
+assert.throws(() => rules.parseDateDigits('20260230'), /valid/);
+assert.throws(() => rules.parseMonthDayDigits('0230'), /valid/);
 """
         completed = subprocess.run(
             ["node", "-e", script],
@@ -111,7 +118,7 @@ class BirthDatePrivacyTests(unittest.TestCase):
         self.assertIn('data-clarity-mask="true"', html)
 
     def test_exact_date_calculators_use_unambiguous_inputs_and_disable_session_replay(self):
-        for path in ("/age", "/baby-months", "/parent-child"):
+        for path in ("/age", "/baby-months", "/parent-child", "/dog", "/cat", "/d-day", "/100-day-calculator", "/birthday-dday-calculator"):
             with self.subTest(path=path):
                 html = self.client.get(path).get_data(as_text=True)
                 self.assertNotIn("js/clarity-init.js", html)
@@ -120,9 +127,9 @@ class BirthDatePrivacyTests(unittest.TestCase):
         age_html = self.client.get("/age").get_data(as_text=True)
         baby_html = self.client.get("/baby-months").get_data(as_text=True)
         family_js = Path("static/js/parent-child.js").read_text(encoding="utf-8")
-        self.assertIn('maxlength="8"', age_html)
-        self.assertIn('maxlength="8"', baby_html)
-        self.assertIn('maxlength="8"', family_js)
+        self.assertIn('maxlength="10"', age_html)
+        self.assertIn('maxlength="10"', baby_html)
+        self.assertIn('maxlength="10"', family_js)
         self.assertNotIn('maxlength="6"', age_html)
         self.assertNotIn('maxlength="6"', baby_html)
 
@@ -182,6 +189,53 @@ class BirthDatePrivacyTests(unittest.TestCase):
         self.assertIn("양력 생년월일은 브라우저 안에서 계산", html)
         self.assertIn("음력 생년월일은 양력 변환을 위해서만 서버로 전송", html)
         self.assertIn("공유 주소에는 생년월일을 넣지 않습니다", html)
+
+    def test_profile_date_storage_requires_explicit_save_and_rejects_damaged_values(self):
+        script = r"""
+const assert = require('assert');
+const profile = require('./static/js/profile-date.js');
+const values = new Map();
+const storage = {
+  getItem(key) { return values.has(key) ? values.get(key) : null; },
+  setItem(key, value) { values.set(key, value); },
+  removeItem(key) { values.delete(key); }
+};
+
+assert.strictEqual(profile.loadProfileDate(storage), null);
+profile.saveProfileDate('1992-10-02', storage);
+assert.strictEqual(values.get('agecalc.profileBirthDate.v1'), '1992-10-02');
+assert.strictEqual(profile.loadProfileDate(storage), '1992-10-02');
+profile.clearProfileDate(storage);
+assert.strictEqual(profile.loadProfileDate(storage), null);
+
+values.set('agecalc.profileBirthDate.v1', '1992-99-99');
+assert.strictEqual(profile.loadProfileDate(storage), null);
+assert.strictEqual(values.has('agecalc.profileBirthDate.v1'), false);
+assert.throws(() => profile.saveProfileDate('not-a-date', storage), /valid/);
+"""
+        completed = subprocess.run(
+            ["node", "-e", script],
+            cwd=Path.cwd(),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stderr)
+
+    def test_profile_date_controls_explain_device_storage_and_deletion(self):
+        timeline_html = self.client.get("/life-timeline").get_data(as_text=True)
+        age_html = self.client.get("/age").get_data(as_text=True)
+        birthday_html = self.client.get("/birthday-dday-calculator").get_data(as_text=True)
+
+        self.assertIn('id="profile-date-consent"', timeline_html)
+        self.assertIn('id="profile-date-clear"', timeline_html)
+        self.assertIn("공용 기기", timeline_html)
+        self.assertIn('data-profile-date-input="full"', timeline_html)
+        self.assertIn('data-profile-date-input="full"', age_html)
+        self.assertIn('data-profile-date-input="month-day"', birthday_html)
+        for html in (timeline_html, age_html, birthday_html):
+            self.assertIn("profile-date.js", html)
 
     def test_age_page_describes_solar_and_lunar_processing_accurately(self):
         html = self.client.get("/age").get_data(as_text=True)

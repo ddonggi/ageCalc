@@ -34,7 +34,7 @@
     <!-- Google tag (gtag.js) -->
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
 
-    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/date-rules.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 
 </head>
@@ -45,8 +45,6 @@
         {% include 'partials/header.html' %}
         <h1>강아지 나이 계산기</h1>
         <div style="text-align: center;margin-bottom: 2rem;">반려견의 실제 나이를 사람 나이로 환산해 보여드립니다.</div>
-
-        {% include 'partials/home_coupang_rails.html' %}
 
         <section class="section-shell direct-answer" aria-label="강아지 나이 환산 바로 답변">
             <div class="section-heading">
@@ -60,12 +58,21 @@
             <p class="small">환산값은 달력 나이를 비교하기 위한 정보이며 건강 상태나 기대수명을 판정하는 수의학적 진단을 대신하지 않습니다.</p>
         </section>
 
-        <form class="age-form" id="pet-age-form" data-pet="dog" autocomplete="off">
+        <form class="age-form" id="pet-age-form" data-pet="dog" autocomplete="off" data-clarity-mask="true">
             <div class="form-group">
                 <h3>강아지 나이를 입력하세요</h3>
-                <div class="pet-size-options" id="pet-size-options">
+                <fieldset class="pet-mode-fieldset">
+                    <legend>알고 있는 정보를 선택하세요</legend>
+                    <div class="pet-mode-options">
+                        <label><input type="radio" name="pet-age-mode" value="birth-date" checked><span>생일을 알아요</span></label>
+                        <label><input type="radio" name="pet-age-mode" value="known-age"><span>현재 나이를 알아요</span></label>
+                        <label><input type="radio" name="pet-age-mode" value="adoption-date"><span>데려온 날을 알아요</span></label>
+                    </div>
+                </fieldset>
+                <div class="pet-size-options" id="pet-size-options" aria-describedby="pet-size-explanation">
                     <label class="pet-size-option" data-size="small" for="size-small">
                         <input type="radio" id="size-small" name="pet-size" value="small" checked>
+                        <img class="dog-size-illustration dog-size-illustration-small" src="{{ url_for('static', filename='images/dog-size-small.png') }}" alt="" width="1254" height="1254">
                         <svg class="dog-size-icon dog-size-icon-small" viewBox="0 0 64 52" aria-hidden="true">
                             <path d="M20 17c-5-6-12-5-13 2-1 6 4 12 11 14l4-6-2-10Z" fill="currentColor" opacity="0.9"></path>
                             <path d="M44 17c5-6 12-5 13 2 1 6-4 12-11 14l-4-6 2-10Z" fill="currentColor" opacity="0.9"></path>
@@ -83,6 +90,7 @@
                     </label>
                     <label class="pet-size-option" data-size="medium" for="size-medium">
                         <input type="radio" id="size-medium" name="pet-size" value="medium">
+                        <img class="dog-size-illustration dog-size-illustration-medium" src="{{ url_for('static', filename='images/dog-size-medium.png') }}" alt="" width="1254" height="1254" loading="lazy">
                         <svg class="dog-size-icon dog-size-icon-medium" viewBox="0 0 64 52" aria-hidden="true">
                             <path d="M19 16c-6-7-13-5-14 2-1 7 4 14 12 16l5-7-3-11Z" fill="currentColor" opacity="0.9"></path>
                             <path d="M45 16c6-7 13-5 14 2 1 7-4 14-12 16l-5-7 3-11Z" fill="currentColor" opacity="0.9"></path>
@@ -101,6 +109,7 @@
                     </label>
                     <label class="pet-size-option" data-size="large" for="size-large">
                         <input type="radio" id="size-large" name="pet-size" value="large">
+                        <img class="dog-size-illustration dog-size-illustration-large" src="{{ url_for('static', filename='images/dog-size-large.png') }}" alt="" width="1254" height="1254" loading="lazy">
                         <svg class="dog-size-icon dog-size-icon-large" viewBox="0 0 64 52" aria-hidden="true">
                             <path d="M18 15c-7-8-15-5-15 3 0 8 5 15 13 17l6-8-4-12Z" fill="currentColor" opacity="0.9"></path>
                             <path d="M46 15c7-8 15-5 15 3 0 8-5 15-13 17l-6-8 4-12Z" fill="currentColor" opacity="0.9"></path>
@@ -120,6 +129,7 @@
                     </label>
                     <label class="pet-size-option" data-size="giant" for="size-giant">
                         <input type="radio" id="size-giant" name="pet-size" value="giant">
+                        <img class="dog-size-illustration dog-size-illustration-giant" src="{{ url_for('static', filename='images/dog-size-giant.png') }}" alt="" width="1254" height="1254" loading="lazy">
                         <svg class="dog-size-icon dog-size-icon-giant" viewBox="0 0 64 52" aria-hidden="true">
                             <path d="M17 14c-8-9-16-5-16 4 0 9 6 16 14 18l7-9-5-13Z" fill="currentColor" opacity="0.9"></path>
                             <path d="M47 14c8-9 16-5 16 4 0 9-6 16-14 18l-7-9 5-13Z" fill="currentColor" opacity="0.9"></path>
@@ -139,18 +149,33 @@
                         초대형견
                     </label>
                 </div>
-                <div class="date-inputs">
-                    <input type="text" id="pet-years" placeholder="년" inputmode="numeric" pattern="[0-9]*" maxlength="2" required>
-                    <input type="text" id="pet-months" placeholder="개월" inputmode="numeric" pattern="[0-9]*" maxlength="2">
+                <p class="pet-size-explanation" id="pet-size-explanation" hidden>
+                    데려온 날만으로는 실제 나이를 알 수 없어 체형별 사람 나이 환산을 제공하지 않습니다.
+                    체형은 생일이나 현재 나이를 선택했을 때 사용할 수 있어요.
+                </p>
+                <div class="pet-input-panel" data-pet-panel="birth-date">
+                    <label class="field-label" for="pet-birth-date">생년월일 8자리</label>
+                    <input type="text" id="pet-birth-date" placeholder="2021.05.10" inputmode="numeric" pattern="[0-9.]*" maxlength="10" aria-describedby="pet-error">
+                </div>
+                <div class="pet-input-panel date-inputs" data-pet-panel="known-age" hidden>
+                    <label class="field-label" for="pet-years">현재 나이</label>
+                    <input type="text" id="pet-years" placeholder="년" inputmode="numeric" pattern="[0-9]*" maxlength="2" aria-label="강아지 나이 년">
+                    <input type="text" id="pet-months" placeholder="개월" inputmode="numeric" pattern="[0-9]*" maxlength="2" aria-label="강아지 나이 개월">
+                </div>
+                <div class="pet-input-panel" data-pet-panel="adoption-date" hidden>
+                    <label class="field-label" for="pet-adoption-date">데려온 날 8자리</label>
+                    <input type="text" id="pet-adoption-date" placeholder="2024.03.01" inputmode="numeric" pattern="[0-9.]*" maxlength="10" aria-describedby="pet-error">
+                    <p class="input-help">실제 나이가 아니라 오늘까지 함께한 기간을 계산합니다.</p>
                 </div>
                 <small id="pet-error" class="error-msg" aria-live="polite"></small>
             </div>
         </form>
 
-        <div class="result-container" id="pet-result-container">
+        <div class="result-container" id="pet-result-container" aria-live="polite">
             <h2>계산 결과</h2>
             <div id="pet-result-content"></div>
         </div>
+        {% include 'partials/home_coupang_rails.html' %}
 
         <section class="section-shell">
             <div class="section-heading">

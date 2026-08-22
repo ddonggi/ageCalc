@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Preflight checks for the AdSense re-review state.
+"""Operational checks for the live AdSense site.
 
 The checks intentionally avoid live network calls. They validate the local Flask
-routes, dynamic sitemap, robots.txt, and ads.txt that will be deployed.
+routes, dynamic sitemap, robots.txt, ads.txt, and content quality that will be deployed.
+Content warnings remain visible but only errors block a release.
 """
 
 from __future__ import annotations
@@ -74,7 +75,7 @@ def validate_sitemap_paths(paths: list[str], report: PreflightReport) -> None:
     for path in paths:
         for prefix in FORBIDDEN_SITEMAP_PREFIXES:
             if path == prefix or path.startswith(f"{prefix}/"):
-                report.add_issue("forbidden_sitemap_path", path, "승인 전 사이트맵에 노출하지 않을 경로입니다.")
+                report.add_issue("forbidden_sitemap_path", path, "운영 사이트맵에 노출하지 않을 경로입니다.")
 
 
 def _has_noindex(response, html: str) -> bool:
@@ -295,13 +296,7 @@ def run_local_preflight() -> PreflightReport:
         report.add_issue(
             "content_quality_failure",
             "/sitemap.xml",
-            f"승인 대상 페이지 {report.content_quality_failures}개가 콘텐츠 품질 오류 상태입니다.",
-        )
-    if report.content_quality_warnings:
-        report.add_issue(
-            "content_quality_warning",
-            "/sitemap.xml",
-            f"승인 대상 페이지에 콘텐츠 품질 경고 {report.content_quality_warnings}개가 남아 있습니다.",
+            f"운영 페이지 {report.content_quality_failures}개가 콘텐츠 품질 오류 상태입니다.",
         )
     return report
 
@@ -334,7 +329,7 @@ def _report_to_json(report: PreflightReport) -> str:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Run AdSense approval preflight checks against the local Flask app.")
+    parser = argparse.ArgumentParser(description="Run AdSense operational checks against the local Flask app.")
     parser.add_argument("--format", choices=("text", "json"), default="text", help="Output format.")
     args = parser.parse_args(argv)
 

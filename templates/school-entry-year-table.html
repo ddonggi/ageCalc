@@ -96,9 +96,6 @@
             <p class="small">이 페이지는 입학 학년도만 계산합니다. 정확한 입학식 날짜는 학교 일정을 확인하세요.</p>
             <p class="small">현재 몇 학년인지 확인하려면 학년 계산기를 사용하세요.</p>
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
-
         <section class="section-shell">
             <div class="section-heading">
                 <h2 id="school-entry-search">출생년도 선택</h2>
@@ -123,6 +120,8 @@
                 </div>
             </form>
         </section>
+        {% include 'partials/info_coupang_promotions.html' %}
+        {% include 'partials/home_coupang_rails.html' %}
 
         {% if selected_row %}
         <section class="section-shell section-card-grid">

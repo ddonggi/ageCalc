@@ -1502,6 +1502,14 @@ def index():
     return render_template('index.html', today=_current_local_date())
 
 
+@app.get('/life-timeline')
+def life_timeline():
+    """생년월일 기반 통합 결과를 브라우저에서 계산하는 페이지."""
+    if request.args:
+        return redirect(url_for('life_timeline'))
+    return render_template('life-timeline.html', today=_current_local_date())
+
+
 @app.get("/<hub_slug>/")
 def life_hub(hub_slug):
     hub = HUB_PAGE_BY_SLUG.get(hub_slug)

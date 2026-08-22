@@ -28,7 +28,9 @@
 
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/date-rules.js') }}" defer></script>
+    <script src="{{ versioned_static('js/profile-date.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/birthday-dday.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
 
@@ -78,46 +80,28 @@
             </p>
             {% endif %}
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
-
         <section class="section-shell">
             <div class="section-heading">
                 <h2 id="birthday-search">생일 선택</h2>
-                <p class="section-intro">월과 일을 고르면 다음 생일 날짜와 남은 일수를 바로 요약해 보여드립니다.</p>
+                <p class="section-intro">생일 월일 4자리를 입력하면 다음 생일 날짜와 남은 일수를 바로 보여드립니다.</p>
             </div>
-            <form class="age-form" method="get" action="{{ url_for('birthday_dday_calculator') }}">
+            <form class="age-form" id="birthday-dday-form" autocomplete="off" data-clarity-mask="true">
                 <div class="form-group">
                     <div class="date-inputs">
-                        <select name="month" aria-label="생일 월">
-                            <option value="">월</option>
-                            {% for value in range(1, 13) %}
-                            <option value="{{ value }}" {% if month == value %}selected{% endif %}>{{ value }}월</option>
-                            {% endfor %}
-                        </select>
-                        <select name="day" aria-label="생일 일">
-                            <option value="">일</option>
-                            {% for value in range(1, 32) %}
-                            <option value="{{ value }}" {% if day == value %}selected{% endif %}>{{ value }}일</option>
-                            {% endfor %}
-                        </select>
+                        <label class="field-label" for="birthday-dday-input">생일 월일</label>
+                        <input type="text" id="birthday-dday-input" placeholder="05.10" inputmode="numeric" pattern="[0-9.]*" maxlength="5" aria-label="생일 월일 4자리" aria-describedby="birthday-dday-error" data-profile-date-input="month-day" value="{% if month and day %}{{ '%02d.%02d'|format(month, day) }}{% endif %}">
                     </div>
                     <div class="hero-actions">
-                        <button class="btn btn-primary" type="submit">생일 계산</button>
-                        {% if month or day %}
-                        <a class="btn btn-secondary" href="{{ url_for('birthday_dday_calculator') }}">입력 지우기</a>
-                        {% endif %}
+                        <button class="btn btn-secondary" id="birthday-dday-clear" type="button">입력 지우기</button>
                     </div>
-                    {% if invalid_date %}
-                    <small class="error-msg">존재하는 날짜를 선택해 주세요. 2월 30일 같은 날짜는 계산할 수 없습니다.</small>
-                    {% endif %}
+                    <small class="error-msg" id="birthday-dday-error" aria-live="polite"></small>
                 </div>
             </form>
         </section>
 
-        {% if selected_snapshot %}
-        <section class="section-shell section-card-grid">
-            <article class="section-card birth-year-summary">
+        <section class="section-shell section-card-grid" id="birthday-dday-result" {% if not selected_snapshot %}hidden{% endif %} aria-live="polite">
+            <article class="section-card birth-year-summary" id="birthday-dday-result-content">
+                {% if selected_snapshot %}
                 <p class="eyebrow">선택한 생일</p>
                 <h2>{{ selected_snapshot.birthday_label }}</h2>
                 <p>{{ selected_snapshot.detail }}</p>
@@ -140,9 +124,11 @@
                     </div>
                 </div>
                 <p class="small">{{ selected_snapshot.status_note }}</p>
+                {% endif %}
             </article>
         </section>
-        {% endif %}
+        {% include 'partials/info_coupang_promotions.html' %}
+        {% include 'partials/home_coupang_rails.html' %}
 
         <section class="section-shell faq" aria-labelledby="birthday-dday-faq">
             <h2 id="birthday-dday-faq">생일 D-day 자주 묻는 질문</h2>

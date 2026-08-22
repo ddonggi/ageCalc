@@ -61,7 +61,7 @@ class AgeCalculatorUI {
         radioButtons.forEach(radio => {
             radio.addEventListener('change', () => {
                 // 값이 유효하면 재계산
-                if (this.birthInput && this.birthInput.value.length === 8) {
+                if (this.birthInput && this.birthInput.value.replace(/\D/g, '').length === 8) {
                     const v = this.validateBirthDate(this.birthInput.value);
                     if (v.valid) {
                         this.autoCalculateFromBirthDate(v);
@@ -1056,6 +1056,7 @@ class AgeCalculatorUI {
         if (!this.birthInput) return;
 
         this.birthInput.addEventListener('input', () => {
+            this.birthInput.value = AgeCalcDateRules.formatDateDigits(this.birthInput.value);
             this.checkAndCalculateBirthDate();
         });
 
@@ -1197,15 +1198,7 @@ class AgeCalculatorUI {
      * 초기 포커스 설정
      */
     setInitialFocus() {
-        const target = this.birthInput || this.yearInput;
-        if (target) {
-            if (document.readyState === 'complete') {
-                target.focus();
-            } else {
-                document.addEventListener('DOMContentLoaded', () => target.focus());
-                window.addEventListener('load', () => target.focus());
-            }
-        }
+        // 사용자가 페이지 내용을 먼저 읽을 수 있도록 초기 포커스를 강제로 옮기지 않습니다.
     }
 
     /**

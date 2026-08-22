@@ -66,9 +66,6 @@
                 </article>
             </div>
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
-
         <section class="section-shell direct-answer" aria-label="대학 학번 바로 답변">
             <p class="eyebrow">바로 답변 · 대학 학번 역산</p>
             <h2>{% if selected_row %}{{ selected_row.cohort_label }}·{{ selected_year }}학번의 나이와 출생연도{% else %}학번에서 출생연도와 현재 나이를 역산합니다{% endif %}</h2>
@@ -103,6 +100,8 @@
                 </div>
             </form>
         </section>
+        {% include 'partials/info_coupang_promotions.html' %}
+        {% include 'partials/home_coupang_rails.html' %}
 
         {% if selected_row %}
         <section class="section-shell section-card-grid">

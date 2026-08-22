@@ -98,6 +98,7 @@
     <!-- Google tag (gtag.js) -->
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
 
+    <script src="{{ versioned_static('js/profile-date.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 
 </head>
@@ -143,8 +144,6 @@
                 정확한 결과에는 연·월·일이 모두 필요하며, 이 페이지에 표시된 {{ today.isoformat() }}이 기준일입니다.
             </p>
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
         <form class="age-form" id="age-form" action="{{ url_for('age') }}" method="post" autocomplete="off" data-clarity-mask="true">
             <div class="form-group">
                 <h3>생년월일을 입력하세요 (8자리)</h3>
@@ -161,8 +160,9 @@
                 </div>
 
                 <div class="date-inputs">
-                    <input type="text" id="birth-input" name="birth-input" placeholder="19921002" inputmode="numeric"
-                        pattern="[0-9]*" maxlength="8" required data-clarity-mask="true">
+                    <label class="field-label" for="birth-input">생년월일 8자리</label>
+                    <input type="text" id="birth-input" name="birth-input" placeholder="1992.10.02" inputmode="numeric"
+                        pattern="[0-9.]*" maxlength="10" required aria-describedby="birth-error" data-clarity-mask="true" data-profile-date-input="full">
                 </div>
 
                 <p class="input-help">
@@ -175,12 +175,14 @@
             </div>
         </form>
 
-        <div class="result-container" id="result-container" data-clarity-mask="true">
+        <div class="result-container" id="result-container" aria-live="polite" data-clarity-mask="true">
             <h2>계산 결과</h2>
             <div id="result-content">
                 <!-- 결과 내용이 JavaScript로 동적 생성됨 -->
             </div>
         </div>
+        {% include 'partials/info_coupang_promotions.html' %}
+        {% include 'partials/home_coupang_rails.html' %}
         <div class="info">
             <h3>사용법</h3>
             <ul>

@@ -1,24 +1,21 @@
 class DDayCalculator {
     constructor() {
         this.labelInput = document.getElementById("dday-label");
-        this.yearInput = document.getElementById("dday-year");
-        this.monthInput = document.getElementById("dday-month");
-        this.dayInput = document.getElementById("dday-day");
+        this.dateInput = document.getElementById("dday-date");
         this.modeInputs = Array.from(document.querySelectorAll('input[name="dday-mode"]'));
         this.errorEl = document.getElementById("dday-error");
         this.resultContainer = document.getElementById("dday-result-container");
         this.resultContent = document.getElementById("dday-result-content");
 
-        if (!this.yearInput || !this.monthInput || !this.dayInput || !this.resultContainer || !this.resultContent) {
+        if (!this.dateInput || !this.resultContainer || !this.resultContent) {
             return;
         }
 
         this.bindEvents();
-        this.updateResult();
     }
 
     bindEvents() {
-        [this.labelInput, this.yearInput, this.monthInput, this.dayInput].forEach((input) => {
+        [this.labelInput, this.dateInput].forEach((input) => {
             if (!input) return;
             ["input", "change"].forEach((eventName) => {
                 input.addEventListener(eventName, () => {
@@ -34,9 +31,7 @@ class DDayCalculator {
     }
 
     normalizeInputs() {
-        this.limitDigits(this.yearInput, 4);
-        this.limitDigits(this.monthInput, 2);
-        this.limitDigits(this.dayInput, 2);
+        this.dateInput.value = AgeCalcDateRules.formatDateDigits(this.dateInput.value);
     }
 
     limitDigits(input, maxLength) {
@@ -56,43 +51,15 @@ class DDayCalculator {
     }
 
     validate() {
-        const yearText = String(this.yearInput.value || "");
-        const monthText = String(this.monthInput.value || "");
-        const dayText = String(this.dayInput.value || "");
-        const year = Number(yearText || 0);
-        const month = Number(monthText || 0);
-        const day = Number(dayText || 0);
-
-        if (!year || !month || !day) {
-            return { valid: false, message: "연, 월, 일을 모두 입력해 주세요." };
-        }
-        if (yearText.length !== 4) {
-            return { valid: false, message: "연도는 4자리로 입력해 주세요." };
-        }
-        if (monthText.length !== 2) {
-            return { valid: false, message: "월은 2자리로 입력해 주세요." };
-        }
-        if (dayText.length !== 2) {
-            return { valid: false, message: "일은 2자리로 입력해 주세요." };
-        }
-        if (month < 1 || month > 12) {
-            return { valid: false, message: "월은 1~12 사이로 입력해 주세요." };
-        }
-        if (day < 1 || day > 31) {
-            return { valid: false, message: "일은 1~31 사이로 입력해 주세요." };
-        }
-
-        const date = new Date(year, month - 1, day);
-        if (
-            Number.isNaN(date.getTime()) ||
-            date.getFullYear() !== year ||
-            date.getMonth() !== month - 1 ||
-            date.getDate() !== day
-        ) {
+        const digits = String(this.dateInput.value || "").replace(/\D/g, "");
+        if (digits.length < 8) return { valid: false, incomplete: true, message: "" };
+        try {
+            const parsed = AgeCalcDateRules.parseDateDigits(digits);
+            const date = new Date(parsed.getUTCFullYear(), parsed.getUTCMonth(), parsed.getUTCDate());
+            return { valid: true, date };
+        } catch (error) {
             return { valid: false, message: "올바른 날짜를 입력해 주세요." };
         }
-
-        return { valid: true, date };
     }
 
     diffDays(targetDate) {
@@ -147,7 +114,7 @@ class DDayCalculator {
     updateResult() {
         const validation = this.validate();
         if (!validation.valid) {
-            this.showError(validation.message);
+            this.showError(validation.incomplete ? "" : validation.message);
             this.clearResult();
             return;
         }

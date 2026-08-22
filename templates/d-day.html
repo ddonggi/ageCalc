@@ -25,7 +25,6 @@
 
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
 
@@ -68,10 +67,7 @@
                 시작일을 1일째로 세는 백일 계산과 달리 두 날짜 사이의 순수한 날짜 차이를 사용합니다.
             </p>
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
-
-        <form class="age-form" id="dday-form" autocomplete="off">
+        <form class="age-form" id="dday-form" autocomplete="off" data-clarity-mask="true">
             <div class="form-split">
                 <div class="field-stack">
                     <h3>기념일 이름</h3>
@@ -95,18 +91,19 @@
             <div class="form-group">
                 <h3>기준 날짜</h3>
                 <div class="date-inputs">
-                    <input type="text" id="dday-year" placeholder="년" inputmode="numeric" pattern="[0-9]*" maxlength="4" required>
-                    <input type="text" id="dday-month" placeholder="월" inputmode="numeric" pattern="[0-9]*" maxlength="2" required>
-                    <input type="text" id="dday-day" placeholder="일" inputmode="numeric" pattern="[0-9]*" maxlength="2" required>
+                    <label class="field-label" for="dday-date">기준 날짜</label>
+                    <input type="text" id="dday-date" placeholder="2026.12.25" inputmode="numeric" pattern="[0-9.]*" maxlength="10" required aria-label="기준 날짜 8자리" aria-describedby="dday-error">
                 </div>
                 <small id="dday-error" class="error-msg" aria-live="polite"></small>
             </div>
         </form>
 
-        <div class="result-container" id="dday-result-container">
+        <div class="result-container" id="dday-result-container" aria-live="polite">
             <h2>계산 결과</h2>
             <div id="dday-result-content"></div>
         </div>
+        {% include 'partials/info_coupang_promotions.html' %}
+        {% include 'partials/home_coupang_rails.html' %}
 
         <section class="section-shell">
             <div class="section-heading">

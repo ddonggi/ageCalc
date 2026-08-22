@@ -185,12 +185,13 @@ class ContentQualityAuditTests(unittest.TestCase):
 
         self.assertEqual({}, failing)
 
-    def test_review_mode_audit_covers_only_46_approval_pages(self):
+    def test_operational_audit_allows_warnings_on_46_public_pages(self):
         report = audit_local_pages()
 
         self.assertEqual(46, len(report.results))
         self.assertEqual(0, report.error_count)
-        self.assertEqual(0, report.warning_count)
+        self.assertGreater(report.warning_count, 0)
+        self.assertTrue(report.ok)
         self.assertFalse(any(result.path.endswith("/") and result.path != "/" for result in report.results))
 
     def test_public_mode_audit_includes_dynamic_ymyl_blog_articles(self):

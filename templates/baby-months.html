@@ -47,8 +47,6 @@
         <h1>아이 개월수 계산기</h1>
         <div style="text-align: center;margin-bottom: 2rem;">출생일을 입력하면 현재 아이 개월 수와 아기 월령이 바로 나옵니다.</div>
 
-        {% include 'partials/home_coupang_rails.html' %}
-
         <section class="section-shell direct-answer" aria-label="아이 월령 바로 답변">
             <div class="section-heading">
                 <p class="eyebrow">바로 답변</p>
@@ -67,16 +65,18 @@
             <div class="form-group">
                 <h3>출생일을 입력하세요 (8자리)</h3>
                 <div class="date-inputs">
-                    <input type="text" id="baby-birth-input" placeholder="20250615" inputmode="numeric" pattern="[0-9]*" maxlength="8" required aria-label="출생일 8자리" data-clarity-mask="true">
+                    <label class="field-label" for="baby-birth-input">출생일 8자리</label>
+                    <input type="text" id="baby-birth-input" placeholder="2025.06.15" inputmode="numeric" pattern="[0-9.]*" maxlength="10" required aria-describedby="baby-error" data-clarity-mask="true">
                 </div>
                 <small id="baby-error" class="error-msg" aria-live="polite"></small>
             </div>
         </form>
 
-        <div class="result-container" id="baby-result-container" data-clarity-mask="true">
+        <div class="result-container" id="baby-result-container" aria-live="polite" data-clarity-mask="true">
             <h2>계산 결과</h2>
             <div id="baby-result-content"></div>
         </div>
+        {% include 'partials/home_coupang_rails.html' %}
 
         <section class="section-shell">
             <div class="section-heading">

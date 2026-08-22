@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>내 생애 타임라인 계산기 | AgeCalc</title>
+    <meta name="description" content="생년월일 한 번으로 현재 만나이, 살아온 날, 다음 생일, 띠와 별자리를 오늘 기준으로 한 화면에서 확인합니다." />
+    <meta name="robots" content="noindex,follow" />
+    <link rel="canonical" href="https://agecalc.cloud/life-timeline" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="내 생애 타임라인 계산기" />
+    <meta property="og:description" content="한 번 입력한 생년월일로 나의 시간과 다음 생일을 이어서 확인하세요." />
+    <meta property="og:url" content="https://agecalc.cloud/life-timeline" />
+    <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ versioned_static('js/date-rules.js') }}" defer></script>
+    {% include 'partials/adsense.html' %}
+</head>
+<body class="life-timeline-page">
+    <div id="pixel-background"></div>
+    <div class="container">
+        {% include 'partials/header.html' %}
+
+        <section class="hero-band life-timeline-hero">
+            <div class="hero-copy">
+                <p class="eyebrow">My Life · Today</p>
+                <h1>내 생애 타임라인 계산기</h1>
+                <p class="page-intro">생년월일 한 번으로 지금의 나이부터 살아온 날, 다음 생일과 출생 프로필까지 하나의 흐름으로 확인하세요.</p>
+            </div>
+            <div class="life-orbit" aria-hidden="true">
+                <span>탄생</span><i></i><span>오늘</span><i></i><span>다음 생일</span>
+            </div>
+        </section>
+
+        <section class="section-shell direct-answer">
+            <div class="section-heading">
+                <p class="eyebrow">한 번만 입력하세요</p>
+                <h2>모든 결과는 {{ today.strftime('%Y년 %-m월 %-d일') }}을 같은 기준일로 계산합니다</h2>
+            </div>
+            <form class="age-form life-timeline-form" id="life-timeline-form" data-today="{{ today.isoformat() }}" autocomplete="off" data-clarity-mask="true">
+                <label class="field-label" for="life-birth-date">생년월일 8자리</label>
+                <input type="text" id="life-birth-date" placeholder="1992.10.02" inputmode="numeric" pattern="[0-9.]*" maxlength="10" required aria-describedby="life-timeline-help profile-date-note life-timeline-error" data-profile-date-input="full" />
+                <p class="input-help" id="life-timeline-help">입력한 날짜는 브라우저 안에서만 계산하며 URL이나 서버로 전송하지 않습니다.</p>
+                <div class="profile-date-control">
+                    <label for="profile-date-consent"><input type="checkbox" id="profile-date-consent" /> <span>이 기기에서 다음 계산에도 사용</span></label>
+                    <button type="button" class="btn btn-secondary" id="profile-date-clear">저장값 삭제</button>
+                </div>
+                <p class="input-help" id="profile-date-note">선택하면 이 브라우저에만 저장됩니다. 공용 기기에서는 사용하지 말고, 언제든 저장값을 삭제하세요.</p>
+                <small class="error-msg" id="life-timeline-error" aria-live="polite"></small>
+            </form>
+        </section>
+
+        <section class="life-timeline-result" id="life-timeline-result" aria-live="polite" aria-label="생애 타임라인 계산 결과" hidden></section>
+
+        <section class="section-shell section-card-grid">
+            <article class="section-card">
+                <p class="eyebrow">날짜 기준</p>
+                <h2>살아온 날은 날짜 차이입니다</h2>
+                <p>출생일을 1일째로 세는 기념일 방식이 아니라, 출생일과 오늘 사이에 실제로 지난 날짜 수를 표시합니다.</p>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">해석 범위</p>
+                <h2>띠는 출생연도 기준입니다</h2>
+                <p>일상적인 연도별 띠를 표시합니다. 음력 설이나 입춘을 기준으로 하는 사주식 해석은 별도로 확인해야 합니다.</p>
+            </article>
+        </section>
+
+        <section class="section-shell">
+            <div class="section-heading"><h2>타임라인 다음에 확인할 도구</h2></div>
+            <div class="footer-links">
+                <a href="{{ url_for('age') }}">만 나이 기준 자세히 보기</a>
+                <a href="{{ url_for('birthday_dday_calculator') }}">생일 D-day 계산하기</a>
+                <a href="{{ url_for('birth_year_zodiac_table') }}">출생연도별 띠표 보기</a>
+                <a href="{{ url_for('school_grade_calculator') }}">출생연도 기준 학년 보기</a>
+            </div>
+        </section>
+
+        {% include 'partials/footer.html' %}
+    </div>
+    <div class="cookie-banner" id="cookie-banner"><div class="cookie-content"><p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 거부해도 계산 기능은 그대로 이용할 수 있습니다.</p><div class="cookie-buttons"><button id="accept-cookies" class="btn btn-primary">동의</button><button id="reject-cookies" class="btn btn-secondary">거부</button></div></div></div>
+    <script src="{{ versioned_static('js/profile-date.js') }}" defer></script>
+    <script src="{{ versioned_static('js/life-timeline.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
+</body>
+</html>

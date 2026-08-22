@@ -66,9 +66,6 @@
                 </article>
             </div>
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
-
         <section class="section-shell direct-answer" aria-label="학년별 나이 바로 답변">
             <p class="eyebrow">바로 답변 · 학년별 나이 해석</p>
             <h2>{% if selected_row %}{{ selected_row.label }} 나이는 {{ selected_row.annual_age }}입니다{% else %}{{ school_year }}학년도 중1은 연나이 {{ featured_grade_rows[0].annual_age }}, 중3은 {{ featured_grade_rows[1].annual_age }}, 고1은 {{ featured_grade_rows[2].annual_age }}, 고3은 {{ featured_grade_rows[3].annual_age }}입니다{% endif %}</h2>
@@ -114,6 +111,8 @@
                 </div>
             </form>
         </section>
+        {% include 'partials/info_coupang_promotions.html' %}
+        {% include 'partials/home_coupang_rails.html' %}
 
         {% if selected_row %}
         <section class="section-shell section-card-grid">

@@ -1,8 +1,27 @@
-# AgeCalc AdSense 승인 기준선
+# AgeCalc AdSense 운영 기준선
 
 기준일: 2026-06-19
 
-## 2026-07-13 재심사 승인 모드
+## 2026-08-23 승인 이후 운영 모드
+
+AgeCalc는 AdSense 승인이 완료된 상태다. 아래의 과거 재심사 기준은 당시 변경 이력을 보존하기 위한 기록이며, 현재 배포 판정에는 다음 운영 기준을 적용한다.
+
+- 콘텐츠 품질 `error`는 배포를 차단한다.
+- 콘텐츠 품질 `warning`은 보고서와 운영 개선 목록에 남기되 배포를 차단하지 않는다.
+- sitemap의 비정상 URL, 공개 페이지의 `noindex`, AdSense 코드 누락, `robots.txt`·`ads.txt` 오류는 계속 배포를 차단한다.
+- 문장 반복, 얇은 본문 등 경고는 월간 콘텐츠 개선 대상으로 관리한다.
+- 승인 상태와 관계없이 모바일 가독성, 광고 배치, 개인정보 보호, 정책 페이지 접근성을 유지한다.
+
+현재 검증 결과는 다음 형식을 만족해야 한다.
+
+```text
+전체 unittest 통과
+[adsense-preflight] PASS ... quality_failures=0 quality_warnings=N
+```
+
+`quality_warnings=N`은 허용되며, `quality_failures`와 차단 이슈는 반드시 0이어야 한다.
+
+## 2026-07-13 과거 재심사 승인 모드
 
 `가치가 별로 없는 콘텐츠` 거절 이후 재심사 기간에는 다음 운영 상태를 최우선 기준으로 사용한다.
 
@@ -16,7 +35,7 @@
 - 공개 HTML과 CSP에는 쿠팡 도메인, `rel="sponsored"`, 제휴 고지 문구가 없어야 한다.
 - `retirement`, `health`, `generations` 하위 sitemap은 비어 있으므로 sitemap index에서도 제외한다.
 
-재심사 전 검증 결과는 다음을 만족해야 한다.
+당시 재심사 전 검증 결과는 다음을 만족해야 했다.
 
 ```text
 전체 unittest 통과
