@@ -2,6 +2,17 @@
     'use strict';
 
     const ZODIAC = ['원숭이', '닭', '개', '돼지', '쥐', '소', '호랑이', '토끼', '용', '뱀', '말', '양'];
+    const RELATED_TOOL_DESTINATIONS = {
+        '/age': 'age',
+        '/birthday-dday-calculator': 'birthday_dday',
+        '/birth-year-zodiac-table': 'birth_year_zodiac'
+    };
+
+    function trackEvent(name, params) {
+        if (root.AgeCalcTracking && typeof root.AgeCalcTracking.trackEvent === 'function') {
+            root.AgeCalcTracking.trackEvent(name, params);
+        }
+    }
 
     function parseIso(value) {
         const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || ''));
@@ -121,6 +132,17 @@
         const result = document.getElementById('life-timeline-result');
         const asOf = form.dataset.today;
 
+        result.addEventListener('click', (event) => {
+            const link = event.target.closest('a[href]');
+            const destination = link && RELATED_TOOL_DESTINATIONS[link.getAttribute('href')];
+            if (destination) {
+                trackEvent('life_timeline_related_tool_click', {
+                    calculator: 'life_timeline',
+                    destination
+                });
+            }
+        });
+
         input.addEventListener('input', () => {
             input.value = root.AgeCalcDateRules.formatDateDigits(input.value);
             const digits = input.value.replace(/\D/g, '');
@@ -137,6 +159,7 @@
                 input.classList.remove('error');
                 result.innerHTML = renderResult(timeline);
                 result.hidden = false;
+                trackEvent('life_timeline_complete', { calculator: 'life_timeline' });
             } catch (exception) {
                 error.textContent = String(exception.message).includes('future')
                     ? '미래 날짜는 입력할 수 없습니다.'

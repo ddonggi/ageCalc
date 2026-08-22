@@ -55,6 +55,56 @@ class LifeTimelineTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "기준일보다 늦을 수 없습니다"):
             self.build(date(2026, 8, 24), date(2026, 8, 23))
 
+    def test_ten_hand_checked_samples_match_python_and_browser_calculators(self):
+        samples = (
+            ("2000-08-24", "2026-08-23", {"full_age": 25, "korean_year_age": 26, "days_lived": 9495, "next_birthday": "2026-08-24", "days_until_birthday": 1, "zodiac": "용", "constellation": "처녀자리"}),
+            ("2000-08-24", "2026-08-25", {"full_age": 26, "korean_year_age": 26, "days_lived": 9497, "next_birthday": "2027-08-24", "days_until_birthday": 364, "zodiac": "용", "constellation": "처녀자리"}),
+            ("2000-08-23", "2026-08-23", {"full_age": 26, "korean_year_age": 26, "days_lived": 9496, "next_birthday": "2026-08-23", "days_until_birthday": 0, "zodiac": "용", "constellation": "처녀자리"}),
+            ("2000-02-29", "2025-02-28", {"full_age": 24, "korean_year_age": 25, "days_lived": 9131, "next_birthday": "2028-02-29", "days_until_birthday": 1096, "zodiac": "용", "constellation": "물고기자리"}),
+            ("1990-12-31", "2026-12-30", {"full_age": 35, "korean_year_age": 36, "days_lived": 13148, "next_birthday": "2026-12-31", "days_until_birthday": 1, "zodiac": "말", "constellation": "염소자리"}),
+            ("1999-12-31", "2026-01-01", {"full_age": 26, "korean_year_age": 27, "days_lived": 9498, "next_birthday": "2026-12-31", "days_until_birthday": 364, "zodiac": "토끼", "constellation": "염소자리"}),
+            ("2000-01-01", "2026-01-01", {"full_age": 26, "korean_year_age": 26, "days_lived": 9497, "next_birthday": "2026-01-01", "days_until_birthday": 0, "zodiac": "용", "constellation": "염소자리"}),
+            ("2000-01-20", "2026-01-20", {"full_age": 26, "korean_year_age": 26, "days_lived": 9497, "next_birthday": "2026-01-20", "days_until_birthday": 0, "zodiac": "용", "constellation": "물병자리"}),
+            ("2000-02-19", "2026-02-19", {"full_age": 26, "korean_year_age": 26, "days_lived": 9497, "next_birthday": "2026-02-19", "days_until_birthday": 0, "zodiac": "용", "constellation": "물고기자리"}),
+            ("2000-03-21", "2026-03-21", {"full_age": 26, "korean_year_age": 26, "days_lived": 9496, "next_birthday": "2026-03-21", "days_until_birthday": 0, "zodiac": "용", "constellation": "양자리"}),
+        )
+        program = r"""
+const timeline = require('./static/js/life-timeline.js');
+const samples = JSON.parse(process.argv[1]);
+process.stdout.write(JSON.stringify(samples.map(([birthDate, asOf]) => timeline.buildLifeTimeline(birthDate, asOf))));
+"""
+        completed = subprocess.run(
+            ["node", "-e", program, json.dumps([(birth_date, as_of) for birth_date, as_of, _ in samples])],
+            cwd=Path.cwd(),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stderr)
+        browser_results = json.loads(completed.stdout)
+        for (birth_iso, as_of_iso, expected), browser_result in zip(samples, browser_results):
+            with self.subTest(birth_date=birth_iso, reference_date=as_of_iso):
+                self.assertEqual(
+                    {
+                        **expected,
+                        "next_birthday": date.fromisoformat(expected["next_birthday"]),
+                    },
+                    self.build(date.fromisoformat(birth_iso), date.fromisoformat(as_of_iso)),
+                )
+                self.assertEqual(
+                    {
+                        "fullAge": expected["full_age"],
+                        "yearAge": expected["korean_year_age"],
+                        "daysLived": expected["days_lived"],
+                        "nextBirthday": expected["next_birthday"],
+                        "daysUntilBirthday": expected["days_until_birthday"],
+                        "zodiac": expected["zodiac"],
+                        "constellation": expected["constellation"],
+                    },
+                    browser_result,
+                )
+
 
 class LifeTimelineBrowserTests(unittest.TestCase):
     def test_browser_calculator_matches_domain_result_without_network_requests(self):
@@ -87,6 +137,78 @@ process.stdout.write(JSON.stringify(result));
         javascript = Path("static/js/life-timeline.js").read_text(encoding="utf-8")
         self.assertNotIn("fetch(", javascript)
         self.assertNotIn("XMLHttpRequest", javascript)
+
+    def test_tracks_only_safe_completion_and_related_tool_events_after_rendering(self):
+        program = r"""
+const listeners = {};
+function element() {
+  return {
+    value: '', hidden: true, innerHTML: '', dataset: {}, listeners: {},
+    classList: { add() {}, remove() {} },
+    addEventListener(name, listener) { this.listeners[name] = listener; }
+  };
+}
+const form = element();
+form.dataset.today = '2026-08-23';
+const input = element();
+const error = element();
+const result = element();
+result.listeners.click = () => {};
+const elements = {
+  'life-timeline-form': form,
+  'life-birth-date': input,
+  'life-timeline-error': error,
+  'life-timeline-result': result
+};
+const events = [];
+global.window = {
+  AgeCalcTracking: {
+    trackEvent(name, params) {
+      events.push({ name, params, rendered: !result.hidden && Boolean(result.innerHTML) });
+    }
+  },
+  AgeCalcDateRules: {
+    formatDateDigits(value) { return value; },
+    parseDateDigits(value) {
+      const [year, month, day] = value.split('.').map(Number);
+      return new Date(Date.UTC(year, month - 1, day));
+    }
+  }
+};
+global.document = {
+  addEventListener(name, listener) { listeners[name] = listener; },
+  getElementById(id) { return elements[id]; }
+};
+require('./static/js/life-timeline.js');
+listeners.DOMContentLoaded();
+input.value = '2000.08.24';
+input.listeners.input();
+for (const href of ['/age', '/birthday-dday-calculator', '/birth-year-zodiac-table']) {
+  result.listeners.click({
+    target: { closest() { return { getAttribute() { return href; } }; } },
+    preventDefault() {}
+  });
+}
+process.stdout.write(JSON.stringify(events));
+"""
+        completed = subprocess.run(
+            ["node", "-e", program],
+            cwd=Path.cwd(),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stderr)
+        self.assertEqual(
+            [
+                {"name": "life_timeline_complete", "params": {"calculator": "life_timeline"}, "rendered": True},
+                {"name": "life_timeline_related_tool_click", "params": {"calculator": "life_timeline", "destination": "age"}, "rendered": True},
+                {"name": "life_timeline_related_tool_click", "params": {"calculator": "life_timeline", "destination": "birthday_dday"}, "rendered": True},
+                {"name": "life_timeline_related_tool_click", "params": {"calculator": "life_timeline", "destination": "birth_year_zodiac"}, "rendered": True},
+            ],
+            json.loads(completed.stdout),
+        )
 
 
 class LifeTimelinePageTests(unittest.TestCase):
