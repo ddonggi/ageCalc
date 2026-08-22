@@ -232,10 +232,7 @@ def _validate_observed_row(row: dict[str, str], prefix: str, errors: list[str]) 
     if not cited and row["citation_link_available"] == "true":
         errors.append(f"{prefix}: link cannot exist without citation")
 
-    if not row["evidence_file"]:
-        errors.append(f"{prefix}: observed row requires evidence_file")
-    if not _is_sha256(row["evidence_sha256"]):
-        errors.append(f"{prefix}: observed row requires a SHA-256 evidence checksum")
+    _validate_evidence(row, prefix, errors, "observed row")
     if row["downstream_clicks"] != "not_available":
         errors.append(f"{prefix}: downstream_clicks must remain not_available without GA4 data")
 
@@ -249,8 +246,20 @@ def _validate_unavailable_row(row: dict[str, str], prefix: str, errors: list[str
     for field in ("citation_context", "sentiment"):
         if row[field] != "not_applicable":
             errors.append(f"{prefix}: unavailable surface requires not_applicable {field}")
-    if not row["evidence_file"] or not _is_sha256(row["evidence_sha256"]):
-        errors.append(f"{prefix}: unavailable surface requires evidence file and SHA-256")
+    _validate_evidence(row, prefix, errors, "unavailable surface")
+
+
+def _validate_evidence(
+    row: dict[str, str], prefix: str, errors: list[str], subject: str
+) -> None:
+    files = _split_values(row["evidence_file"])
+    checksums = _split_values(row["evidence_sha256"])
+    if not files:
+        errors.append(f"{prefix}: {subject} requires evidence_file")
+    if not checksums or any(not _is_sha256(checksum) for checksum in checksums):
+        errors.append(f"{prefix}: {subject} requires SHA-256 evidence checksums")
+    if files and checksums and len(files) != len(checksums):
+        errors.append(f"{prefix}: evidence files and checksums must have matching counts")
 
 
 def summarize_observations(rows: Iterable[dict[str, str]]) -> dict[str, Any]:

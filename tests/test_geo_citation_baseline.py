@@ -69,6 +69,24 @@ class GeoCitationBaselineTest(unittest.TestCase):
         self.assertTrue(any("agecalc.cloud URL" in error for error in errors))
         self.assertTrue(any("SHA-256" in error for error in errors))
 
+    def test_accepts_multiple_evidence_files_with_matching_checksums(self):
+        rows = self._observed_rows()
+        checksum = hashlib.sha256(b"second evidence").hexdigest()
+        rows[0]["evidence_file"] = "answer-1.png;answer-2.png"
+        rows[0]["evidence_sha256"] = f"{rows[0]['evidence_sha256']};{checksum}"
+
+        errors = validate_observations(self.catalog, rows, require_complete=True)
+
+        self.assertEqual((), errors)
+
+    def test_rejects_mismatched_evidence_file_and_checksum_counts(self):
+        rows = self._observed_rows()
+        rows[0]["evidence_file"] = "answer-1.png;answer-2.png"
+
+        errors = validate_observations(self.catalog, rows, require_complete=True)
+
+        self.assertTrue(any("evidence files and checksums" in error for error in errors))
+
     def test_brand_sentiment_and_citation_context_must_be_consistent(self):
         rows = self._observed_rows()
         rows[0]["brand_mentioned"] = "false"
