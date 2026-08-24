@@ -4367,6 +4367,60 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn(".mega-menu-panel {", css)
         self.assertIn("z-index: 90;", css)
 
+    def test_desktop_header_is_fixed_full_width_without_changing_fullscreen_game(self):
+        css = Path("static/css/style.css").read_text(encoding="utf-8")
+
+        self.assertIn("--desktop-header-height: 104px;", css)
+        self.assertRegex(
+            css,
+            re.compile(
+                r"@media\s*\(min-width:\s*901px\)\s*\{.*?"
+                r"body:not\(\.snake-page\)\s+\.container\s*>\s*\.site-header\s*\{[^}]*"
+                r"position:\s*fixed;[^}]*inset:\s*0\s+0\s+auto;[^}]*width:\s*100%;[^}]*"
+                r"min-height:\s*var\(--desktop-header-height\);[^}]*z-index:\s*1000;",
+                re.DOTALL,
+            ),
+        )
+        self.assertRegex(
+            css,
+            r"body:not\(\.snake-page\)\s*\{[^}]*padding-top:\s*var\(--desktop-header-height\);",
+        )
+        self.assertRegex(css, r"\.mega-menu-panel\s*\{[^}]*z-index:\s*1010;")
+        self.assertRegex(css, r"\.cookie-banner\s*\{[^}]*z-index:\s*1100;")
+        self.assertRegex(css, r"\.reading-progress\s*\{[^}]*z-index:\s*1110;")
+
+    def test_header_navigation_uses_shared_900px_mobile_boundary(self):
+        css = Path("static/css/style.css").read_text(encoding="utf-8")
+        navigation = Path("static/js/navigation.js").read_text(encoding="utf-8")
+
+        self.assertRegex(
+            css,
+            re.compile(
+                r"@media\s*\(min-width:\s*901px\)\s*and\s*\(max-width:\s*1180px\)\s*\{.*?"
+                r"\.site-header,[^}]*\.home-page\s+\.site-header\s*\{[^}]*"
+                r"grid-template-columns:\s*minmax\(140px,\s*1fr\)\s+auto\s+auto;",
+                re.DOTALL,
+            ),
+        )
+        self.assertRegex(
+            css,
+            re.compile(
+                r"@media\s*\(min-width:\s*901px\)\s*and\s*\(max-width:\s*1180px\)\s*\{.*?"
+                r"\.mega-nav,[^}]*\.home-page\s+\.mega-nav\s*\{[^}]*flex-wrap:\s*nowrap;",
+                re.DOTALL,
+            ),
+        )
+        self.assertRegex(
+            css,
+            re.compile(
+                r"@media\s*\(min-width:\s*901px\)\s*and\s*\(max-width:\s*980px\)\s*\{.*?"
+                r"\.mega-nav,[^}]*\.home-page\s+\.mega-nav\s*\{[^}]*display:\s*flex;",
+                re.DOTALL,
+            ),
+        )
+        self.assertIn("window.innerWidth > 900", navigation)
+        self.assertNotIn("window.innerWidth > 980", navigation)
+
     def test_desktop_navigation_does_not_expand_document_width(self):
         css = Path("static/css/style.css").read_text(encoding="utf-8")
 

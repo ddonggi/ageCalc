@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   window.addEventListener("resize", () => {
-    if (window.innerWidth > 980 && !panel.hidden) {
+    if (window.innerWidth > 900 && !panel.hidden) {
       closePanel({ returnFocus: false });
     }
   });

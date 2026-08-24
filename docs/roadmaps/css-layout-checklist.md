@@ -26,6 +26,7 @@
 
 **Files:**
 - Modify: `static/css/style.css`
+- Modify: `static/js/navigation.js` for the shared 900px navigation boundary
 - Modify: `templates/partials/header.html` only if a dedicated inner wrapper is required
 - Modify: `tests/test_public_pages.py`
 
@@ -33,7 +34,7 @@
 - Consumes: `.site-header`, `.container`, `.mega-nav`, `.mega-menu-panel`
 - Produces: 데스크톱에서 뷰포트 전체 너비를 차지하며 스크롤 중 고정되는 공통 헤더
 
-- [ ] **Step 1: 데스크톱 fixed 헤더의 회귀 테스트 작성**
+- [x] **Step 1: 데스크톱 fixed 헤더의 회귀 테스트 작성**
 
 ```python
 def test_desktop_header_is_fixed_full_width_without_changing_mobile_header():
@@ -44,7 +45,7 @@ def test_desktop_header_is_fixed_full_width_without_changing_mobile_header():
     assert "--desktop-header-height" in css
 ```
 
-- [ ] **Step 2: 테스트가 기존 CSS에서 실패하는지 확인**
+- [x] **Step 2: 테스트가 기존 CSS에서 실패하는지 확인**
 
 Run:
 
@@ -54,7 +55,7 @@ Run:
 
 Expected: 데스크톱 fixed 헤더 규칙과 본문 보정 토큰이 없어 FAIL.
 
-- [ ] **Step 3: 데스크톱 헤더를 전체 너비 fixed로 구현**
+- [x] **Step 3: 데스크톱 헤더를 전체 너비 fixed로 구현**
 
 적용할 CSS 계약:
 
@@ -80,7 +81,9 @@ Expected: 데스크톱 fixed 헤더 규칙과 본문 보정 토큰이 없어 FAI
 
 기존 `.site-header`의 최대 너비·바깥 여백이 전체 너비 적용을 방해하면 헤더 자체는 full bleed로 두고 내부 정렬용 래퍼를 추가한다. 내부 래퍼의 최대 너비는 기존 `--page-width`를 사용한다.
 
-- [ ] **Step 4: 메뉴와 본문 겹침 방지**
+구현 메모: `body.no-scroll`과 `100svh`를 사용하는 `.snake-page`는 fixed 헤더와 본문 보정에서 제외하고, 901~980px 구간은 데스크톱 메뉴를 복원해 JavaScript의 900px 경계와 일치시킨다.
+
+- [x] **Step 4: 메뉴와 본문 겹침 방지**
 
 ```css
 @media (min-width: 901px) {
@@ -104,7 +107,7 @@ Expected: 데스크톱 fixed 헤더 규칙과 본문 보정 토큰이 없어 FAI
 - 360px: 가로 스크롤이 없고 메뉴 버튼을 키보드·터치로 사용할 수 있다.
 - 200% 확대: 메뉴 텍스트가 잘리거나 본문을 영구적으로 가리지 않는다.
 
-- [ ] **Step 6: 전체 검증**
+- [x] **Step 6: 전체 검증**
 
 ```bash
 /srv/apps/agecalc/.micromamba/envs/agecalc/bin/python -m unittest discover -s tests -v
@@ -112,6 +115,8 @@ git diff --check
 ```
 
 Expected: 전체 테스트 PASS, whitespace 오류 없음.
+
+자동 검증 기록: 2026-08-24, 대표 6개 경로 HTTP 200, 전체 unittest 410개 PASS, `git diff --check` PASS. 브라우저 기반 반응형·200% 확대 확인은 Step 5에 남겨 둔다.
 
 ---
 
@@ -128,9 +133,9 @@ Expected: 전체 테스트 PASS, whitespace 오류 없음.
 
 ## Definition of Done
 
-- [ ] 변경된 레이아웃의 목적과 적용 화면 구간이 문서화되어 있다.
+- [x] 변경된 레이아웃의 목적과 적용 화면 구간이 문서화되어 있다.
 - [ ] 데스크톱·태블릿·모바일 경계값을 확인했다.
 - [ ] 키보드 탐색과 200% 확대가 가능하다.
 - [ ] 페이지 시작 콘텐츠, 드롭다운, 쿠키 배너가 서로 겹치지 않는다.
 - [ ] 가로 스크롤과 누적 레이아웃 이동이 증가하지 않는다.
-- [ ] 관련 테스트와 전체 테스트가 통과한다.
+- [x] 관련 테스트와 전체 테스트가 통과한다.

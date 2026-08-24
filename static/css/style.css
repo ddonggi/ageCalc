@@ -31,6 +31,7 @@
     --content-width: 1040px;
     --aside-rail-width: 168px;
     --aside-rail-gap: 24px;
+    --desktop-header-height: 104px;
     --ink: var(--text);
     --ink-soft: var(--muted);
     --card: var(--surface-strong);
@@ -4458,5 +4459,62 @@ body.snake-page .game-panel {
     .scroll-top-btn {
         right: 14px;
         bottom: 14px;
+    }
+}
+
+@media (min-width: 901px) {
+    body:not(.snake-page) {
+        padding-top: var(--desktop-header-height);
+    }
+
+    body:not(.snake-page) .container > .site-header {
+        position: fixed;
+        inset: 0 0 auto;
+        width: 100%;
+        min-height: var(--desktop-header-height);
+        z-index: 1000;
+    }
+
+    .mega-menu-panel {
+        z-index: 1010;
+    }
+
+    .cookie-banner {
+        z-index: 1100;
+    }
+
+    .reading-progress {
+        z-index: 1110;
+    }
+}
+
+@media (min-width: 901px) and (max-width: 1180px) {
+    .site-header,
+    .home-page .site-header {
+        grid-template-columns: minmax(140px, 1fr) auto auto;
+        gap: 12px;
+    }
+
+    .mega-nav,
+    .home-page .mega-nav {
+        flex-wrap: nowrap;
+        gap: clamp(10px, 1.5vw, 18px);
+    }
+}
+
+@media (min-width: 901px) and (max-width: 980px) {
+    .mega-nav,
+    .home-page .mega-nav {
+        display: flex;
+    }
+
+    .hub-nav-direct,
+    .home-page .hub-nav-direct {
+        display: inline-flex;
+    }
+
+    .menu-toggle,
+    .home-page .menu-toggle {
+        display: none;
     }
 }
