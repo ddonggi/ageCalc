@@ -276,7 +276,7 @@ STATIC_PAGE_REGISTRY = (
         "생일 D-day 계산기",
         "다음 생일까지 남은 날짜 계산",
         priority="core",
-        related_endpoints=("age", "d_day", "hundred_day_calculator"),
+        related_endpoints=("hundred_day_calculator", "baby_months"),
         lastmod="2026-08-13",
     ),
     _page(
@@ -340,7 +340,7 @@ STATIC_PAGE_REGISTRY = (
         "아이 개월 수 계산기",
         "출생일 기준 현재 아이 월령 계산",
         priority="core",
-        related_endpoints=("baby_months_table", "hundred_day_calculator", "school_grade_calculator"),
+        related_endpoints=("parent_child", "school_grade_calculator"),
         lastmod="2026-08-15",
     ),
     _page(

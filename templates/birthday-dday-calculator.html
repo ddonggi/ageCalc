@@ -124,6 +124,15 @@
                     </div>
                 </div>
                 <p class="small">{{ selected_snapshot.status_note }}</p>
+                <div class="result-next">
+                    <h3>이어서 확인하기</h3>
+                    <div class="result-next-links">
+                        <a href="{{ url_for('age') }}">현재 만나이 확인</a>
+                        <a href="{{ url_for('d_day') }}">다른 기념일 계산</a>
+                        <a href="{{ url_for('life_timeline') }}">생애 타임라인 보기</a>
+                    </div>
+                    <p class="small">저장에 동의한 생년월일이 있으면 다음 계산기에서 자동으로 불러옵니다.</p>
+                </div>
                 {% endif %}
             </article>
         </section>

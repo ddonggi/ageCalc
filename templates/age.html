@@ -92,7 +92,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
     <script src="{{ url_for('static', filename='js/date-rules.js') }}?v=age-input-20260810a" defer></script>
-    <script src="{{ url_for('static', filename='js/age-calculator.js') }}?v=age-input-20260810a" defer></script>
+    <script src="{{ url_for('static', filename='js/age-calculator.js') }}?v=age-result-20260824a" defer></script>
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <!-- Google tag (gtag.js) -->
@@ -112,8 +112,7 @@
                 <p class="eyebrow">대표 도구</p>
                 <h1>만나이 계산기</h1>
                 <p class="page-intro">
-                    양력과 음력 생일을 모두 입력할 수 있습니다. 계산 결과를 읽는 기준과 연령별 안내도
-                    한 화면에 담았습니다.
+                    양력과 음력 생일을 입력해 오늘의 만나이를 확인하고, 같은 출생연도로 이어지는 계산을 바로 살펴보세요.
                 </p>
                 <div class="hero-actions">
                     <a class="btn btn-primary" href="#age-form">바로 계산하기</a>
@@ -130,8 +129,8 @@
                     <span class="metric-label">결과 해설과 기준 안내</span>
                 </article>
                 <article class="metric-card">
-                    <span class="metric-value">기준</span>
-                    <span class="metric-label">연령별 기준 안내</span>
+                    <span class="metric-value">연결</span>
+                    <span class="metric-label">나이표·입학년도 이어보기</span>
                 </article>
             </div>
         </section>
@@ -162,8 +161,14 @@
                 <div class="date-inputs">
                     <label class="field-label" for="birth-input">생년월일 8자리</label>
                     <input type="text" id="birth-input" name="birth-input" placeholder="1992.10.02" inputmode="numeric"
-                        pattern="[0-9.]*" maxlength="10" required aria-describedby="birth-error" data-clarity-mask="true" data-profile-date-input="full">
+                        pattern="[0-9.]*" maxlength="10" required aria-describedby="birth-error profile-date-note" data-clarity-mask="true" data-profile-date-input="full" data-profile-date-calendar="solar">
                 </div>
+
+                <div class="profile-date-control">
+                    <label for="profile-date-consent"><input type="checkbox" id="profile-date-consent"> <span>양력 생년월일을 이 기기에서 다음 계산에도 사용</span></label>
+                    <button type="button" class="btn btn-secondary" id="profile-date-clear">저장값 삭제</button>
+                </div>
+                <p class="input-help" id="profile-date-note">선택하면 양력 생년월일만 이 브라우저에 저장됩니다. 공용 기기에서는 사용하지 말고, 언제든 저장값을 삭제하세요.</p>
 
                 <p class="input-help">
                     음력 입력은 출생 당시의 음력 날짜를 양력 출생일로 환산해 만나이를 계산합니다.
@@ -244,259 +249,17 @@
             <p class="small">마지막 기준 확인일: {{ editorial_metadata.reviewed_at if editorial_metadata else '2026-06-22' }}</p>
         </section>
 
-        <!-- 연령별 주요 권리·제도 -->
-        <div class="age-rights-section">
-            <h3>🧑 연령별 주요 권리·제도 (만나이 기준)</h3>
-            <p>
-                기준 확인일: {{ editorial_metadata.reviewed_at if editorial_metadata else '2026-06-22' }}. 아래 내용은 연령 조건을 이해하기 위한 일반 안내입니다.
-                실제 신청 가능 여부와 시행일은 정부24·국가법령정보센터·담당 기관의 최신 공고를 우선합니다.
-            </p>
-
-            <div class="age-rights-grid">
-                <div class="age-right-item" data-age="14">
-                    <div class="age-header">
-                        <span class="age-number">14</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.kakaocorp.com/page/" target="_blank" rel="noopener noreferrer">카카오톡,
-                                SNS 등 대부분 온라인 서비스 가입 가능</a></li>
-                        <li>형사 미성년자(만 14세 미만) → 형사처벌 불가, 만 14세부터는 형사책임 인정</li>
-                    </ul>
+        <section class="section-shell section-card-grid" aria-label="연령별 제도 확인 안내">
+            <article class="section-card">
+                <p class="eyebrow">공식 기준 우선</p>
+                <h2>연령별 제도는 공식 기준을 확인하세요</h2>
+                <p>복지·주거·연금·자격 제도는 나이 외에도 소득, 거주지, 가입 기간과 시행 시점에 따라 달라집니다. 계산 결과만으로 신청 가능 여부를 판단하지 마세요.</p>
+                <div class="footer-links">
+                    <a href="{{ url_for('references') }}">계산 기준과 공식 출처 확인</a>
+                    <a href="{{ url_for('about') }}">콘텐츠 검수 원칙 보기</a>
                 </div>
-
-                <div class="age-right-item" data-age="15">
-                    <div class="age-header">
-                        <span class="age-number">15</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.moel.go.kr/" target="_blank" rel="noopener noreferrer">근로기준법상 취직 가능 연령
-                                (부모 동의 필요)</a></li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item " data-age="17">
-                    <div class="age-header">
-                        <span class="age-number">17</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=13100000013" target="_blank"
-                                rel="noopener noreferrer">주민등록증 발급 가능</a></li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item" data-age="18">
-                    <div class="age-header">
-                        <span class="age-number">18</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.safedriving.or.kr/" target="_blank" rel="noopener noreferrer">자동차 운전면허
-                                취득 가능 (2종 보통 기준)</a></li>
-                        <li><a href="https://www.nec.go.kr/" target="_blank" rel="noopener noreferrer">선거권 부여 (국회의원, 대통령
-                                선거 모두 가능)</a></li>
-                        <li><a href="https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=12700000050" target="_blank"
-                                rel="noopener noreferrer">혼인 가능 (민법 개정 후 남녀 모두 만 18세 이상부터)</a></li>
-                        <li>일부 청년 정책(교통·문화 할인, 청소년 우대 등) 종료</li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item " data-age="19">
-                    <div class="age-header">
-                        <span class="age-number">19</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li>술·담배 구매 가능 (청소년보호법)</li>
-                        <li>성인 등급 콘텐츠 및 일부 성인 전용 시설 출입 가능</li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item" data-age="20">
-                    <div class="age-header">
-                        <span class="age-number">20</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.mma.go.kr/" target="_blank" rel="noopener noreferrer">군 입대 의무 본격 적용
-                                (징병검사, 현역 입영 가능)</a></li>
-                        <li><a href="https://www.kosaf.go.kr/ko/main.do" target="_blank" rel="noopener noreferrer">대학
-                                등록금·청년 지원금 일부 제도 만 20세 이상 대상</a></li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item" data-age="24">
-                    <div class="age-header">
-                        <span class="age-number">24</span>
-                        <span class="age-unit">세 이하</span>
-                    </div>
-                    <ul>
-                        <li>일부 공공기관 청년 우대금리 통장 가입 가능</li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item" data-age="34">
-                    <div class="age-header">
-                        <span class="age-number">34</span>
-                        <span class="age-unit">세 이하</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.molit.go.kr/" target="_blank" rel="noopener noreferrer">청년 월세 특별 지원
-                                (국토부, 지자체)</a></li>
-                        <li>청년 전세자금 대출 (버팀목 전세자금 등)</li>
-                        <li>청년 주택 청약 우대 (신혼부부 특별공급 등은 만 39세 이하까지 확대되기도 함)</li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item" data-age="39">
-                    <div class="age-header">
-                        <span class="age-number">39</span>
-                        <span class="age-unit">세 이하</span>
-                    </div>
-                    <ul>
-                        <li class="available">청년 주택/장기전세주택 입주 가능 연령</li>
-                        <li><a href="https://www.semas.or.kr/" target="_blank" rel="noopener noreferrer">청년 창업 지원
-                                (중소기업청, 창업지원금 등)</a></li>
-                        <li class="available">일부 지자체 청년 지원 정책 상한선</li>
-                    </ul>
-                </div>
-                <div class="age-right-item" data-age="40">
-                    <div class="age-header">
-                        <span class="age-number">40</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.semas.or.kr/" target="_blank" rel="noopener noreferrer">중장년층 창업 지원
-                                (중소기업청, 중장년 창업지원금)</a></li>
-                        <li><a href="https://www.work.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 재취업 지원
-                                (고용지원센터)</a></li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item" data-age="45">
-                    <div class="age-header">
-                        <span class="age-number">45</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.molit.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 전용 주택 청약
-                                (일부 지자체)</a></li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item" data-age="50">
-                    <div class="age-header">
-                        <span class="age-number">50</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.work.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 전용 취업 지원
-                                프로그램</a></li>
-                        <li><a href="https://www.nhis.or.kr/" target="_blank" rel="noopener noreferrer">중장년층 건강검진 무료
-                                (국가건강검진)</a></li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item" data-age="55">
-                    <div class="age-header">
-                        <span class="age-number">55</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.molit.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 전용 주택 분양
-                                (일부 아파트)</a></li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item" data-age="60">
-                    <div class="age-header">
-                        <span class="age-number">60</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 특별 지원 (일부
-                                지자체)</a></li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item" data-age="61">
-                    <div class="age-header">
-                        <span class="age-number">61</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">노령연금 지급 시작
-                                (1953-56년생)</a></li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item" data-age="62">
-                    <div class="age-header">
-                        <span class="age-number">62</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">노령연금 지급 시작
-                                (1957-60년생)</a></li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item" data-age="63">
-                    <div class="age-header">
-                        <span class="age-number">63</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">노령연금 지급 시작
-                                (1961-64년생)</a></li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item" data-age="64">
-                    <div class="age-header">
-                        <span class="age-number">64</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">노령연금 지급 시작
-                                (1965-68년생)</a></li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item" data-age="65">
-                    <div class="age-header">
-                        <span class="age-number">65</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">노인복지법상 노인 혜택
-                                시작</a></li>
-                        <li><a href="https://www.work.go.kr/" target="_blank" rel="noopener noreferrer">노인교통카드 할인
-                                (대중교통)</a></li>
-                        <li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">노인 문화시설 할인 (박물관,
-                                영화관 등)</a></li>
-                        <li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">기초연금 수급 자격 (만 65세
-                                이상)</a></li>
-                        <li><a href="https://www.longtermcare.or.kr/" target="_blank" rel="noopener noreferrer">노인장기요양보험
-                                수급 자격</a></li>
-                    </ul>
-                </div>
-
-                <div class="age-right-item" data-age="70">
-                    <div class="age-header">
-                        <span class="age-number">70</span>
-                        <span class="age-unit">세 이상</span>
-                    </div>
-                    <ul>
-                        <li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">노인 우선 대기 및 할인 혜택
-                                확대</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
+            </article>
+        </section>
 
         <section aria-labelledby="how-works" style="margin-top:40px">
             <h2 id="how-works">만나이 공식</h2>

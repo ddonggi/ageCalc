@@ -1,3 +1,26 @@
+function buildBirthdayResultHTML({ birthdayLabel, nextDate, statusLabel, days, statusNote }) {
+    return `
+        <p class="eyebrow">선택한 생일</p>
+        <h2>${birthdayLabel}</h2>
+        <p>${birthdayLabel}의 다음 생일은 ${nextDate}입니다.</p>
+        <div class="summary-grid">
+            <div class="summary-card"><strong>생일</strong><span>${birthdayLabel}</span></div>
+            <div class="summary-card"><strong>다음 생일</strong><span>${nextDate}</span></div>
+            <div class="summary-card"><strong>오늘 기준 상태</strong><span>${statusLabel}</span></div>
+            <div class="summary-card"><strong>남은 기간</strong><span>${days}일</span></div>
+        </div>
+        <p class="small">${statusNote}</p>
+        <div class="result-next">
+            <h3>이어서 확인하기</h3>
+            <div class="result-next-links">
+                <a href="/age">현재 만나이 확인</a>
+                <a href="/d-day">다른 기념일 계산</a>
+                <a href="/life-timeline">생애 타임라인 보기</a>
+            </div>
+            <p class="small">저장에 동의한 생년월일이 있으면 다음 계산기에서 자동으로 불러옵니다.</p>
+        </div>`;
+}
+
 class BirthdayDDayCalculator {
     constructor() {
         this.form = document.getElementById('birthday-dday-form');
@@ -63,19 +86,15 @@ class BirthdayDDayCalculator {
         const statusLabel = days === 0 ? 'D-Day' : `D-${days}`;
         const statusNote = days === 0 ? '바로 오늘이 생일입니다.' : `다음 생일까지 ${days}일 남았습니다.`;
         this.error.textContent = '';
-        this.resultContent.innerHTML = `
-            <p class="eyebrow">선택한 생일</p>
-            <h2>${birthdayLabel}</h2>
-            <p>${birthdayLabel}의 다음 생일은 ${nextDate}입니다.</p>
-            <div class="summary-grid">
-                <div class="summary-card"><strong>생일</strong><span>${birthdayLabel}</span></div>
-                <div class="summary-card"><strong>다음 생일</strong><span>${nextDate}</span></div>
-                <div class="summary-card"><strong>오늘 기준 상태</strong><span>${statusLabel}</span></div>
-                <div class="summary-card"><strong>남은 기간</strong><span>${days}일</span></div>
-            </div>
-            <p class="small">${statusNote}</p>`;
+        this.resultContent.innerHTML = buildBirthdayResultHTML({
+            birthdayLabel, nextDate, statusLabel, days, statusNote
+        });
         this.result.hidden = false;
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => new BirthdayDDayCalculator());
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { BirthdayDDayCalculator, buildBirthdayResultHTML };
+}

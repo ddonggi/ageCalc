@@ -50,6 +50,13 @@
         return mode === 'month-day' ? `${month}.${day}` : `${year}.${month}.${day}`;
     }
 
+    function canStoreProfileDate(input, targetDocument) {
+        const requiredCalendar = input?.dataset?.profileDateCalendar;
+        if (!requiredCalendar) return true;
+        const selectedCalendar = targetDocument?.querySelector('input[name="calendar_type"]:checked');
+        return selectedCalendar?.value === requiredCalendar;
+    }
+
     function bindPage() {
         const inputs = Array.from(document.querySelectorAll('[data-profile-date-input]'));
         const consent = document.getElementById('profile-date-consent');
@@ -69,6 +76,7 @@
         inputs.forEach(input => {
             input.addEventListener('input', () => {
                 if (!consent || !consent.checked || input.dataset.profileDateInput !== 'full') return;
+                if (!canStoreProfileDate(input, document)) return;
                 const digits = input.value.replace(/\D/g, '');
                 if (digits.length !== 8) return;
                 const value = `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
@@ -93,6 +101,6 @@
 
     if (typeof document !== 'undefined') document.addEventListener('DOMContentLoaded', bindPage);
     if (typeof module !== 'undefined' && module.exports) {
-        module.exports = { saveProfileDate, loadProfileDate, clearProfileDate };
+        module.exports = { saveProfileDate, loadProfileDate, clearProfileDate, canStoreProfileDate };
     }
 }(typeof window !== 'undefined' ? window : globalThis));

@@ -35,6 +35,7 @@
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
 
     <script src="{{ url_for('static', filename='js/date-rules.js') }}" defer></script>
+    <script src="{{ versioned_static('js/profile-date.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 
 </head>
@@ -66,9 +67,14 @@
                 <h3>출생일을 입력하세요 (8자리)</h3>
                 <div class="date-inputs">
                     <label class="field-label" for="baby-birth-input">출생일 8자리</label>
-                    <input type="text" id="baby-birth-input" placeholder="2025.06.15" inputmode="numeric" pattern="[0-9.]*" maxlength="10" required aria-describedby="baby-error" data-clarity-mask="true">
+                    <input type="text" id="baby-birth-input" placeholder="2025.06.15" inputmode="numeric" pattern="[0-9.]*" maxlength="10" required aria-describedby="baby-error profile-date-note" data-clarity-mask="true" data-profile-date-input="full">
                 </div>
                 <small id="baby-error" class="error-msg" aria-live="polite"></small>
+                <div class="profile-date-control">
+                    <label for="profile-date-consent"><input type="checkbox" id="profile-date-consent"> <span>출생일을 이 기기에서 다음 계산에도 사용</span></label>
+                    <button type="button" class="btn btn-secondary" id="profile-date-clear">저장값 삭제</button>
+                </div>
+                <p class="input-help" id="profile-date-note">선택한 경우에만 이 브라우저에 저장됩니다. 공용 기기에서는 사용하지 말고, 언제든 저장값을 삭제하세요.</p>
             </div>
         </form>
 

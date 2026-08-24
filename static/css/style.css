@@ -1636,6 +1636,43 @@ body:not(.home-page) .hero-actions .btn {
     padding-inline: 10px;
 }
 
+.home-quick-tools {
+    display: grid;
+    gap: 18px;
+}
+
+.home-quick-links {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.home-quick-links a {
+    display: grid;
+    gap: 6px;
+    min-height: 96px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 252, 245, 0.72);
+    color: var(--text);
+    text-decoration: none;
+}
+
+.home-quick-links a:hover,
+.home-quick-links a:focus-visible {
+    border-color: var(--accent-1);
+}
+
+.home-quick-links span {
+    color: var(--muted);
+    font-size: 0.88rem;
+}
+
+.home-method-note {
+    max-width: 920px;
+}
+
 .home-page .category-hub-section,
 .home-page .footer {
     width: var(--page-width);
@@ -2894,39 +2931,138 @@ input.error {
     font-size: 1rem;
 }
 
-.rights-info,
 .share-section,
 .article-tools {
     display: grid;
     gap: 12px;
 }
 
-.rights-list {
+.age-result-primary {
     display: grid;
+    gap: 8px;
+}
+
+.age-result-primary .eyebrow,
+.age-result-primary .age,
+.age-result-primary .message {
+    margin: 0;
+}
+
+.age-result-primary .age-number {
+    font-size: clamp(2.35rem, 8vw, 4.5rem);
+    line-height: 1;
+}
+
+.age-result-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+
+.age-result-summary-item {
+    display: grid;
+    gap: 6px;
+    padding: 16px;
+}
+
+.age-result-summary-item + .age-result-summary-item {
+    border-left: 1px solid var(--line);
+}
+
+.age-result-summary-item strong {
+    color: var(--muted);
+    font-size: 0.82rem;
+}
+
+.age-result-summary-item span {
+    color: var(--text);
+    font-weight: 800;
+}
+
+.age-result-next {
+    display: grid;
+    gap: 12px;
+}
+
+.age-result-next h4 {
+    margin: 0;
+}
+
+.age-result-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
 }
 
-.right-item {
+.age-result-links a {
     display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 10px;
-    align-items: start;
-    padding: 12px 14px;
+    gap: 5px;
+    min-height: 88px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
     border-radius: var(--radius-sm);
-    background: rgba(76, 55, 38, 0.04);
+    background: rgba(255, 252, 245, 0.72);
+    color: var(--text);
+    text-decoration: none;
 }
 
-.right-item.available {
-    background: rgba(103, 232, 249, 0.1);
+.age-result-links a:hover,
+.age-result-links a:focus-visible {
+    border-color: var(--accent-1);
 }
 
-.right-item.locked {
-    background: rgba(76, 55, 38, 0.04);
+.age-result-links span {
+    color: var(--muted);
+    font-size: 0.84rem;
+    font-weight: 500;
 }
 
-.right-icon {
-    font-size: 1rem;
-    line-height: 1.4;
+.result-next {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+}
+
+.result-next h3 {
+    margin: 0 0 0.75rem;
+}
+
+.result-next-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+}
+
+.result-next-links a {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--text);
+    text-decoration: none;
+}
+
+.result-next-links a:hover,
+.result-next-links a:focus-visible {
+    border-color: var(--accent-1);
+    color: var(--accent-1);
+}
+
+.share-section summary {
+    cursor: pointer;
+    color: var(--text);
+    font-weight: 800;
+}
+
+.share-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
 }
 
 .share-buttons {
@@ -4372,6 +4508,10 @@ body.snake-page .game-panel {
         padding-inline: 0;
     }
 
+    .home-quick-links {
+        grid-template-columns: 1fr;
+    }
+
     .home-life-hub-grid {
         grid-template-columns: 1fr 1fr;
     }
@@ -4400,6 +4540,21 @@ body.snake-page .game-panel {
     .page-feedback-actions {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .age-result-summary,
+    .age-result-links,
+    .result-next-links {
+        grid-template-columns: 1fr;
+    }
+
+    .age-result-summary-item + .age-result-summary-item {
+        border-top: 1px solid var(--line);
+        border-left: 0;
+    }
+
+    .age-result-links a {
+        min-height: 72px;
     }
 
     .coupang-partners-aside {

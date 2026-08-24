@@ -55,7 +55,7 @@
                 </div>
             </div>
 
-            <div class="age-hub-dashboard" aria-label="오늘 기준 나이 계산기 미리보기">
+            <div class="age-hub-dashboard" aria-label="자주 찾는 계산">
                 <div class="age-hub-dashboard-head">
                     <div>
                         <p class="command-label">기준일: 오늘</p>
@@ -95,65 +95,17 @@
         {% include 'partials/info_coupang_promotions.html' %}
         {% include 'partials/home_coupang_rails.html' %}
 
-        <section class="section-shell direct-answer" aria-label="AgeCalc 바로 답변">
+        <section class="section-shell home-quick-tools">
             <div class="section-heading">
-                <p class="eyebrow">바로 답변</p>
-                <h2>AgeCalc에서 살펴볼 생활 기준</h2>
-                <p class="section-intro">
-                    AgeCalc는 생년월일과 기준일을 바탕으로 만나이, 연나이, 학년, 입학년도, 생일 D-day,
-                    아이 개월 수, 부모·자녀 나이 관계, 반려동물 환산 나이를 한곳에서 확인하는 생활 나이 계산 플랫폼입니다.
-                </p>
+                <p class="eyebrow">Quick Reference</p>
+                <h2>빠른 표·기준 찾기</h2>
+                <p class="section-intro">날짜를 입력하지 않고 출생연도와 입학 시점, 띠 기준을 바로 확인하세요.</p>
             </div>
-        </section>
-
-        <section class="home-preview-deck" aria-label="자주 찾는 생활 계산 미리보기">
-            <a class="preview-card preview-table" href="{{ url_for('birth_year_age_table') }}">
-                <strong>출생연도 나이표</strong>
-                <span class="preview-arrow" aria-hidden="true">›</span>
-                <div class="mini-table" aria-hidden="true">
-                    <span>출생연도</span><span>만나이</span><span>한국 나이</span>
-                    <span>2026</span><span>0</span><span>1</span>
-                    <span>2025</span><span>1</span><span>2</span>
-                    <span>2024</span><span>2</span><span>3</span>
-                </div>
-            </a>
-            <a class="preview-card preview-entry" href="{{ url_for('school_entry_year_table') }}">
-                <strong>입학연도 계산</strong>
-                <span class="preview-arrow" aria-hidden="true">›</span>
-                <p>출생연도</p>
-                <div class="year-tiles" aria-hidden="true">
-                    <span>2</span><span>0</span><span>1</span><span>9</span>
-                    <b>→</b>
-                    <span>2</span><span>0</span><span>2</span><span>6</span>
-                </div>
-            </a>
-            <a class="preview-card preview-stamp" href="{{ url_for('birth_year_zodiac_table') }}">
-                <strong>띠 나이표</strong>
-                <span class="preview-arrow" aria-hidden="true">›</span>
-                <small>2026년 기준</small>
-                <div class="stamp-table" aria-hidden="true">
-                    <span>호랑이띠</span><span>2010</span><span>16</span>
-                    <span>토끼띠</span><span>2011</span><span>15</span>
-                </div>
-            </a>
-            <a class="preview-card preview-note" href="{{ url_for('baby_months') }}">
-                <strong>아기 개월수</strong>
-                <span class="preview-arrow" aria-hidden="true">›</span>
-                <p>생년월일 <span>2024.02.23</span></p>
-                <b>15개월 12일</b>
-                <small>다음 기념일 16개월 D-19</small>
-            </a>
-        </section>
-
-        <section class="section-shell">
-            <div class="section-heading">
-                <p class="eyebrow">사용 순서</p>
-                <h2>먼저 계산하고, 기준을 확인하세요</h2>
-                <p class="section-intro">
-                    계산기에서 결과를 확인한 뒤 관련 가이드와 참고 자료로 이동하면 생일 전후, 학년도, 공식 기준,
-                    의료·행정 판단이 필요한 예외를 구분해 볼 수 있습니다.
-                </p>
-            </div>
+            <nav class="home-quick-links" aria-label="빠른 표와 기준 찾기">
+                <a href="{{ url_for('birth_year_age_table') }}"><strong>출생연도 나이표</strong><span>몇 년생인지로 현재 나이 확인</span></a>
+                <a href="{{ url_for('school_entry_year_table') }}"><strong>입학년도 계산</strong><span>초·중·고 입학 시점 확인</span></a>
+                <a href="{{ url_for('birth_year_zodiac_table') }}"><strong>띠 나이표</strong><span>출생연도별 띠 확인</span></a>
+            </nav>
         </section>
 
         <section class="section-shell home-life-hubs" aria-labelledby="home-life-hubs-title">
@@ -174,6 +126,18 @@
                     </article>
                 </a>
                 {% endfor %}
+            </div>
+        </section>
+
+        <section class="section-shell home-method-note direct-answer">
+            <div class="section-heading">
+                <p class="eyebrow">How to use</p>
+                <h2>계산 결과와 기준을 함께 확인하세요</h2>
+                <p class="section-intro">
+                    AgeCalc는 생년월일과 기준일을 바탕으로 만나이, 연나이, 학년, 입학년도, 생일 D-day,
+                    아이 개월 수와 반려동물 환산 나이를 계산합니다. 결과를 확인한 뒤 관련 가이드와 참고 자료로 이동하면
+                    생일 전후, 학년도, 공식 기준과 의료·행정 판단이 필요한 예외를 구분할 수 있습니다.
+                </p>
             </div>
         </section>
 

@@ -212,6 +212,12 @@ values.set('agecalc.profileBirthDate.v1', '1992-99-99');
 assert.strictEqual(profile.loadProfileDate(storage), null);
 assert.strictEqual(values.has('agecalc.profileBirthDate.v1'), false);
 assert.throws(() => profile.saveProfileDate('not-a-date', storage), /valid/);
+
+const profileInput = { dataset: { profileDateInput: 'full', profileDateCalendar: 'solar' } };
+const solarDocument = { querySelector() { return { value: 'solar' }; } };
+const lunarDocument = { querySelector() { return { value: 'lunar' }; } };
+assert.strictEqual(profile.canStoreProfileDate(profileInput, solarDocument), true);
+assert.strictEqual(profile.canStoreProfileDate(profileInput, lunarDocument), false);
 """
         completed = subprocess.run(
             ["node", "-e", script],
@@ -227,14 +233,23 @@ assert.throws(() => profile.saveProfileDate('not-a-date', storage), /valid/);
         timeline_html = self.client.get("/life-timeline").get_data(as_text=True)
         age_html = self.client.get("/age").get_data(as_text=True)
         birthday_html = self.client.get("/birthday-dday-calculator").get_data(as_text=True)
+        baby_html = self.client.get("/baby-months").get_data(as_text=True)
 
         self.assertIn('id="profile-date-consent"', timeline_html)
         self.assertIn('id="profile-date-clear"', timeline_html)
         self.assertIn("공용 기기", timeline_html)
+        self.assertIn('id="profile-date-consent"', age_html)
+        self.assertIn('id="profile-date-clear"', age_html)
+        self.assertIn("공용 기기", age_html)
+        self.assertIn("양력", age_html)
         self.assertIn('data-profile-date-input="full"', timeline_html)
         self.assertIn('data-profile-date-input="full"', age_html)
         self.assertIn('data-profile-date-input="month-day"', birthday_html)
-        for html in (timeline_html, age_html, birthday_html):
+        self.assertIn('id="profile-date-consent"', baby_html)
+        self.assertIn('id="profile-date-clear"', baby_html)
+        self.assertIn("공용 기기", baby_html)
+        self.assertIn('data-profile-date-input="full"', baby_html)
+        for html in (timeline_html, age_html, birthday_html, baby_html):
             self.assertIn("profile-date.js", html)
 
     def test_age_page_describes_solar_and_lunar_processing_accurately(self):

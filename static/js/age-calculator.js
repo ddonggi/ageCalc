@@ -8,7 +8,6 @@ class AgeCalculatorUI {
         this.birthErrorEl = null;
         this.hiddenDateInput = null;
         this.form = null;
-        this.adRefreshTimer = null; // 구글 애드 리프레시 타이머
         this.autoCalcTimer = null; // 자동 계산 타이머
 
         this.init();
@@ -407,11 +406,6 @@ class AgeCalculatorUI {
             resultContent.innerHTML = this.createSuccessResultHTML(result);
             resultContainer.classList.add('show');
 
-            // 5초 후 구글 애드 리프레시
-            this.scheduleAdRefresh();
-
-
-
             // 공유 이벤트 다시 바인딩
             this.bindShareEvents();
 
@@ -445,33 +439,50 @@ class AgeCalculatorUI {
      * 성공 결과 HTML 생성
      */
     createSuccessResultHTML(result) {
-        // 12지신 정보 가져오기
-        //const year = parseInt(this.yearInput.value);
         const year = this.getBirthYear();
         const zodiacInfo = year && year >= 1900 ? DateUtils.getZodiacSign(year) : null;
-        const zodiacText = zodiacInfo ? `(${zodiacInfo.emoji} ${zodiacInfo.animal})` : '';
-
-        // 권리·제도 정보 생성
-        const rightsInfo = this.generateRightsInfo(result.age);
+        const zodiacText = zodiacInfo ? `${zodiacInfo.emoji} ${zodiacInfo.animal}띠` : '';
+        const calendarType = document.querySelector?.('input[name="calendar_type"]:checked')?.value || 'solar';
+        const birthIso = this.getBirthDateIso();
+        const birthday = calendarType === 'solar' && birthIso
+            ? DateUtils.getNextBirthdaySummary(birthIso)
+            : null;
+        const birthdayText = birthday
+            ? (birthday.daysUntil === 0 ? '오늘이 생일입니다' : `다음 생일까지 D-${birthday.daysUntil}`)
+            : '음력 생일 D-day는 별도 기준 확인이 필요합니다';
 
         return `
             <div class="result success">
-                <p class="message">${result.message}</p>
-                <div class="age-info">
-                    <p class="age">만 나이: <span class="age-number">${result.age}세</span> <span class="zodiac-simple">${zodiacText}</span></p>
+                <div class="age-result-primary">
+                    <p class="eyebrow">오늘 기준 만나이</p>
+                    <p class="age"><span class="age-number">만 ${result.age}세</span></p>
+                    <p class="message">${result.message}</p>
                 </div>
-                
-                <!-- 권리·제도 정보 -->
-                <div class="rights-info">
-                    <h4>🧑 현재 나이로 가능한 권리·제도</h4>
-                    <div class="rights-list">
-                        ${rightsInfo}
+                <div class="age-result-summary" aria-label="만나이 관련 요약">
+                    <div class="age-result-summary-item">
+                        <strong>다음 생일</strong>
+                        <span>${birthdayText}</span>
                     </div>
+                    ${zodiacText ? `<div class="age-result-summary-item"><strong>출생연도 기준</strong><span>${zodiacText}</span></div>` : ''}
                 </div>
-                
-                <!-- 공유하기 섹션 -->
-                <div class="share-section">
-                    <h4>결과 공유하기 <button class="link-copy-btn" title="링크 복사">📋</button> <button class="image-save-btn" title="이미지로 저장">📸</button></h4>
+
+                ${year ? `
+                <nav class="age-result-next" aria-label="계산 결과 관련 도구">
+                    <h4>이어서 확인하기</h4>
+                    <div class="age-result-links">
+                        <a href="/birth-year-age-table?year=${year}"><strong>${year}년생 나이표</strong><span>연나이와 만나이 범위 보기</span></a>
+                        <a href="/annual-age-calculator?birth_year=${year}"><strong>연나이 확인</strong><span>출생연도로 바로 계산</span></a>
+                        <a href="/school-entry-year-table?year=${year}"><strong>입학년도 확인</strong><span>초·중·고 입학 시점 보기</span></a>
+                        <a href="/birthday-dday-calculator"><strong>생일 D-day</strong><span>저장에 동의했다면 생일 자동 입력</span></a>
+                    </div>
+                </nav>` : ''}
+
+                <details class="share-section">
+                    <summary>결과 공유하기</summary>
+                    <div class="share-tools">
+                        <button class="link-copy-btn btn btn-secondary" type="button">링크 복사</button>
+                        <button class="image-save-btn btn btn-secondary" type="button">이미지로 저장</button>
+                    </div>
                     <div class="share-buttons">
                         <button class="share-btn kakao" data-share="kakao" title="카카오톡 공유">
                             <span class="share-icon">K</span>
@@ -492,112 +503,9 @@ class AgeCalculatorUI {
                             </svg>
                         </button>
                     </div>
-                </div>
+                </details>
             </div>
         `;
-    }
-
-    /**
-     * 권리·제도 정보 생성
-     */
-    generateRightsInfo(age) {
-        // 기본 권리·제도 목록
-        const basicRights = [
-            { age: 14, text: '카카오톡, SNS 등 대부분 온라인 서비스 가입 가능', link: 'https://www.kakaocorp.com/page/' },
-            { age: 14, text: '형사 미성년자(만 14세 미만) → 형사처벌 불가, 만 14세부터는 형사책임 인정' },
-            { age: 15, text: '근로기준법상 취직 가능 연령 (부모 동의 필요)', link: 'https://www.moel.go.kr/' },
-            { age: 17, text: '주민등록증 발급 가능', link: 'https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=13100000013' },
-            { age: 18, text: '자동차 운전면허 취득 가능 (2종 보통 기준)', link: 'https://www.safedriving.or.kr/' },
-            { age: 18, text: '선거권 부여 (국회의원, 대통령 선거 모두 가능)', link: 'https://www.nec.go.kr/' },
-            { age: 18, text: '혼인 가능 (민법 개정 후 남녀 모두 만 18세 이상부터)', link: 'https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=12700000050' },
-            { age: 18, text: '일부 청년 정책(교통·문화 할인, 청소년 우대 등) 종료' },
-            { age: 19, text: '술·담배 구매 가능 (청소년보호법)' },
-            { age: 19, text: '성인영화/게임/유흥업소 출입 가능' },
-            { age: 20, text: '군 입대 의무 본격 적용 (징병검사, 현역 입영 가능)', link: 'https://www.mma.go.kr/' },
-            { age: 20, text: '대학 등록금·청년 지원금 일부 제도 만 20세 이상 대상', link: 'https://www.kosaf.go.kr/ko/main.do' },
-            { age: 24, text: '일부 공공기관 청년 우대금리 통장 가입 가능' },
-            { age: 34, text: '청년 월세 특별 지원 (국토부, 지자체)', link: 'https://www.molit.go.kr/' },
-            { age: 34, text: '청년 전세자금 대출 (버팀목 전세자금 등)' },
-            { age: 34, text: '청년 주택 청약 우대 (신혼부부 특별공급 등은 만 39세 이하까지 확대되기도 함)' },
-            { age: 39, text: '청년 주택/장기전세주택 입주 가능 연령' },
-            { age: 39, text: '청년 창업 지원 (중소기업청, 창업지원금 등)', link: 'https://www.semas.or.kr/' },
-            { age: 39, text: '일부 지자체 청년 지원 정책 상한선' },
-            { age: 40, text: '중장년층 창업 지원 (중소기업청, 중장년 창업지원금)', link: 'https://www.semas.or.kr/' },
-            { age: 40, text: '중장년층 재취업 지원 (고용지원센터)', link: 'https://www.work.go.kr/' },
-            { age: 45, text: '중장년층 전용 주택 청약 (일부 지자체)', link: 'https://www.molit.go.kr/' },
-            { age: 50, text: '중장년층 전용 취업 지원 프로그램', link: 'https://www.work.go.kr/' },
-            { age: 50, text: '중장년층 건강검진 무료 (국가건강검진)', link: 'https://www.nhis.or.kr/' },
-            { age: 55, text: '중장년층 전용 주택 분양 (일부 아파트)', link: 'https://www.molit.go.kr/' },
-            { age: 60, text: '중장년층 특별 지원 (일부 지자체)', link: 'https://www.mohw.go.kr/' },
-            { age: 65, text: '노인복지법상 노인 혜택 시작', link: 'https://www.mohw.go.kr/' },
-            { age: 65, text: '노인교통카드 할인 (대중교통)', link: 'https://www.work.go.kr/' },
-            { age: 65, text: '노인 문화시설 할인 (박물관, 영화관 등)', link: 'https://www.mohw.go.kr/' },
-            { age: 65, text: '기초연금 수급 자격 (만 65세 이상)', link: 'https://www.nps.or.kr/' },
-            { age: 65, text: '노인장기요양보험 수급 자격', link: 'https://www.longtermcare.or.kr/' },
-            { age: 70, text: '노인 우선 대기 및 할인 혜택 확대', link: 'https://www.mohw.go.kr/' }
-        ];
-
-        // 노령연금 정보 (출생연도별)
-        const pensionRights = [
-            { age: 61, text: '노령연금 지급 시작 (1953-56년생)', link: 'https://www.nps.or.kr/' },
-            { age: 62, text: '노령연금 지급 시작 (1957-60년생)', link: 'https://www.nps.or.kr/' },
-            { age: 63, text: '노령연금 지급 시작 (1961-64년생)', link: 'https://www.nps.or.kr/' },
-            { age: 64, text: '노령연금 지급 시작 (1965-68년생)', link: 'https://www.nps.or.kr/' },
-            { age: 65, text: '노령연금 지급 시작 (1969년생 이후)', link: 'https://www.nps.or.kr/' }
-        ];
-
-        // 사용자의 출생연도에 따른 노령연금 정보 선택
-        //const userYear = parseInt(this.yearInput.value);
-        const userYear = this.getBirthYear();
-        let selectedPension = null;
-
-        if (userYear && userYear >= 1953) {
-            if (userYear >= 1953 && userYear <= 1956) {
-                selectedPension = pensionRights[0]; // 61세
-            } else if (userYear >= 1957 && userYear <= 1960) {
-                selectedPension = pensionRights[1]; // 62세
-            } else if (userYear >= 1961 && userYear <= 1964) {
-                selectedPension = pensionRights[2]; // 63세
-            } else if (userYear >= 1965 && userYear <= 1968) {
-                selectedPension = pensionRights[3]; // 64세
-            } else if (userYear >= 1969) {
-                selectedPension = pensionRights[4]; // 65세
-            }
-        }
-
-        // 기본 권리와 선택된 노령연금 정보를 합침
-        const allRights = [...basicRights];
-        if (selectedPension) {
-            allRights.push(selectedPension);
-        }
-
-        let html = '';
-        allRights.forEach(right => {
-            let isAvailable;
-            if (right.age === 24 || right.age === 29 || right.age === 34 || right.age === 39) {
-                // 24세, 29세, 34세, 39세는 "이하" 기준
-                isAvailable = age <= right.age;
-            } else {
-                // 나머지는 "이상" 기준
-                isAvailable = age >= right.age;
-            }
-            const icon = isAvailable ? '✅' : '🔒';
-            const textColor = isAvailable ? '#333' : '#999';
-
-            if (right.link) {
-                html += `<div class="right-item ${isAvailable ? 'available' : 'locked'}">
-                    <span class="right-icon">${icon}</span>
-                    <a href="${right.link}" target="_blank" style="color: ${textColor};">${right.text}</a>
-                </div>`;
-            } else {
-                html += `<div class="right-item ${isAvailable ? 'available' : 'locked'}">
-                    <span class="right-icon">${icon}</span>
-                    <span style="color: ${textColor};">${right.text}</span>
-                </div>`;
-            }
-        });
-
-        return html;
     }
 
     /**
@@ -644,59 +552,6 @@ class AgeCalculatorUI {
             resultContainer.classList.add('show');
         } else {
             // 로딩 상태는 displayResult에서 자동으로 해제됨
-        }
-    }
-
-    /**
-     * 구글 애드 리프레시 스케줄링
-     */
-    scheduleAdRefresh() {
-        // 기존 타이머가 있다면 제거
-        if (this.adRefreshTimer) {
-            clearTimeout(this.adRefreshTimer);
-        }
-
-        // 5초 후 애드 리프레시 실행
-        this.adRefreshTimer = setTimeout(() => {
-            this.refreshGoogleAds();
-        }, 5000);
-    }
-
-    /**
-     * 구글 애드 리프레시 실행
-     */
-    refreshGoogleAds() {
-        try {
-            // Google AdSense가 로드되어 있는지 확인
-            if (window.adsbygoogle && window.adsbygoogle.push) {
-                console.log('Google AdSense 리프레시 실행');
-
-                // 모든 광고 블록을 새로고침
-                const adBlocks = document.querySelectorAll('ins.adsbygoogle');
-                adBlocks.forEach(adBlock => {
-                    try {
-                        (window.adsbygoogle = window.adsbygoogle || []).push({});
-                    } catch (error) {
-                        console.warn('광고 블록 리프레시 실패:', error);
-                    }
-                });
-
-                // 또는 페이지의 모든 광고를 새로고침
-                if (window.googletag && window.googletag.pubads) {
-                    window.googletag.pubads().refresh();
-                }
-
-            } else if (window.googletag && window.googletag.pubads) {
-                // Google Publisher Tags 사용 시
-                console.log('Google Publisher Tags 리프레시 실행');
-                window.googletag.pubads().refresh();
-
-            } else {
-                console.log('Google AdSense가 로드되지 않았습니다.');
-            }
-
-        } catch (error) {
-            console.error('Google AdSense 리프레시 오류:', error);
         }
     }
 
@@ -1307,6 +1162,12 @@ class AgeCalculatorUI {
         if (day) this.dayInput.value = day;
     }
 
+    getBirthDateIso() {
+        const digits = String(this.birthInput?.value || '').replace(/\D/g, '');
+        if (digits.length !== 8) return null;
+        return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`;
+    }
+
     getBirthYear() {
         // 8자리 모드
         if (this.birthInput) {
@@ -1334,6 +1195,32 @@ class AgeCalculatorUI {
  * 유틸리티 함수들
  */
 const DateUtils = {
+    getNextBirthdaySummary: (birthIso, referenceDate = new Date()) => {
+        const [birthYear, birthMonth, birthDay] = birthIso.split('-').map(Number);
+        if (!birthYear || !birthMonth || !birthDay) return null;
+
+        const referenceUtc = Date.UTC(
+            referenceDate.getFullYear(),
+            referenceDate.getMonth(),
+            referenceDate.getDate()
+        );
+        let candidateYear = referenceDate.getFullYear();
+        let candidateUtc = referenceUtc;
+        while (candidateYear <= referenceDate.getFullYear() + 8) {
+            candidateUtc = Date.UTC(candidateYear, birthMonth - 1, birthDay);
+            const candidate = new Date(candidateUtc);
+            const isExactDate = candidate.getUTCMonth() === birthMonth - 1
+                && candidate.getUTCDate() === birthDay;
+            if (isExactDate && candidateUtc >= referenceUtc) break;
+            candidateYear += 1;
+        }
+
+        return {
+            daysUntil: Math.round((candidateUtc - referenceUtc) / 86400000),
+            date: `${candidateYear}-${String(birthMonth).padStart(2, '0')}-${String(birthDay).padStart(2, '0')}`
+        };
+    },
+
     /**
      * 날짜 유효성 검사
      */

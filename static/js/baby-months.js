@@ -1,3 +1,29 @@
+function buildBabyMonthsResultHTML({ months, totalDays, years, remain }) {
+    return `
+        <div class="result success">
+            <p class="message">현재 개월 수</p>
+            <div class="age-info">
+                <p class="age"><span class="age-number">${months}개월</span> <span class="small">(${totalDays}일)</span></p>
+            </div>
+            <p class="small">${years}년 ${remain}개월</p>
+            <div class="result-section">
+                <h4>결과 해석</h4>
+                <p>출생일에서 오늘까지 완료된 달 수를 계산한 값입니다.</p>
+                <p class="small">날짜 계산 결과이며 발달 평가나 의료 진단이 아닙니다.</p>
+            </div>
+            <div class="result-next">
+                <h3>이어서 확인하기</h3>
+                <div class="result-next-links">
+                    <a href="/baby-months-table">월령표 보기</a>
+                    <a href="/birthday-dday-calculator">다음 생일 확인</a>
+                    <a href="/age">현재 만나이 확인</a>
+                    <a href="/100-day-calculator">100일·돌 날짜 확인</a>
+                </div>
+                <p class="small">저장에 동의한 출생일은 관련 계산기에서 자동으로 불러옵니다.</p>
+            </div>
+        </div>`;
+}
+
 class BabyMonthsCalculator {
     constructor() {
         this.birthInput = document.getElementById('baby-birth-input');
@@ -88,20 +114,9 @@ class BabyMonthsCalculator {
         const years = Math.floor(months / 12);
         const remain = months % 12;
 
-        this.resultContent.innerHTML = `
-            <div class="result success">
-                <p class="message">현재 개월 수</p>
-                <div class="age-info">
-                    <p class="age"><span class="age-number">${months}개월</span> <span class="small">(${totalDays}일)</span></p>
-                </div>
-                <p class="small">${years}년 ${remain}개월</p>
-                <div class="result-section">
-                    <h4>결과 해석</h4>
-                    <p>출생일에서 오늘까지 완료된 달 수를 계산한 값입니다.</p>
-                    <p class="small">날짜 계산 결과이며 발달 평가나 의료 진단이 아닙니다.</p>
-                </div>
-            </div>
-        `;
+        this.resultContent.innerHTML = buildBabyMonthsResultHTML({
+            months, totalDays, years, remain
+        });
         this.resultContainer.classList.add('show');
     }
 
@@ -119,3 +134,7 @@ class BabyMonthsCalculator {
 document.addEventListener('DOMContentLoaded', () => {
     new BabyMonthsCalculator();
 });
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { BabyMonthsCalculator, buildBabyMonthsResultHTML };
+}

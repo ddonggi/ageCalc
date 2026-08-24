@@ -797,6 +797,10 @@ def _birth_year_range_label(year: int, current_year: int) -> str:
 
 def _build_birth_year_snapshot(year: int, current_year: int) -> dict[str, object]:
     annual_age = current_year - year
+    elementary_entry = year + 7
+    middle_entry = year + 13
+    high_entry = year + 16
+    high_graduation_year = year + 19
     if annual_age <= 0:
         detail = "올해 출생자는 현재 기준으로 만 0세입니다. 실제 출생일이 미래라면 아직 계산 대상이 아닐 수 있습니다."
     else:
@@ -810,6 +814,12 @@ def _build_birth_year_snapshot(year: int, current_year: int) -> dict[str, object
         "detail": detail,
         "zodiac": KOREAN_ZODIAC[year % 12],
         "generation": _generation_label(year),
+        "elementary_entry": f"{elementary_entry}학년도",
+        "middle_entry": f"{middle_entry}학년도",
+        "high_entry": f"{high_entry}학년도",
+        "high_graduation_date": f"{high_graduation_year}년 2월",
+        "college_entry": f"{high_graduation_year}학년도",
+        "hwangap_year": f"{year + 60}년",
     }
 
 

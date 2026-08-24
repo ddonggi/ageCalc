@@ -1,5 +1,6 @@
 import json
 import re
+import subprocess
 import unittest
 from datetime import date, datetime
 from html.parser import HTMLParser
@@ -80,6 +81,119 @@ def _parse_page_markup(html):
 
 
 class PublicPageTests(unittest.TestCase):
+    def test_age_page_keeps_policy_guidance_compact_and_source_first(self):
+        html = app.test_client().get("/age").get_data(as_text=True)
+
+        self.assertNotIn('class="age-rights-section"', html)
+        self.assertNotIn("청년 월세 특별 지원", html)
+        self.assertNotIn("중장년층 전용 주택", html)
+        self.assertIn("연령별 제도는 공식 기준을 확인하세요", html)
+        self.assertIn('href="/references"', html)
+
+    def test_age_result_prioritizes_summary_and_safe_related_links(self):
+        program = r"""
+const assert = require('assert');
+global.document = { addEventListener() {} };
+global.window = {};
+
+const { AgeCalculatorUI, DateUtils } = require('./static/js/age-calculator.js');
+const calculator = Object.create(AgeCalculatorUI.prototype);
+calculator.birthInput = { value: '1992.10.02' };
+calculator.hiddenDateInput = null;
+const html = calculator.createSuccessResultHTML({
+  success: true,
+  message: '생년월일: 1992-10-02',
+  age: 33
+});
+
+assert.match(html, /만 33세/);
+assert.match(html, /다음 생일까지/);
+assert.match(html, /이어서 확인하기/);
+assert.match(html, /href="\/birth-year-age-table\?year=1992"/);
+assert.match(html, /href="\/annual-age-calculator\?birth_year=1992"/);
+assert.match(html, /href="\/school-entry-year-table\?year=1992"/);
+assert.match(html, /href="\/birthday-dday-calculator"/);
+assert.strictEqual((html.match(/class="age-result-links"[\s\S]*?<\/div>/) || [''])[0].match(/<a /g).length, 4);
+assert.doesNotMatch(html, /birth_date=/);
+assert.doesNotMatch(html, /1992-10-02[^<]*href=/);
+assert.doesNotMatch(html, /현재 나이로 가능한 권리·제도/);
+assert.deepStrictEqual(
+  DateUtils.getNextBirthdaySummary('1992-10-02', new Date(2026, 9, 1)),
+  { daysUntil: 1, date: '2026-10-02' }
+);
+assert.deepStrictEqual(
+  DateUtils.getNextBirthdaySummary('2000-02-29', new Date(2026, 1, 28)),
+  { daysUntil: 731, date: '2028-02-29' }
+);
+"""
+        completed = subprocess.run(
+            ["node", "-e", program],
+            cwd=Path.cwd(),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stderr)
+
+    def test_age_result_does_not_refresh_ads_after_rendering(self):
+        program = r"""
+const assert = require('assert');
+
+const scheduledCallbacks = [];
+global.setTimeout = (callback) => {
+  scheduledCallbacks.push(callback);
+  return scheduledCallbacks.length;
+};
+global.clearTimeout = () => {};
+
+const resultContainer = {
+  classList: { add() {}, remove() {} }
+};
+const resultContent = { innerHTML: '' };
+global.document = {
+  addEventListener() {},
+  getElementById(id) {
+    if (id === 'result-container') return resultContainer;
+    if (id === 'result-content') return resultContent;
+    return null;
+  },
+  querySelector() { return null; },
+  querySelectorAll() { return []; }
+};
+
+let adsenseRefreshes = 0;
+let publisherRefreshes = 0;
+global.window = {
+  adsbygoogle: { push() { adsenseRefreshes += 1; } },
+  googletag: {
+    pubads() {
+      return { refresh() { publisherRefreshes += 1; } };
+    }
+  }
+};
+
+const { AgeCalculatorUI } = require('./static/js/age-calculator.js');
+const calculator = Object.create(AgeCalculatorUI.prototype);
+calculator.birthInput = { value: '1992.10.02' };
+calculator.hiddenDateInput = null;
+calculator.displayResult({ success: true, message: '계산 완료', age: 33 });
+scheduledCallbacks.forEach(callback => callback());
+
+assert.match(resultContent.innerHTML, /33세/);
+assert.strictEqual(adsenseRefreshes, 0);
+assert.strictEqual(publisherRefreshes, 0);
+"""
+        completed = subprocess.run(
+            ["node", "-e", program],
+            cwd=Path.cwd(),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stderr)
+
     def test_public_images_reserve_space_and_have_accessible_text(self):
         client = app.test_client()
 
@@ -907,6 +1021,41 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn("선택한 연도", html)
         self.assertIn("1990년생 나이 안내", html)
 
+    def test_birth_year_result_renders_school_life_milestones_and_safe_ctas(self):
+        with mock.patch.object(app_module, "_current_local_date", return_value=date(2026, 8, 24)):
+            response = app.test_client().get("/birth-year-age-table?year=1992")
+
+        self.assertEqual(200, response.status_code)
+        html = response.get_data(as_text=True)
+        self.assertIn('id="birth-year-selected-result"', html)
+        result_start = html.index('id="birth-year-selected-result"')
+        result_end = html.index("</section>", result_start)
+        result_html = html[result_start:result_end]
+
+        for phrase in (
+            "연나이 34세",
+            "만 33~34세",
+            "원숭이띠",
+            "초등학교 1999학년도",
+            "중학교 2005학년도",
+            "고등학교 2008학년도",
+            "2011년 2월",
+            "대학 입학 예상 2011학년도",
+            "환갑 2052년",
+        ):
+            self.assertIn(phrase, result_html)
+
+        expected_links = (
+            'href="/annual-age-calculator?birth_year=1992"',
+            'href="/school-entry-year-table?year=1992"',
+            'href="/birth-year-zodiac-table?year=1992"',
+            'href="/age"',
+        )
+        for link in expected_links:
+            self.assertIn(link, result_html)
+        self.assertEqual(4, result_html.count("<a "))
+        self.assertNotIn("birth_date=", result_html)
+
     def test_school_grade_calculator_page_is_public(self):
         client = app.test_client()
         response = client.get("/school-grade-calculator")
@@ -1588,6 +1737,75 @@ class PublicPageTests(unittest.TestCase):
         for affiliate_marker in ("info-coupang-promotions", "home-coupang-rail-left"):
             if affiliate_marker in html:
                 self.assertLess(direct_answer, html.index(affiliate_marker))
+
+    def test_birthday_dday_ssr_and_csr_results_offer_the_same_next_steps(self):
+        server_html = app.test_client().get(
+            "/birthday-dday-calculator?month=10&day=2"
+        ).get_data(as_text=True)
+        expected_links = (
+            'href="/age"',
+            'href="/d-day"',
+            'href="/life-timeline"',
+        )
+        result_html = server_html[
+            server_html.index('id="birthday-dday-result-content"'):
+            server_html.index('</article>', server_html.index('id="birthday-dday-result-content"'))
+        ]
+        for link in expected_links:
+            self.assertIn(link, result_html)
+
+        program = r"""
+const assert = require('assert');
+global.document = { addEventListener() {} };
+const { buildBirthdayResultHTML } = require('./static/js/birthday-dday.js');
+const html = buildBirthdayResultHTML({
+  birthdayLabel: '10월 2일',
+  nextDate: '2026.10.02',
+  statusLabel: 'D-39',
+  days: 39,
+  statusNote: '다음 생일까지 39일 남았습니다.'
+});
+for (const href of ['/age', '/d-day', '/life-timeline']) {
+  assert.match(html, new RegExp(`href="${href}"`));
+}
+assert.strictEqual((html.match(/class="result-next-links"[\s\S]*?<\/div>/) || [''])[0].match(/<a /g).length, 3);
+assert.doesNotMatch(html, /birth_date=/);
+"""
+        completed = subprocess.run(
+            ["node", "-e", program], cwd=Path.cwd(), capture_output=True, text=True
+        )
+        self.assertEqual(0, completed.returncode, completed.stderr)
+
+    def test_baby_months_result_offers_four_privacy_safe_next_steps(self):
+        program = r"""
+const assert = require('assert');
+global.document = { addEventListener() {} };
+const { buildBabyMonthsResultHTML } = require('./static/js/baby-months.js');
+const html = buildBabyMonthsResultHTML({ months: 14, totalDays: 426, years: 1, remain: 2 });
+for (const href of ['/baby-months-table', '/birthday-dday-calculator', '/age', '/100-day-calculator']) {
+  assert.match(html, new RegExp(`href="${href}"`));
+}
+assert.strictEqual((html.match(/class="result-next-links"[\s\S]*?<\/div>/) || [''])[0].match(/<a /g).length, 4);
+assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
+"""
+        completed = subprocess.run(
+            ["node", "-e", program], cwd=Path.cwd(), capture_output=True, text=True
+        )
+        self.assertEqual(0, completed.returncode, completed.stderr)
+
+    def test_result_ctas_and_static_related_paths_have_distinct_roles(self):
+        pages = {page["endpoint"]: page for page in PUBLIC_PAGE_REGISTRY}
+
+        self.assertTrue(
+            set(pages["birthday_dday_calculator"]["related_endpoints"]).isdisjoint(
+                {"age", "d_day", "life_timeline"}
+            )
+        )
+        self.assertTrue(
+            set(pages["baby_months"]["related_endpoints"]).isdisjoint(
+                {"baby_months_table", "birthday_dday_calculator", "age", "hundred_day_calculator"}
+            )
+        )
 
     def test_age_page_renders_feedback_widget(self):
         client = app.test_client()
@@ -3917,6 +4135,79 @@ class PublicPageTests(unittest.TestCase):
         for hub in HUB_PAGES:
             self.assertIn(f'href="{hub["path"]}"', html)
         self.assertNotIn("표·비교 모음", html)
+
+    def test_home_prioritizes_frequent_calculators_without_repeated_preview_cards(self):
+        html = app.test_client().get("/").get_data(as_text=True)
+
+        self.assertIn('aria-label="자주 찾는 계산"', html)
+        self.assertEqual(5, html.count('class="age-hub-result-card'))
+        self.assertNotIn('class="home-preview-deck"', html)
+        self.assertIn('aria-label="빠른 표와 기준 찾기"', html)
+        quick_links = re.search(
+            r'<nav class="home-quick-links".*?</nav>', html, re.S
+        )
+        self.assertIsNotNone(quick_links)
+        self.assertEqual(3, quick_links.group(0).count("<a "))
+        self.assertIn('href="/birth-year-age-table"', quick_links.group(0))
+        self.assertIn('href="/school-entry-year-table"', quick_links.group(0))
+        self.assertIn('href="/birth-year-zodiac-table"', quick_links.group(0))
+        self.assertNotIn('href="/baby-months"', quick_links.group(0))
+
+    def test_home_moves_explanatory_copy_below_primary_exploration(self):
+        html = app.test_client().get("/").get_data(as_text=True)
+
+        self.assertEqual(
+            1,
+            len(re.findall(r'class="[^"]*\bhome-method-note\b[^"]*\bdirect-answer\b[^"]*"', html)),
+        )
+        self.assertNotIn('aria-label="AgeCalc 바로 답변"', html)
+        self.assertNotIn('<p class="eyebrow">사용 순서</p>', html)
+        self.assertLess(
+            html.index('id="home-life-hubs-title"'),
+            html.index("home-method-note"),
+        )
+        self.assertIn("계산 결과와 기준을 함께 확인하세요", html)
+
+    def test_home_quick_links_use_one_column_on_mobile(self):
+        css = Path("static/css/style.css").read_text(encoding="utf-8")
+        mobile_css = re.search(
+            r"@media\s*\(max-width:\s*760px\)\s*\{(?P<body>.*)\n\}",
+            css,
+            re.DOTALL,
+        )
+
+        self.assertIsNotNone(mobile_css)
+        self.assertRegex(
+            mobile_css.group("body"),
+            r"\.home-quick-links\s*\{[^}]*grid-template-columns:\s*1fr;",
+        )
+
+    def test_primary_calculators_explain_their_meaning_in_initial_html(self):
+        cases = {
+            "/age": ("만나이 계산기", "1992", "계산 기준"),
+            "/annual-age-calculator": ("연나이 계산기", "1992", "계산 공식"),
+            "/birthday-dday-calculator": ("생일 D-day 계산기", "2월 29일", "계산 기준"),
+            "/birth-year-age-table": ("출생연도별 나이표", "1992", "예시"),
+            "/school-grade-calculator": ("학년 계산기", "2019", "계산 기준"),
+            "/school-entry-year-table": ("입학년도", "2019", "계산 기준"),
+            "/baby-months": ("아이 개월수 계산기", "2025", "월령"),
+        }
+
+        for path, visible_markers in cases.items():
+            with self.subTest(path=path):
+                response = app.test_client().get(path)
+                html = response.get_data(as_text=True)
+                schemas, visible_text = _parse_page_markup(html)
+
+                self.assertEqual(200, response.status_code)
+                self.assertRegex(html, r"<title>[^<]+</title>")
+                self.assertRegex(html, r'<meta name="description" content="[^"]+"')
+                self.assertRegex(html, r'<link rel="canonical" href="https://agecalc\.cloud/[^"]*"')
+                self.assertRegex(html, r"<h1[^>]*>.*?</h1>")
+                for marker in visible_markers:
+                    self.assertIn(marker, visible_text)
+                self.assertIn('href="/references"', html)
+                self.assertTrue(any(schema.get("@type") == "WebPage" for schema in schemas))
 
     def test_home_page_renders_coupang_side_rails_when_enabled(self):
         client = app.test_client()

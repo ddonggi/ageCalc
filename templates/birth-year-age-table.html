@@ -113,7 +113,7 @@
         {% include 'partials/home_coupang_rails.html' %}
 
         {% if selected_row %}
-        <section class="section-shell section-card-grid">
+        <section class="section-shell section-card-grid" id="birth-year-selected-result">
             <article class="section-card birth-year-summary">
                 <p class="eyebrow">선택한 연도</p>
                 <h2>{{ selected_row.label }} 나이 안내</h2>
@@ -121,7 +121,7 @@
                 <div class="summary-grid">
                     <div class="summary-card">
                         <strong>연나이</strong>
-                        <span>{{ selected_row.annual_age }}</span>
+                        <span>연나이 {{ selected_row.annual_age }}</span>
                     </div>
                     <div class="summary-card">
                         <strong>만나이 범위</strong>
@@ -129,13 +129,35 @@
                     </div>
                     <div class="summary-card">
                         <strong>띠</strong>
-                        <span>{{ selected_row.zodiac }}</span>
+                        <span>{{ selected_row.zodiac }}띠</span>
                     </div>
                     <div class="summary-card">
                         <strong>세대명</strong>
                         <span>{{ selected_row.generation }}</span>
                     </div>
                 </div>
+                <div class="result-next">
+                    <h3>이어서 확인하기</h3>
+                    <div class="result-next-links">
+                        <a href="{{ url_for('annual_age_calculator', birth_year=selected_year) }}">연나이 자세히 보기</a>
+                        <a href="{{ url_for('school_entry_year_table', year=selected_year) }}">입학년도 확인</a>
+                        <a href="{{ url_for('birth_year_zodiac_table', year=selected_year) }}">같은 띠 연도 보기</a>
+                        <a href="{{ url_for('age') }}">정확한 만나이 계산</a>
+                    </div>
+                </div>
+            </article>
+            <article class="section-card birth-year-milestones">
+                <p class="eyebrow">생활 시점</p>
+                <h2>{{ selected_row.label }} 주요 연도</h2>
+                <div class="summary-grid">
+                    <div class="summary-card"><strong>초등학교</strong><span>초등학교 {{ selected_row.elementary_entry }}</span></div>
+                    <div class="summary-card"><strong>중학교</strong><span>중학교 {{ selected_row.middle_entry }}</span></div>
+                    <div class="summary-card"><strong>고등학교</strong><span>고등학교 {{ selected_row.high_entry }}</span></div>
+                    <div class="summary-card"><strong>고교 졸업 예상</strong><span>{{ selected_row.high_graduation_date }}</span></div>
+                    <div class="summary-card"><strong>대학 입학 예상</strong><span>대학 입학 예상 {{ selected_row.college_entry }}</span></div>
+                    <div class="summary-card"><strong>환갑</strong><span>환갑 {{ selected_row.hwangap_year }}</span></div>
+                </div>
+                <p class="small">일반 학제 기준 예상 시점입니다. 조기입학·입학유예·재수·해외 학제는 반영하지 않습니다.</p>
             </article>
         </section>
         {% endif %}
