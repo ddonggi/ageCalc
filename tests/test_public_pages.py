@@ -81,6 +81,19 @@ def _parse_page_markup(html):
 
 
 class PublicPageTests(unittest.TestCase):
+    def test_archived_minigames_are_absent_from_every_sitemap(self):
+        locations = _sitemap_leaf_locations(app.test_client())
+        self.assertFalse(any("/minigames" in location for location in locations))
+
+    def test_archived_minigame_source_files_remain_present(self):
+        for path in (
+            Path("templates/minigames.html"),
+            Path("templates/guess.html"),
+            Path("static/js/guess-game.js"),
+            Path("static/css/snake.css"),
+        ):
+            self.assertTrue(path.exists(), path)
+
     def test_age_page_keeps_policy_guidance_compact_and_source_first(self):
         html = app.test_client().get("/age").get_data(as_text=True)
 
