@@ -1,4 +1,5 @@
 import re
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -54,9 +55,33 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
     def test_home_exposes_accessible_quick_age_calculator(self):
         html = self.client.get("/").get_data(as_text=True)
         self.assertIn('id="home-age-form"', html)
+        self.assertIn('data-today="', html)
         self.assertIn('id="home-birth-input"', html)
+        self.assertIn('type="date"', html)
         self.assertIn('aria-describedby="home-birth-help home-birth-error"', html)
+        self.assertIn('id="home-birth-error" role="alert"', html)
         self.assertIn('id="home-age-result"', html)
+        self.assertIn('id="home-age-value"', html)
+        self.assertIn('href="/school-grade-calculator"', html)
+        self.assertIn('href="/birthday-dday-calculator"', html)
+        self.assertIn("js/home-age-calculator.js", html)
+        self.assertNotIn('class="age-hub-dashboard"', html)
+        self.assertNotIn('class="age-hub-result-card"', html)
+
+    def test_home_calculator_module_handles_birthday_boundaries(self):
+        program = r"""
+const assert = require('assert');
+global.document = { addEventListener() {} };
+const { calculateSolarAge } = require('./static/js/home-age-calculator.js');
+assert.deepStrictEqual(calculateSolarAge('1992-10-02', '2026-10-01').age, 33);
+assert.deepStrictEqual(calculateSolarAge('1992-10-02', '2026-10-02').age, 34);
+assert.strictEqual(calculateSolarAge('1992-10-02', '2026-10-01').daysToBirthday, 1);
+assert.strictEqual(calculateSolarAge('1992-10-02', '2026-10-02').daysToBirthday, 0);
+assert.strictEqual(calculateSolarAge('2027-01-01', '2026-08-28').ok, false);
+assert.strictEqual(calculateSolarAge('2024-02-30', '2026-08-28').ok, false);
+"""
+        result = subprocess.run(["node", "-e", program], capture_output=True, text=True)
+        self.assertEqual(0, result.returncode, result.stderr)
 
     def test_archived_games_stay_reachable_but_hidden(self):
         for path in ("/minigames", "/minigames/guess", "/minigames/snake"):

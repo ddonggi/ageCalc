@@ -4219,11 +4219,15 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
             self.assertIn(f'href="{hub["path"]}"', html)
         self.assertNotIn("표·비교 모음", html)
 
-    def test_home_prioritizes_frequent_calculators_without_repeated_preview_cards(self):
+    def test_home_prioritizes_calculator_without_repeated_preview_cards(self):
         html = app.test_client().get("/").get_data(as_text=True)
 
-        self.assertIn('aria-label="자주 찾는 계산"', html)
-        self.assertEqual(5, html.count('class="age-hub-result-card'))
+        self.assertIn('id="home-age-form"', html)
+        self.assertIn('id="home-age-result"', html)
+        self.assertIn('id="home-grade-result"', html)
+        self.assertIn('id="home-birthday-result"', html)
+        self.assertNotIn('class="age-hub-dashboard"', html)
+        self.assertNotIn('class="age-hub-result-card"', html)
         self.assertNotIn('class="home-preview-deck"', html)
         self.assertIn('aria-label="빠른 표와 기준 찾기"', html)
         quick_links = re.search(

@@ -42,55 +42,44 @@
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <section class="hero-band hero-command-board age-hub-hero">
-            <div class="hero-copy age-hub-copy">
-                <p class="eyebrow">Age Calculator Hub</p>
-                <h1>오늘 기준 나이를 바로 계산하세요</h1>
+        <section class="hero-band age-hub-hero editorial-hero" aria-labelledby="home-title">
+            <div class="editorial-hero-copy">
+                <p class="eyebrow">Age calculator & life dates</p>
+                <h1 id="home-title">오늘 기준 나이를 바로 계산하세요</h1>
                 <p class="page-intro">
-                    만나이, 학년, 생일 D-day, 아이 개월수, 반려동물 나이까지 날짜 기준 생활 계산을 한곳에서 확인하세요.
+                    생년월일부터 중요한 생활 시점까지 차분하게 확인하세요.
                 </p>
-                <div class="hero-actions">
-                    <a class="btn btn-primary" href="{{ url_for('age') }}">만나이 계산하기</a>
-                    <a class="btn btn-secondary" href="{{ url_for('school_grade_calculator') }}">학년 계산하기</a>
-                    <a class="btn btn-secondary" href="{{ url_for('birthday_dday_calculator') }}">생일 D-day 보기</a>
-                </div>
             </div>
 
-            <div class="age-hub-dashboard" aria-label="자주 찾는 계산">
-                <div class="age-hub-dashboard-head">
-                    <div>
-                        <p class="command-label">기준일: 오늘</p>
+            <div class="editorial-panel-shell">
+                <form id="home-age-form" class="editorial-panel-core" data-today="{{ today.isoformat() }}" novalidate>
+                    <div class="home-age-reference">
+                        <p class="command-label">기준일</p>
                         <strong>{{ today.strftime("%Y.%m.%d") }}</strong>
                     </div>
-                    <span>바로 계산</span>
-                </div>
-                <div class="age-hub-result-grid">
-                    <a class="age-hub-result-card is-primary" href="{{ url_for('age') }}">
-                        <span class="age-hub-result-index">01</span>
-                        <strong>만나이</strong>
-                        <small>생년월일 기준 계산</small>
-                    </a>
-                    <a class="age-hub-result-card" href="{{ url_for('school_grade_calculator') }}">
-                        <span class="age-hub-result-index">02</span>
-                        <strong>학년</strong>
-                        <small>출생연도 기준 확인</small>
-                    </a>
-                    <a class="age-hub-result-card" href="{{ url_for('birthday_dday_calculator') }}">
-                        <span class="age-hub-result-index">03</span>
-                        <strong>생일</strong>
-                        <small>다음 생일까지 D-day</small>
-                    </a>
-                    <a class="age-hub-result-card" href="{{ url_for('baby_months') }}">
-                        <span class="age-hub-result-index">04</span>
-                        <strong>아이 개월수</strong>
-                        <small>출생일 기준 월령 계산</small>
-                    </a>
-                    <a class="age-hub-result-card" href="{{ url_for('dog') }}">
-                        <span class="age-hub-result-index">05</span>
-                        <strong>반려동물 나이</strong>
-                        <small>사람 나이로 환산</small>
-                    </a>
-                </div>
+
+                    <label for="home-birth-input">생년월일</label>
+                    <input id="home-birth-input" type="date" required aria-describedby="home-birth-help home-birth-error">
+                    <p id="home-birth-help">입력한 날짜는 저장하지 않습니다.</p>
+                    <p id="home-birth-error" role="alert"></p>
+
+                    <button class="btn btn-primary" type="submit">계산하기</button>
+
+                    <div class="editorial-result-grid" id="home-age-result" aria-live="polite" hidden>
+                        <div class="home-age-result-card home-age-result-card-primary">
+                            <span>만나이</span>
+                            <output id="home-age-value"></output>
+                        </div>
+                        <div class="home-age-result-card" id="home-grade-result">
+                            <span>학년</span>
+                            <a href="{{ url_for('school_grade_calculator') }}">학년 계산</a>
+                        </div>
+                        <div class="home-age-result-card" id="home-birthday-result">
+                            <span>생일 D-day</span>
+                            <a href="{{ url_for('birthday_dday_calculator') }}">D-day 계산</a>
+                        </div>
+                    </div>
+                </form>
             </div>
         </section>
         {% include 'partials/info_coupang_promotions.html' %}
@@ -157,6 +146,7 @@
 
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <script src="{{ versioned_static('js/home-age-calculator.js') }}" defer></script>
 
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
         ↑
