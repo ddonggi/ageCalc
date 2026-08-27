@@ -80,6 +80,75 @@ def _parse_page_markup(html):
     return [json.loads(block) for block in parser.json_ld_blocks], " ".join(parser.text_parts)
 
 
+ARCHIVED_MINIGAME_TEMPLATES = (
+    Path("templates/2048.html"),
+    Path("templates/battleship.html"),
+    Path("templates/blackjack.html"),
+    Path("templates/breakout.html"),
+    Path("templates/checkers.html"),
+    Path("templates/connect4.html"),
+    Path("templates/dotsandboxes.html"),
+    Path("templates/fifteen.html"),
+    Path("templates/gomoku.html"),
+    Path("templates/guess.html"),
+    Path("templates/hangman.html"),
+    Path("templates/hanoi.html"),
+    Path("templates/lightsout.html"),
+    Path("templates/mancala.html"),
+    Path("templates/mastermind.html"),
+    Path("templates/memory.html"),
+    Path("templates/minesweeper.html"),
+    Path("templates/minigames.html"),
+    Path("templates/nim.html"),
+    Path("templates/pegsolitaire.html"),
+    Path("templates/pig.html"),
+    Path("templates/pong.html"),
+    Path("templates/reversi.html"),
+    Path("templates/rps.html"),
+    Path("templates/simon.html"),
+    Path("templates/snake.html"),
+    Path("templates/tictactoe.html"),
+    Path("templates/war.html"),
+    Path("templates/yahtzee.html"),
+)
+ARCHIVED_MINIGAME_SCRIPTS = tuple(
+    Path(f"static/js/{name}-game.js")
+    for name in (
+        "2048", "battleship", "blackjack", "breakout", "checkers", "connect4",
+        "dotsandboxes", "fifteen", "gomoku", "guess", "hangman", "hanoi",
+        "lightsout", "mancala", "mastermind", "memory", "minesweeper", "nim",
+        "pegsolitaire", "pig", "pong", "reversi", "rps", "simon", "snake",
+        "tictactoe", "war", "yahtzee",
+    )
+)
+ARCHIVED_MINIGAME_SHARED_SCRIPTS = (
+    Path("static/js/analytics.js"),
+    Path("static/js/clarity-init.js"),
+    Path("static/js/cookie-consent.js"),
+    Path("static/js/pixel-stickers.js"),
+    Path("static/js/scroll-top.js"),
+)
+ARCHIVED_MINIGAME_STYLESHEETS = tuple(
+    [Path("static/css/style.css")]
+    + [
+        Path(f"static/css/{name}.css")
+        for name in (
+        "2048", "battleship", "blackjack", "breakout", "checkers", "connect4",
+        "dotsandboxes", "fifteen", "gomoku", "hangman", "hanoi", "lightsout",
+        "mancala", "mastermind", "memory", "minesweeper", "nim", "pegsolitaire",
+        "pig", "pong", "reversi", "rps", "simon", "tictactoe", "war", "yahtzee",
+        )
+    ]
+)
+ARCHIVED_MINIGAME_IMAGE_ASSETS = (
+    Path("static/images/apple-touch-icon.png"),
+    Path("static/images/favicon-16x16.png"),
+    Path("static/images/favicon-32x32.png"),
+    Path("static/images/og-image.png"),
+    Path("static/images/site.webmanifest"),
+)
+
+
 class PublicPageTests(unittest.TestCase):
     def test_archived_minigames_are_absent_from_every_sitemap(self):
         locations = _sitemap_leaf_locations(app.test_client())
@@ -87,10 +156,11 @@ class PublicPageTests(unittest.TestCase):
 
     def test_archived_minigame_source_files_remain_present(self):
         for path in (
-            Path("templates/minigames.html"),
-            Path("templates/guess.html"),
-            Path("templates/snake.html"),
-            Path("static/js/guess-game.js"),
+            *ARCHIVED_MINIGAME_TEMPLATES,
+            *ARCHIVED_MINIGAME_SCRIPTS,
+            *ARCHIVED_MINIGAME_SHARED_SCRIPTS,
+            *ARCHIVED_MINIGAME_STYLESHEETS,
+            *ARCHIVED_MINIGAME_IMAGE_ASSETS,
         ):
             self.assertTrue(path.exists(), path)
 
