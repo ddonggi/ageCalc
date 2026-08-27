@@ -20,9 +20,36 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
         css = Path("static/css/editorial-luxury.css").read_text()
         for value in ("#F6F1E8", "#FCF9F3", "#241D18", "#66705A", "#A68B61", "#A34C3D"):
             self.assertIn(value.lower(), css.lower())
+        self.assertNotIn("#efe6d8", css.lower())
         self.assertIn("@media (prefers-reduced-motion: reduce)", css)
         self.assertIn(":focus-visible", css)
         self.assertTrue(Path("static/fonts/PretendardVariable.subset.woff2").read_bytes().startswith(b"wOF2"))
+
+    def test_theme_limits_motion_to_transform_and_opacity(self):
+        css = Path("static/css/editorial-luxury.css").read_text()
+        allowed_motion_properties = {"none", "transform", "opacity"}
+        for match in re.finditer(r"(?<!-)\btransition\s*:\s*([^;]+);", css):
+            transition_value = match.group(1).strip()
+            for transition_part in transition_value.split(","):
+                animated_property = transition_part.strip().split()[0]
+                self.assertIn(animated_property, allowed_motion_properties, transition_value)
+        for match in re.finditer(r"(?<!-)\banimation\s*:\s*([^;]+);", css):
+            self.assertEqual("none !important", match.group(1).strip())
+
+    def test_theme_enforces_accessible_mobile_menu_targets(self):
+        css = Path("static/css/editorial-luxury.css").read_text()
+        for selector in (".menu-toggle", ".mobile-nav-close"):
+            with self.subTest(selector=selector):
+                blocks = "\n".join(
+                    match.group("body")
+                    for match in re.finditer(
+                        rf"[^{{}}]*{re.escape(selector)}[^{{}}]*\{{(?P<body>[^}}]+)\}}",
+                        css,
+                        re.S,
+                    )
+                )
+                self.assertRegex(blocks, r"\bmin-width:\s*44px;")
+                self.assertRegex(blocks, r"\bmin-height:\s*44px;")
 
     def test_home_exposes_accessible_quick_age_calculator(self):
         html = self.client.get("/").get_data(as_text=True)

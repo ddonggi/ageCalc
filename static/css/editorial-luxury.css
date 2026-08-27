@@ -36,7 +36,7 @@ body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) {
   color: var(--lux-text);
   background:
     radial-gradient(circle at 16% 12%, rgba(166, 139, 97, .16), transparent 28rem),
-    linear-gradient(180deg, var(--lux-canvas), #EFE6D8 100%);
+    linear-gradient(180deg, var(--lux-canvas), rgba(252, 249, 243, .72) 100%);
   font-family: var(--lux-body);
 }
 
@@ -171,7 +171,13 @@ body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .menu-togg
   font-family: var(--lux-body);
   font-weight: 600;
   letter-spacing: 0;
-  transition: color var(--lux-motion), background-color var(--lux-motion), border-color var(--lux-motion), transform var(--lux-motion);
+  transition: transform var(--lux-motion);
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .menu-toggle,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .mobile-nav-close {
+  min-width: 44px;
+  min-height: 44px;
 }
 
 body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .mega-nav-trigger:hover,
@@ -266,7 +272,7 @@ body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .home-quic
   background: rgba(252, 249, 243, .76);
   color: var(--lux-text);
   box-shadow: none;
-  transition: border-color var(--lux-motion), transform var(--lux-motion), background-color var(--lux-motion), box-shadow var(--lux-motion);
+  transition: transform var(--lux-motion);
 }
 
 body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .section-card:hover,
@@ -311,7 +317,7 @@ body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .btn,
 body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .page-btn {
   min-height: 2.9rem;
   border-radius: 999px;
-  transition: background-color var(--lux-motion), border-color var(--lux-motion), color var(--lux-motion), transform var(--lux-motion), box-shadow var(--lux-motion);
+  transition: transform var(--lux-motion);
 }
 
 body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .btn:hover,
