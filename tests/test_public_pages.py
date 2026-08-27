@@ -89,8 +89,8 @@ class PublicPageTests(unittest.TestCase):
         for path in (
             Path("templates/minigames.html"),
             Path("templates/guess.html"),
+            Path("templates/snake.html"),
             Path("static/js/guess-game.js"),
-            Path("static/css/snake.css"),
         ):
             self.assertTrue(path.exists(), path)
 
