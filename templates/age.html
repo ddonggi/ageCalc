@@ -87,6 +87,7 @@
 
     <!-- CSS-->
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
 
     <!-- 스크립트 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"
@@ -254,7 +255,7 @@
                 <p class="eyebrow">공식 기준 우선</p>
                 <h2>연령별 제도는 공식 기준을 확인하세요</h2>
                 <p>복지·주거·연금·자격 제도는 나이 외에도 소득, 거주지, 가입 기간과 시행 시점에 따라 달라집니다. 계산 결과만으로 신청 가능 여부를 판단하지 마세요.</p>
-                <div class="footer-links">
+                <div class="footer-links editorial-link-row">
                     <a href="{{ url_for('references') }}">계산 기준과 공식 출처 확인</a>
                     <a href="{{ url_for('about') }}">콘텐츠 검수 원칙 보기</a>
                 </div>
@@ -296,7 +297,7 @@
                     정확한 만나이를 확인했다면 신청서의 기준일, 다음 생일까지 남은 기간, 학교나 가족의 주요 시점을 이어서 볼 수 있습니다.
                     연도만 빠르게 비교하려면 출생년도별 나이표를, 생일과 무관한 연도 기준 숫자가 필요하면 연나이 계산기를 선택하세요.
                 </p>
-                <div class="footer-links">
+                <div class="footer-links editorial-link-row">
                     <a href="{{ url_for('birthday_dday_calculator') }}">다음 생일 확인</a>
                     <a href="{{ url_for('birth_year_age_table') }}">출생연도표 보기</a>
                     <a href="{{ url_for('annual_age_calculator') }}">연나이 계산</a>

@@ -1,5 +1,6 @@
 import re
 import unittest
+from pathlib import Path
 
 from app import app
 
@@ -14,6 +15,14 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
                 response = self.client.get(path)
                 self.assertEqual(200, response.status_code)
                 self.assertIn("css/editorial-luxury.css", response.get_data(as_text=True))
+
+    def test_theme_defines_approved_tokens_and_reduced_motion(self):
+        css = Path("static/css/editorial-luxury.css").read_text()
+        for value in ("#F6F1E8", "#FCF9F3", "#241D18", "#66705A", "#A68B61", "#A34C3D"):
+            self.assertIn(value.lower(), css.lower())
+        self.assertIn("@media (prefers-reduced-motion: reduce)", css)
+        self.assertIn(":focus-visible", css)
+        self.assertTrue(Path("static/fonts/PretendardVariable.subset.woff2").read_bytes().startswith(b"wOF2"))
 
     def test_home_exposes_accessible_quick_age_calculator(self):
         html = self.client.get("/").get_data(as_text=True)
