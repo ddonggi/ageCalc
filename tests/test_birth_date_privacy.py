@@ -135,8 +135,12 @@ class BirthDatePrivacyTests(unittest.TestCase):
 
     def test_home_exact_date_calculator_omits_replay_initializer_and_masks_region(self):
         html = self.client.get("/").get_data(as_text=True)
+        analytics = Path("static/js/analytics.js").read_text(encoding="utf-8")
 
         self.assertNotIn("js/clarity-init.js", html)
+        self.assertIn('data-disable-clarity="true"', html)
+        self.assertIn("disableClarity", analytics)
+        self.assertIn("dataset.disableClarity !== 'true'", analytics)
         self.assertIn(
             'id="home-age-form" class="editorial-panel-core" data-clarity-mask="true"',
             html,

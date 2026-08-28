@@ -23,6 +23,10 @@
 - Keep existing title, description, canonical, Open Graph, structured data, privacy masking, ads, and affiliate disclosures intact.
 - Preserve all unrelated user changes already present in the worktree.
 
+## Verification note
+
+The Core Web Vitals baseline command currently targets the live `https://agecalc.cloud` origin, not this feature branch. Browser-based viewport, keyboard, and screenshot checks were unavailable in this environment; those checks remain a required preview/deployment gate before production release.
+
 ---
 
 ## File Structure
