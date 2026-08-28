@@ -38,6 +38,7 @@ body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) {
     radial-gradient(circle at 16% 12%, rgba(166, 139, 97, .16), transparent 28rem),
     linear-gradient(180deg, var(--lux-canvas), rgba(252, 249, 243, .72) 100%);
   font-family: var(--lux-body);
+  overflow-wrap: anywhere;
 }
 
 body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) #pixel-background,

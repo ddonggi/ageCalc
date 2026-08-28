@@ -139,6 +139,19 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
         self.assertNotIn('class="age-hub-dashboard"', html)
         self.assertNotIn('class="age-hub-result-card"', html)
 
+    def test_home_quick_calculator_has_no_persistence_or_query_transport(self):
+        script = Path("static/js/home-age-calculator.js").read_text()
+        self.assertNotIn("localStorage", script)
+        self.assertNotIn("sessionStorage", script)
+        self.assertNotIn("URLSearchParams", script)
+        self.assertNotIn("fetch(", script)
+
+    def test_theme_has_touch_target_and_mobile_overflow_guards(self):
+        css = Path("static/css/editorial-luxury.css").read_text()
+        self.assertRegex(css, r"min-height:\s*44px")
+        self.assertIn("overflow-wrap", css)
+        self.assertNotRegex(css, r"transition:\s*(?:all\s+)?(?:linear|ease-in-out)")
+
     def test_home_calculator_module_handles_birthday_boundaries(self):
         program = r"""
 const assert = require('assert');
