@@ -33,6 +33,12 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
                 self.assertIn("editorial-calculator-shell", html)
                 self.assertIn("css/editorial-luxury.css", html)
 
+    def test_content_templates_load_theme_and_keep_readable_prose_hook(self):
+        for template_name in ("blog-list.html", "blog-detail.html", "guide.html", "guide-detail.html"):
+            source = Path("templates", template_name).read_text()
+            self.assertIn("editorial-luxury.css", source)
+            self.assertRegex(source, r"editorial-(?:index|article|prose)")
+
     def test_theme_defines_approved_tokens_and_reduced_motion(self):
         css = Path("static/css/editorial-luxury.css").read_text()
         for value in ("#F6F1E8", "#FCF9F3", "#241D18", "#66705A", "#A68B61", "#A34C3D"):

@@ -32,12 +32,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
 
-<body class="guide-detail-page">
+<body class="guide-detail-page editorial-content-page">
     {% if page.indexable %}
     {% include 'partials/reading-progress.html' %}
     {% endif %}
@@ -45,15 +46,16 @@
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <article class="guide-article" data-content-format="{{ page.content_format }}"
+        <article class="guide-article editorial-article" data-content-format="{{ page.content_format }}"
             {% if page.indexable %}data-reading-progress-target data-content-type="guide"{% endif %}>
-            <header class="guide-article-header">
+            <header class="guide-article-header editorial-article-header">
                 <p class="eyebrow">AgeCalc 기준 가이드</p>
                 <span class="guide-category-label">{{ page.category_label }}</span>
                 <h1>{{ page.title }}</h1>
                 <p class="page-intro">{{ page.intro }}</p>
             </header>
 
+            <div class="editorial-prose">
             {% if not page.indexable %}
             <section class="guide-related-box" aria-label="콘텐츠 통합 안내">
                 <p class="eyebrow">통합 예정 안내</p>
@@ -72,7 +74,7 @@
             </section>
             {% endif %}
 
-            <section class="guide-related-box" aria-label="관련 계산기">
+            <section class="guide-related-box editorial-prose-section" aria-label="관련 계산기">
                 <p class="eyebrow">관련 계산기</p>
                 <div class="article-links">
                     {% for endpoint, label in page.related_links %}
@@ -82,7 +84,7 @@
             </section>
 
             {% if page.indexable %}
-            <section class="section-shell">
+            <section class="section-shell editorial-prose-section">
                 <div class="section-heading">
                     <p class="eyebrow">상황별 해석</p>
                     <h2>사례로 먼저 확인하기</h2>
@@ -98,7 +100,7 @@
                 </div>
             </section>
 
-            <section class="section-shell">
+            <section class="section-shell editorial-prose-section">
                 <div class="section-heading">
                     <p class="eyebrow">기준 비교</p>
                     <h2>기본 기준과 예외 비교표</h2>
@@ -176,7 +178,7 @@
             </div>
             {% endif %}
 
-            <section class="guide-faq">
+            <section class="guide-faq editorial-prose-section">
                 <h2>자주 묻는 질문</h2>
                 {% for question, answer in page.faqs %}
                 <details>
@@ -185,6 +187,7 @@
                 </details>
                 {% endfor %}
             </section>
+            </div>
         </article>
 
         {% include 'partials/footer.html' %}

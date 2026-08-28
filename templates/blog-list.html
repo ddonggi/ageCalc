@@ -32,6 +32,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% set adsense_enabled = adsense_enabled and blog_indexable %}
@@ -39,73 +40,84 @@
     {% include 'partials/adsense.html' %}
 </head>
 
-<body class="blog-page">
+<body class="blog-page editorial-content-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
         {% include 'partials/home_coupang_rails.html' %}
 
-        <section class="hero-band blog-hero-band">
-            <div class="hero-copy">
-                <p class="eyebrow">도움말 글</p>
-                <h1>블로그</h1>
-                <p class="page-intro">
-                    계산기 결과를 해석하는 설명형 글만 선별해 공개합니다.
-                    현재 게시된 글은 {{ total }}개입니다.
-                </p>
-            </div>
-        </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-
-        {% if blog_indexable and categories %}
-        <nav class="article-links" aria-label="블로그 카테고리">
-            {% for category_slug, category_label in categories.items() %}
-            <a href="{{ url_for('blog_category', category_slug=category_slug) }}">{{ category_label }}</a>
-            {% endfor %}
-        </nav>
-        {% endif %}
-
-        {% if posts %}
-        <section class="section-shell">
-            <div class="section-heading">
-                <h2>최신 글</h2>
-                <p class="section-intro">요약을 먼저 보고, 필요한 글을 바로 읽을 수 있게 정리했습니다.</p>
-            </div>
-            <div class="blog-grid">
-                {% for post in posts %}
-                {% set article = article_by_slug.get(post.slug) %}
-                <article class="blog-card">
-                <a class="blog-card-link" href="{{ url_for('blog_detail', slug=post.slug) }}">
-                    {% if article and article.thumbnail %}
-                    <img class="blog-thumb" src="{{ article.thumbnail }}" alt="{{ article.thumbnail_alt }}" width="1200" height="630" loading="lazy">
-                    {% endif %}
-                    <h3>{{ article.title if article else post.title }}</h3>
-                    <p class="blog-date">
-                        {% if post.published_at %}
-                        {{ post.published_at | blog_datetime('%Y-%m-%d') }}
-                        {% endif %}
+        <main class="editorial-index editorial-index--blog">
+            <section class="hero-band blog-hero-band editorial-index-hero">
+                <div class="hero-copy">
+                    <p class="eyebrow">도움말 글</p>
+                    <h1>블로그</h1>
+                    <p class="page-intro">
+                        계산기 결과를 해석하는 설명형 글만 선별해 공개합니다.
+                        현재 게시된 글은 {{ total }}개입니다.
                     </p>
-                    <p class="blog-excerpt">{{ article.summary if article else post.excerpt }}</p>
-                </a>
-            </article>
-            {% endfor %}
+                </div>
+            </section>
+            {% if coupang_partners_enabled and coupang_event_promotions %}
+            <div class="editorial-ad-slot">
+                <span class="editorial-ad-label">광고 및 제휴 안내</span>
+                {% include 'partials/info_coupang_promotions.html' %}
             </div>
-        </section>
+            {% endif %}
 
-        <nav class="pagination" aria-label="블로그 페이지 이동">
-            {% if page > 1 %}
-            <a class="page-btn" href="{{ url_for('blog_list', page=page-1) }}">이전</a>
+            {% if blog_indexable and categories %}
+            <nav class="article-links editorial-filter-nav" aria-label="블로그 카테고리">
+                {% for category_slug, category_label in categories.items() %}
+                <a href="{{ url_for('blog_category', category_slug=category_slug) }}">{{ category_label }}</a>
+                {% endfor %}
+            </nav>
             {% endif %}
-            <span class="page-current">{{ page }} / {{ total_pages }}</span>
-            {% if page < total_pages %}
-            <a class="page-btn" href="{{ url_for('blog_list', page=page+1) }}">다음</a>
+
+            {% if posts %}
+            <section class="section-shell editorial-story-list-shell">
+                <div class="section-heading">
+                    <h2>최신 글</h2>
+                    <p class="section-intro">요약을 먼저 보고, 필요한 글을 바로 읽을 수 있게 정리했습니다.</p>
+                </div>
+                <div class="editorial-story-list">
+                    {% for post in posts %}
+                    {% set article = article_by_slug.get(post.slug) %}
+                    <article class="editorial-story-card{% if article and article.thumbnail %} has-media{% endif %}">
+                        <a class="editorial-story-link" href="{{ url_for('blog_detail', slug=post.slug) }}">
+                            {% if article and article.thumbnail %}
+                            <span class="editorial-story-media">
+                                <img class="blog-thumb" src="{{ article.thumbnail }}" alt="{{ article.thumbnail_alt }}" width="1200" height="630" loading="lazy">
+                            </span>
+                            {% endif %}
+                            <span class="editorial-story-copy">
+                                <span class="blog-date editorial-story-meta">
+                                    {% if post.published_at %}
+                                    {{ post.published_at | blog_datetime('%Y-%m-%d') }}
+                                    {% endif %}
+                                </span>
+                                <span class="editorial-story-title">{{ article.title if article else post.title }}</span>
+                                <span class="blog-excerpt editorial-story-summary">{{ article.summary if article else post.excerpt }}</span>
+                            </span>
+                        </a>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <nav class="pagination" aria-label="블로그 페이지 이동">
+                {% if page > 1 %}
+                <a class="page-btn" href="{{ url_for('blog_list', page=page-1) }}">이전</a>
+                {% endif %}
+                <span class="page-current">{{ page }} / {{ total_pages }}</span>
+                {% if page < total_pages %}
+                <a class="page-btn" href="{{ url_for('blog_list', page=page+1) }}">다음</a>
+                {% endif %}
+            </nav>
+            {% else %}
+            <div class="result error">
+                <p class="message">아직 게시된 글이 없습니다.</p>
+            </div>
             {% endif %}
-        </nav>
-        {% else %}
-        <div class="result error">
-            <p class="message">아직 게시된 글이 없습니다.</p>
-        </div>
-        {% endif %}
+        </main>
 
         {% include 'partials/footer.html' %}
     </div>

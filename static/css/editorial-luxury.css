@@ -860,6 +860,289 @@ body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .notice {
   color: var(--lux-text);
 }
 
+body.editorial-content-page {
+  line-height: 1.75;
+}
+
+.editorial-index {
+  display: grid;
+  gap: clamp(1.4rem, 3vw, 2.4rem);
+  margin-block: clamp(1rem, 3vw, 2.5rem);
+}
+
+.editorial-index-hero {
+  position: relative;
+  display: grid;
+  min-height: 320px;
+  align-items: end;
+  padding: clamp(2rem, 5vw, 4.8rem);
+}
+
+.editorial-index-hero .hero-copy {
+  max-width: 720px;
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .editorial-index-hero .hero-copy h1,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .editorial-article-header h1 {
+  max-width: 14ch;
+  font-size: 6rem;
+  line-height: .98;
+}
+
+.editorial-filter-nav,
+[data-editorial-related-paths],
+.editorial-article .article-links {
+  gap: .65rem;
+}
+
+.editorial-filter-nav a,
+[data-editorial-related-paths] a,
+.editorial-article .article-links a,
+.editorial-story-link,
+.editorial-article .page-btn,
+.editorial-index .page-btn {
+  min-height: 44px;
+}
+
+.editorial-story-list-shell {
+  overflow: hidden;
+  padding: clamp(1rem, 3vw, 1.7rem);
+}
+
+.editorial-story-list {
+  display: grid;
+  gap: 0;
+  border-block: 1px solid var(--lux-border-strong);
+}
+
+.editorial-story-card {
+  border-bottom: 1px solid var(--lux-border);
+}
+
+.editorial-story-card:last-child {
+  border-bottom: 0;
+}
+
+.editorial-story-link {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1rem, 3vw, 2.2rem);
+  align-items: center;
+  padding: clamp(1.2rem, 3vw, 2rem) .2rem;
+  color: var(--lux-text);
+  text-decoration: none;
+  transition: transform var(--lux-motion);
+}
+
+.editorial-story-card.has-media .editorial-story-link {
+  grid-template-columns: minmax(220px, .58fr) minmax(0, 1fr);
+}
+
+.editorial-story-card.has-media:nth-child(even) .editorial-story-link {
+  grid-template-columns: minmax(0, 1fr) minmax(220px, .58fr);
+}
+
+.editorial-story-card.has-media:nth-child(even) .editorial-story-media {
+  order: 2;
+}
+
+.editorial-story-link:hover,
+.editorial-story-link:focus-visible {
+  transform: translateY(-2px);
+}
+
+.editorial-story-media {
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 1200 / 630;
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-core);
+  background: var(--lux-surface);
+}
+
+.editorial-story-media img,
+.editorial-article .blog-hero {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.editorial-story-copy {
+  display: grid;
+  gap: .55rem;
+  min-width: 0;
+}
+
+.editorial-story-index,
+.editorial-story-meta,
+.editorial-meta dt {
+  color: var(--lux-gold);
+  font-family: var(--lux-number);
+  font-size: .78rem;
+  font-weight: 600;
+}
+
+.editorial-story-title {
+  color: var(--lux-espresso);
+  font-family: var(--lux-display);
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.editorial-story-summary {
+  max-width: 65ch;
+  color: var(--lux-muted);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.editorial-article {
+  display: grid;
+  gap: clamp(1.4rem, 3vw, 2.3rem);
+  margin-block: clamp(1rem, 3vw, 2.5rem);
+}
+
+.editorial-article-header {
+  display: grid;
+  gap: 1rem;
+  max-width: 880px;
+  padding-block: clamp(1rem, 3vw, 2.5rem);
+}
+
+.editorial-article-header .article-intro,
+.editorial-article-header .page-intro {
+  max-width: 65ch;
+  line-height: 1.75;
+}
+
+.editorial-article .blog-hero {
+  overflow: hidden;
+  max-height: 560px;
+  border: 1px solid var(--lux-border-strong);
+  border-radius: var(--lux-radius-shell);
+  box-shadow: var(--lux-shadow-soft);
+}
+
+.editorial-prose {
+  display: grid;
+  gap: clamp(1.2rem, 2.8vw, 2rem);
+  max-width: 65ch;
+  line-height: 1.75;
+}
+
+.editorial-article .editorial-prose {
+  max-width: 880px;
+}
+
+.editorial-prose > section,
+.guide-content-checklist,
+.guide-content-case-study,
+.guide-content-comparison,
+.guide-content-reference,
+.editorial-prose-section {
+  max-width: 65ch;
+}
+
+.editorial-prose .section-shell,
+.editorial-prose .guide-related-box,
+.editorial-prose .notice,
+.editorial-meta {
+  width: 100%;
+}
+
+.editorial-prose p,
+.editorial-prose li,
+.editorial-prose dd,
+.editorial-meta p,
+.editorial-meta li {
+  line-height: 1.75;
+}
+
+.editorial-prose a,
+.editorial-meta a {
+  text-decoration: underline;
+  text-decoration-thickness: .08em;
+  text-underline-offset: .18em;
+}
+
+.editorial-prose h2,
+.editorial-prose h3,
+.editorial-meta h2,
+.editorial-meta h3 {
+  text-wrap: balance;
+}
+
+.editorial-article .section-card-grid,
+.editorial-index .hub-card-grid {
+  max-width: 100%;
+}
+
+.editorial-article .section-card,
+.editorial-index .hub-card,
+.editorial-index .question-item {
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-core);
+  background: rgba(252, 249, 243, .82);
+}
+
+.editorial-meta {
+  border-color: rgba(166, 139, 97, .42);
+}
+
+.editorial-meta-heading,
+.editorial-meta-facts,
+.editorial-meta-sources,
+.editorial-meta-correction {
+  max-width: 65ch;
+}
+
+.editorial-meta-facts {
+  gap: 0;
+}
+
+.editorial-meta-facts div {
+  border-color: var(--lux-border);
+}
+
+.editorial-ad-slot,
+.info-coupang-promotions,
+.coupang-partners-aside {
+  display: grid;
+  gap: .75rem;
+  padding: 1rem;
+  border: 1px solid rgba(166, 139, 97, .45);
+  border-radius: var(--lux-radius-core);
+  background: rgba(252, 249, 243, .9);
+}
+
+.editorial-ad-label,
+.coupang-disclosure,
+.home-coupang-disclosure,
+.coupang-partners-aside p {
+  color: var(--lux-gold);
+  font-family: var(--lux-number);
+  font-size: .75rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.editorial-source-list {
+  position: relative;
+  padding-top: 1rem;
+  border-top: 3px solid var(--lux-gold);
+}
+
+.editorial-reading-progress {
+  background: rgba(36, 29, 24, .1);
+}
+
+.editorial-reading-progress .reading-progress-fill {
+  background: var(--lux-gold);
+}
+
 body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .data-table-wrap,
 body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .table-scroll {
   border: 1px solid var(--lux-border);
@@ -1018,6 +1301,41 @@ body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .scroll-to
 
   body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .hero-copy h1 {
     font-size: 3.4rem;
+  }
+
+  .editorial-index-hero {
+    min-height: 260px;
+    padding: 1.4rem 1.1rem;
+  }
+
+  body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .editorial-index-hero .hero-copy h1,
+  body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .editorial-article-header h1 {
+    font-size: 3.2rem;
+  }
+
+  .editorial-story-card.has-media .editorial-story-link,
+  .editorial-story-card.has-media:nth-child(even) .editorial-story-link {
+    grid-template-columns: 1fr;
+  }
+
+  .editorial-story-card.has-media:nth-child(even) .editorial-story-media,
+  .editorial-story-copy {
+    order: initial;
+  }
+
+  .editorial-story-title {
+    font-size: 1.55rem;
+  }
+
+  .editorial-prose,
+  .editorial-article .editorial-prose,
+  .editorial-prose > section,
+  .guide-content-checklist,
+  .guide-content-case-study,
+  .guide-content-comparison,
+  .guide-content-reference,
+  .editorial-prose-section {
+    max-width: 100%;
   }
 
   .home-page .editorial-hero {

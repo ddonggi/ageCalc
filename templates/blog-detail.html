@@ -39,6 +39,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     {% if review_mode or draft_mode %}
     <meta name="referrer" content="no-referrer" />
     <script nonce="{{ csp_nonce }}">window.history.replaceState({}, document.title, window.location.pathname);</script>
@@ -74,7 +75,7 @@
     {% include 'partials/adsense.html' %}
 </head>
 
-<body class="blog-page">
+<body class="blog-page editorial-content-page">
     {% set article = structured_article %}
     {% if not review_mode and not draft_mode and (blog_indexable | default(false)) %}
     {% include 'partials/reading-progress.html' %}
@@ -88,9 +89,9 @@
         {% else %}
         <a class="back-link" href="{{ url_for('blog_list') }}">글 목록으로 돌아가기</a>
         {% endif %}
-        <article class="blog-article"
+        <article class="blog-article editorial-article"
             {% if not review_mode and not draft_mode and (blog_indexable | default(false)) %}data-reading-progress-target data-content-type="blog"{% endif %}>
-            <header class="article-header">
+            <header class="article-header editorial-article-header">
                 <p class="eyebrow">{{ article.eyebrow if article else '해설 글' }}</p>
                 <h1>{{ article.h1 if article else post.title }}</h1>
                 {% if review_mode %}
@@ -138,8 +139,8 @@
                     {{ post.created_at | blog_datetime('%Y-%m-%d %H:%M') }}
                     {% endif %}
                 </p>
-                <aside class="editorial-meta">
-                <div class="notice" style="margin-top: 16px;">
+                <aside class="editorial-meta" data-editorial-meta-variant="article">
+                <div class="notice">
                     <p><strong>작성</strong>: {{ article.author if article else author_name }}</p>
                     {% if article %}
                     <p><strong>카테고리</strong>: <a href="{{ url_for('blog_category', category_slug=article.category) }}">{{ article.category_label }}</a></p>
@@ -164,6 +165,7 @@
             {% if (article and article.thumbnail) or post.cover_image_url %}
             <img class="blog-hero" src="{{ article.thumbnail if article else post.cover_image_url }}" alt="{{ article.thumbnail_alt if article else post.title }}" width="1200" height="630">
             {% endif %}
+            <div class="editorial-prose">
             {% if article %}
             <section class="section-shell direct-answer" aria-label="{{ article.direct_answer_title }}">
                 <div class="section-heading">
@@ -186,7 +188,7 @@
                 </div>
             </section>
 
-            <section class="section-shell">
+            <section class="section-shell editorial-prose-section">
                 <div class="section-heading">
                     <p class="eyebrow">이런 분께</p>
                     <h2>이 글이 필요한 사람</h2>
@@ -198,7 +200,7 @@
                 </ul>
             </section>
 
-            <section class="section-shell">
+            <section class="section-shell editorial-prose-section">
                 <div class="section-heading">
                     <p class="eyebrow">사례</p>
                     <h2>사례로 보면 더 빠릅니다</h2>
@@ -214,7 +216,7 @@
                 </div>
             </section>
 
-            <section class="section-shell">
+            <section class="section-shell editorial-prose-section">
                 <div class="section-heading">
                     <p class="eyebrow">비교</p>
                     <h2>상황별 확인 기준</h2>
@@ -242,7 +244,7 @@
             </section>
 
             {% for content_section in article.content_sections or [] %}
-            <section class="section-shell">
+            <section class="section-shell editorial-prose-section">
                 <div class="section-heading"><h2>{{ content_section.heading }}</h2></div>
                 {% for paragraph in content_section.paragraphs %}<p>{{ paragraph }}</p>{% endfor %}
             </section>
@@ -251,10 +253,13 @@
             <div class="blog-content">{{ post.content_html | safe }}</div>
             {% endif %}
             {% if coupang_partners_enabled and not draft_mode and not review_mode %}
+            <div class="editorial-ad-slot editorial-ad-slot--article">
+                <span class="editorial-ad-label">광고 및 제휴 안내</span>
             {% include 'partials/coupang_partners.html' %}
+            </div>
             {% endif %}
             {% if post.sources %}
-            <section class="notice">
+            <section class="notice editorial-source-list">
                 <h2>참고한 자료</h2>
                 <ul>
                     {% for source in post.sources %}
@@ -271,7 +276,7 @@
             </section>
             {% endif %}
             {% if article and article.source_urls %}
-            <section class="notice">
+            <section class="notice editorial-source-list">
                 <h2>공식 출처</h2>
                 <ul>
                     {% for source in article.source_urls %}
@@ -285,7 +290,7 @@
             </section>
             {% endif %}
             {% if article %}
-            <section class="section-shell blog-related-tools">
+            <section class="section-shell blog-related-tools editorial-prose-section">
                 <div class="section-heading">
                     <p class="eyebrow">연결 계산기</p>
                     <h2>같이 확인하면 정확도가 높아집니다</h2>
@@ -301,7 +306,7 @@
                 </div>
             </section>
 
-            <section class="section-shell blog-related-articles">
+            <section class="section-shell blog-related-articles editorial-prose-section">
                 <div class="section-heading">
                     <p class="eyebrow">다음 읽기</p>
                     <h2>다음에 읽을 글</h2>
@@ -322,7 +327,7 @@
                 </nav>
             </section>
 
-            <section class="section-shell faq">
+            <section class="section-shell faq editorial-prose-section">
                 <div class="section-heading">
                     <p class="eyebrow">자주 묻는 질문</p>
                     <h2>FAQ</h2>
@@ -350,6 +355,7 @@
                 </div>
             </section>
             {% endif %}
+            </div>
         </article>
         {% include 'partials/footer.html' %}
     </div>
