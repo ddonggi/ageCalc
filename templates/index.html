@@ -33,7 +33,6 @@
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
 
@@ -52,7 +51,7 @@
             </div>
 
             <div class="editorial-panel-shell">
-                <form id="home-age-form" class="editorial-panel-core" data-today="{{ today.isoformat() }}" novalidate>
+                <form id="home-age-form" class="editorial-panel-core" data-clarity-mask="true" data-today="{{ today.isoformat() }}" novalidate>
                     <div class="home-age-reference">
                         <p class="command-label">기준일</p>
                         <strong>{{ today.strftime("%Y.%m.%d") }}</strong>

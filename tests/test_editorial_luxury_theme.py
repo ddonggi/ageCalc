@@ -79,6 +79,28 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
                 return match.group("body")
         return ""
 
+    def _css_hex_token(self, css, token):
+        match = re.search(rf"{re.escape(token)}\s*:\s*(#[0-9a-f]{{6}})\s*;", css, re.I)
+        self.assertIsNotNone(match, token)
+        return match.group(1)
+
+    def _contrast_ratio(self, foreground, background):
+        def relative_luminance(color):
+            channels = [int(color[index:index + 2], 16) / 255 for index in (1, 3, 5)]
+            channels = [
+                channel / 12.92
+                if channel <= 0.04045
+                else ((channel + 0.055) / 1.055) ** 2.4
+                for channel in channels
+            ]
+            return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2]
+
+        lighter, darker = sorted(
+            (relative_luminance(foreground), relative_luminance(background)),
+            reverse=True,
+        )
+        return (lighter + 0.05) / (darker + 0.05)
+
     def _selector_targets_result_table_or_numeric_ui(self, selector):
         element_pattern = r"(^|[\s>+~,(]){element}(?=[:.#\[\s>+~,)]+|$)"
         return (
@@ -154,6 +176,33 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
         self.assertIn("@media (prefers-reduced-motion: reduce)", css)
         self.assertIn(":focus-visible", css)
         self.assertTrue(Path("static/fonts/PretendardVariable.subset.woff2").read_bytes().startswith(b"wOF2"))
+
+    def test_theme_small_text_color_pairs_meet_wcag_aa(self):
+        css = Path("static/css/editorial-luxury.css").read_text()
+        surface = self._css_hex_token(css, "--lux-surface")
+        danger = self._css_hex_token(css, "--lux-danger")
+        muted = self._css_hex_token(css, "--lux-muted")
+
+        home_error = self._css_rule_bodies(css, ".home-page #home-birth-error:not(:empty)")
+        self.assertIn("color: var(--lux-danger);", home_error)
+        self.assertIn("background: var(--lux-surface);", home_error)
+
+        for selector in (
+            ".editorial-story-meta",
+            ".editorial-meta dt",
+            ".editorial-ad-label",
+            ".coupang-disclosure",
+            ".home-coupang-disclosure",
+            ".coupang-partners-aside p",
+        ):
+            with self.subTest(selector=selector):
+                self.assertIn(
+                    "color: var(--lux-muted);",
+                    self._css_rule_bodies(css, selector),
+                )
+
+        self.assertGreaterEqual(self._contrast_ratio(danger, surface), 4.5)
+        self.assertGreaterEqual(self._contrast_ratio(muted, surface), 4.5)
 
     def test_theme_limits_motion_to_transform_and_opacity(self):
         css = Path("static/css/editorial-luxury.css").read_text()

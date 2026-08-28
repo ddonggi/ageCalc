@@ -387,6 +387,13 @@ body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .hero-copy
   color: var(--lux-danger);
 }
 
+.home-page #home-birth-error:not(:empty) {
+  padding: .45rem .65rem;
+  border-radius: 8px;
+  background: var(--lux-surface);
+  color: var(--lux-danger);
+}
+
 .home-page #home-age-form .btn {
   min-height: 52px;
   width: 100%;
@@ -995,7 +1002,7 @@ body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .editorial
 .editorial-story-index,
 .editorial-story-meta,
 .editorial-meta dt {
-  color: var(--lux-gold);
+  color: var(--lux-muted);
   font-family: var(--lux-number);
   font-size: .78rem;
   font-weight: 600;
@@ -1140,7 +1147,7 @@ body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .editorial
 .coupang-disclosure,
 .home-coupang-disclosure,
 .coupang-partners-aside p {
-  color: var(--lux-gold);
+  color: var(--lux-muted);
   font-family: var(--lux-number);
   font-size: .75rem;
   font-weight: 600;

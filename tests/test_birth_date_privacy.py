@@ -133,6 +133,15 @@ class BirthDatePrivacyTests(unittest.TestCase):
         self.assertNotIn('maxlength="6"', age_html)
         self.assertNotIn('maxlength="6"', baby_html)
 
+    def test_home_exact_date_calculator_omits_replay_initializer_and_masks_region(self):
+        html = self.client.get("/").get_data(as_text=True)
+
+        self.assertNotIn("js/clarity-init.js", html)
+        self.assertIn(
+            'id="home-age-form" class="editorial-panel-core" data-clarity-mask="true"',
+            html,
+        )
+
     def test_age_page_busts_cached_date_calculator_assets_and_has_no_six_digit_contract(self):
         age_html = self.client.get("/age").get_data(as_text=True)
         age_js = Path("static/js/age-calculator.js").read_text(encoding="utf-8")
