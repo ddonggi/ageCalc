@@ -31,6 +31,7 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <!-- Google tag (gtag.js) -->
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
 
@@ -39,7 +40,7 @@
 
 </head>
 
-<body>
+<body class="editorial-calculator-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
@@ -58,6 +59,7 @@
             <p class="small">환산값은 달력 나이를 비교하기 위한 정보이며 건강 상태나 기대수명을 판정하는 수의학적 진단을 대신하지 않습니다.</p>
         </section>
 
+        <div class="editorial-calculator-shell">
         <form class="age-form" id="pet-age-form" data-pet="dog" autocomplete="off" data-clarity-mask="true">
             <div class="form-group">
                 <h3>강아지 나이를 입력하세요</h3>
@@ -175,8 +177,10 @@
             <h2>계산 결과</h2>
             <div id="pet-result-content"></div>
         </div>
+        </div>
         {% include 'partials/home_coupang_rails.html' %}
 
+        <div class="editorial-supporting-content">
         <section class="section-shell">
             <div class="section-heading">
                 <h2>체형별 환산 예시</h2>
@@ -233,6 +237,7 @@
                 <a href="{{ url_for('references') }}">AgeCalc 환산 기준 확인</a>
             </div>
         </section>
+        </div>
 
         {% include 'partials/footer.html' %}
     </div>

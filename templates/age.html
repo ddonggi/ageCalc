@@ -104,7 +104,7 @@
 
 </head>
 
-<body class="age-page">
+<body class="age-page editorial-calculator-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
@@ -144,49 +144,52 @@
                 정확한 결과에는 연·월·일이 모두 필요하며, 이 페이지에 표시된 {{ today.isoformat() }}이 기준일입니다.
             </p>
         </section>
-        <form class="age-form" id="age-form" action="{{ url_for('age') }}" method="post" autocomplete="off" data-clarity-mask="true">
-            <div class="form-group">
-                <h3>생년월일을 입력하세요 (8자리)</h3>
+        <div class="editorial-calculator-shell">
+            <form class="age-form" id="age-form" action="{{ url_for('age') }}" method="post" autocomplete="off" data-clarity-mask="true">
+                <div class="form-group">
+                    <h3>생년월일을 입력하세요 (8자리)</h3>
 
-                <!-- 음력/양력 토글 -->
-                <div class="calendar-toggle-container">
-                    <div class="calendar-toggle">
-                        <input type="radio" id="solar" name="calendar_type" value="solar" checked>
-                        <label for="solar">양력</label>
-                        <input type="radio" id="lunar" name="calendar_type" value="lunar">
-                        <label for="lunar">음력</label>
-                        <span class="toggle-slider"></span>
+                    <!-- 음력/양력 토글 -->
+                    <div class="calendar-toggle-container">
+                        <div class="calendar-toggle">
+                            <input type="radio" id="solar" name="calendar_type" value="solar" checked>
+                            <label for="solar">양력</label>
+                            <input type="radio" id="lunar" name="calendar_type" value="lunar">
+                            <label for="lunar">음력</label>
+                            <span class="toggle-slider"></span>
+                        </div>
                     </div>
+
+                    <div class="date-inputs">
+                        <label class="field-label" for="birth-input">생년월일 8자리</label>
+                        <input type="text" id="birth-input" name="birth-input" placeholder="1992.10.02" inputmode="numeric"
+                            pattern="[0-9.]*" maxlength="10" required aria-describedby="birth-error profile-date-note" data-clarity-mask="true" data-profile-date-input="full" data-profile-date-calendar="solar">
+                    </div>
+
+                    <div class="profile-date-control">
+                        <label for="profile-date-consent"><input type="checkbox" id="profile-date-consent"> <span>양력 생년월일을 이 기기에서 다음 계산에도 사용</span></label>
+                        <button type="button" class="btn btn-secondary" id="profile-date-clear">저장값 삭제</button>
+                    </div>
+                    <p class="input-help" id="profile-date-note">선택하면 양력 생년월일만 이 브라우저에 저장됩니다. 공용 기기에서는 사용하지 말고, 언제든 저장값을 삭제하세요.</p>
+
+                    <p class="input-help">
+                        음력 입력은 출생 당시의 음력 날짜를 양력 출생일로 환산해 만나이를 계산합니다.
+                        윤달 선택은 지원하지 않으며 평달로 계산합니다. 올해 돌아오는 음력 생일의 양력 날짜를 찾는 기능은 아닙니다.
+                        자세한 기준은 <a href="{{ url_for('guide_detail', slug='lunar-birthday-age-guide') }}">음력 생일의 만나이 계산 기준</a>에서 확인하세요.
+                    </p>
+
+                    <small id="birth-error" class="error-msg" aria-live="polite"></small>
                 </div>
+            </form>
 
-                <div class="date-inputs">
-                    <label class="field-label" for="birth-input">생년월일 8자리</label>
-                    <input type="text" id="birth-input" name="birth-input" placeholder="1992.10.02" inputmode="numeric"
-                        pattern="[0-9.]*" maxlength="10" required aria-describedby="birth-error profile-date-note" data-clarity-mask="true" data-profile-date-input="full" data-profile-date-calendar="solar">
+            <div class="result-container" id="result-container" aria-live="polite" data-clarity-mask="true">
+                <h2>계산 결과</h2>
+                <div id="result-content">
+                    <!-- 결과 내용이 JavaScript로 동적 생성됨 -->
                 </div>
-
-                <div class="profile-date-control">
-                    <label for="profile-date-consent"><input type="checkbox" id="profile-date-consent"> <span>양력 생년월일을 이 기기에서 다음 계산에도 사용</span></label>
-                    <button type="button" class="btn btn-secondary" id="profile-date-clear">저장값 삭제</button>
-                </div>
-                <p class="input-help" id="profile-date-note">선택하면 양력 생년월일만 이 브라우저에 저장됩니다. 공용 기기에서는 사용하지 말고, 언제든 저장값을 삭제하세요.</p>
-
-                <p class="input-help">
-                    음력 입력은 출생 당시의 음력 날짜를 양력 출생일로 환산해 만나이를 계산합니다.
-                    윤달 선택은 지원하지 않으며 평달로 계산합니다. 올해 돌아오는 음력 생일의 양력 날짜를 찾는 기능은 아닙니다.
-                    자세한 기준은 <a href="{{ url_for('guide_detail', slug='lunar-birthday-age-guide') }}">음력 생일의 만나이 계산 기준</a>에서 확인하세요.
-                </p>
-
-                <small id="birth-error" class="error-msg" aria-live="polite"></small>
-            </div>
-        </form>
-
-        <div class="result-container" id="result-container" aria-live="polite" data-clarity-mask="true">
-            <h2>계산 결과</h2>
-            <div id="result-content">
-                <!-- 결과 내용이 JavaScript로 동적 생성됨 -->
             </div>
         </div>
+        <div class="editorial-supporting-content">
         {% include 'partials/info_coupang_promotions.html' %}
         {% include 'partials/home_coupang_rails.html' %}
         <div class="info">
@@ -390,6 +393,7 @@
 
 
         {% include 'partials/page-feedback.html' with context %}
+        </div>
 
         <!-- 푸터 -->
         {% include 'partials/footer.html' %}

@@ -31,6 +31,7 @@
         rel="stylesheet">
 
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <!-- Google tag (gtag.js) -->
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
 
@@ -40,7 +41,7 @@
 
 </head>
 
-<body>
+<body class="editorial-calculator-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
@@ -62,6 +63,7 @@
             </p>
         </section>
 
+        <div class="editorial-calculator-shell">
         <form class="age-form" id="baby-months-form" autocomplete="off" data-clarity-mask="true">
             <div class="form-group">
                 <h3>출생일을 입력하세요 (8자리)</h3>
@@ -82,8 +84,10 @@
             <h2>계산 결과</h2>
             <div id="baby-result-content"></div>
         </div>
+        </div>
         {% include 'partials/home_coupang_rails.html' %}
 
+        <div class="editorial-supporting-content">
         <section class="section-shell">
             <div class="section-heading">
                 <h2>월령 계산 예시</h2>
@@ -152,6 +156,7 @@
                 <a href="https://www.nhis.or.kr/" target="_blank" rel="noopener noreferrer">국민건강보험공단 영유아 건강검진 확인</a>
             </div>
         </section>
+        </div>
 
         {% include 'partials/footer.html' %}
     </div>

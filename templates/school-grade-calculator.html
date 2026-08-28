@@ -29,12 +29,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
 
-<body>
+<body class="editorial-calculator-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
@@ -74,30 +75,31 @@
             <p class="small">입학 시점만 확인하려면 입학년도 계산표를 보세요.</p>
         </section>
 
-        <section class="section-shell">
-            <div class="section-heading">
-                <h2 id="school-grade-search">출생년도 선택</h2>
-                <p class="section-intro">출생년도를 고르면 해당 연도의 현재 학년과 입학 시점을 바로 요약해 보여드립니다.</p>
-            </div>
-            <form class="age-form birth-year-form" method="get" action="{{ url_for('school_grade_calculator') }}">
-                <div class="form-group">
-                    <div class="date-inputs">
-                        <select name="year" aria-label="출생년도 선택">
-                            <option value="">출생년도를 선택하세요</option>
-                            {% for year in year_options %}
-                            <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}년생</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="hero-actions">
-                        <button class="btn btn-primary" type="submit">학년 보기</button>
-                        {% if selected_year %}
-                        <a class="btn btn-secondary" href="{{ url_for('school_grade_calculator') }}">선택 해제</a>
-                        {% endif %}
-                    </div>
+        <div class="editorial-calculator-shell">
+            <section class="section-shell">
+                <div class="section-heading">
+                    <h2 id="school-grade-search">출생년도 선택</h2>
+                    <p class="section-intro">출생년도를 고르면 해당 연도의 현재 학년과 입학 시점을 바로 요약해 보여드립니다.</p>
                 </div>
-            </form>
-        </section>
+                <form class="age-form birth-year-form" method="get" action="{{ url_for('school_grade_calculator') }}">
+                    <div class="form-group">
+                        <div class="date-inputs">
+                            <select name="year" aria-label="출생년도 선택">
+                                <option value="">출생년도를 선택하세요</option>
+                                {% for year in year_options %}
+                                <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}년생</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="hero-actions">
+                            <button class="btn btn-primary" type="submit">학년 보기</button>
+                            {% if selected_year %}
+                            <a class="btn btn-secondary" href="{{ url_for('school_grade_calculator') }}">선택 해제</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
+            </section>
         {% include 'partials/info_coupang_promotions.html' %}
         {% include 'partials/home_coupang_rails.html' %}
 
@@ -138,6 +140,8 @@
         </section>
         {% endif %}
 
+        </div>
+        <div class="editorial-supporting-content">
         <section class="section-shell">
             <div class="section-heading">
                 <h2>예시로 보는 학년</h2>
@@ -236,6 +240,7 @@
                 <p>초·중등교육법과 교육부·교육청의 최신 학적 안내를 확인합니다. 공식 출처 확인일은 2026-06-22입니다.</p>
             </article>
         </section>
+        </div>
 
         {% include 'partials/footer.html' %}
     </div>

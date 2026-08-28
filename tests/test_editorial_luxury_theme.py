@@ -17,6 +17,22 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
                 self.assertEqual(200, response.status_code)
                 self.assertIn("css/editorial-luxury.css", response.get_data(as_text=True))
 
+    def test_calculator_pages_use_shared_editorial_structure(self):
+        for path in (
+            "/age",
+            "/annual-age-calculator",
+            "/school-grade-calculator",
+            "/birthday-dday-calculator",
+            "/baby-months",
+            "/dog",
+            "/cat",
+        ):
+            with self.subTest(path=path):
+                html = self.client.get(path).get_data(as_text=True)
+                self.assertIn("editorial-calculator-page", html)
+                self.assertIn("editorial-calculator-shell", html)
+                self.assertIn("css/editorial-luxury.css", html)
+
     def test_theme_defines_approved_tokens_and_reduced_motion(self):
         css = Path("static/css/editorial-luxury.css").read_text()
         for value in ("#F6F1E8", "#FCF9F3", "#241D18", "#66705A", "#A68B61", "#A34C3D"):
