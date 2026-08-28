@@ -68,6 +68,20 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
                 self.assertRegex(blocks, r"\bmin-width:\s*44px;")
                 self.assertRegex(blocks, r"\bmin-height:\s*44px;")
 
+    def test_calculator_shell_footer_links_have_accessible_targets(self):
+        css = Path("static/css/editorial-luxury.css").read_text()
+        blocks = "\n".join(
+            match.group("body")
+            for match in re.finditer(
+                r"[^{}]*\.editorial-calculator-shell[^{}]*\.footer-links\s+a[^{}]*\{(?P<body>[^}]+)\}",
+                css,
+                re.S,
+            )
+        )
+        self.assertRegex(blocks, r"\bdisplay:\s*inline-flex;")
+        self.assertRegex(blocks, r"\balign-items:\s*center;")
+        self.assertRegex(blocks, r"\bmin-height:\s*44px;")
+
     def test_home_exposes_accessible_quick_age_calculator(self):
         html = self.client.get("/").get_data(as_text=True)
         self.assertIn('id="home-age-form"', html)

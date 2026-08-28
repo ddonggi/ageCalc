@@ -827,6 +827,26 @@ body.editorial-calculator-page .editorial-calculator-shell .result-next-links a:
   transform: translateY(-1px);
 }
 
+body.editorial-calculator-page .editorial-calculator-shell .footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: .7rem .9rem;
+  border: 1px solid var(--lux-border);
+  border-radius: 10px;
+  background: rgba(252, 249, 243, .78);
+  color: var(--lux-espresso);
+  text-decoration: none;
+  transition: transform var(--lux-motion);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .footer-links a:hover,
+body.editorial-calculator-page .editorial-calculator-shell .footer-links a:focus-visible {
+  border-color: rgba(102, 112, 90, .42);
+  color: var(--lux-sage);
+  transform: translateY(-1px);
+}
+
 body.editorial-calculator-page .editorial-supporting-content {
   display: grid;
   gap: clamp(1rem, 2.2vw, 1.5rem);
