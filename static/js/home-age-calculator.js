@@ -25,16 +25,30 @@
     return date;
   }
 
+  function isLeapYear(year) {
+    return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  }
+
+  function isLeapDayBirthday(birth) {
+    return birth.getUTCMonth() === 1 && birth.getUTCDate() === 29;
+  }
+
   function birthdayInYear(birth, year) {
+    if (isLeapDayBirthday(birth) && !isLeapYear(year)) {
+      return null;
+    }
+
     return new Date(Date.UTC(year, birth.getUTCMonth(), birth.getUTCDate()));
   }
 
   function calculateDaysToBirthday(birth, today) {
     var millisecondsPerDay = 24 * 60 * 60 * 1000;
-    var nextBirthday = birthdayInYear(birth, today.getUTCFullYear());
+    var targetYear = today.getUTCFullYear();
+    var nextBirthday = birthdayInYear(birth, targetYear);
 
-    if (nextBirthday < today) {
-      nextBirthday = birthdayInYear(birth, today.getUTCFullYear() + 1);
+    while (!nextBirthday || nextBirthday < today) {
+      targetYear += 1;
+      nextBirthday = birthdayInYear(birth, targetYear);
     }
 
     return Math.round((nextBirthday - today) / millisecondsPerDay);

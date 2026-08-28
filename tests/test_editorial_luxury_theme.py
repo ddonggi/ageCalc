@@ -77,6 +77,9 @@ assert.deepStrictEqual(calculateSolarAge('1992-10-02', '2026-10-01').age, 33);
 assert.deepStrictEqual(calculateSolarAge('1992-10-02', '2026-10-02').age, 34);
 assert.strictEqual(calculateSolarAge('1992-10-02', '2026-10-01').daysToBirthday, 1);
 assert.strictEqual(calculateSolarAge('1992-10-02', '2026-10-02').daysToBirthday, 0);
+assert.strictEqual(calculateSolarAge('2000-02-29', '2026-02-28').daysToBirthday, 731);
+assert.strictEqual(calculateSolarAge('2000-02-29', '2028-02-28').daysToBirthday, 1);
+assert.strictEqual(calculateSolarAge('2000-02-29', '2028-02-29').daysToBirthday, 0);
 assert.strictEqual(calculateSolarAge('2027-01-01', '2026-08-28').ok, false);
 assert.strictEqual(calculateSolarAge('2024-02-30', '2026-08-28').ok, false);
 """
