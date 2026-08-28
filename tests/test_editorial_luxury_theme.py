@@ -34,6 +34,40 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
     def setUp(self):
         self.client = app.test_client()
 
+    def _css_without_comments(self, css):
+        return re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+
+    def _css_rule_bodies(self, css, selector):
+        css = self._css_without_comments(css)
+        return "\n".join(
+            match.group("body")
+            for match in re.finditer(
+                rf"(?P<selectors>[^{{}}]+)\{{(?P<body>[^}}]+)\}}",
+                css,
+                re.S,
+            )
+            if selector in match.group("selectors")
+        )
+
+    def _css_selector_groups_with_property(self, css, property_name):
+        css = self._css_without_comments(css)
+        return [
+            match.group("selectors")
+            for match in re.finditer(
+                rf"(?P<selectors>[^{{}}]+)\{{(?P<body>[^}}]*\b{re.escape(property_name)}\s*:[^}}]+)\}}",
+                css,
+                re.S,
+            )
+        ]
+
+    def _css_rule_body_for_exact_selector(self, css, selector):
+        css = self._css_without_comments(css)
+        for match in re.finditer(r"(?P<selectors>[^{}]+)\{(?P<body>[^}]+)\}", css, re.S):
+            normalized_selector = " ".join(match.group("selectors").split())
+            if normalized_selector == selector:
+                return match.group("body")
+        return ""
+
     def test_representative_public_pages_load_final_theme(self):
         for path in ("/", "/age", "/about", "/references"):
             with self.subTest(path=path):
@@ -148,8 +182,43 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
 
     def test_theme_has_touch_target_and_mobile_overflow_guards(self):
         css = Path("static/css/editorial-luxury.css").read_text()
+        public_body_selector = 'body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"])'
         self.assertRegex(css, r"min-height:\s*44px")
-        self.assertIn("overflow-wrap", css)
+        self.assertNotIn("overflow-wrap", self._css_rule_body_for_exact_selector(css, public_body_selector))
+
+        expected_overflow_selectors = (
+            f"{public_body_selector} .editorial-prose",
+            f"{public_body_selector} .blog-content",
+            f"{public_body_selector} .guide-content",
+            f"{public_body_selector} .section-shell.direct-answer ~ section:not([class])",
+            f"{public_body_selector} .contact-info",
+            f"{public_body_selector} .contact-info a",
+            f"{public_body_selector} .footer .footer-links a",
+            f"{public_body_selector} .editorial-filter-nav a",
+            f"{public_body_selector} [data-editorial-related-paths] a",
+            f"{public_body_selector} .editorial-article .article-links a",
+            f"{public_body_selector} .editorial-story-summary",
+            f"{public_body_selector} .coupang-disclosure",
+            f"{public_body_selector} .home-coupang-disclosure",
+            f"{public_body_selector} .coupang-partners-aside p",
+        )
+        overflow_groups = [
+            tuple(" ".join(selector.split()) for selector in group.split(","))
+            for group in self._css_selector_groups_with_property(css, "overflow-wrap")
+        ]
+        self.assertIn(expected_overflow_selectors, overflow_groups)
+        self.assertIn("overflow-wrap: anywhere", self._css_rule_bodies(css, ".editorial-prose"))
+        overflow_group = "\n".join(expected_overflow_selectors)
+        for excluded_selector in (
+            ".editorial-result-grid",
+            "output",
+            ".data-table",
+            " table",
+            " th",
+            " td",
+            ".metric-value",
+        ):
+            self.assertNotIn(excluded_selector, overflow_group)
         self.assertNotRegex(css, r"transition:\s*(?:all\s+)?(?:linear|ease-in-out)")
 
     def test_home_calculator_module_handles_birthday_boundaries(self):

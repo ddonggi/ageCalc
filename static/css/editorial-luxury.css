@@ -38,13 +38,30 @@ body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) {
     radial-gradient(circle at 16% 12%, rgba(166, 139, 97, .16), transparent 28rem),
     linear-gradient(180deg, var(--lux-canvas), rgba(252, 249, 243, .72) 100%);
   font-family: var(--lux-body);
-  overflow-wrap: anywhere;
 }
 
 body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) #pixel-background,
 body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"])::before,
 body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"])::after {
   opacity: .16;
+}
+
+/* Public long-text containers can break URLs without affecting result/table UI. */
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .editorial-prose,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .blog-content,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .guide-content,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .section-shell.direct-answer ~ section:not([class]),
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .contact-info,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .contact-info a,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .footer .footer-links a,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .editorial-filter-nav a,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) [data-editorial-related-paths] a,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .editorial-article .article-links a,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .editorial-story-summary,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .coupang-disclosure,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .home-coupang-disclosure,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .coupang-partners-aside p {
+  overflow-wrap: anywhere;
 }
 
 :focus-visible {
