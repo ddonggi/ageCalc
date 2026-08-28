@@ -37,6 +37,17 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
     def _css_without_comments(self, css):
         return re.sub(r"/\*.*?\*/", "", css, flags=re.S)
 
+    def _ordinary_css_rules(self, css):
+        css = self._css_without_comments(css)
+        return [
+            (
+                tuple(" ".join(selector.split()) for selector in match.group("selectors").split(",") if selector.strip()),
+                match.group("body"),
+            )
+            for match in re.finditer(r"(?P<selectors>[^{}@][^{}]*)\{(?P<body>[^{}]+)\}", css, re.S)
+            if match.group("selectors").strip()
+        ]
+
     def _css_rule_bodies(self, css, selector):
         css = self._css_without_comments(css)
         return "\n".join(
@@ -67,6 +78,33 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
             if normalized_selector == selector:
                 return match.group("body")
         return ""
+
+    def _selector_targets_result_table_or_numeric_ui(self, selector):
+        element_pattern = r"(^|[\s>+~,(]){element}(?=[:.#\[\s>+~,)]+|$)"
+        return (
+            ".editorial-result-grid" in selector
+            or ".metric-value" in selector
+            or ".age-number" in selector
+            or re.search(r"\.age-result-[\w-]+", selector)
+            or any(
+                re.search(element_pattern.format(element=element), selector)
+                for element in ("output", "table", "th", "td")
+            )
+        )
+
+    def _result_table_numeric_wrap_violations(self, css):
+        violations = []
+        for selectors, body in self._ordinary_css_rules(css):
+            has_bad_wrapping = (
+                re.search(r"\boverflow-wrap\s*:", body)
+                or re.search(r"\bword-break\s*:\s*break-all\b", body)
+            )
+            if not has_bad_wrapping:
+                continue
+            for selector in selectors:
+                if self._selector_targets_result_table_or_numeric_ui(selector):
+                    violations.append((selector, " ".join(body.split())))
+        return violations
 
     def test_representative_public_pages_load_final_theme(self):
         for path in ("/", "/age", "/about", "/references"):
@@ -219,7 +257,36 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
             ".metric-value",
         ):
             self.assertNotIn(excluded_selector, overflow_group)
+        self.assertEqual([], self._result_table_numeric_wrap_violations(css))
         self.assertNotRegex(css, r"transition:\s*(?:all\s+)?(?:linear|ease-in-out)")
+
+    def test_theme_overflow_guard_detects_result_table_numeric_mutations(self):
+        css = """
+        .safe-prose {
+          overflow-wrap: anywhere;
+        }
+
+        .editorial-result-grid output,
+        .metric-value,
+        .age-result-summary-item,
+        table,
+        th,
+        td {
+          word-break: break-all;
+        }
+        """
+        violations = self._result_table_numeric_wrap_violations(css)
+        self.assertEqual(
+            [
+                (".editorial-result-grid output", "word-break: break-all;"),
+                (".metric-value", "word-break: break-all;"),
+                (".age-result-summary-item", "word-break: break-all;"),
+                ("table", "word-break: break-all;"),
+                ("th", "word-break: break-all;"),
+                ("td", "word-break: break-all;"),
+            ],
+            violations,
+        )
 
     def test_home_calculator_module_handles_birthday_boundaries(self):
         program = r"""
