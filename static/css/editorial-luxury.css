@@ -1145,9 +1145,17 @@ body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .editorial
 
 body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .data-table-wrap,
 body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .table-scroll {
+  overflow: auto;
   border: 1px solid var(--lux-border);
   border-radius: var(--lux-radius-core);
   background: var(--lux-surface);
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .data-table-wrap thead th,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .table-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) table,
@@ -1176,6 +1184,127 @@ body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .data-tabl
 body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .data-table tbody tr.is-selected,
 body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) tr.is-selected {
   background: rgba(166, 139, 97, .18);
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .container > h1,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .container > h3,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .section-shell.direct-answer ~ section:not([class]) {
+  max-width: 65ch;
+  margin-inline: auto;
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .container > h1,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .container > h3 {
+  text-align: center;
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .section-shell.direct-answer ~ section:not([class]) {
+  display: grid;
+  gap: .85rem;
+  width: 100%;
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .section-shell.direct-answer ~ section:not([class]) > * {
+  margin: 0;
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .section-shell.direct-answer ~ section:not([class]) h2,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .section-shell.direct-answer ~ section:not([class]) h3 {
+  max-width: 20ch;
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .section-shell.direct-answer ~ section:not([class]) ul,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .section-shell.direct-answer ~ section:not([class]) ol {
+  display: grid;
+  gap: .65rem;
+  padding-left: 1.2rem;
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .section-shell.direct-answer ~ section:not([class]) .highlight,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .section-shell.direct-answer ~ section:not([class]) .warning,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .contact-info {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-core);
+  background: rgba(252, 249, 243, .72);
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .faq {
+  display: grid;
+  gap: 1rem;
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .faq > div,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .faq details {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-core);
+  background: rgba(252, 249, 243, .78);
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .faq details summary {
+  min-height: 44px;
+  cursor: pointer;
+  color: var(--lux-espresso);
+  font-weight: 700;
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .faq details[open] summary {
+  margin-bottom: .75rem;
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .faq > div > strong,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .faq details summary {
+  display: block;
+  font-family: var(--lux-display);
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .contact-info {
+  display: grid;
+  gap: .45rem;
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .contact-info p,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .contact-info h3 {
+  margin: 0;
+}
+
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .section-shell .footer-links a,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .section-shell .life-hub-link-list a,
+body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .hub-card-link {
+  min-height: 44px;
+}
+
+body.life-hub-page .life-hub-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(280px, .75fr);
+  gap: clamp(1.25rem, 4vw, 3.5rem);
+  align-items: end;
+}
+
+body.life-hub-page .life-hub-copy {
+  display: grid;
+  gap: 1rem;
+  max-width: 38rem;
+}
+
+body.life-hub-page .life-hub-copy .page-intro,
+body.life-hub-page .section-intro,
+body.life-hub-page .life-hub-questions .small {
+  max-width: 65ch;
+}
+
+body.life-hub-page .life-hub-index {
+  align-self: stretch;
+  justify-self: end;
+  width: min(100%, 24rem);
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-shell);
+  background: rgba(252, 249, 243, .86);
+  box-shadow: var(--lux-shadow-soft);
 }
 
 body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .footer {
@@ -1251,6 +1380,15 @@ body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .scroll-to
   body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .hero-copy h1 {
     max-width: 16ch;
     font-size: 5rem;
+  }
+
+  body.life-hub-page .life-hub-hero {
+    grid-template-columns: 1fr;
+  }
+
+  body.life-hub-page .life-hub-index {
+    justify-self: stretch;
+    width: 100%;
   }
 }
 
@@ -1376,6 +1514,10 @@ body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .scroll-to
   body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .support-row,
   body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .cookie-content {
     grid-template-columns: 1fr;
+  }
+
+  body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"]) .section-shell.direct-answer ~ section:not([class]) {
+    max-width: 100%;
   }
 
   body.editorial-calculator-page .editorial-calculator-shell .profile-date-control,

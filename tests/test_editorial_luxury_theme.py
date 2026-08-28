@@ -5,6 +5,30 @@ from pathlib import Path
 
 from app import app
 
+PUBLIC_THEME_TEMPLATES = (
+    "100-day-calculator.html",
+    "age-comparison-table.html",
+    "age-gap-calculator.html",
+    "baby-months-table.html",
+    "birth-year-age-table.html",
+    "birth-year-zodiac-table.html",
+    "college-entry-year-calculator.html",
+    "contact.html",
+    "d-day.html",
+    "faq.html",
+    "grade-age-table.html",
+    "grade-birth-year-table.html",
+    "hub-detail.html",
+    "korean-age-guide.html",
+    "life-timeline.html",
+    "parent-child.html",
+    "pet-age-table.html",
+    "pet-months-table.html",
+    "privacy.html",
+    "school-entry-year-table.html",
+    "terms.html",
+)
+
 
 class EditorialLuxuryThemeTests(unittest.TestCase):
     def setUp(self):
@@ -38,6 +62,17 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
             source = Path("templates", template_name).read_text()
             self.assertIn("editorial-luxury.css", source)
             self.assertRegex(source, r"editorial-(?:index|article|prose)")
+
+    def test_remaining_public_templates_load_theme_after_legacy_css(self):
+        for name in PUBLIC_THEME_TEMPLATES:
+            source = Path("templates", name).read_text()
+            self.assertLess(source.index("css/style.css"), source.index("css/editorial-luxury.css"), name)
+
+    def test_theme_defines_public_page_family_layout_rules(self):
+        css = Path("static/css/editorial-luxury.css").read_text()
+        self.assertRegex(css, r"\.data-table-wrap\s+thead\s+th[\s\S]*position:\s*sticky;")
+        self.assertRegex(css, r"\.section-shell\.direct-answer\s*\~\s*section:not\(\[class\]\)[\s\S]*max-width:\s*65ch;")
+        self.assertRegex(css, r"body\.life-hub-page\s+\.life-hub-hero[\s\S]*grid-template-columns:\s*minmax\(0,\s*1\.1fr\)\s+minmax\(280px,\s*\.75fr\);")
 
     def test_theme_defines_approved_tokens_and_reduced_motion(self):
         css = Path("static/css/editorial-luxury.css").read_text()
