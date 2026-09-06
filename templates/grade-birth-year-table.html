@@ -34,12 +34,12 @@
     {% include 'partials/adsense.html' %}
 </head>
 
-<body>
+<body class="calculator-flat-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <section class="hero-band">
+        <section class="hero-band calculator-page-heading">
             <div class="hero-copy">
                 <p class="eyebrow">학년별 빠른 확인</p>
                 <h1>{% if selected_row %}{{ selected_row.short_label }}은 몇 년생?{% else %}학년별 출생연도표{% endif %}</h1>

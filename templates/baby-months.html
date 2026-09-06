@@ -36,18 +36,19 @@
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
 
     <script src="{{ url_for('static', filename='js/date-rules.js') }}" defer></script>
-    <script src="{{ versioned_static('js/profile-date.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 
 </head>
 
-<body class="editorial-calculator-page">
+<body class="editorial-calculator-page calculator-flat-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
+        <header class="calculator-page-heading">
         <h1>아이 개월수 계산기</h1>
         <div style="text-align: center;margin-bottom: 2rem;">출생일을 입력하면 현재 아이 개월 수와 아기 월령이 바로 나옵니다.</div>
+        </header>
 
         <section class="section-shell direct-answer" aria-label="아이 월령 바로 답변">
             <div class="section-heading">
@@ -64,25 +65,21 @@
         </section>
 
         <div class="editorial-calculator-shell">
-        <form class="age-form" id="baby-months-form" autocomplete="off" data-clarity-mask="true">
+        <form class="age-form" id="baby-months-form" action="{{ url_for('baby_months') }}#baby-result-container" method="get" autocomplete="off" data-clarity-mask="true">
             <div class="form-group">
                 <h3>출생일을 입력하세요 (8자리)</h3>
                 <div class="date-inputs">
                     <label class="field-label" for="baby-birth-input">출생일 8자리</label>
-                    <input type="text" id="baby-birth-input" placeholder="2025.06.15" inputmode="numeric" pattern="[0-9.]*" maxlength="10" required aria-describedby="baby-error profile-date-note" data-clarity-mask="true" data-profile-date-input="full">
+                    <input type="text" id="baby-birth-input" name="birth_date" value="{% if baby_birth_date %}{{ baby_birth_date.strftime('%Y.%m.%d') }}{% endif %}" placeholder="2025.06.15" inputmode="numeric" pattern="[0-9.]*" maxlength="10" required aria-describedby="baby-error" data-clarity-mask="true">
                 </div>
                 <small id="baby-error" class="error-msg" aria-live="polite"></small>
-                <div class="profile-date-control">
-                    <label for="profile-date-consent"><input type="checkbox" id="profile-date-consent"> <span>출생일을 이 기기에서 다음 계산에도 사용</span></label>
-                    <button type="button" class="btn btn-secondary" id="profile-date-clear">저장값 삭제</button>
-                </div>
-                <p class="input-help" id="profile-date-note">선택한 경우에만 이 브라우저에 저장됩니다. 공용 기기에서는 사용하지 말고, 언제든 저장값을 삭제하세요.</p>
+                <button class="btn btn-primary" type="submit">계산하기</button>
             </div>
         </form>
 
-        <div class="result-container" id="baby-result-container" aria-live="polite" data-clarity-mask="true">
+        <div class="result-container{% if baby_result %} show{% endif %}" id="baby-result-container" aria-live="polite" data-clarity-mask="true">
             <h2>계산 결과</h2>
-            <div id="baby-result-content"></div>
+            <div id="baby-result-content">{% if baby_result %}<div class="result success"><p class="message">현재 개월 수</p><div class="age-info"><p class="age"><span class="age-number">{{ baby_result.months }}개월</span> <span class="small">({{ baby_result.total_days }}일)</span></p></div><p class="small">{{ baby_result.years }}년 {{ baby_result.remain }}개월</p><div class="result-section"><h4>결과 해석</h4><p>출생일에서 오늘까지 완료된 달 수를 계산한 값입니다.</p><p class="small">날짜 계산 결과이며 발달 평가나 의료 진단이 아닙니다.</p></div></div>{% endif %}</div>
         </div>
         </div>
         {% include 'partials/home_coupang_rails.html' %}

@@ -35,12 +35,12 @@
     {% include 'partials/adsense.html' %}
 </head>
 
-<body>
+<body class="calculator-flat-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <section class="hero-band">
+        <section class="hero-band calculator-page-heading">
             <div class="hero-copy">
                 <p class="eyebrow">빠른 조회</p>
                 <h1>{% if selected_row %}{{ selected_year }}년생은 몇살?{% else %}몇년생 몇살? 출생연도별 나이표{% endif %}</h1>

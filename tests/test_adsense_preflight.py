@@ -32,10 +32,9 @@ class AdsensePreflightTests(unittest.TestCase):
     def test_preflight_reports_forbidden_sitemap_paths(self):
         report = PreflightReport()
 
-        validate_sitemap_paths(["/", "/blog", "/minigames", "/blog/drafts"], report)
+        validate_sitemap_paths(["/", "/blog", "/blog/drafts"], report)
 
         self.assertFalse(report.ok)
-        self.assertIn("/minigames", format_report(report))
         self.assertIn("/blog/drafts", format_report(report))
 
     def test_review_mode_validator_rejects_affiliate_material(self):

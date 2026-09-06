@@ -91,16 +91,78 @@ class BirthDatePrivacyTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers.get("Cache-Control"), "no-store")
 
-    def test_legacy_age_and_family_links_redirect_without_birth_data(self):
-        age_response = self.client.get("/age?birth_date=921002&calendar_type=solar")
+    def test_age_query_renders_a_no_store_result_page_and_keeps_family_links_private(self):
+        age_response = self.client.get("/age?birth_date=19921002&calendar_type=solar")
         family_response = self.client.get("/parent-child?s=encoded-private-input")
 
-        self.assertEqual(age_response.status_code, 302)
-        self.assertEqual(age_response.headers["Location"], "/age")
+        age_html = age_response.get_data(as_text=True)
+        self.assertEqual(age_response.status_code, 200)
+        self.assertEqual(age_response.headers["Cache-Control"], "no-store")
+        self.assertIn('action="/age#result-container" method="get"', age_html)
+        self.assertIn('name="birth_date"', age_html)
+        self.assertIn('value="1992.10.02"', age_html)
+        self.assertIn('id="result-container"', age_html)
+        self.assertIn('만 33세', age_html)
+        self.assertIn('class="age-result-summary"', age_html)
+        self.assertIn('다음 생일', age_html)
+        self.assertIn('원숭이띠', age_html)
+        for href in (
+            'href="/birth-year-age-table?year=1992"',
+            'href="/annual-age-calculator?birth_year=1992"',
+            'href="/school-entry-year-table?year=1992"',
+            'href="/birthday-dday-calculator"',
+        ):
+            self.assertIn(href, age_html)
         self.assertEqual(family_response.status_code, 302)
         self.assertEqual(family_response.headers["Location"], "/parent-child")
 
-    def test_hundred_day_dates_are_calculated_locally_without_query_fields(self):
+    def test_age_result_page_keeps_its_query_string(self):
+        script = r"""
+const assert = require('assert');
+let replaceCalls = 0;
+global.document = { addEventListener() {} };
+global.window = {
+  location: { search: '?birth_date=19921002&calendar_type=solar', pathname: '/age' },
+  history: { replaceState() { replaceCalls += 1; } }
+};
+
+const { AgeCalculatorUI } = require('./static/js/age-calculator.js');
+const calculator = Object.create(AgeCalculatorUI.prototype);
+calculator.loadFromUrl();
+
+assert.strictEqual(replaceCalls, 0, '결과 URL의 계산 파라미터를 지우면 안 됩니다.');
+"""
+        completed = subprocess.run(
+            ["node", "-e", script],
+            cwd=Path.cwd(),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        self.assertEqual(0, completed.returncode, completed.stderr)
+
+    def test_realtime_calculators_submit_to_server_rendered_result_pages(self):
+        cases = {
+            "/100-day-calculator?start_date=20260101": "100일째 날짜",
+            "/birthday-dday-calculator?month=5&day=10": "다음 생일",
+            "/baby-months?birth_date=20250101": "현재 개월 수",
+            "/d-day?date=20261225&mode=until&label=여행": "여행",
+            "/dog?mode=known-age&birth_date=&years=2&months=6&adoption_date=&size=small": "사람 나이 환산",
+            "/cat?mode=known-age&birth_date=&years=2&months=6&adoption_date=": "사람 나이 환산",
+            "/parent-child?parent_role=mother&parent_birth=19800101&child_role=son&child_birth=20100101": "출산 당시 엄마 만 나이",
+            "/life-timeline?birth_date=19921002": "출생 프로필",
+        }
+
+        for url, expected_text in cases.items():
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                html = response.get_data(as_text=True)
+                self.assertEqual(200, response.status_code)
+                self.assertEqual("no-store", response.headers.get("Cache-Control"))
+                self.assertIn(expected_text, html)
+
+    def test_hundred_day_date_input_uses_a_get_result_url(self):
         legacy_response = self.client.get("/100-day-calculator?year=2026&month=1&day=1")
         clean_response = self.client.get("/100-day-calculator")
         html = clean_response.get_data(as_text=True)
@@ -108,11 +170,12 @@ class BirthDatePrivacyTests(unittest.TestCase):
 
         self.assertEqual(302, legacy_response.status_code)
         self.assertEqual("/100-day-calculator", legacy_response.headers["Location"])
-        self.assertNotIn('name="year"', html)
-        self.assertNotIn('name="month"', html)
-        self.assertNotIn('name="day"', html)
+        self.assertIn('action="/100-day-calculator#hundred-day-result" method="get"', html)
+        self.assertIn('name="start_date"', html)
+        self.assertIn('type="submit">계산하기</button>', html)
         self.assertIn("hundred-day-calculator.js", html)
-        self.assertIn("addUtcDays(startDate, 99)", javascript)
+        self.assertIn("formatDateDigits", javascript)
+        self.assertIn("parseStartDate", javascript)
         self.assertNotIn("fetch(", javascript)
         self.assertNotIn("js/clarity-init.js", html)
         self.assertIn('data-clarity-mask="true"', html)
@@ -196,12 +259,13 @@ class BirthDatePrivacyTests(unittest.TestCase):
         self.assertIn("location /static/js/", nginx_conf)
         self.assertIn('add_header Cache-Control "no-cache, must-revalidate"', nginx_conf)
 
-    def test_privacy_notice_describes_browser_and_lunar_processing(self):
+    def test_privacy_notice_describes_result_url_and_lunar_processing(self):
         html = self.client.get("/privacy").get_data(as_text=True)
 
-        self.assertIn("양력 생년월일은 브라우저 안에서 계산", html)
-        self.assertIn("음력 생년월일은 양력 변환을 위해서만 서버로 전송", html)
-        self.assertIn("공유 주소에는 생년월일을 넣지 않습니다", html)
+        self.assertIn("계산 결과 URL에 입력값이 포함될 수 있습니다", html)
+        self.assertIn("생년월일, 기념일 또는 가족 관계 입력값", html)
+        self.assertIn("음력 생년월일은 양력 변환을 위해 서버에서 처리", html)
+        self.assertIn("결과 URL을 다른 사람과 공유하지 마세요", html)
 
     def test_profile_date_storage_requires_explicit_save_and_rejects_damaged_values(self):
         script = r"""
@@ -242,28 +306,27 @@ assert.strictEqual(profile.canStoreProfileDate(profileInput, lunarDocument), fal
 
         self.assertEqual(0, completed.returncode, completed.stderr)
 
-    def test_profile_date_controls_explain_device_storage_and_deletion(self):
+    def test_profile_date_controls_are_removed_from_calculator_pages(self):
         timeline_html = self.client.get("/life-timeline").get_data(as_text=True)
         age_html = self.client.get("/age").get_data(as_text=True)
         birthday_html = self.client.get("/birthday-dday-calculator").get_data(as_text=True)
         baby_html = self.client.get("/baby-months").get_data(as_text=True)
 
-        self.assertIn('id="profile-date-consent"', timeline_html)
-        self.assertIn('id="profile-date-clear"', timeline_html)
-        self.assertIn("공용 기기", timeline_html)
-        self.assertIn('id="profile-date-consent"', age_html)
-        self.assertIn('id="profile-date-clear"', age_html)
-        self.assertIn("공용 기기", age_html)
+        for html in (timeline_html, age_html, baby_html):
+            self.assertNotIn('id="profile-date-consent"', html)
+            self.assertNotIn('id="profile-date-clear"', html)
+            self.assertNotIn("공용 기기", html)
+            self.assertNotIn("다음 계산에도 사용", html)
+            self.assertNotIn("저장값 삭제", html)
         self.assertIn("양력", age_html)
-        self.assertIn('data-profile-date-input="full"', timeline_html)
-        self.assertIn('data-profile-date-input="full"', age_html)
-        self.assertIn('data-profile-date-input="month-day"', birthday_html)
-        self.assertIn('id="profile-date-consent"', baby_html)
-        self.assertIn('id="profile-date-clear"', baby_html)
-        self.assertIn("공용 기기", baby_html)
-        self.assertIn('data-profile-date-input="full"', baby_html)
-        for html in (timeline_html, age_html, birthday_html, baby_html):
-            self.assertIn("profile-date.js", html)
+        self.assertNotIn('data-profile-date-input=', timeline_html)
+        self.assertNotIn('data-profile-date-input=', age_html)
+        self.assertNotIn('data-profile-date-input=', baby_html)
+        self.assertNotIn('profile-date.js', timeline_html)
+        self.assertNotIn('profile-date.js', age_html)
+        self.assertNotIn('profile-date.js', baby_html)
+        self.assertNotIn('data-profile-date-input=', birthday_html)
+        self.assertNotIn("profile-date.js", birthday_html)
 
     def test_age_page_describes_solar_and_lunar_processing_accurately(self):
         html = self.client.get("/age").get_data(as_text=True)

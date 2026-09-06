@@ -8,8 +8,6 @@ class AgeCalculatorUI {
         this.birthErrorEl = null;
         this.hiddenDateInput = null;
         this.form = null;
-        this.autoCalcTimer = null; // 자동 계산 타이머
-
         this.init();
     }
 
@@ -26,9 +24,6 @@ class AgeCalculatorUI {
             this.bindEvents();
             this.setInitialFocus();
             this.initializeZodiacInfo();
-            setTimeout(() => {
-                this.loadFromUrl();
-            }, 100);
         }
     }
 
@@ -44,7 +39,7 @@ class AgeCalculatorUI {
      */
     bindEvents() {
         this.bindBirthDateInputEvents();
-        this.bindAutoCalculation();
+        this.bindCalculationSubmit();
         this.bindZodiacPreview();
         this.bindShareEvents();
         this.bindCookieEvents();
@@ -59,12 +54,9 @@ class AgeCalculatorUI {
         const radioButtons = document.querySelectorAll('input[name="calendar_type"]');
         radioButtons.forEach(radio => {
             radio.addEventListener('change', () => {
-                // 값이 유효하면 재계산
+                // 달력 종류를 바꾸면 현재 입력값의 오류 표시를 갱신합니다.
                 if (this.birthInput && this.birthInput.value.replace(/\D/g, '').length === 8) {
-                    const v = this.validateBirthDate(this.birthInput.value);
-                    if (v.valid) {
-                        this.autoCalculateFromBirthDate(v);
-                    }
+                    this.checkAndCalculateBirthDate();
                 }
             });
         });
@@ -899,15 +891,13 @@ class AgeCalculatorUI {
      * URL에서 결과 로드
      */
     async loadFromUrl() {
-        if (window.location.search) {
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
+        // 서버가 결과를 다시 렌더링하므로 주소의 계산 파라미터를 유지합니다.
     }
 
     /**
-     * 자동 계산 이벤트
+     * 입력 검증과 계산하기 제출 이벤트
      */
-    bindAutoCalculation() {
+    bindCalculationSubmit() {
         if (!this.birthInput) return;
 
         this.birthInput.addEventListener('input', () => {
@@ -915,34 +905,15 @@ class AgeCalculatorUI {
             this.checkAndCalculateBirthDate();
         });
 
-        // 폼 제출은 막고, 자동 계산만 사용
         this.form.addEventListener('submit', (e) => {
-            e.preventDefault();
-        });
-    }
-
-    /**
-     * 입력값 확인 및 자동 계산
-     */
-    checkAndCalculate() {
-        const year = this.yearInput.value.trim();
-        const month = this.monthInput.value.trim();
-        const day = this.dayInput.value.trim();
-
-        // 입력값이 변경되면 기존 결과 숨기기
-        this.hideResult();
-
-        // 모든 필드가 채워지고 유효한 경우에만 계산
-        if (year && month && day) {
-            // 입력 완료 후 약간의 지연을 두고 계산 (사용자 입력 완료 대기)
-            if (this.autoCalcTimer) {
-                clearTimeout(this.autoCalcTimer);
+            const v = this.validateBirthDate(this.birthInput.value);
+            if (!v.valid) {
+                e.preventDefault();
+                this.showBirthError(v.msg);
+                return;
             }
-
-            this.autoCalcTimer = setTimeout(() => {
-                this.autoCalculate();
-            }, 500); // 0.5초 지연
-        }
+            this.showBirthError('');
+        });
     }
 
     // 8자리 YYYYMMDD 검증. 두 자리 연도는 세기가 모호하므로 받지 않습니다.
@@ -976,7 +947,7 @@ class AgeCalculatorUI {
         }
     }
 
-    // 8자리 모드에서 입력 시 호출
+    // 8자리 모드에서 입력 시 호출: 형식을 확인하지만 결과는 계산하지 않습니다.
     checkAndCalculateBirthDate() {
         const raw = this.birthInput.value;
         const digits = raw.replace(/\D/g, '');
@@ -996,58 +967,8 @@ class AgeCalculatorUI {
         }
 
         this.showBirthError('');
-
-        if (this.autoCalcTimer) {
-            clearTimeout(this.autoCalcTimer);
-        }
-        this.autoCalcTimer = setTimeout(() => {
-            this.autoCalculateFromBirthDate(v);
-        }, 500);
     }
 
-
-    async autoCalculateFromBirthDate(v) {
-        // 여기서 v.iso = YYYY-MM-DD
-        this.showLoading(true);
-        try {
-            const result = await this.calculateAgeAsync(v.iso);
-            this.displayResult(result);
-        } catch (error) {
-            console.error('나이 계산 오류:', error);
-            this.showError(null, '나이 계산 중 오류가 발생했습니다. 다시 시도해주세요.');
-        } finally {
-            this.showLoading(false);
-        }
-    }
-
-
-    /**
-     * 자동 계산 실행
-     */
-    async autoCalculate() {
-        // 입력값 검증
-        if (!this.validateInputs()) {
-            return;
-        }
-
-        // 로딩 상태 표시
-        this.showLoading(true);
-
-        try {
-            // 서버에 비동기 요청
-            const result = await this.calculateAgeAsync();
-
-            // 결과 표시
-            this.displayResult(result);
-
-        } catch (error) {
-            console.error('나이 계산 오류:', error);
-            this.showError(null, '나이 계산 중 오류가 발생했습니다. 다시 시도해주세요.');
-        } finally {
-            // 로딩 상태 해제
-            this.showLoading(false);
-        }
-    }
 
     /**
      * 초기 포커스 설정

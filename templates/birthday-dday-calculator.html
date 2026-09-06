@@ -30,17 +30,16 @@
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/date-rules.js') }}" defer></script>
-    <script src="{{ versioned_static('js/profile-date.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/birthday-dday.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
 
-<body class="editorial-calculator-page">
+<body class="editorial-calculator-page calculator-flat-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <section class="hero-band">
+        <section class="hero-band calculator-page-heading">
             <div class="hero-copy">
                 <p class="eyebrow">생일 카운트다운</p>
                 <h1>생일 D-day 계산기</h1>
@@ -87,14 +86,17 @@
                     <h2 id="birthday-search">생일 선택</h2>
                     <p class="section-intro">생일 월일 4자리를 입력하면 다음 생일 날짜와 남은 일수를 바로 보여드립니다.</p>
                 </div>
-                <form class="age-form" id="birthday-dday-form" autocomplete="off" data-clarity-mask="true">
+                <form class="age-form" id="birthday-dday-form" action="{{ url_for('birthday_dday_calculator') }}#birthday-dday-result" method="get" autocomplete="off" data-clarity-mask="true">
                     <div class="form-group">
                         <div class="date-inputs">
                             <label class="field-label" for="birthday-dday-input">생일 월일</label>
-                            <input type="text" id="birthday-dday-input" placeholder="05.10" inputmode="numeric" pattern="[0-9.]*" maxlength="5" aria-label="생일 월일 4자리" aria-describedby="birthday-dday-error" data-profile-date-input="month-day" value="{% if month and day %}{{ '%02d.%02d'|format(month, day) }}{% endif %}">
+                            <input type="text" id="birthday-dday-input" placeholder="05.10" inputmode="numeric" pattern="[0-9.]*" maxlength="5" aria-label="생일 월일 4자리" aria-describedby="birthday-dday-error" value="{% if month and day %}{{ '%02d.%02d'|format(month, day) }}{% endif %}" required>
+                            <input type="hidden" id="birthday-dday-month" name="month" value="{{ month or '' }}">
+                            <input type="hidden" id="birthday-dday-day" name="day" value="{{ day or '' }}">
                         </div>
                         <div class="hero-actions">
-                            <button class="btn btn-secondary" id="birthday-dday-clear" type="button">입력 지우기</button>
+                            <button class="btn btn-primary" type="submit">계산하기</button>
+                            <a class="btn btn-secondary" id="birthday-dday-clear" href="{{ url_for('birthday_dday_calculator') }}">입력 지우기</a>
                         </div>
                         <small class="error-msg" id="birthday-dday-error" aria-live="polite"></small>
                     </div>

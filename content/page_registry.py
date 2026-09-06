@@ -167,7 +167,7 @@ STATIC_PAGE_REGISTRY = (
     _page(
         "age_gap_calculator",
         "/age-gap-calculator",
-        "family",
+        "age",
         "나이 차이 계산기",
         "두 출생연도의 나이 차이와 만나이 범위 비교",
         related_endpoints=("parent_child", "age", "birth_year_age_table"),
@@ -186,7 +186,7 @@ STATIC_PAGE_REGISTRY = (
     _page(
         "baby_months_table",
         "/baby-months-table",
-        "family",
+        "age",
         "개월수 계산표",
         "생후 개월 수별 연령 환산표 확인",
         related_endpoints=("baby_months", "hundred_day_calculator", "school_grade_calculator"),
@@ -266,7 +266,7 @@ STATIC_PAGE_REGISTRY = (
         "education",
         "학번 계산기",
         "대학 학번 기준 출생연도와 현재 나이 확인",
-        related_endpoints=("school_entry_year_table", "birth_year_age_table", "grade_birth_year_table"),
+        related_endpoints=("school_entry_year_table", "grade_birth_year_table", "parent_child"),
         lastmod="2026-08-13",
     ),
     _page(
@@ -336,7 +336,7 @@ STATIC_PAGE_REGISTRY = (
     _page(
         "baby_months",
         "/baby-months",
-        "family",
+        "age",
         "아이 개월 수 계산기",
         "출생일 기준 현재 아이 월령 계산",
         priority="core",
@@ -356,7 +356,7 @@ STATIC_PAGE_REGISTRY = (
     _page(
         "parent_child",
         "/parent-child",
-        "family",
+        "age",
         "부모·자녀 나이 관계 계산기",
         "부모와 자녀의 나이 차이와 주요 생애 시점 계산",
         priority="core",
@@ -381,7 +381,7 @@ def _guide_page(page: dict[str, object]) -> dict[str, object]:
         "school": "education",
         "anniversary": "anniversary",
         "pet": "pets",
-        "family": "family",
+        "family": "age",
     }
     slug = str(page["slug"])
     related_endpoints = tuple(endpoint for endpoint, _label in page["related_links"])
@@ -562,13 +562,9 @@ def indexable_guide_pages() -> tuple[dict[str, object], ...]:
 SITEMAP_GROUPS = (
     "core",
     "age",
-    "family",
     "education",
     "anniversary",
-    "retirement",
-    "health",
     "pets",
-    "generations",
     "guides",
 )
 

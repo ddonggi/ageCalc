@@ -29,12 +29,12 @@
     {% include 'partials/adsense.html' %}
 </head>
 
-<body class="anniversary-page">
+<body class="anniversary-page calculator-flat-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <section class="hero-band">
+        <section class="hero-band calculator-page-heading">
             <div class="hero-copy">
                 <p class="eyebrow">날짜 계산 안내</p>
                 <h1>기념일 계산기</h1>
@@ -68,20 +68,20 @@
                 시작일을 1일째로 세는 백일 계산과 달리 두 날짜 사이의 순수한 날짜 차이를 사용합니다.
             </p>
         </section>
-        <form class="age-form" id="dday-form" autocomplete="off" data-clarity-mask="true">
+        <form class="age-form" id="dday-form" action="{{ url_for('d_day') }}#dday-result-container" method="get" autocomplete="off" data-clarity-mask="true">
             <div class="form-split">
                 <div class="field-stack">
                     <h3>기념일 이름</h3>
-                    <input type="text" id="dday-label" maxlength="40" placeholder="예: 결혼기념일, 시험일, 여행 출발일">
+                    <input type="text" id="dday-label" name="label" value="{{ dday_values.label }}" maxlength="40" placeholder="예: 결혼기념일, 시험일, 여행 출발일">
                     <small class="small">이름은 결과 카드 제목에만 사용됩니다.</small>
                 </div>
                 <div class="field-stack">
                     <h3>계산 방식</h3>
                     <div class="calendar-toggle-container">
                         <div class="calendar-toggle">
-                            <input type="radio" id="mode-until" name="dday-mode" value="until" checked>
+                            <input type="radio" id="mode-until" name="mode" value="until" {% if dday_values.mode != 'since' %}checked{% endif %}>
                             <label for="mode-until">다가오는 날</label>
-                            <input type="radio" id="mode-since" name="dday-mode" value="since">
+                            <input type="radio" id="mode-since" name="mode" value="since" {% if dday_values.mode == 'since' %}checked{% endif %}>
                             <label for="mode-since">지난 날부터</label>
                         </div>
                     </div>
@@ -93,15 +93,16 @@
                 <h3>기준 날짜</h3>
                 <div class="date-inputs">
                     <label class="field-label" for="dday-date">기준 날짜</label>
-                    <input type="text" id="dday-date" placeholder="2026.12.25" inputmode="numeric" pattern="[0-9.]*" maxlength="10" required aria-label="기준 날짜 8자리" aria-describedby="dday-error">
+                    <input type="text" id="dday-date" name="date" value="{{ dday_values.date }}" placeholder="2026.12.25" inputmode="numeric" pattern="[0-9.]*" maxlength="10" required aria-label="기준 날짜 8자리" aria-describedby="dday-error">
                 </div>
                 <small id="dday-error" class="error-msg" aria-live="polite"></small>
+                <button class="btn btn-primary" type="submit">계산하기</button>
             </div>
         </form>
 
-        <div class="result-container" id="dday-result-container" aria-live="polite">
+        <div class="result-container{% if dday_result %} show{% endif %}" id="dday-result-container" aria-live="polite">
             <h2>계산 결과</h2>
-            <div id="dday-result-content"></div>
+            <div id="dday-result-content">{% if dday_result %}<div class="result success"><p class="message">{{ dday_result.label }}</p><div class="count-pill {{ dday_result.tone }}">{{ dday_result.status_label }}</div><p class="result-kicker">{{ dday_result.kicker }}</p><p>{{ dday_result.date }} 기준으로 {{ dday_result.caption }}</p><div class="summary-grid"><div class="summary-card"><strong>기준 날짜</strong><span>{{ dday_result.date }}</span></div><div class="summary-card"><strong>오늘 기준 차이</strong><span>{{ dday_result.days }}일</span></div><div class="summary-card"><strong>표시 방식</strong><span>{{ dday_result.mode_label }}</span></div></div><p class="small">오늘 제외 기준입니다. 같은 날짜면 D-Day로 표시합니다.</p></div>{% endif %}</div>
         </div>
         {% include 'partials/info_coupang_promotions.html' %}
         {% include 'partials/home_coupang_rails.html' %}

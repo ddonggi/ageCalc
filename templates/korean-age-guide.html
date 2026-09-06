@@ -34,7 +34,6 @@
 </head>
 
 <body>
-    {% include 'partials/reading-progress.html' %}
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
@@ -182,7 +181,6 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/reading-progress.js') }}?v=mobile-stable-20260810a" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
 </body>

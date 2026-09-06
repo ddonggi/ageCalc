@@ -40,12 +40,14 @@
 
 </head>
 
-<body class="editorial-calculator-page">
+<body class="editorial-calculator-page calculator-flat-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
+        <header class="calculator-page-heading">
         <h1>고양이 나이 계산기</h1>
         <div style="text-align: center;margin-bottom: 2rem;">반려묘의 실제 나이를 사람 나이로 환산해 보여드립니다.</div>
+        </header>
 
         <section class="section-shell direct-answer" aria-label="고양이 나이 환산 바로 답변">
             <div class="section-heading">
@@ -60,38 +62,39 @@
         </section>
 
         <div class="editorial-calculator-shell">
-        <form class="age-form" id="pet-age-form" data-pet="cat" autocomplete="off" data-clarity-mask="true">
+        <form class="age-form" id="pet-age-form" action="{{ url_for('cat') }}#pet-result-container" method="get" data-pet="cat" autocomplete="off" data-clarity-mask="true">
             <div class="form-group">
                 <h3>고양이 나이를 입력하세요</h3>
                 <fieldset class="pet-mode-fieldset">
                     <legend>알고 있는 정보를 선택하세요</legend>
                     <div class="pet-mode-options">
-                        <label><input type="radio" name="pet-age-mode" value="birth-date" checked><span>생일을 알아요</span></label>
-                        <label><input type="radio" name="pet-age-mode" value="known-age"><span>현재 나이를 알아요</span></label>
-                        <label><input type="radio" name="pet-age-mode" value="adoption-date"><span>데려온 날을 알아요</span></label>
+                        <label><input type="radio" name="mode" value="birth-date" {% if pet_values.mode != 'known-age' and pet_values.mode != 'adoption-date' %}checked{% endif %}><span>생일을 알아요</span></label>
+                        <label><input type="radio" name="mode" value="known-age" {% if pet_values.mode == 'known-age' %}checked{% endif %}><span>현재 나이를 알아요</span></label>
+                        <label><input type="radio" name="mode" value="adoption-date" {% if pet_values.mode == 'adoption-date' %}checked{% endif %}><span>데려온 날을 알아요</span></label>
                     </div>
                 </fieldset>
                 <div class="pet-input-panel" data-pet-panel="birth-date">
                     <label class="field-label" for="pet-birth-date">생년월일 8자리</label>
-                    <input type="text" id="pet-birth-date" placeholder="2021.05.10" inputmode="numeric" pattern="[0-9.]*" maxlength="10" aria-describedby="pet-error">
+                    <input type="text" id="pet-birth-date" name="birth_date" value="{{ pet_values.birth_date }}" placeholder="2021.05.10" inputmode="numeric" pattern="[0-9.]*" maxlength="10" aria-describedby="pet-error">
                 </div>
                 <div class="pet-input-panel date-inputs" data-pet-panel="known-age" hidden>
                     <label class="field-label" for="pet-years">현재 나이</label>
-                    <input type="text" id="pet-years" placeholder="년" inputmode="numeric" pattern="[0-9]*" maxlength="2" aria-label="고양이 나이 년">
-                    <input type="text" id="pet-months" placeholder="개월" inputmode="numeric" pattern="[0-9]*" maxlength="2" aria-label="고양이 나이 개월">
+                    <input type="text" id="pet-years" name="years" value="{{ pet_values.years }}" placeholder="년" inputmode="numeric" pattern="[0-9]*" maxlength="2" aria-label="고양이 나이 년">
+                    <input type="text" id="pet-months" name="months" value="{{ pet_values.months }}" placeholder="개월" inputmode="numeric" pattern="[0-9]*" maxlength="2" aria-label="고양이 나이 개월">
                 </div>
                 <div class="pet-input-panel" data-pet-panel="adoption-date" hidden>
                     <label class="field-label" for="pet-adoption-date">데려온 날 8자리</label>
-                    <input type="text" id="pet-adoption-date" placeholder="2024.03.01" inputmode="numeric" pattern="[0-9.]*" maxlength="10" aria-describedby="pet-error">
+                    <input type="text" id="pet-adoption-date" name="adoption_date" value="{{ pet_values.adoption_date }}" placeholder="2024.03.01" inputmode="numeric" pattern="[0-9.]*" maxlength="10" aria-describedby="pet-error">
                     <p class="input-help">실제 나이가 아니라 오늘까지 함께한 기간을 계산합니다.</p>
                 </div>
                 <small id="pet-error" class="error-msg" aria-live="polite"></small>
+                <button class="btn btn-primary" type="submit">계산하기</button>
             </div>
         </form>
 
-        <div class="result-container" id="pet-result-container" aria-live="polite">
+        <div class="result-container{% if pet_result %} show{% endif %}" id="pet-result-container" aria-live="polite">
             <h2>계산 결과</h2>
-            <div id="pet-result-content"></div>
+            <div id="pet-result-content">{% if pet_result %}{% if pet_result.kind == 'adoption' %}<div class="result success"><p class="message">오늘까지 함께한 기간</p><div class="age-info"><p class="age"><span class="age-number">{{ pet_result.age_text }}</span></p></div><p class="small">데려온 날부터 오늘까지 완료된 달 수입니다. 실제 나이나 사람 나이 환산값은 아닙니다.</p></div>{% else %}<div class="result success"><p class="message">고양이 나이 {{ pet_result.age_text }} 기준</p><div class="age-info"><p class="age">사람 나이 환산: <span class="age-number">{{ pet_result.human_age }}</span></p></div><p class="small">환산 나이는 건강 상태나 기대수명을 판정하지 않습니다.</p></div>{% endif %}{% endif %}</div>
         </div>
         </div>
         {% include 'partials/home_coupang_rails.html' %}

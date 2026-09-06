@@ -35,6 +35,14 @@ class ReadingProgressPageTests(unittest.TestCase):
                 self.assertIn(f'data-content-type="{content_type}"', html)
                 self.assertIn('js/reading-progress.js', html)
 
+    def test_home_renders_page_reading_progress_from_shared_header(self):
+        response = app.test_client().get("/")
+
+        self.assertEqual(200, response.status_code)
+        html = response.get_data(as_text=True)
+        self.assertIn('role="progressbar"', html)
+        self.assertIn('js/reading-progress.js', html)
+
     def test_nonindexable_guide_does_not_render_reading_progress(self):
         response = app.test_client().get("/guides/age-gap-calculation-guide")
 

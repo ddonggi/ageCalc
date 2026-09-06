@@ -126,7 +126,7 @@ def editorial_metadata_for(page: dict[str, object] | None) -> dict[str, object] 
     if page["key"] in {"references", "faq"}:
         source_hub = "age"
     elif page["key"] == "guide:baby-months-calculation-guide":
-        source_hub = "family"
+        source_hub = "age"
     metadata = {
         "author": EDITORIAL_AUTHOR,
         "reviewer": EDITORIAL_REVIEWER,

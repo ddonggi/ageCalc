@@ -39,13 +39,15 @@
 
 </head>
 
-<body class="parent-child-page">
+<body class="parent-child-page calculator-flat-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
+        <header class="calculator-page-heading">
         <h1>부모·자녀 나이 관계 계산기</h1>
         <div style="text-align: center;margin-bottom: 2rem;">부모와 자녀의 나이 차이와 주요 시점을 함께 살펴볼 수 있습니다.</div>
+        </header>
 
         <section class="section-shell direct-answer" aria-label="부모 자녀 나이 관계 바로 답변">
             <div class="section-heading">
@@ -58,7 +60,7 @@
             </p>
         </section>
 
-        <form class="age-form" id="parent-child-form" autocomplete="off" data-clarity-mask="true">
+        <form class="age-form" id="parent-child-form" action="{{ url_for('parent_child') }}#parent-child-result-container" method="get" autocomplete="off" data-clarity-mask="true" data-parent-inputs='{{ parent_inputs|tojson }}' data-child-inputs='{{ child_inputs|tojson }}'>
             <div class="form-group">
                 <h3>부모</h3>
                 <div class="line-actions">
@@ -75,11 +77,12 @@
                 <div id="child-lines" class="line-group"></div>
                 <small id="parent-child-error" class="error-msg" aria-live="polite"></small>
             </div>
+            <button class="btn btn-primary" type="submit">계산하기</button>
         </form>
 
-        <div class="result-container" id="parent-child-result-container" aria-live="polite" data-clarity-mask="true">
+        <div class="result-container{% if parent_results %} show{% endif %}" id="parent-child-result-container" aria-live="polite" data-clarity-mask="true">
             <h2>계산 결과</h2>
-            <div id="parent-child-result-content"></div>
+            <div id="parent-child-result-content">{% for item in parent_results or [] %}<div class="result success"><p class="message">{{ item.parent_label }}와 {{ item.child_order }} {{ item.child_label }}의 시간이 이렇게 이어졌어요.</p><div class="age-info"><p class="age">출산 당시 {{ item.parent_label }} 만 나이: <span class="age-number">{{ item.parent_age_at_birth }}세</span></p><p class="age">지금 두 사람의 만 나이 차이: <span class="age-number">{{ item.age_gap }}세</span></p></div>{% for milestone in item.milestones %}<div class="result-section"><p>{{ milestone.year }}년에 {{ item.parent_label }}는 {{ milestone.label }}({{ milestone.age }})이고 {{ item.child_order }} {{ item.child_label }}은 {{ milestone.child_age }}살이에요.</p></div>{% endfor %}<div class="result-section"><h4>다음 가족 시점 확인</h4><div class="footer-links"><a href="/guides/sixtieth-seventieth-eightieth-age-guide">환갑·칠순 기준 보기</a><a href="/school-grade-calculator?year={{ item.child_birth_year }}">자녀 학교 시점 보기</a><a href="/school-entry-year-table?year={{ item.child_birth_year }}">자녀 입학년도 보기</a></div></div></div>{% endfor %}</div>
             <div class="share-section" style="margin-top:12px;">
                 <h4>결과 공유하기</h4>
                 <div class="share-buttons">

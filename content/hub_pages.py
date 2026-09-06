@@ -41,7 +41,7 @@ def _hub(
     }
 
 
-HUB_PAGES = (
+_LEGACY_HUB_PAGES = (
     _hub(
         "age",
         "나이 계산",
@@ -321,8 +321,85 @@ HUB_USAGE_GUIDES = {
     },
 }
 
+_LEGACY_LINKS = {
+    str(link["endpoint"]): link
+    for hub in _LEGACY_HUB_PAGES
+    for link in (*hub["primary_links"], *hub["supporting_links"])
+}
+_LEGACY_LINKS["life_timeline"] = _link(
+    "life_timeline",
+    "생애 타임라인",
+    "출생일을 기준으로 주요 생애 시점을 한눈에 봅니다.",
+)
+_LEGACY_LINKS["age"] = _link(
+    "age",
+    "만나이 계산",
+    "생년월일과 오늘 날짜를 비교해 정확한 만나이를 계산합니다.",
+)
+
+
+def _tools(*endpoints: str) -> tuple[dict[str, str], ...]:
+    return tuple(_LEGACY_LINKS[endpoint] for endpoint in endpoints)
+
+
+HUB_PAGES = (
+    _hub(
+        "age",
+        "나이",
+        "나이",
+        "Age",
+        "나이, 가족·육아, 은퇴·노후, 건강·검진, 세대 기준을 한곳에서 확인합니다.",
+        "현재 나이부터 가족의 월령과 나이 차이, 출생연도와 세대 기준까지 필요한 계산기를 바로 선택하세요.",
+        _tools("age", "annual_age_calculator", "age_gap_calculator", "age_comparison_table"),
+        _tools("birth_year_age_table", "birth_year_zodiac_table", "baby_months", "baby_months_table", "parent_child", "life_timeline"),
+        (("어떤 나이 계산기를 골라야 하나요?", "생년월일을 안다면 만나이, 출생연도만 안다면 나이표부터 확인하세요."),),
+        accent="terracotta",
+        slug="age-tools",
+    ),
+    _hub(
+        "education",
+        "학교",
+        "학교",
+        "School",
+        "현재 학년, 입학연도, 학년별 나이와 대학 학번을 확인합니다.",
+        "출생연도에 맞는 학교 계산기를 선택해 현재 학년과 입학 시기를 확인하세요.",
+        _tools("school_grade_calculator", "school_entry_year_table", "college_entry_year_calculator", "grade_age_table"),
+        _tools("grade_birth_year_table"),
+        (("학교 계산 결과가 실제 재학 상태와 다른가요?", "조기입학과 입학유예 등 개인별 사정은 학교 안내를 함께 확인하세요."),),
+        accent="mustard",
+    ),
+    _hub(
+        "anniversary",
+        "기념일",
+        "기념일",
+        "Anniversary",
+        "생일, 백일과 여러 기념일까지 남은 날짜를 계산합니다.",
+        "반복되는 생일과 특정 목표일, 시작일을 포함하는 백일 계산을 목적에 맞게 선택하세요.",
+        _tools("d_day", "birthday_dday_calculator", "hundred_day_calculator"),
+        _tools("parent_child", "baby_months", "guide"),
+        (("100일째는 어떻게 계산하나요?", "시작일을 1일째로 보면 시작일에 99일을 더한 날입니다."),),
+        accent="terracotta",
+    ),
+    _hub(
+        "pets",
+        "반려동물",
+        "반려동물",
+        "Pets",
+        "강아지와 고양이의 나이와 생애 단계를 확인합니다.",
+        "반려동물의 종류와 현재 연령에 맞는 계산기 또는 나이표를 선택하세요.",
+        _tools("dog", "cat", "pet_age_table", "pet_months_table"),
+        (),
+        (("환산 나이로 건강 상태를 알 수 있나요?", "환산값은 돌봄 참고 기준이며 진단은 수의사의 검진이 필요합니다."),),
+        accent="olive",
+    ),
+)
+
 HUB_PAGES = tuple(
-    {**hub, "usage_guide": HUB_USAGE_GUIDES[str(hub["key"])]}
+    {
+        **hub,
+        "usage_guide": HUB_USAGE_GUIDES[str(hub["key"])],
+        "tool_links": tuple((*hub["primary_links"], *hub["supporting_links"])),
+    }
     for hub in HUB_PAGES
 )
 

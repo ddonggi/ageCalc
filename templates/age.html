@@ -93,22 +93,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
     <script src="{{ url_for('static', filename='js/date-rules.js') }}?v=age-input-20260810a" defer></script>
-    <script src="{{ url_for('static', filename='js/age-calculator.js') }}?v=age-result-20260824a" defer></script>
+    <script src="{{ url_for('static', filename='js/age-calculator.js') }}?v=age-submit-20260907a" defer></script>
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <!-- Google tag (gtag.js) -->
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
 
-    <script src="{{ versioned_static('js/profile-date.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 
 </head>
 
-<body class="age-page editorial-calculator-page">
+<body class="age-page editorial-calculator-page calculator-flat-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
-        <section class="hero-band utility-hero">
+        <section class="hero-band utility-hero calculator-page-heading">
             <div class="hero-copy">
                 <p class="eyebrow">대표 도구</p>
                 <h1>만나이 계산기</h1>
@@ -145,16 +144,16 @@
             </p>
         </section>
         <div class="editorial-calculator-shell">
-            <form class="age-form" id="age-form" action="{{ url_for('age') }}" method="post" autocomplete="off" data-clarity-mask="true">
+            <form class="age-form" id="age-form" action="{{ url_for('age') }}#result-container" method="get" autocomplete="off" data-clarity-mask="true">
                 <div class="form-group">
                     <h3>생년월일을 입력하세요 (8자리)</h3>
 
                     <!-- 음력/양력 토글 -->
                     <div class="calendar-toggle-container">
                         <div class="calendar-toggle">
-                            <input type="radio" id="solar" name="calendar_type" value="solar" checked>
+                            <input type="radio" id="solar" name="calendar_type" value="solar" {% if calendar_type == 'solar' %}checked{% endif %}>
                             <label for="solar">양력</label>
-                            <input type="radio" id="lunar" name="calendar_type" value="lunar">
+                            <input type="radio" id="lunar" name="calendar_type" value="lunar" {% if calendar_type == 'lunar' %}checked{% endif %}>
                             <label for="lunar">음력</label>
                             <span class="toggle-slider"></span>
                         </div>
@@ -162,15 +161,9 @@
 
                     <div class="date-inputs">
                         <label class="field-label" for="birth-input">생년월일 8자리</label>
-                        <input type="text" id="birth-input" name="birth-input" placeholder="1992.10.02" inputmode="numeric"
-                            pattern="[0-9.]*" maxlength="10" required aria-describedby="birth-error profile-date-note" data-clarity-mask="true" data-profile-date-input="full" data-profile-date-calendar="solar">
+                        <input type="text" id="birth-input" name="birth_date" placeholder="1992.10.02" inputmode="numeric"
+                            pattern="[0-9.]*" maxlength="10" required aria-describedby="birth-error" data-clarity-mask="true" data-profile-date-calendar="solar" value="{{ birth_date_display or '' }}">
                     </div>
-
-                    <div class="profile-date-control">
-                        <label for="profile-date-consent"><input type="checkbox" id="profile-date-consent"> <span>양력 생년월일을 이 기기에서 다음 계산에도 사용</span></label>
-                        <button type="button" class="btn btn-secondary" id="profile-date-clear">저장값 삭제</button>
-                    </div>
-                    <p class="input-help" id="profile-date-note">선택하면 양력 생년월일만 이 브라우저에 저장됩니다. 공용 기기에서는 사용하지 말고, 언제든 저장값을 삭제하세요.</p>
 
                     <p class="input-help">
                         음력 입력은 출생 당시의 음력 날짜를 양력 출생일로 환산해 만나이를 계산합니다.
@@ -179,13 +172,54 @@
                     </p>
 
                     <small id="birth-error" class="error-msg" aria-live="polite"></small>
+                    <button class="btn btn-primary" type="submit">계산하기</button>
                 </div>
             </form>
 
-            <div class="result-container" id="result-container" aria-live="polite" data-clarity-mask="true">
+            <div class="result-container{% if result %} show{% endif %}" id="result-container" aria-live="polite" data-clarity-mask="true" tabindex="-1">
                 <h2>계산 결과</h2>
                 <div id="result-content">
-                    <!-- 결과 내용이 JavaScript로 동적 생성됨 -->
+                    {% if result %}
+                        {% if result.success %}
+                        <div class="result success">
+                            <div class="age-result-primary">
+                                <p class="eyebrow">오늘 기준 만나이</p>
+                                <p class="age"><span class="age-number">만 {{ result.age }}세</span></p>
+                                <p class="message">{{ result.message }}</p>
+                            </div>
+                            <div class="age-result-summary" aria-label="만나이 관련 요약">
+                                <div class="age-result-summary-item">
+                                    <strong>다음 생일</strong>
+                                    <span>{{ result_details.next_birthday_text }}</span>
+                                </div>
+                                <div class="age-result-summary-item">
+                                    <strong>출생연도 기준</strong>
+                                    <span>{{ result_details.zodiac_text }}</span>
+                                </div>
+                            </div>
+                            <nav class="age-result-next" aria-label="계산 결과 관련 도구">
+                                <h4>이어서 확인하기</h4>
+                                <div class="age-result-links">
+                                    <a href="{{ url_for('birth_year_age_table', year=result_details.birth_year) }}"><strong>{{ result_details.birth_year }}년생 나이표</strong><span>연나이와 만나이 범위 보기</span></a>
+                                    <a href="{{ url_for('annual_age_calculator', birth_year=result_details.birth_year) }}"><strong>연나이 확인</strong><span>출생연도로 바로 계산</span></a>
+                                    <a href="{{ url_for('school_entry_year_table', year=result_details.birth_year) }}"><strong>입학년도 확인</strong><span>초·중·고 입학 시점 보기</span></a>
+                                    <a href="{{ url_for('birthday_dday_calculator') }}"><strong>생일 D-day</strong><span>생일까지 남은 날짜 계산</span></a>
+                                </div>
+                            </nav>
+                            <details class="share-section">
+                                <summary>결과 공유하기</summary>
+                                <div class="share-tools">
+                                    <button class="link-copy-btn btn btn-secondary" type="button">링크 복사</button>
+                                    <button class="image-save-btn btn btn-secondary" type="button">이미지로 저장</button>
+                                </div>
+                            </details>
+                        </div>
+                        {% else %}
+                        <div class="result error">
+                            <p class="message">{{ result.message }}</p>
+                        </div>
+                        {% endif %}
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -196,7 +230,7 @@
             <h3>사용법</h3>
             <ul>
                 <li>생년월일을 입력하세요</li>
-                <li>입력이 완료되면 자동으로 나이가 계산됩니다</li>
+                <li>생년월일을 입력한 뒤 계산하기를 누르세요</li>
                 <li>정확한 만나이가 표시됩니다</li>
             </ul>
         </div>
@@ -375,7 +409,7 @@
             <p>A. 네, 반응형으로 동작하며 주요 모바일 브라우저를 지원합니다.</p>
 
             <h3>Q. 잘못 입력했을 때 어떻게 하나요?</h3>
-            <p>A. 입력값을 수정하면 즉시 재계산됩니다. 비정상 날짜는 오류 안내가 표시됩니다.</p>
+            <p>A. 입력값을 수정하면 오류 여부를 바로 확인할 수 있습니다. 수정한 뒤 계산하기를 누르세요.</p>
         </section>
 
         <section aria-labelledby="notice">
@@ -392,7 +426,6 @@
         </section>
 
 
-        {% include 'partials/page-feedback.html' with context %}
         </div>
 
         <!-- 푸터 -->
@@ -415,7 +448,6 @@
     </button>
 
     <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/page-feedback.js') }}" defer></script>
 </body>
 
 </html>

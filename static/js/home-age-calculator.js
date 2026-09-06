@@ -3,6 +3,14 @@
 
   var INVALID_DATE_MESSAGE = "올바른 생년월일을 입력하세요.";
 
+  function normalizeBirthDate(value) {
+    var digits = String(value || "").replace(/\D/g, "");
+    if (!/^\d{8}$/.test(digits)) {
+      return "";
+    }
+    return digits.slice(0, 4) + "-" + digits.slice(4, 6) + "-" + digits.slice(6, 8);
+  }
+
   function parseIsoDate(value) {
     var match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value || "");
     if (!match) {
@@ -55,7 +63,7 @@
   }
 
   function calculateSolarAge(birthIso, todayIso) {
-    var birth = parseIsoDate(birthIso);
+    var birth = parseIsoDate(normalizeBirthDate(birthIso));
     var today = parseIsoDate(todayIso);
 
     if (!birth || !today || birth > today) {
@@ -91,6 +99,10 @@
     if (!input || !error || !result || !ageValue || !todayIso) {
       return;
     }
+
+    input.addEventListener("input", function () {
+      input.value = input.value.replace(/\D/g, "").slice(0, 8);
+    });
 
     form.addEventListener("submit", function (event) {
       event.preventDefault();

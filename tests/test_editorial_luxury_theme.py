@@ -131,7 +131,7 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
     def test_representative_public_pages_load_final_theme(self):
         for path in ("/", "/age", "/about", "/references"):
             with self.subTest(path=path):
-                response = self.client.get(path)
+                response = self.client.get(path, follow_redirects=True)
                 self.assertEqual(200, response.status_code)
                 self.assertIn("css/editorial-luxury.css", response.get_data(as_text=True))
 
@@ -151,6 +151,69 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
                 self.assertIn("editorial-calculator-shell", html)
                 self.assertIn("css/editorial-luxury.css", html)
 
+    def test_calculator_flat_layout_prioritizes_form_without_flattening_inner_cards(self):
+        css = Path("static/css/editorial-luxury.css").read_text()
+        self.assertIn("body.calculator-flat-page .container > *", css)
+        self.assertIn("body.calculator-flat-page .calculator-page-heading.hero-band", css)
+        self.assertIn("body.calculator-flat-page .container > .editorial-calculator-shell", css)
+        self.assertIn("body.calculator-flat-page .container > .section-shell.direct-answer", css)
+        self.assertIn("body.calculator-flat-page .editorial-supporting-content .info", css)
+        self.assertRegex(
+            css,
+            r"body\.calculator-flat-page \.section-shell,\nbody\.calculator-flat-page \.age-form,\nbody\.calculator-flat-page \.result-container\.show[\s\S]*?\{[\s\S]*?border:\s*0;[\s\S]*?background:\s*transparent;[\s\S]*?box-shadow:\s*none;",
+        )
+        self.assertIn("body.calculator-flat-page .section-card-grid", css)
+        self.assertIn("body.calculator-flat-page .section-card:not(.birth-year-summary)", css)
+        self.assertIn("body.calculator-flat-page .container > .section-shell.direct-answer", css)
+        self.assertIn("background: transparent;", css)
+        self.assertIn("border: 0;", css)
+        self.assertIn("box-shadow: none;", css)
+        self.assertIn("@media (max-width: 760px)", css)
+
+    def test_all_public_and_game_styles_use_the_body_font_except_brand_word(self):
+        css_files = tuple(Path("static/css").glob("*.css"))
+        for css_file in css_files:
+            with self.subTest(css_file=css_file):
+                css = self._css_without_comments(css_file.read_text())
+                for selectors, body in self._ordinary_css_rules(css):
+                    if (
+                        "font-family:" not in body
+                        or any(".brand-word" in selector for selector in selectors)
+                        or any(selector.lstrip().startswith("@") for selector in selectors)
+                        or "src:" in body
+                    ):
+                        continue
+                    font_families = re.findall(r"font-family:\s*([^;]+);", body)
+                    self.assertEqual(
+                        ["var(--site-font)"] * len(font_families),
+                        [font_family.strip() for font_family in font_families],
+                        "Only .brand-word may use --lux-brand.",
+                    )
+
+    def test_public_heading_scale_is_compact_without_changing_games(self):
+        css = Path("static/css/editorial-luxury.css").read_text()
+        compact_selector = (
+            r"body"
+        )
+        for heading, expected in {
+            "h1": "clamp(2.1rem, 4vw, 4.2rem)",
+            "h2": "clamp(1.35rem, 2.2vw, 2.1rem)",
+            "h3": "clamp(1rem, 1.5vw, 1.25rem)",
+            "h4": "clamp(.95rem, 1.2vw, 1.05rem)",
+        }.items():
+            self.assertRegex(
+                css,
+                rf"{compact_selector}\s+{heading}\s*\{{[^}}]*font-size:\s*{re.escape(expected)}\s*!important;",
+            )
+
+    def test_heading_tags_do_not_have_max_width_constraints(self):
+        for css_path in (Path("static/css/style.css"), Path("static/css/editorial-luxury.css")):
+            css = self._css_without_comments(css_path.read_text())
+            for selectors, body in self._ordinary_css_rules(css):
+                for selector in selectors:
+                    if re.search(r"(?:^|[ >+~])h[1-6](?::[\w-]+)?$", selector.strip()):
+                        self.assertNotIn("max-width", body, selector)
+
     def test_content_templates_load_theme_and_keep_readable_prose_hook(self):
         for template_name in ("blog-list.html", "blog-detail.html", "guide.html", "guide-detail.html"):
             source = Path("templates", template_name).read_text()
@@ -166,7 +229,207 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
         css = Path("static/css/editorial-luxury.css").read_text()
         self.assertRegex(css, r"\.data-table-wrap\s+thead\s+th[\s\S]*position:\s*sticky;")
         self.assertRegex(css, r"\.section-shell\.direct-answer\s*\~\s*section:not\(\[class\]\)[\s\S]*max-width:\s*65ch;")
-        self.assertRegex(css, r"body\.life-hub-page\s+\.life-hub-hero[\s\S]*grid-template-columns:\s*minmax\(0,\s*1\.1fr\)\s+minmax\(280px,\s*\.75fr\);")
+        self.assertNotIn("life-hub-hero", css)
+
+    def test_non_home_heroes_are_flat_and_header_has_no_active_style(self):
+        theme_css = Path("static/css/editorial-luxury.css").read_text()
+        base_css = Path("static/css/style.css").read_text()
+
+        self.assertRegex(
+            theme_css,
+            r"body:not\(\.home-page\)\s+\.hero-band\s*\{[^}]*border:\s*0;[^}]*border-radius:\s*0;",
+        )
+        self.assertNotIn(".hub-nav-direct.is-active", theme_css)
+        self.assertNotIn(".hub-nav-direct.is-active", base_css)
+
+    def test_all_heroes_share_the_body_canvas_without_shadows(self):
+        theme_css = Path("static/css/editorial-luxury.css").read_text()
+        hero_selector = "body .hero-band"
+
+        hero_rules = self._css_rule_bodies(theme_css, hero_selector)
+        self.assertIn("border: 0;", hero_rules)
+        self.assertIn("border-radius: 0;", hero_rules)
+        self.assertIn("background: transparent;", hero_rules)
+        self.assertIn("box-shadow: none;", hero_rules)
+        self.assertNotIn("body .hero-band::after", theme_css)
+
+    def test_public_sections_use_a_flat_canvas_with_editorial_dividers(self):
+        theme_css = Path("static/css/editorial-luxury.css").read_text()
+        public_selector = "body"
+
+        section_shell_rules = self._css_rule_bodies(theme_css, f"{public_selector} .section-shell")
+        self.assertIn("border: 0 !important;", section_shell_rules)
+        self.assertIn("border-top: 1px solid var(--lux-border-strong) !important;", section_shell_rules)
+        self.assertIn("border-radius: 0 !important;", section_shell_rules)
+        self.assertNotIn("background: transparent !important;", section_shell_rules)
+        self.assertIn("box-shadow: none !important;", section_shell_rules)
+
+        for selector in (".info", ".related-paths"):
+            with self.subTest(selector=selector):
+                rules = self._css_rule_bodies(theme_css, f"{public_selector} {selector}")
+                self.assertIn("border: 0;", rules)
+                self.assertIn("border-radius: 0;", rules)
+                self.assertNotIn("background: transparent;", rules)
+                self.assertIn("box-shadow: none;", rules)
+
+        footer_rules = self._css_rule_bodies(theme_css, f"{public_selector} .footer")
+        self.assertIn("border: 0;", footer_rules)
+        self.assertIn("border-radius: 0;", footer_rules)
+        self.assertIn("background: transparent;", footer_rules)
+        self.assertIn("box-shadow: none;", footer_rules)
+
+    def test_full_bleed_footer_clips_viewport_unit_scrollbar_overflow(self):
+        css = Path("static/css/editorial-luxury.css").read_text()
+
+        html_rules = self._css_rule_bodies(css, "html")
+        self.assertIn("overflow-x: clip;", html_rules)
+
+    def test_home_editorial_hero_title_has_no_character_width_cap(self):
+        theme_css = Path("static/css/editorial-luxury.css").read_text()
+        title_rules = self._css_rule_bodies(theme_css, ".home-page .editorial-hero-copy h1")
+        self.assertNotIn("max-width:", title_rules)
+
+    def test_hub_tool_list_uses_the_life_hub_link_list_structure(self):
+        source = Path("templates/hub-detail.html").read_text()
+        tool_list = source.split('aria-labelledby="hub-tools-title"', 1)[1].split("</section>", 1)[0]
+        self.assertIn('class="life-hub-link-list hub-tool-link-list"', tool_list)
+        self.assertNotIn("hub-card calendar-card", tool_list)
+
+        theme_css = Path("static/css/editorial-luxury.css").read_text()
+        self.assertRegex(
+            theme_css,
+            r"body \.life-hub-link-list\s*\{[^}]*gap:\s*\.75rem;[^}]*border:\s*0;",
+        )
+        self.assertRegex(
+            theme_css,
+            r"body \.life-hub-link-list a\s*\{[^}]*border:\s*1px solid var\(--lux-border\);[^}]*border-radius:\s*10px;",
+        )
+        self.assertNotIn("border-right: 1px solid var(--lux-border);", theme_css.split("body.home-page .home-life-hub-card", 1)[1].split("}", 1)[0])
+
+    def test_home_life_hubs_use_editorial_dividers_instead_of_cards(self):
+        theme_css = Path("static/css/editorial-luxury.css").read_text()
+        grid_rules = self._css_rule_bodies(theme_css, "body.home-page .home-life-hub-grid")
+        card_rules = self._css_rule_bodies(theme_css, "body.home-page .home-life-hub-card")
+        article_rules = self._css_rule_bodies(theme_css, "body.home-page .home-life-hub-card article")
+
+        self.assertIn("border: 0;", grid_rules)
+        self.assertNotIn("border-right: 1px solid var(--lux-border);", card_rules)
+        self.assertIn("background: transparent !important;", card_rules)
+        self.assertIn("box-shadow: none !important;", card_rules)
+        self.assertIn("transform: none !important;", card_rules)
+        self.assertIn("border: 1px solid rgba(166, 139, 97, .42) !important;", article_rules)
+        self.assertIn("background: var(--lux-surface) !important;", article_rules)
+        self.assertIn("box-shadow: 0 16px 36px rgba(36, 29, 24, .10) !important;", article_rules)
+        self.assertNotIn("body.home-page .life-hub-link-list a", theme_css)
+
+        self.assertRegex(
+            theme_css,
+            r"@media\s*\(max-width:\s*760px\)\s*\{[\s\S]*?body\.home-page\s+\.home-life-hub-grid\s*\{[^}]*grid-template-columns:\s*1fr;",
+        )
+
+    def test_all_public_hero_surfaces_and_decorations_are_flat(self):
+        theme_css = Path("static/css/editorial-luxury.css").read_text()
+        public_selector = "body"
+        hero_rules = self._css_rule_bodies(
+            theme_css,
+            f"{public_selector} :is(.hero-band, [class*=\"-hero\"])",
+        )
+        self.assertIn("background: transparent !important;", hero_rules)
+        self.assertIn("box-shadow: none !important;", hero_rules)
+        decoration_rules = self._css_rule_bodies(
+            theme_css,
+            f"{public_selector} [class*=\"-hero\"]::before",
+        )
+        self.assertIn("background: none !important;", decoration_rules)
+        self.assertIn("box-shadow: none !important;", decoration_rules)
+
+    def test_header_category_links_do_not_change_on_hover(self):
+        theme_css = Path("static/css/editorial-luxury.css").read_text()
+        base_css = Path("static/css/style.css").read_text()
+
+        self.assertNotIn(".hub-nav-direct:hover", theme_css)
+        self.assertNotIn(".hub-nav-direct:hover", base_css)
+        self.assertIn(":focus-visible", theme_css)
+
+    def test_mobile_menu_toggle_stays_flat_when_interacted_with(self):
+        theme_css = Path("static/css/editorial-luxury.css").read_text()
+
+        self.assertRegex(
+            theme_css,
+            r"body \.menu-toggle,\s*body \.menu-toggle:hover,\s*body \.menu-toggle:focus-visible\s*\{[^}]*"
+            r"border:\s*0;[^}]*background:\s*transparent;[^}]*transform:\s*none;",
+        )
+
+    def test_navigation_panels_have_no_border_or_radius(self):
+        theme_css = Path("static/css/editorial-luxury.css").read_text()
+        panel_rules = self._css_rule_bodies(theme_css, "body .mega-menu-panel,\nbody .mobile-nav-panel")
+        self.assertIn("border: 0;", panel_rules)
+        self.assertIn("border-radius: 0;", panel_rules)
+
+    def test_home_hero_and_header_use_a_single_unstacked_surface(self):
+        theme_css = Path("static/css/editorial-luxury.css").read_text()
+        base_css = Path("static/css/style.css").read_text()
+        header_selector = "body .site-header"
+
+        self.assertRegex(
+            theme_css,
+            r"\.home-page\s+\.editorial-hero\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\);[^}]*align-items:\s*start;",
+        )
+        self.assertRegex(
+            theme_css,
+            r"\.home-page\s+\.editorial-hero\s+\.editorial-panel-shell\s*\{[^}]*justify-self:\s*stretch;[^}]*transform:\s*none;",
+        )
+        self.assertRegex(
+            theme_css,
+            r"\.editorial-panel-shell::before,[\s\S]*?\.editorial-panel-shell::after\s*\{[^}]*display:\s*none;",
+        )
+        self.assertNotRegex(base_css, r"\.calendar-card-1\s*\{[^}]*transform:")
+        header_rules = self._css_rule_bodies(theme_css, header_selector)
+        self.assertIn("border: 0;", header_rules)
+        self.assertIn("border-bottom: 1px solid var(--lux-border);", header_rules)
+        self.assertIn("border-radius: 0;", header_rules)
+        self.assertIn("display: none;", self._css_rule_bodies(theme_css, f"{header_selector}::before"))
+        self.assertNotRegex(
+            theme_css,
+            rf"{re.escape(header_selector)}\s*\{{[^}}]*border-radius:\s*16px;",
+        )
+
+    def test_home_title_and_calculator_panel_use_a_wider_flat_surface(self):
+        theme_css = Path("static/css/editorial-luxury.css").read_text()
+        title_rules = self._css_rule_bodies(theme_css, ".home-page .editorial-hero-copy h1")
+        shell_rules = self._css_rule_bodies(theme_css, ".home-page .editorial-hero .editorial-panel-shell")
+        core_rules = self._css_rule_bodies(theme_css, ".home-page .editorial-hero .editorial-panel-core")
+
+        self.assertIn("font-size: clamp(2.9rem, 4.7vw, 5.4rem);", title_rules)
+        self.assertIn("width: 100%;", shell_rules)
+        self.assertIn("padding: 0;", shell_rules)
+        self.assertNotIn("border: 1px solid rgba(166, 139, 97, .42);", shell_rules)
+        self.assertIn("border-radius: 0;", shell_rules)
+        self.assertIn("background: transparent;", shell_rules)
+        self.assertIn("box-shadow: none;", shell_rules)
+        self.assertIn("border: 0;", core_rules)
+        self.assertIn("border-radius: var(--lux-radius-core);", core_rules)
+        self.assertIn("box-shadow: none;", core_rules)
+
+    def test_home_prioritizes_life_paths_and_aligns_hub_actions(self):
+        source = Path("templates/index.html").read_text()
+        self.assertLess(source.index('class="section-shell home-life-hubs"'), source.index('class="section-shell home-quick-tools"'))
+        self.assertEqual(4, self.client.get("/").get_data(as_text=True).count("계산하러 가기"))
+        self.assertNotIn("허브 보기", source)
+
+        theme_css = Path("static/css/editorial-luxury.css").read_text()
+        card_rules = self._css_rule_bodies(theme_css, "body.home-page .home-life-hub-card article")
+        button_rules = self._css_rule_bodies(theme_css, "body.home-page #home-age-form .btn-primary")
+        self.assertIn("grid-template-rows: auto auto auto 1fr auto;", card_rules)
+        self.assertIn("background: var(--lux-gold);", button_rules)
+        self.assertIn("border-color: var(--lux-gold);", button_rules)
+        self.assertIn("color: var(--lux-espresso);", button_rules)
+
+    def test_home_quick_reference_uses_the_life_hub_link_list(self):
+        source = Path("templates/index.html").read_text()
+        quick_tools = source.split('class="section-shell home-quick-tools"', 1)[1].split("</section>", 1)[0]
+        self.assertIn('class="life-hub-link-list"', quick_tools)
+        self.assertNotIn('class="home-quick-links"', quick_tools)
 
     def test_theme_defines_approved_tokens_and_reduced_motion(self):
         css = Path("static/css/editorial-luxury.css").read_text()
@@ -249,8 +512,12 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
         self.assertIn('id="home-age-form"', html)
         self.assertIn('data-today="', html)
         self.assertIn('id="home-birth-input"', html)
-        self.assertIn('type="date"', html)
-        self.assertIn('aria-describedby="home-birth-help home-birth-error"', html)
+        self.assertRegex(
+            html,
+            r'<input id="home-birth-input" type="text" placeholder="19921002" inputmode="numeric" pattern="\[0-9\]\*" maxlength="8"',
+        )
+        self.assertIn('aria-describedby="home-birth-error"', html)
+        self.assertNotIn("입력한 날짜는 저장하지 않습니다.", html)
         self.assertIn('id="home-birth-error" role="alert"', html)
         self.assertIn('id="home-age-result"', html)
         self.assertIn('id="home-age-value"', html)
@@ -269,7 +536,7 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
 
     def test_theme_has_touch_target_and_mobile_overflow_guards(self):
         css = Path("static/css/editorial-luxury.css").read_text()
-        public_body_selector = 'body:not(.games-hub-page):not(.snake-page):not([class$="-game-page"])'
+        public_body_selector = "body"
         self.assertRegex(css, r"min-height:\s*44px")
         self.assertNotIn("overflow-wrap", self._css_rule_body_for_exact_selector(css, public_body_selector))
 
@@ -344,6 +611,7 @@ global.document = { addEventListener() {} };
 const { calculateSolarAge } = require('./static/js/home-age-calculator.js');
 assert.deepStrictEqual(calculateSolarAge('1992-10-02', '2026-10-01').age, 33);
 assert.deepStrictEqual(calculateSolarAge('1992-10-02', '2026-10-02').age, 34);
+assert.deepStrictEqual(calculateSolarAge('19921002', '2026-10-02').age, 34);
 assert.strictEqual(calculateSolarAge('1992-10-02', '2026-10-01').daysToBirthday, 1);
 assert.strictEqual(calculateSolarAge('1992-10-02', '2026-10-02').daysToBirthday, 0);
 assert.strictEqual(calculateSolarAge('2000-02-29', '2026-02-28').daysToBirthday, 731);
@@ -355,13 +623,11 @@ assert.strictEqual(calculateSolarAge('2024-02-30', '2026-08-28').ok, false);
         result = subprocess.run(["node", "-e", program], capture_output=True, text=True)
         self.assertEqual(0, result.returncode, result.stderr)
 
-    def test_archived_games_stay_reachable_but_hidden(self):
+    def test_removed_game_routes_are_not_reachable(self):
         for path in ("/minigames", "/minigames/guess", "/minigames/snake"):
             with self.subTest(path=path):
-                response = self.client.get(path)
-                self.assertEqual(200, response.status_code)
-                self.assertEqual("noindex, nofollow", response.headers["X-Robots-Tag"])
-                self.assertNotIn("css/editorial-luxury.css", response.get_data(as_text=True))
+                response = self.client.get(path, follow_redirects=True)
+                self.assertEqual(404, response.status_code)
 
     def test_public_navigation_has_no_minigame_discovery_link(self):
         for path in ("/", "/age", "/about"):

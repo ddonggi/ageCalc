@@ -58,8 +58,7 @@
                     </div>
 
                     <label for="home-birth-input">생년월일</label>
-                    <input id="home-birth-input" type="date" required aria-describedby="home-birth-help home-birth-error">
-                    <p id="home-birth-help">입력한 날짜는 저장하지 않습니다.</p>
+                    <input id="home-birth-input" type="text" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" required autocomplete="bday" aria-describedby="home-birth-error">
                     <p id="home-birth-error" role="alert"></p>
 
                     <button class="btn btn-primary" type="submit">계산하기</button>
@@ -84,23 +83,10 @@
         {% include 'partials/info_coupang_promotions.html' %}
         {% include 'partials/home_coupang_rails.html' %}
 
-        <section class="section-shell home-quick-tools">
-            <div class="section-heading">
-                <p class="eyebrow">Quick Reference</p>
-                <h2>빠른 표·기준 찾기</h2>
-                <p class="section-intro">날짜를 입력하지 않고 출생연도와 입학 시점, 띠 기준을 바로 확인하세요.</p>
-            </div>
-            <nav class="home-quick-links" aria-label="빠른 표와 기준 찾기">
-                <a href="{{ url_for('birth_year_age_table') }}"><strong>출생연도 나이표</strong><span>몇 년생인지로 현재 나이 확인</span></a>
-                <a href="{{ url_for('school_entry_year_table') }}"><strong>입학년도 계산</strong><span>초·중·고 입학 시점 확인</span></a>
-                <a href="{{ url_for('birth_year_zodiac_table') }}"><strong>띠 나이표</strong><span>출생연도별 띠 확인</span></a>
-            </nav>
-        </section>
-
         <section class="section-shell home-life-hubs" aria-labelledby="home-life-hubs-title">
             <div class="section-heading">
                 <p class="eyebrow">Life Paths</p>
-                <h2 id="home-life-hubs-title">8개의 생활 영역</h2>
+                <h2 id="home-life-hubs-title">4개의 생활 영역</h2>
                 <p class="section-intro">계산 결과를 가족, 학교, 기념일, 건강과 앞으로의 생애 시점으로 연결합니다.</p>
             </div>
             <div class="home-life-hub-grid">
@@ -111,11 +97,24 @@
                         <p class="eyebrow">{{ hub.eyebrow }}</p>
                         <h3>{{ hub.title }}</h3>
                         <p>{{ hub.description }}</p>
-                        <span class="home-life-hub-action">허브 보기 <b aria-hidden="true">↗</b></span>
+                        <span class="home-life-hub-action">계산하러 가기 <b aria-hidden="true">↗</b></span>
                     </article>
                 </a>
                 {% endfor %}
             </div>
+        </section>
+
+        <section class="section-shell home-quick-tools">
+            <div class="section-heading">
+                <p class="eyebrow">Quick Reference</p>
+                <h2>빠른 표·기준 찾기</h2>
+                <p class="section-intro">날짜를 입력하지 않고 출생연도와 입학 시점, 띠 기준을 바로 확인하세요.</p>
+            </div>
+            <nav class="life-hub-link-list" aria-label="빠른 표와 기준 찾기">
+                <a href="{{ url_for('birth_year_age_table') }}"><strong>출생연도 나이표</strong><span>몇 년생인지로 현재 나이 확인</span></a>
+                <a href="{{ url_for('school_entry_year_table') }}"><strong>입학년도 계산</strong><span>초·중·고 입학 시점 확인</span></a>
+                <a href="{{ url_for('birth_year_zodiac_table') }}"><strong>띠 나이표</strong><span>출생연도별 띠 확인</span></a>
+            </nav>
         </section>
 
         <section class="section-shell home-method-note direct-answer">

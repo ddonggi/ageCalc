@@ -44,6 +44,8 @@ Thumbs.db
 
 # Runtime data
 data/
+_data/*
+!_data/README.md
 static/generated/
 .worktrees/
 

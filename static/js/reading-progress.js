@@ -30,7 +30,10 @@
     const init = (browserWindow, browserDocument) => {
         const progress = browserDocument.querySelector('[data-reading-progress]');
         const fill = browserDocument.querySelector('[data-reading-progress-fill]');
-        const article = browserDocument.querySelector('[data-reading-progress-target]');
+        const article = browserDocument.querySelector('[data-reading-progress-target]')
+            || browserDocument.querySelector('main')
+            || browserDocument.querySelector('.container')
+            || browserDocument.body;
         if (!progress || !fill || !article) return;
 
         const sent = new Set();
@@ -58,7 +61,7 @@
             newMilestones(percentage, sent).forEach((milestone) => {
                 const tracked = browserWindow.AgeCalcTracking?.trackEvent?.('reading_progress', {
                     percent: milestone,
-                    content_type: article.dataset.contentType,
+                    content_type: article.dataset.contentType || 'page',
                     page_path: browserWindow.location.pathname,
                 });
                 if (tracked) sent.add(milestone);
