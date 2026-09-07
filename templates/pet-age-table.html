@@ -81,7 +81,7 @@
         <section class="section-shell">
             <div class="section-heading">
                 <h2 id="pet-age-search">반려동물 선택</h2>
-                <p class="section-intro">종류와 나이를 고르면 해당 반려동물의 사람 나이 환산을 바로 요약해 보여드립니다.</p>
+                <p class="section-intro">종류와 나이를 고르면 사람 나이 환산값을 바로 보여드립니다.</p>
             </div>
             <form class="age-form birth-year-form" method="get" action="{{ url_for('pet_age_table') }}">
                 <div class="form-group">
@@ -144,7 +144,7 @@
         <section class="section-shell">
             <div class="section-heading">
                 <h2>예시로 보는 반려동물 나이</h2>
-                <p class="section-intro">자주 찾는 나이를 예시로 먼저 정리했습니다.</p>
+                <p class="section-intro">자주 찾는 나이의 환산 예시를 모았습니다.</p>
             </div>
             <div class="section-card-grid">
                 {% for example in examples %}

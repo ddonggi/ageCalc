@@ -46,7 +46,7 @@
                 <p class="eyebrow">Age calculator & life dates</p>
                 <h1 id="home-title">오늘 기준 나이를 바로 계산하세요</h1>
                 <p class="page-intro">
-                    생년월일부터 중요한 생활 시점까지 차분하게 확인하세요.
+                    생년월일로 현재 나이와 생활에 필요한 날짜를 확인하세요.
                 </p>
             </div>
 
@@ -70,7 +70,7 @@
                         </div>
                         <div class="home-age-result-card" id="home-grade-result">
                             <span>학년</span>
-                            <a href="{{ url_for('school_grade_calculator') }}">학년 계산</a>
+                            <a id="home-grade-link" data-calculator-url="{{ url_for('school_grade_calculator') }}" href="{{ url_for('school_grade_calculator') }}">학년 계산</a>
                         </div>
                         <div class="home-age-result-card" id="home-birthday-result">
                             <span>생일 D-day</span>
@@ -87,7 +87,7 @@
             <div class="section-heading">
                 <p class="eyebrow">Life Paths</p>
                 <h2 id="home-life-hubs-title">4개의 생활 영역</h2>
-                <p class="section-intro">계산 결과를 가족, 학교, 기념일, 건강과 앞으로의 생애 시점으로 연결합니다.</p>
+                <p class="section-intro">나이, 학교, 기념일, 반려동물 관련 계산을 한곳에서 찾아보세요.</p>
             </div>
             <div class="home-life-hub-grid">
                 {% for hub in life_hubs %}
@@ -108,10 +108,10 @@
             <div class="section-heading">
                 <p class="eyebrow">Quick Reference</p>
                 <h2>빠른 표·기준 찾기</h2>
-                <p class="section-intro">날짜를 입력하지 않고 출생연도와 입학 시점, 띠 기준을 바로 확인하세요.</p>
+                <p class="section-intro">날짜 입력 없이 출생연도, 입학 시점, 띠를 바로 확인하세요.</p>
             </div>
             <nav class="life-hub-link-list" aria-label="빠른 표와 기준 찾기">
-                <a href="{{ url_for('birth_year_age_table') }}"><strong>출생연도 나이표</strong><span>몇 년생인지로 현재 나이 확인</span></a>
+                <a href="{{ url_for('birth_year_age_table') }}"><strong>출생연도 나이표</strong><span>출생연도별 현재 나이 확인</span></a>
                 <a href="{{ url_for('school_entry_year_table') }}"><strong>입학년도 계산</strong><span>초·중·고 입학 시점 확인</span></a>
                 <a href="{{ url_for('birth_year_zodiac_table') }}"><strong>띠 나이표</strong><span>출생연도별 띠 확인</span></a>
             </nav>

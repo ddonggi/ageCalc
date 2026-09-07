@@ -46,7 +46,7 @@
                 {% for link in hub.tool_links %}
                 <a href="{{ url_for(link.endpoint) }}">
                     <strong>{{ link.label }}</strong>
-                    <span>{{ link.summary }} 자세히 보기</span>
+                    <span>{{ link.summary }}</span>
                 </a>
                 {% endfor %}
             </div>

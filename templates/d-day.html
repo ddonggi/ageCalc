@@ -93,7 +93,7 @@
                 <h3>기준 날짜</h3>
                 <div class="date-inputs">
                     <label class="field-label" for="dday-date">기준 날짜</label>
-                    <input type="text" id="dday-date" name="date" value="{{ dday_values.date }}" placeholder="2026.12.25" inputmode="numeric" pattern="[0-9.]*" maxlength="10" required aria-label="기준 날짜 8자리" aria-describedby="dday-error">
+                    <input type="text" id="dday-date" name="date" value="{{ dday_values.date }}" placeholder="20261225" inputmode="numeric" pattern="[0-9]*" maxlength="8" required aria-label="기준 날짜 8자리" aria-describedby="dday-error">
                 </div>
                 <small id="dday-error" class="error-msg" aria-live="polite"></small>
                 <button class="btn btn-primary" type="submit">계산하기</button>
@@ -161,7 +161,7 @@
 
         <section class="section-shell">
             <div class="section-heading">
-                <h2>D-day 결과 다음에 할 일</h2>
+                <h2>D-day를 계산한 뒤 함께 볼 내용</h2>
                 <p class="section-intro">첫날을 포함하는 기념일인지, 매년 반복되는 생일인지에 따라 전용 계산기를 선택하세요.</p>
             </div>
             <div class="footer-links">

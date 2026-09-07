@@ -27,9 +27,9 @@ assert.strictEqual(rules.calculateCompletedMonths('2025-01-31', '2025-02-28'), 1
 assert.strictEqual(rules.calculateCompletedMonths('2024-02-29', '2025-02-28'), 12);
 assert.strictEqual(rules.calculateCompletedMonths('2025-06-15', '2026-02-14'), 7);
 assert.strictEqual(rules.calculateCompletedMonths('2025-06-15', '2026-02-15'), 8);
-assert.strictEqual(rules.formatDateDigits('19921002'), '1992.10.02');
-assert.strictEqual(rules.formatDateDigits('1992-10-0'), '1992.10.0');
-assert.strictEqual(rules.formatMonthDayDigits('0510'), '05.10');
+assert.strictEqual(rules.formatDateDigits('19921002'), '19921002');
+assert.strictEqual(rules.formatDateDigits('1992-10-0'), '1992100');
+assert.strictEqual(rules.formatMonthDayDigits('0510'), '0510');
 assert.strictEqual(rules.formatIsoDate(rules.parseDateDigits('20260228')), '2026-02-28');
 assert.deepStrictEqual(rules.parseMonthDayDigits('0229'), { month: 2, day: 29 });
 assert.throws(() => rules.parseDateDigits('20260230'), /valid/);
@@ -100,7 +100,7 @@ class BirthDatePrivacyTests(unittest.TestCase):
         self.assertEqual(age_response.headers["Cache-Control"], "no-store")
         self.assertIn('action="/age#result-container" method="get"', age_html)
         self.assertIn('name="birth_date"', age_html)
-        self.assertIn('value="1992.10.02"', age_html)
+        self.assertIn('value="19921002"', age_html)
         self.assertIn('id="result-container"', age_html)
         self.assertIn('만 33세', age_html)
         self.assertIn('class="age-result-summary"', age_html)
@@ -190,9 +190,9 @@ assert.strictEqual(replaceCalls, 0, '결과 URL의 계산 파라미터를 지우
         age_html = self.client.get("/age").get_data(as_text=True)
         baby_html = self.client.get("/baby-months").get_data(as_text=True)
         family_js = Path("static/js/parent-child.js").read_text(encoding="utf-8")
-        self.assertIn('maxlength="10"', age_html)
-        self.assertIn('maxlength="10"', baby_html)
-        self.assertIn('maxlength="10"', family_js)
+        self.assertIn('maxlength="8"', age_html)
+        self.assertIn('maxlength="8"', baby_html)
+        self.assertIn('maxlength="8"', family_js)
         self.assertNotIn('maxlength="6"', age_html)
         self.assertNotIn('maxlength="6"', baby_html)
 

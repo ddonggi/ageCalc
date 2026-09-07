@@ -138,7 +138,7 @@ class ParentChildCalculator {
                 </div>
                 <div class="date-inputs">
                     <label class="field-label" for="birth-${item.id}">${selectedLabel} 생년월일 8자리</label>
-                    <input type="text" id="birth-${item.id}" data-kind="${kind}" data-id="${item.id}" data-field="birth" placeholder="1992.10.02" inputmode="numeric" pattern="[0-9.]*" maxlength="10" value="${AgeCalcDateRules.formatDateDigits(item.birth || '')}" aria-describedby="parent-child-error" data-clarity-mask="true">
+                    <input type="text" id="birth-${item.id}" data-kind="${kind}" data-id="${item.id}" data-field="birth" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" value="${AgeCalcDateRules.formatDateDigits(item.birth || '')}" aria-describedby="parent-child-error" data-clarity-mask="true">
                 </div>
                 <button type="button" class="line-remove" title="삭제">-</button>
             `;

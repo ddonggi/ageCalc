@@ -52,7 +52,7 @@
         <section class="section-shell direct-answer" aria-label="강아지 나이 환산 바로 답변">
             <div class="section-heading">
                 <p class="eyebrow">바로 답변</p>
-                <h2>강아지 사람 나이 환산값은 체형별 연령표를 적용한 참고 수치입니다</h2>
+                <h2>강아지 사람 나이 환산값은 체형별 연령표를 바탕으로 한 참고값입니다.</h2>
             </div>
             <p>
                 첫 1~2년의 빠른 성장과 이후 소형견·중형견·대형견·초대형견의 환산 차이를 반영합니다.
@@ -159,7 +159,7 @@
                 </p>
                 <div class="pet-input-panel" data-pet-panel="birth-date">
                     <label class="field-label" for="pet-birth-date">생년월일 8자리</label>
-                    <input type="text" id="pet-birth-date" name="birth_date" value="{{ pet_values.birth_date }}" placeholder="2021.05.10" inputmode="numeric" pattern="[0-9.]*" maxlength="10" aria-describedby="pet-error">
+                    <input type="text" id="pet-birth-date" name="birth_date" value="{{ pet_values.birth_date }}" placeholder="20210510" inputmode="numeric" pattern="[0-9]*" maxlength="8" aria-describedby="pet-error">
                 </div>
                 <div class="pet-input-panel date-inputs" data-pet-panel="known-age" hidden>
                     <label class="field-label" for="pet-years">현재 나이</label>
@@ -168,7 +168,7 @@
                 </div>
                 <div class="pet-input-panel" data-pet-panel="adoption-date" hidden>
                     <label class="field-label" for="pet-adoption-date">데려온 날 8자리</label>
-                    <input type="text" id="pet-adoption-date" name="adoption_date" value="{{ pet_values.adoption_date }}" placeholder="2024.03.01" inputmode="numeric" pattern="[0-9.]*" maxlength="10" aria-describedby="pet-error">
+                    <input type="text" id="pet-adoption-date" name="adoption_date" value="{{ pet_values.adoption_date }}" placeholder="20240301" inputmode="numeric" pattern="[0-9]*" maxlength="8" aria-describedby="pet-error">
                     <p class="input-help">실제 나이가 아니라 오늘까지 함께한 기간을 계산합니다.</p>
                 </div>
                 <small id="pet-error" class="error-msg" aria-live="polite"></small>
@@ -230,7 +230,7 @@
 
         <section class="section-shell">
             <div class="section-heading">
-                <h2>환산 결과 다음에 확인할 일</h2>
+                <h2>환산한 뒤 함께 볼 내용</h2>
                 <p class="section-intro">환산 숫자보다 실제 변화 기록과 정기 검진 일정을 우선하세요.</p>
             </div>
             <div class="footer-links">

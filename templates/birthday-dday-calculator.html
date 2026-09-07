@@ -84,13 +84,13 @@
             <section class="section-shell">
                 <div class="section-heading">
                     <h2 id="birthday-search">생일 선택</h2>
-                    <p class="section-intro">생일 월일 4자리를 입력하면 다음 생일 날짜와 남은 일수를 바로 보여드립니다.</p>
+                    <p class="section-intro">생일 월일 4자리를 입력하면 다음 생일과 남은 일수를 바로 확인할 수 있습니다.</p>
                 </div>
                 <form class="age-form" id="birthday-dday-form" action="{{ url_for('birthday_dday_calculator') }}#birthday-dday-result" method="get" autocomplete="off" data-clarity-mask="true">
                     <div class="form-group">
                         <div class="date-inputs">
                             <label class="field-label" for="birthday-dday-input">생일 월일</label>
-                            <input type="text" id="birthday-dday-input" placeholder="05.10" inputmode="numeric" pattern="[0-9.]*" maxlength="5" aria-label="생일 월일 4자리" aria-describedby="birthday-dday-error" value="{% if month and day %}{{ '%02d.%02d'|format(month, day) }}{% endif %}" required>
+                            <input type="text" id="birthday-dday-input" placeholder="0510" inputmode="numeric" pattern="[0-9]*" maxlength="4" aria-label="생일 월일 4자리" aria-describedby="birthday-dday-error" value="{% if month and day %}{{ '%02d%02d'|format(month, day) }}{% endif %}" required>
                             <input type="hidden" id="birthday-dday-month" name="month" value="{{ month or '' }}">
                             <input type="hidden" id="birthday-dday-day" name="day" value="{{ day or '' }}">
                         </div>
@@ -155,7 +155,7 @@
         <section class="section-shell">
             <div class="section-heading">
                 <h2>예시로 보는 생일 D-day</h2>
-                <p class="section-intro">자주 예시로 드는 생일 날짜를 먼저 정리했습니다.</p>
+                <p class="section-intro">자주 찾는 생일 날짜의 계산 예시를 모았습니다.</p>
             </div>
             <div class="section-card-grid">
                 {% for example in examples %}
@@ -202,7 +202,7 @@
             </article>
             <article class="section-card">
                 <p class="eyebrow">다음 행동</p>
-                <h2>D-day 결과 다음에 할 일</h2>
+                <h2>D-day를 계산한 뒤 함께 볼 내용</h2>
                 <p>
                     생일까지 남은 기간을 확인한 뒤 정확한 만나이를 계산하거나, 백일·돌·개인 기념일처럼 시작일 포함 규칙이 필요한 날짜는
                     100일 계산기와 기념일 계산기로 구분해 확인하세요.

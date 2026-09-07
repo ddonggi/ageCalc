@@ -24,13 +24,12 @@
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
-        {% include 'partials/breadcrumbs.html' %}
 
         <section class="hero-band life-timeline-hero calculator-page-heading">
             <div class="hero-copy">
                 <p class="eyebrow">My Life · Today</p>
                 <h1>내 생애 타임라인 계산기</h1>
-                <p class="page-intro">생년월일 한 번으로 지금의 나이부터 살아온 날, 다음 생일과 출생 프로필까지 하나의 흐름으로 확인하세요.</p>
+                <p class="page-intro">생년월일을 한 번 입력하면 지금 나이, 살아온 날, 다음 생일, 출생 프로필을 한 화면에서 확인할 수 있습니다.</p>
             </div>
             <div class="life-orbit" aria-hidden="true">
                 <span>탄생</span><i></i><span>오늘</span><i></i><span>다음 생일</span>
@@ -44,7 +43,7 @@
             </div>
             <form class="age-form life-timeline-form" id="life-timeline-form" action="{{ url_for('life_timeline') }}#life-timeline-result" method="get" data-today="{{ today.isoformat() }}" autocomplete="off" data-clarity-mask="true">
                 <label class="field-label" for="life-birth-date">생년월일 8자리</label>
-                <input type="text" id="life-birth-date" name="birth_date" value="{% if birth_date %}{{ birth_date.strftime('%Y.%m.%d') }}{% endif %}" placeholder="1992.10.02" inputmode="numeric" pattern="[0-9.]*" maxlength="10" required aria-describedby="life-timeline-error" />
+                <input type="text" id="life-birth-date" name="birth_date" value="{% if birth_date %}{{ birth_date.strftime('%Y%m%d') }}{% endif %}" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" required aria-describedby="life-timeline-error" />
                 <small class="error-msg" id="life-timeline-error" aria-live="polite"></small>
                 <button class="btn btn-primary" type="submit">계산하기</button>
             </form>
@@ -75,7 +74,7 @@
         </section>
 
         <section class="section-shell">
-            <div class="section-heading"><h2>타임라인 다음에 확인할 도구</h2></div>
+            <div class="section-heading"><h2>타임라인을 본 뒤 함께 볼 도구</h2></div>
             <div class="footer-links">
                 <a href="{{ url_for('age') }}">만 나이 기준 자세히 보기</a>
                 <a href="{{ url_for('birthday_dday_calculator') }}">생일 D-day 계산하기</a>

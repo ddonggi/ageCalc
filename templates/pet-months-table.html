@@ -81,7 +81,7 @@
         <section class="section-shell">
             <div class="section-heading">
                 <h2 id="pet-month-search">월령 선택</h2>
-                <p class="section-intro">종류와 개월 수를 고르면 해당 월령의 사람 나이 환산을 요약해 보여드립니다.</p>
+                <p class="section-intro">종류와 개월 수를 고르면 사람 나이 환산값이 바로 나옵니다.</p>
             </div>
             <form class="age-form birth-year-form" method="get" action="{{ url_for('pet_months_table') }}">
                 <div class="form-group">
@@ -144,7 +144,7 @@
         <section class="section-shell">
             <div class="section-heading">
                 <h2>예시로 보는 월령</h2>
-                <p class="section-intro">자주 찾는 반려동물 월령 예시를 먼저 정리했습니다.</p>
+                <p class="section-intro">자주 찾는 반려동물 월령 예시를 모았습니다.</p>
             </div>
             <div class="section-card-grid">
                 {% for example in examples %}

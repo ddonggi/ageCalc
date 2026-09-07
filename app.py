@@ -1706,7 +1706,7 @@ def age():
         else requested_birth_date
     )
     birth_date_display = (
-        f'{birth_date_digits[:4]}.{birth_date_digits[4:6]}.{birth_date_digits[6:]}'
+        birth_date_digits
         if len(birth_date_digits) == 8
         else requested_birth_date
     )

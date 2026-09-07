@@ -35,6 +35,8 @@
     {% endif %}
 </header>
 
+{% include 'partials/breadcrumbs.html' %}
+
 <div class="mobile-nav-overlay" hidden data-mobile-nav-overlay></div>
 <aside class="mobile-nav-panel" id="mobile-nav-panel" hidden data-mobile-nav-panel aria-label="모바일 계산 카테고리 메뉴">
     <div class="mobile-nav-head">
@@ -69,7 +71,7 @@
 </aside>
 
 <script src="{{ url_for('static', filename='js/navigation.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/calculator-form-focus.js') }}" defer></script>
 {% if reading_progress_enabled %}
 <script src="{{ url_for('static', filename='js/reading-progress.js') }}?v=mobile-stable-20260810a" defer></script>
 {% endif %}
-{% include 'partials/breadcrumbs.html' %}

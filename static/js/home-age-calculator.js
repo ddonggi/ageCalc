@@ -94,6 +94,7 @@
     var error = document.getElementById("home-birth-error");
     var result = document.getElementById("home-age-result");
     var ageValue = document.getElementById("home-age-value");
+    var gradeLink = document.getElementById("home-grade-link");
     var todayIso = form.getAttribute("data-today");
 
     if (!input || !error || !result || !ageValue || !todayIso) {
@@ -119,6 +120,11 @@
       input.removeAttribute("aria-invalid");
       error.textContent = "";
       ageValue.textContent = calculation.age + "세";
+      if (gradeLink) {
+        var birthYear = normalizeBirthDate(input.value).slice(0, 4);
+        var calculatorUrl = gradeLink.getAttribute("data-calculator-url");
+        gradeLink.href = calculatorUrl + "?year=" + birthYear;
+      }
       result.hidden = false;
     });
   }

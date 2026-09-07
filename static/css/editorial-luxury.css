@@ -73,6 +73,12 @@ body .coupang-partners-aside p {
   box-shadow: var(--lux-focus);
 }
 
+/* Result anchors receive programmatic focus after a calculation submits. */
+.result-container[tabindex="-1"]:focus {
+  outline: none;
+  box-shadow: none;
+}
+
 body .container {
   max-width: 1220px;
   color: var(--lux-text);
@@ -287,7 +293,7 @@ body .hero-copy h1 {
   margin: 0;
   color: var(--lux-espresso);
   font-family: var(--site-font);
-  font-size: clamp(2.9rem, 4.7vw, 5.4rem);
+  font-size: clamp(1.9rem, 2.7vw, 2.4rem);
   font-weight: 600;
   line-height: .94;
   letter-spacing: 0;
@@ -303,6 +309,8 @@ body .hero-copy h1 {
 .home-page .editorial-hero .editorial-panel-shell {
   position: relative;
   z-index: 1;
+  display: grid;
+  gap: clamp(1rem, 2.5vw, 1.5rem);
   justify-self: stretch;
   width: 100%;
   padding: 0;
@@ -320,8 +328,7 @@ body .hero-copy h1 {
 .home-page .editorial-hero .editorial-panel-core {
   position: relative;
   display: grid;
-  gap: .85rem;
-  min-height: 430px;
+  gap: clamp(1rem, 2.5vw, 1.5rem);
   padding: clamp(1.35rem, 3vw, 2rem);
   border: 0;
   border-radius: var(--lux-radius-core);
@@ -597,7 +604,15 @@ body .alert-error {
 body.editorial-calculator-page .editorial-calculator-shell {
   display: grid;
   gap: clamp(1rem, 2.5vw, 1.5rem);
-  margin: clamp(1.4rem, 4vw, 2.6rem) 0;
+  /* margin: clamp(1.4rem, 4vw, 2.6rem) 0; */
+}
+
+body.calculator-flat-page .editorial-calculator-shell,
+body.calculator-flat-page .section-shell:has(> .age-form) {
+  display: grid;
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+  width: min(100%, 760px);
+  margin-inline: auto;
 }
 
 body.editorial-calculator-page .editorial-calculator-shell .section-shell,
@@ -633,13 +648,9 @@ body.editorial-calculator-page .editorial-calculator-shell .form-group,
 body.editorial-calculator-page .editorial-calculator-shell .date-inputs,
 body.editorial-calculator-page .editorial-calculator-shell .profile-date-control,
 body.editorial-calculator-page .editorial-calculator-shell .pet-input-panel {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: .75rem;
-}
-
-body.editorial-calculator-page .editorial-calculator-shell .profile-date-control {
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
 }
 
 body.editorial-calculator-page .editorial-calculator-shell input:not([type="radio"]):not([type="checkbox"]),
@@ -684,32 +695,83 @@ body.editorial-calculator-page .editorial-calculator-shell .pet-size-explanation
 
 body.editorial-calculator-page .editorial-calculator-shell .calendar-toggle {
   display: inline-grid;
-  grid-auto-flow: column;
+  position: relative;
+  grid-auto-flow: initial;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: center;
   min-height: 50px;
   padding: .25rem;
+  overflow: hidden;
+  isolation: isolate;
 }
 
 body.editorial-calculator-page .editorial-calculator-shell .calendar-toggle label {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding-inline: 1rem;
 }
 
+body.editorial-calculator-page .editorial-calculator-shell .calendar-toggle .toggle-slider {
+  position: absolute;
+  z-index: 0;
+  inset: .25rem auto .25rem .25rem;
+  display: block;
+  width: calc(50% - .25rem);
+  border-radius: inherit;
+  background: var(--lux-espresso);
+  transform: translateX(0);
+  transition: transform 180ms ease;
+  pointer-events: none;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .calendar-toggle input[type="radio"]:checked + label {
+  background: transparent;
+  color: var(--lux-surface);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .calendar-toggle #lunar:checked ~ .toggle-slider {
+  transform: translateX(100%);
+}
+
+body.editorial-calculator-page #age-form .calendar-toggle {
+  min-height: 44px;
+  padding: .125rem;
+}
+
+body.editorial-calculator-page #age-form .calendar-toggle label {
+  min-height: 40px;
+  padding-inline: .875rem;
+  font-size: .9rem;
+}
+
+body.editorial-calculator-page #age-form .date-inputs,
+body.editorial-calculator-page #age-form #birth-input,
+body.editorial-calculator-page #age-form .btn-primary {
+  width: 100%;
+}
+
+body.editorial-calculator-page #age-form #birth-input,
+body.editorial-calculator-page #age-form .btn-primary {
+  box-sizing: border-box;
+  height: 48px;
+}
+
 body.editorial-calculator-page .editorial-calculator-shell .result {
-  border: 1px solid var(--lux-border);
-  border-radius: var(--lux-radius-core);
-  background: rgba(252, 249, 243, .86);
+  /* border: 1px solid var(--lux-border); */
+  /* border-radius: var(--lux-radius-core); */
+  /* background: rgba(252, 249, 243, .86); */
   color: var(--lux-text);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .62);
+  /* box-shadow: inset 0 1px 0 rgba(255, 255, 255, .62); */
 }
 
 body.editorial-calculator-page .editorial-calculator-shell .result.success {
   border-color: rgba(102, 112, 90, .32);
-  background:
+  /* background:
     linear-gradient(135deg, rgba(102, 112, 90, .12), rgba(252, 249, 243, .92) 40%),
-    var(--lux-surface);
+    var(--lux-surface); */
 }
 
 body.editorial-calculator-page .editorial-calculator-shell .result.error {
@@ -1721,6 +1783,10 @@ body.calculator-flat-page .container > .site-header {
   order: 0;
 }
 
+body.calculator-flat-page .container > .breadcrumbs {
+  order: 0;
+}
+
 body.calculator-flat-page .container > .calculator-page-heading {
   order: 1;
 }
@@ -1754,8 +1820,8 @@ body.calculator-flat-page .calculator-page-heading.hero-band .hero-copy > .page-
 }
 
 body.calculator-flat-page .calculator-page-heading.hero-band .hero-copy > .eyebrow {
-  margin-top: clamp(1rem, 3vw, 2rem);
-  margin-bottom: 0;
+  /* margin-top: clamp(1rem, 3vw, 2rem); */
+  /* margin-bottom: 0; */
 }
 
 body.calculator-flat-page .calculator-page-heading.hero-band .hero-copy > h1 {
@@ -1764,7 +1830,7 @@ body.calculator-flat-page .calculator-page-heading.hero-band .hero-copy > h1 {
 
 body.calculator-flat-page .calculator-page-heading.hero-band .hero-copy > .page-intro {
   margin-top: 0;
-  margin-bottom: clamp(1rem, 3vw, 1.75rem);
+  /* margin-bottom: clamp(1rem, 3vw, 1.75rem); */
 }
 
 body.calculator-flat-page .calculator-page-heading.hero-band .hero-actions,
@@ -1909,7 +1975,7 @@ body.calculator-flat-page .section-card:not(.birth-year-summary):hover {
 
 /* Keep the public page hierarchy compact and leave full-screen game headings alone. */
 body h1 {
-  font-size: clamp(2.1rem, 4vw, 4.2rem) !important;
+  /* font-size: clamp(2.1rem, 4vw, 4.2rem) !important; */
 }
 
 body h2 {

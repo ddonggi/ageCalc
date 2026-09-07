@@ -67,7 +67,7 @@
          "@context": "https://schema.org",
          "@type": "FAQPage",
          "mainEntity": [
-          {"@type":"Question","name":"만나이는 어떻게 확인하나요?","acceptedAnswer":{"@type":"Answer","text":"양력 또는 음력 생년월일 8자리를 입력하면 오늘 날짜를 기준으로 생일 전후를 반영한 만나이를 확인할 수 있습니다."}},
+          {"@type":"Question","name":"만나이는 어떻게 확인하나요?","acceptedAnswer":{"@type":"Answer","text":"양력이나 음력 생년월일 8자리를 입력하면 오늘 기준으로 생일 전후를 반영한 만나이가 나옵니다."}},
           {"@type":"Question","name":"음력 생일을 입력하면 무엇을 계산하나요?","acceptedAnswer":{"@type":"Answer","text":"입력한 평달 음력 생년월일을 양력 출생일로 환산한 뒤 오늘 기준 만나이를 계산합니다."}},
           {"@type":"Question","name":"올해 음력 생일의 양력 날짜도 확인할 수 있나요?","acceptedAnswer":{"@type":"Answer","text":"아니요. 이 도구는 출생 당시의 음력 생년월일로 만나이를 계산하며, 올해 돌아오는 음력 생일 날짜를 찾는 기념일 변환기는 아닙니다."}},
           {"@type":"Question","name":"윤달 생일도 계산할 수 있나요?","acceptedAnswer":{"@type":"Answer","text":"현재 윤달 선택은 지원하지 않으며 입력한 음력 날짜를 평달로 계산합니다."}},
@@ -161,9 +161,11 @@
 
                     <div class="date-inputs">
                         <label class="field-label" for="birth-input">생년월일 8자리</label>
-                        <input type="text" id="birth-input" name="birth_date" placeholder="1992.10.02" inputmode="numeric"
-                            pattern="[0-9.]*" maxlength="10" required aria-describedby="birth-error" data-clarity-mask="true" data-profile-date-calendar="solar" value="{{ birth_date_display or '' }}">
+                        <input type="text" id="birth-input" name="birth_date" placeholder="19921002" inputmode="numeric"
+                            pattern="[0-9]*" maxlength="8" required aria-describedby="birth-error" data-clarity-mask="true" data-profile-date-calendar="solar" value="{{ birth_date_display or '' }}">
                     </div>
+
+                    <button class="btn btn-primary" type="submit">계산하기</button>
 
                     <p class="input-help">
                         음력 입력은 출생 당시의 음력 날짜를 양력 출생일로 환산해 만나이를 계산합니다.
@@ -172,7 +174,6 @@
                     </p>
 
                     <small id="birth-error" class="error-msg" aria-live="polite"></small>
-                    <button class="btn btn-primary" type="submit">계산하기</button>
                 </div>
             </form>
 
@@ -329,7 +330,7 @@
             </article>
             <article class="section-card">
                 <p class="eyebrow">다음 행동</p>
-                <h2>계산 결과 다음에 확인할 일</h2>
+                <h2>계산한 뒤 함께 볼 내용</h2>
                 <p>
                     정확한 만나이를 확인했다면 신청서의 기준일, 다음 생일까지 남은 기간, 학교나 가족의 주요 시점을 이어서 볼 수 있습니다.
                     연도만 빠르게 비교하려면 출생년도별 나이표를, 생일과 무관한 연도 기준 숫자가 필요하면 연나이 계산기를 선택하세요.
@@ -379,7 +380,7 @@
             <h2 id="faq">자주 묻는 질문</h2>
 
             <h3>Q. 만나이는 어떻게 확인하나요?</h3>
-            <p>A. 양력 또는 음력 생년월일 8자리를 입력하면 오늘 날짜를 기준으로 생일 전후를 반영한 만나이를 확인할 수 있습니다.</p>
+            <p>A. 양력이나 음력 생년월일 8자리를 입력하면 오늘 기준으로 생일 전후를 반영한 만나이가 나옵니다.</p>
 
             <h3>Q. 음력 생일을 입력하면 무엇을 계산하나요?</h3>
             <p>A. 입력한 평달 음력 생년월일을 양력 출생일로 환산한 뒤 오늘 기준 만나이를 계산합니다.</p>

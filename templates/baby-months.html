@@ -53,7 +53,7 @@
         <section class="section-shell direct-answer" aria-label="아이 월령 바로 답변">
             <div class="section-heading">
                 <p class="eyebrow">바로 답변</p>
-                <h2>월령은 출생일에서 기준일까지 완료된 달 수입니다</h2>
+                <h2>월령은 출생일부터 기준일까지 지난 개월 수입니다.</h2>
             </div>
             <p>
                 아이 개월수 계산과 아기 월령 계산은 같은 날짜 기준을 씁니다. 기준일의 일자가 출생일의 일자에 아직 이르지 않았다면 마지막 한 달은 완료되지 않은 것으로 봅니다.
@@ -70,7 +70,7 @@
                 <h3>출생일을 입력하세요 (8자리)</h3>
                 <div class="date-inputs">
                     <label class="field-label" for="baby-birth-input">출생일 8자리</label>
-                    <input type="text" id="baby-birth-input" name="birth_date" value="{% if baby_birth_date %}{{ baby_birth_date.strftime('%Y.%m.%d') }}{% endif %}" placeholder="2025.06.15" inputmode="numeric" pattern="[0-9.]*" maxlength="10" required aria-describedby="baby-error" data-clarity-mask="true">
+                    <input type="text" id="baby-birth-input" name="birth_date" value="{% if baby_birth_date %}{{ baby_birth_date.strftime('%Y%m%d') }}{% endif %}" placeholder="20250615" inputmode="numeric" pattern="[0-9]*" maxlength="8" required aria-describedby="baby-error" data-clarity-mask="true">
                 </div>
                 <small id="baby-error" class="error-msg" aria-live="polite"></small>
                 <button class="btn btn-primary" type="submit">계산하기</button>
@@ -88,7 +88,7 @@
         <section class="section-shell">
             <div class="section-heading">
                 <h2>월령 계산 예시</h2>
-                <p class="section-intro">같은 출생일도 기준일의 일자와 월말 여부에 따라 완료된 개월 수가 달라집니다.</p>
+                <p class="section-intro">출생일이 같아도 기준일의 날짜와 월말 여부에 따라 개월 수가 달라집니다.</p>
             </div>
             <div class="section-card-grid">
                 <article class="section-card" data-example-card>

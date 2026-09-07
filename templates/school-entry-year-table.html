@@ -100,7 +100,7 @@
         <section class="section-shell">
             <div class="section-heading">
                 <h2 id="school-entry-search">출생년도 선택</h2>
-                <p class="section-intro">출생년도를 고르면 해당 연도의 입학 시점을 바로 요약해 보여드립니다.</p>
+                <p class="section-intro">출생년도를 고르면 입학 시점이 바로 나옵니다.</p>
             </div>
             <form class="age-form birth-year-form" method="get" action="{{ url_for('school_entry_year_table') }}">
                 <div class="form-group">
@@ -164,7 +164,7 @@
         <section class="section-shell">
             <div class="section-heading">
                 <h2>예시로 보는 입학 시점</h2>
-                <p class="section-intro">자주 찾는 출생년도 예시를 먼저 정리했습니다.</p>
+                <p class="section-intro">자주 찾는 출생연도 예시를 모았습니다.</p>
             </div>
             <div class="section-card-grid">
                 {% for example in examples %}

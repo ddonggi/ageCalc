@@ -82,13 +82,13 @@
         <section class="section-shell">
             <div class="section-heading">
                 <h2 id="hundred-day-search">시작일 입력</h2>
-                <p class="section-intro">시작일 8자리를 입력하면 100일째 날짜와 오늘 기준 상태를 바로 계산해 보여드립니다.</p>
+                <p class="section-intro">시작일 8자리를 입력하면 100일째 날짜와 오늘 기준 상태가 바로 나옵니다.</p>
             </div>
             <form class="age-form" id="hundred-day-form" action="{{ url_for('hundred_day_calculator') }}#hundred-day-result" method="get" data-clarity-mask="true">
                 <div class="form-group">
                     <div class="date-inputs">
                         <label class="field-label" for="hundred-day-date">시작일</label>
-                        <input type="text" id="hundred-day-date" name="start_date" value="{% if start_date %}{{ start_date.strftime('%Y.%m.%d') }}{% endif %}" placeholder="2026.01.01" inputmode="numeric" pattern="[0-9.]*" maxlength="10" autocomplete="off" aria-label="시작일 8자리" aria-describedby="hundred-day-error" data-clarity-mask="true" required>
+                        <input type="text" id="hundred-day-date" name="start_date" value="{% if start_date %}{{ start_date.strftime('%Y%m%d') }}{% endif %}" placeholder="20260101" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off" aria-label="시작일 8자리" aria-describedby="hundred-day-error" data-clarity-mask="true" required>
                     </div>
                     <div class="hero-actions">
                         <button class="btn btn-primary" type="submit">계산하기</button>
@@ -158,7 +158,7 @@
 
         <section class="section-shell">
             <div class="section-heading">
-                <h2>100일 결과 다음에 할 일</h2>
+                <h2>100일을 계산한 뒤 함께 볼 내용</h2>
                 <p class="section-intro">목적에 따라 일반 D-day, 아이 월령, 생일 계산으로 이어서 살펴보세요.</p>
             </div>
             <div class="footer-links">

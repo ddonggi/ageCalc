@@ -170,6 +170,58 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
         self.assertIn("box-shadow: none;", css)
         self.assertIn("@media (max-width: 760px)", css)
 
+    def test_calendar_toggle_uses_an_animated_selected_slider(self):
+        css = Path("static/css/editorial-luxury.css").read_text()
+        slider = self._css_rule_body_for_exact_selector(
+            css,
+            "body.editorial-calculator-page .editorial-calculator-shell .calendar-toggle .toggle-slider"
+        )
+
+        self.assertIn("transition: transform 180ms", slider)
+        self.assertRegex(
+            css,
+            r"#lunar:checked\s*~\s*\.toggle-slider\s*\{[^}]*transform:\s*translateX\(100%\);",
+        )
+        self.assertRegex(
+            css,
+            r"@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?transition:\s*none\s*!important;",
+        )
+
+    def test_calculator_inputs_stack_vertically_without_a_toggle_container_outline(self):
+        editorial_css = Path("static/css/editorial-luxury.css").read_text()
+        base_css = Path("static/css/style.css").read_text()
+
+        input_layout = self._css_rule_bodies(
+            editorial_css,
+            "body.editorial-calculator-page .editorial-calculator-shell .form-group",
+        )
+        self.assertIn("display: flex;", input_layout)
+        self.assertIn("flex-direction: column;", input_layout)
+        self.assertIn("gap: .75rem;", input_layout)
+        self.assertNotIn(".calendar-toggle:focus-within", self._css_without_comments(base_css))
+
+    def test_age_form_primary_button_matches_the_input_width(self):
+        css = Path("static/css/style.css").read_text()
+        button_rule = self._css_rule_body_for_exact_selector(css, ".age-form .btn-primary")
+
+        self.assertIn("width: 100%;", button_rule)
+
+    def test_calculator_and_home_panels_share_a_control_layout_rhythm(self):
+        css = Path("static/css/editorial-luxury.css").read_text()
+
+        self.assertRegex(
+            css,
+            r"body\.calculator-flat-page \.editorial-calculator-shell,[\s\S]*?"
+            r"body\.calculator-flat-page \.section-shell:has\(> \.age-form\)\s*\{[\s\S]*?"
+            r"gap:\s*clamp\(1rem, 2\.5vw, 1\.5rem\);",
+        )
+        panel_core = self._css_rule_body_for_exact_selector(
+            css,
+            ".home-page .editorial-hero .editorial-panel-core",
+        )
+        self.assertIn("gap: clamp(1rem, 2.5vw, 1.5rem);", panel_core)
+        self.assertNotIn("min-height", panel_core)
+
     def test_all_public_and_game_styles_use_the_body_font_except_brand_word(self):
         css_files = tuple(Path("static/css").glob("*.css"))
         for css_file in css_files:
@@ -294,6 +346,7 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
         tool_list = source.split('aria-labelledby="hub-tools-title"', 1)[1].split("</section>", 1)[0]
         self.assertIn('class="life-hub-link-list hub-tool-link-list"', tool_list)
         self.assertNotIn("hub-card calendar-card", tool_list)
+        self.assertNotIn("자세히 보기", tool_list)
 
         theme_css = Path("static/css/editorial-luxury.css").read_text()
         self.assertRegex(
@@ -400,7 +453,7 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
         shell_rules = self._css_rule_bodies(theme_css, ".home-page .editorial-hero .editorial-panel-shell")
         core_rules = self._css_rule_bodies(theme_css, ".home-page .editorial-hero .editorial-panel-core")
 
-        self.assertIn("font-size: clamp(2.9rem, 4.7vw, 5.4rem);", title_rules)
+        self.assertIn("font-size: clamp(1.9rem, 2.7vw, 2.4rem);", title_rules)
         self.assertIn("width: 100%;", shell_rules)
         self.assertIn("padding: 0;", shell_rules)
         self.assertNotIn("border: 1px solid rgba(166, 139, 97, .42);", shell_rules)
@@ -521,11 +574,76 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
         self.assertIn('id="home-birth-error" role="alert"', html)
         self.assertIn('id="home-age-result"', html)
         self.assertIn('id="home-age-value"', html)
-        self.assertIn('href="/school-grade-calculator"', html)
+        self.assertIn('id="home-grade-link"', html)
+        self.assertIn('data-calculator-url="/school-grade-calculator"', html)
         self.assertIn('href="/birthday-dday-calculator"', html)
         self.assertIn("js/home-age-calculator.js", html)
         self.assertNotIn('class="age-hub-dashboard"', html)
         self.assertNotIn('class="age-hub-result-card"', html)
+
+    def test_calculator_forms_load_focus_and_enter_submit_behavior(self):
+        html = self.client.get("/age").get_data(as_text=True)
+        script_path = Path("static/js/calculator-form-focus.js")
+
+        self.assertIn("js/calculator-form-focus.js", html)
+        self.assertTrue(script_path.is_file())
+        script = script_path.read_text()
+        self.assertIn("form.requestSubmit()", script)
+        self.assertIn("resultTarget", script)
+        self.assertIn("input.focus", script)
+
+    def test_home_grade_link_uses_the_calculated_birth_year(self):
+        script = Path("static/js/home-age-calculator.js").read_text()
+
+        self.assertIn('getElementById("home-grade-link")', script)
+        self.assertIn('"?year=" + birthYear', script)
+
+    def test_calculator_form_focus_script_focuses_and_submits_a_text_input(self):
+        program = r"""
+const assert = require('assert');
+const listeners = {};
+let prevented = false;
+let submitCount = 0;
+
+class FakeInput {
+  constructor() {
+    this.type = 'text';
+    this.disabled = false;
+    this.readOnly = false;
+    this.focused = false;
+  }
+  focus(options) { this.focused = Boolean(options && options.preventScroll); }
+  closest() { return form; }
+}
+
+const input = new FakeInput();
+const form = {
+  elements: [input],
+  matches(selector) { return selector.includes('calculator-flat-page'); },
+  requestSubmit() { submitCount += 1; }
+};
+
+global.HTMLInputElement = FakeInput;
+global.window = { location: { hash: '' } };
+global.document = {
+  addEventListener(name, listener) { listeners[name] = listener; },
+  getElementById() { return null; },
+  querySelector() { return form; }
+};
+
+require('./static/js/calculator-form-focus.js');
+listeners.DOMContentLoaded();
+assert.strictEqual(input.focused, true);
+listeners.keydown({
+  key: 'Enter',
+  target: input,
+  preventDefault() { prevented = true; }
+});
+assert.strictEqual(prevented, true);
+assert.strictEqual(submitCount, 1);
+"""
+        result = subprocess.run(["node", "-e", program], capture_output=True, text=True)
+        self.assertEqual(0, result.returncode, result.stderr)
 
     def test_home_quick_calculator_has_no_persistence_or_query_transport(self):
         script = Path("static/js/home-age-calculator.js").read_text()

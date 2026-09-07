@@ -109,7 +109,7 @@ class PublicPageTests(unittest.TestCase):
         self.assertIn('href="/references"', html)
 
     def test_age_page_submits_only_when_its_explicit_button_is_clicked(self):
-        """Typing validates and formats; submit is left to the server-rendered result page."""
+        """Typing validates as eight digits; submit is left to the server-rendered result page."""
         html = app.test_client().get("/age").get_data(as_text=True)
         self.assertIn('<button class="btn btn-primary" type="submit">계산하기</button>', html)
 
@@ -125,7 +125,7 @@ const resultContainer = {
 };
 const resultContent = { innerHTML: '' };
 const birthInput = {
-  value: '1992.10.02',
+  value: '19921002',
   classList: { add() {}, remove() {} },
   addEventListener(name, callback) { listeners[`birth:${name}`] = callback; }
 };
@@ -203,6 +203,22 @@ calculator.bindCalculationSubmit();
                 self.assertIn('<nav class="breadcrumbs" aria-label="현재 위치">', html)
                 self.assertIn('"@type": "BreadcrumbList"', html)
 
+    def test_breadcrumbs_render_once_immediately_after_the_site_header(self):
+        client = app.test_client()
+        for path in ("/age", "/dog", "/life-timeline"):
+            with self.subTest(path=path):
+                html = client.get(path).get_data(as_text=True)
+                header_end = html.index("</header>")
+                breadcrumb_start = html.index('<nav class="breadcrumbs" aria-label="현재 위치">')
+                self.assertEqual(1, html.count('<nav class="breadcrumbs" aria-label="현재 위치">'))
+                self.assertNotIn("mobile-nav-panel", html[header_end:breadcrumb_start])
+
+        css = Path("static/css/editorial-luxury.css").read_text(encoding="utf-8")
+        self.assertRegex(
+            css,
+            r"body\.calculator-flat-page \.container > \.breadcrumbs\s*\{\s*order:\s*0;",
+        )
+
     def test_age_result_prioritizes_summary_and_safe_related_links(self):
         program = r"""
 const assert = require('assert');
@@ -211,7 +227,7 @@ global.window = {};
 
 const { AgeCalculatorUI, DateUtils } = require('./static/js/age-calculator.js');
 const calculator = Object.create(AgeCalculatorUI.prototype);
-calculator.birthInput = { value: '1992.10.02' };
+calculator.birthInput = { value: '19921002' };
 calculator.hiddenDateInput = null;
 const html = calculator.createSuccessResultHTML({
   success: true,
@@ -288,7 +304,7 @@ global.window = {
 
 const { AgeCalculatorUI } = require('./static/js/age-calculator.js');
 const calculator = Object.create(AgeCalculatorUI.prototype);
-calculator.birthInput = { value: '1992.10.02' };
+calculator.birthInput = { value: '19921002' };
 calculator.hiddenDateInput = null;
 calculator.displayResult({ success: true, message: '계산 완료', age: 33 });
 scheduledCallbacks.forEach(callback => callback());
@@ -1426,7 +1442,7 @@ assert.strictEqual(publisherRefreshes, 0);
         self.assertIn("아기 월령", html)
         self.assertIn("개월수와 월령은 같은 뜻인가요?", html)
         self.assertIn('id="baby-birth-input"', html)
-        self.assertIn('maxlength="10"', html)
+        self.assertIn('maxlength="8"', html)
         self.assertNotIn('id="baby-year"', html)
         self.assertNotIn('id="baby-month"', html)
         self.assertNotIn('id="baby-day"', html)
@@ -2186,7 +2202,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 "생일이 지났는지에 따라 만나이가 한 살 달라집니다",
                 "만나이 공식",
                 "2월 29일과 음력 생일",
-                "계산 결과 다음에 확인할 일",
+                "계산한 뒤 함께 볼 내용",
             ),
             "/birth-year-age-table": (
                 "20살은 연나이 기준",
@@ -2210,7 +2226,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 "다음 생일까지 남은 날짜는 올해 생일과 내년 생일을 차례로 비교해 계산합니다",
                 "생일 D-day 공식",
                 "2월 29일 생일과 기준일 예외",
-                "D-day 결과 다음에 할 일",
+                "D-day를 계산한 뒤 함께 볼 내용",
             ),
         }
 
@@ -2247,7 +2263,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 "조기입학·입학유예·해외 학제",
             ),
             "/grade-birth-year-table": (
-                "학년을 선택하면 일반적으로 해당하는 출생연도가 나옵니다",
+                "학년을 선택하면 보통 어느 출생연도인지 나옵니다",
                 "학년별 출생연도 해석",
                 "빠른년생과 출생연도 예외",
                 "조기입학·입학유예·해외 학제",
@@ -2278,7 +2294,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         client = app.test_client()
         expectations = {
             "/baby-months": (
-                "월령은 출생일에서 기준일까지 완료된 달 수입니다",
+                "월령은 출생일부터 기준일까지 지난 개월 수입니다.",
                 "월령 계산과 발달 판단은 다릅니다",
                 "월말 출생일 계산 예외",
                 "월령 결과 다음에 확인할 일",
@@ -2293,13 +2309,13 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 "100일째는 시작일을 1일째로 포함해 시작일에 99일을 더한 날짜입니다",
                 "시작일 포함 100일 공식",
                 "윤년과 월말을 지나는 100일",
-                "100일 결과 다음에 할 일",
+                "100일을 계산한 뒤 함께 볼 내용",
             ),
             "/d-day": (
                 "D-day는 오늘을 제외하고 목표 날짜까지 남은 날짜 수를 계산합니다",
                 "D-day 포함 기준",
                 "윤년·월말·시간대 예외",
-                "D-day 결과 다음에 할 일",
+                "D-day를 계산한 뒤 함께 볼 내용",
             ),
             "/parent-child": (
                 "부모와 자녀의 생년월일로 출산 당시 만나이와 주요 가족 시점을 계산합니다",
@@ -2353,16 +2369,16 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         client = app.test_client()
         expectations = {
             "/dog": (
-                "강아지 사람 나이 환산값은 체형별 연령표를 적용한 참고 수치입니다",
+                "강아지 사람 나이 환산값은 체형별 연령표를 바탕으로 한 참고값입니다.",
                 "환산 나이와 건강 상태는 다릅니다",
                 "체형·품종·생활환경에 따른 한계",
-                "환산 결과 다음에 확인할 일",
+                "환산한 뒤 함께 볼 내용",
             ),
             "/cat": (
-                "고양이 사람 나이 환산값은 초기 성장 속도를 반영한 참고 수치입니다",
+                "고양이 사람 나이 환산값은 초기 성장 속도를 반영한 참고값입니다.",
                 "환산 나이와 건강 상태는 다릅니다",
                 "품종·생활환경·질병 이력에 따른 한계",
-                "환산 결과 다음에 확인할 일",
+                "환산한 뒤 함께 볼 내용",
             ),
             "/pet-age-table": (
                 "반려동물 나이표는 실제 나이를 사람 나이 기준으로 비교하는 참고표입니다",
@@ -2575,6 +2591,20 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 html = client.get(path).get_data(as_text=True)
                 for marker in markers:
                     self.assertIn(marker, html)
+
+    def test_age_form_places_the_submit_before_help_and_validation_feedback(self):
+        html = app.test_client().get("/age").get_data(as_text=True)
+
+        markers = (
+            "생년월일을 입력하세요 (8자리)",
+            'class="calendar-toggle-container"',
+            'id="birth-input"',
+            'type="submit">계산하기</button>',
+            'class="input-help"',
+            'id="birth-error"',
+        )
+        positions = [html.index(marker) for marker in markers]
+        self.assertEqual(positions, sorted(positions))
 
     def test_guide_content_policy_covers_all_twenty_guides(self):
         self.assertTrue(hasattr(guide_pages_module, "GUIDE_CONTENT_POLICY"))
@@ -3210,7 +3240,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 blog_indexable=True,
             )
 
-        self.assertIn("계산기 결과를 해석하는 설명형 글", html)
+        self.assertIn("계산 결과를 이해하는 데 도움이 되는 글을 모아두었습니다.", html)
         self.assertIn('href="/blog/2026-man-age-guide"', html)
 
     def test_blog_list_shows_all_curated_public_slugs(self):
@@ -3561,7 +3591,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 blog_indexable=True,
             )
 
-        self.assertIn("계산기 결과를 해석하는 설명형 글만 선별해 공개합니다.", html)
+        self.assertIn("계산 결과를 이해하는 데 도움이 되는 글을 모아두었습니다.", html)
         self.assertNotIn("계산기에서 끝나지 않는 배경 설명과 생활 맥락을 읽기 좋은 형식으로 정리합니다.", html)
 
     def test_blog_detail_uses_natural_fixed_copy(self):
