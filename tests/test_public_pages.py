@@ -99,14 +99,17 @@ class PublicPageTests(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertEqual(404, client.get(path, follow_redirects=True).status_code)
 
-    def test_age_page_keeps_policy_guidance_compact_and_source_first(self):
+    def test_age_page_restores_the_full_age_based_policy_reference(self):
         html = app.test_client().get("/age").get_data(as_text=True)
+        script = Path("static/js/age-calculator.js").read_text(encoding="utf-8")
 
-        self.assertNotIn('class="age-rights-section"', html)
-        self.assertNotIn("청년 월세 특별 지원", html)
-        self.assertNotIn("중장년층 전용 주택", html)
+        self.assertIn('class="age-rights-section"', html)
+        self.assertIn("청년 월세 특별 지원", html)
+        self.assertIn("중장년층 전용 주택", html)
         self.assertIn("연령별 제도는 공식 기준을 확인하세요", html)
-        self.assertIn('href="/references"', html)
+        self.assertIn("노령연금 지급 시작", html)
+        self.assertIn("현재 나이로 가능한 권리·제도", script)
+        self.assertIn("generateRightsInfo(age)", script)
 
     def test_age_page_submits_only_when_its_explicit_button_is_clicked(self):
         """Typing validates as eight digits; submit is left to the server-rendered result page."""
@@ -245,7 +248,9 @@ assert.match(html, /href="\/birthday-dday-calculator"/);
 assert.strictEqual((html.match(/class="age-result-links"[\s\S]*?<\/div>/) || [''])[0].match(/<a /g).length, 4);
 assert.doesNotMatch(html, /birth_date=/);
 assert.doesNotMatch(html, /1992-10-02[^<]*href=/);
-assert.doesNotMatch(html, /현재 나이로 가능한 권리·제도/);
+assert.match(html, /현재 나이로 가능한 권리·제도/);
+assert.match(html, /class="right-item available"/);
+assert.match(html, /class="right-item locked"/);
 assert.deepStrictEqual(
   DateUtils.getNextBirthdaySummary('1992-10-02', new Date(2026, 9, 1)),
   { daysUntil: 1, date: '2026-10-02' }

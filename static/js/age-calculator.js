@@ -434,6 +434,7 @@ class AgeCalculatorUI {
         const year = this.getBirthYear();
         const zodiacInfo = year && year >= 1900 ? DateUtils.getZodiacSign(year) : null;
         const zodiacText = zodiacInfo ? `${zodiacInfo.emoji} ${zodiacInfo.animal}띠` : '';
+        const rightsInfo = this.generateRightsInfo(result.age);
         const calendarType = document.querySelector?.('input[name="calendar_type"]:checked')?.value || 'solar';
         const birthIso = this.getBirthDateIso();
         const birthday = calendarType === 'solar' && birthIso
@@ -457,6 +458,11 @@ class AgeCalculatorUI {
                     </div>
                     ${zodiacText ? `<div class="age-result-summary-item"><strong>출생연도 기준</strong><span>${zodiacText}</span></div>` : ''}
                 </div>
+
+                <section class="rights-info" aria-label="현재 나이로 가능한 권리와 제도">
+                    <h4>🧑 현재 나이로 가능한 권리·제도</h4>
+                    <div class="rights-list">${rightsInfo}</div>
+                </section>
 
                 ${year ? `
                 <nav class="age-result-next" aria-label="계산 결과 관련 도구">
@@ -498,6 +504,60 @@ class AgeCalculatorUI {
                 </details>
             </div>
         `;
+    }
+
+    generateRightsInfo(age) {
+        const year = this.getBirthYear();
+        const basicRights = [
+            { age: 14, text: '카카오톡, SNS 등 대부분 온라인 서비스 가입 가능', link: 'https://www.kakaocorp.com/page/' },
+            { age: 14, text: '형사 미성년자(만 14세 미만) → 형사처벌 불가, 만 14세부터는 형사책임 인정' },
+            { age: 15, text: '근로기준법상 취직 가능 연령 (부모 동의 필요)', link: 'https://www.moel.go.kr/' },
+            { age: 17, text: '주민등록증 발급 가능', link: 'https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=13100000013' },
+            { age: 18, text: '자동차 운전면허 취득 가능 (2종 보통 기준)', link: 'https://www.safedriving.or.kr/' },
+            { age: 18, text: '선거권 부여 (국회의원, 대통령 선거 모두 가능)', link: 'https://www.nec.go.kr/' },
+            { age: 18, text: '혼인 가능 (민법 개정 후 남녀 모두 만 18세 이상부터)', link: 'https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=12700000050' },
+            { age: 18, text: '일부 청년 정책(교통·문화 할인, 청소년 우대 등) 종료' },
+            { age: 19, text: '술·담배 구매 가능 (청소년보호법)' },
+            { age: 19, text: '성인영화/게임/유흥업소 출입 가능' },
+            { age: 20, text: '군 입대 의무 본격 적용 (징병검사, 현역 입영 가능)', link: 'https://www.mma.go.kr/' },
+            { age: 20, text: '대학 등록금·청년 지원금 일부 제도 만 20세 이상 대상', link: 'https://www.kosaf.go.kr/ko/main.do' },
+            { age: 24, maximum: true, text: '일부 공공기관 청년 우대금리 통장 가입 가능' },
+            { age: 34, maximum: true, text: '청년 월세 특별 지원 (국토부, 지자체)', link: 'https://www.molit.go.kr/' },
+            { age: 34, maximum: true, text: '청년 전세자금 대출 (버팀목 전세자금 등)' },
+            { age: 34, maximum: true, text: '청년 주택 청약 우대 (신혼부부 특별공급 등은 만 39세 이하까지 확대되기도 함)' },
+            { age: 39, maximum: true, text: '청년 주택/장기전세주택 입주 가능 연령' },
+            { age: 39, maximum: true, text: '청년 창업 지원 (중소기업청, 창업지원금 등)', link: 'https://www.semas.or.kr/' },
+            { age: 39, maximum: true, text: '일부 지자체 청년 지원 정책 상한선' },
+            { age: 40, text: '중장년층 창업 지원 (중소기업청, 중장년 창업지원금)', link: 'https://www.semas.or.kr/' },
+            { age: 40, text: '중장년층 재취업 지원 (고용지원센터)', link: 'https://www.work.go.kr/' },
+            { age: 45, text: '중장년층 전용 주택 청약 (일부 지자체)', link: 'https://www.molit.go.kr/' },
+            { age: 50, text: '중장년층 전용 취업 지원 프로그램', link: 'https://www.work.go.kr/' },
+            { age: 50, text: '중장년층 건강검진 무료 (국가건강검진)', link: 'https://www.nhis.or.kr/' },
+            { age: 55, text: '중장년층 전용 주택 분양 (일부 아파트)', link: 'https://www.molit.go.kr/' },
+            { age: 60, text: '중장년층 특별 지원 (일부 지자체)', link: 'https://www.mohw.go.kr/' },
+            { age: 65, text: '노인복지법상 노인 혜택 시작', link: 'https://www.mohw.go.kr/' },
+            { age: 65, text: '노인교통카드 할인 (대중교통)', link: 'https://www.work.go.kr/' },
+            { age: 65, text: '노인 문화시설 할인 (박물관, 영화관 등)', link: 'https://www.mohw.go.kr/' },
+            { age: 65, text: '기초연금 수급 자격 (만 65세 이상)', link: 'https://www.nps.or.kr/' },
+            { age: 65, text: '노인장기요양보험 수급 자격', link: 'https://www.longtermcare.or.kr/' },
+            { age: 70, text: '노인 우선 대기 및 할인 혜택 확대', link: 'https://www.mohw.go.kr/' },
+        ];
+        const pensionRights = [
+            { start: 1953, end: 1956, age: 61 }, { start: 1957, end: 1960, age: 62 },
+            { start: 1961, end: 1964, age: 63 }, { start: 1965, end: 1968, age: 64 },
+            { start: 1969, age: 65 },
+        ];
+        const pension = pensionRights.find((right) => year >= right.start && (!right.end || year <= right.end));
+        if (pension) {
+            basicRights.push({ age: pension.age, text: `노령연금 지급 시작 (${pension.start}${pension.end ? `-${String(pension.end).slice(2)}` : '년생 이후'})`, link: 'https://www.nps.or.kr/' });
+        }
+        return basicRights.map((right) => {
+            const available = right.maximum ? age <= right.age : age >= right.age;
+            const content = right.link
+                ? `<a href="${right.link}" target="_blank" rel="noopener noreferrer">${right.text}</a>`
+                : `<span>${right.text}</span>`;
+            return `<div class="right-item ${available ? 'available' : 'locked'}"><span class="right-icon">${available ? '✅' : '🔒'}</span>${content}</div>`;
+        }).join('');
     }
 
     /**

@@ -225,6 +225,54 @@ FOOTER_POLICY_LINKS = [
     {"endpoint": "privacy", "label": "개인정보처리방침"},
     {"endpoint": "terms", "label": "이용약관"},
 ]
+
+AGE_RIGHTS = (
+    (14, False, "카카오톡, SNS 등 대부분 온라인 서비스 가입 가능", "https://www.kakaocorp.com/page/"),
+    (14, False, "형사 미성년자(만 14세 미만) → 형사처벌 불가, 만 14세부터는 형사책임 인정", ""),
+    (15, False, "근로기준법상 취직 가능 연령 (부모 동의 필요)", "https://www.moel.go.kr/"),
+    (17, False, "주민등록증 발급 가능", "https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=13100000013"),
+    (18, False, "자동차 운전면허 취득 가능 (2종 보통 기준)", "https://www.safedriving.or.kr/"),
+    (18, False, "선거권 부여 (국회의원, 대통령 선거 모두 가능)", "https://www.nec.go.kr/"),
+    (18, False, "혼인 가능 (민법 개정 후 남녀 모두 만 18세 이상부터)", "https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=12700000050"),
+    (18, False, "일부 청년 정책(교통·문화 할인, 청소년 우대 등) 종료", ""),
+    (19, False, "술·담배 구매 가능 (청소년보호법)", ""),
+    (19, False, "성인영화/게임/유흥업소 출입 가능", ""),
+    (20, False, "군 입대 의무 본격 적용 (징병검사, 현역 입영 가능)", "https://www.mma.go.kr/"),
+    (20, False, "대학 등록금·청년 지원금 일부 제도 만 20세 이상 대상", "https://www.kosaf.go.kr/ko/main.do"),
+    (24, True, "일부 공공기관 청년 우대금리 통장 가입 가능", ""),
+    (34, True, "청년 월세 특별 지원 (국토부, 지자체)", "https://www.molit.go.kr/"),
+    (34, True, "청년 전세자금 대출 (버팀목 전세자금 등)", ""),
+    (34, True, "청년 주택 청약 우대 (신혼부부 특별공급 등은 만 39세 이하까지 확대되기도 함)", ""),
+    (39, True, "청년 주택/장기전세주택 입주 가능 연령", ""),
+    (39, True, "청년 창업 지원 (중소기업청, 창업지원금 등)", "https://www.semas.or.kr/"),
+    (39, True, "일부 지자체 청년 지원 정책 상한선", ""),
+    (40, False, "중장년층 창업 지원 (중소기업청, 중장년 창업지원금)", "https://www.semas.or.kr/"),
+    (40, False, "중장년층 재취업 지원 (고용지원센터)", "https://www.work.go.kr/"),
+    (45, False, "중장년층 전용 주택 청약 (일부 지자체)", "https://www.molit.go.kr/"),
+    (50, False, "중장년층 전용 취업 지원 프로그램", "https://www.work.go.kr/"),
+    (50, False, "중장년층 건강검진 무료 (국가건강검진)", "https://www.nhis.or.kr/"),
+    (55, False, "중장년층 전용 주택 분양 (일부 아파트)", "https://www.molit.go.kr/"),
+    (60, False, "중장년층 특별 지원 (일부 지자체)", "https://www.mohw.go.kr/"),
+    (65, False, "노인복지법상 노인 혜택 시작", "https://www.mohw.go.kr/"),
+    (65, False, "노인교통카드 할인 (대중교통)", "https://www.work.go.kr/"),
+    (65, False, "노인 문화시설 할인 (박물관, 영화관 등)", "https://www.mohw.go.kr/"),
+    (65, False, "기초연금 수급 자격 (만 65세 이상)", "https://www.nps.or.kr/"),
+    (65, False, "노인장기요양보험 수급 자격", "https://www.longtermcare.or.kr/"),
+    (70, False, "노인 우선 대기 및 할인 혜택 확대", "https://www.mohw.go.kr/"),
+)
+
+
+def _age_rights_for(age: int, birth_year: int) -> tuple[dict[str, object], ...]:
+    rights = [
+        {"text": text, "url": url, "available": age <= threshold if maximum else age >= threshold}
+        for threshold, maximum, text, url in AGE_RIGHTS
+    ]
+    for start, end, pension_age in ((1953, 1956, 61), (1957, 1960, 62), (1961, 1964, 63), (1965, 1968, 64), (1969, None, 65)):
+        if birth_year >= start and (end is None or birth_year <= end):
+            cohort = f"{start}-{str(end)[2:]}년생" if end else f"{start}년생 이후"
+            rights.append({"text": f"노령연금 지급 시작 ({cohort})", "url": "https://www.nps.or.kr/", "available": age >= pension_age})
+            break
+    return tuple(rights)
 @app.before_request
 def set_csp_nonce():
     g.csp_nonce = secrets.token_urlsafe(16)
@@ -1748,6 +1796,7 @@ def age():
             'birth_year': birth_year,
             'next_birthday_text': next_birthday_text,
             'zodiac_text': f'{zodiac_emoji} {zodiac_animal}띠',
+            'rights': _age_rights_for(int(result['age']), birth_year),
         }
     example_birth_date = date(1992, 10, 2)
     example_man_age = today.year - example_birth_date.year - (
