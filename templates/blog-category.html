@@ -16,94 +16,103 @@
     <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
     <link rel="icon" href="/favicon.ico">
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% set adsense_enabled = adsense_enabled and category_indexable %}
     {% set coupang_partners_enabled = coupang_partners_enabled and category_indexable %}
     {% include 'partials/adsense.html' %}
 </head>
-<body class="blog-page">
+<body class="blog-page editorial-content-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
-        <a class="back-link" href="{{ url_for('blog_list') }}">블로그로 돌아가기</a>
-        <section class="hero-band blog-hero-band">
-            <div class="hero-copy">
-                <p class="eyebrow">블로그 카테고리</p>
-                <h1>{{ category_label }}</h1>
-                <p class="page-intro">공개 기준과 검수 기한을 통과한 글 {{ total }}개를 모았습니다.</p>
-            </div>
-        </section>
-        <section class="section-shell direct-answer">
-            <h2>{{ category_label }} 글을 고르는 기준</h2>
-            <p>공개 감사와 재검수 기한을 통과한 글만 모으며, 각 글에서 계산기와 공식 확인 경로를 함께 제공합니다.</p>
-        </section>
-        {% if category_editorial_content %}
-        <section class="section-shell blog-category-usage-guide" aria-labelledby="category-usage-guide-title">
-            <div class="section-heading">
-                <p class="eyebrow">Reading Guide</p>
-                <h2 id="category-usage-guide-title">{{ category_editorial_content.title }}</h2>
-                <p class="section-intro">{{ category_editorial_content.intro }}</p>
-            </div>
-            <div class="hub-card-grid">
-                {% for title, description in category_editorial_content.steps %}
-                <article class="hub-card calendar-card calendar-card-{{ loop.index % 4 }}">
-                    <span class="hub-card-index">0{{ loop.index }}</span>
-                    <h3>{{ title }}</h3>
-                    <p>{{ description }}</p>
-                </article>
-                {% endfor %}
-            </div>
-            <section class="life-hub-questions" aria-labelledby="category-questions-title">
-                <div class="section-heading">
-                    <p class="eyebrow">Questions</p>
-                    <h2 id="category-questions-title">자주 묻는 질문</h2>
+        <main class="editorial-index editorial-index--blog-category">
+            <a class="back-link" href="{{ url_for('blog_list') }}">블로그로 돌아가기</a>
+            <section class="hero-band blog-hero-band editorial-index-hero">
+                <div class="hero-copy">
+                    <p class="eyebrow">블로그 카테고리</p>
+                    <h1>{{ category_label }}</h1>
+                    <p class="page-intro">공개 기준과 검수 기한을 통과한 글 {{ total }}개를 모았습니다.</p>
                 </div>
-                <div class="question-list">
-                    {% for question, answer in category_editorial_content.faqs %}
-                    <article class="question-item">
-                        <h3>{{ question }}</h3>
-                        <p>{{ answer }}</p>
+            </section>
+            <section class="section-shell direct-answer editorial-prose">
+                <h2>{{ category_label }} 글을 고르는 기준</h2>
+                <p>공개 감사와 재검수 기한을 통과한 글만 모으며, 각 글에서 계산기와 공식 확인 경로를 함께 제공합니다.</p>
+            </section>
+            {% if category_editorial_content %}
+            <section class="section-shell blog-category-usage-guide editorial-prose" aria-labelledby="category-usage-guide-title">
+                <div class="section-heading">
+                    <p class="eyebrow">Reading Guide</p>
+                    <h2 id="category-usage-guide-title">{{ category_editorial_content.title }}</h2>
+                    <p class="section-intro">{{ category_editorial_content.intro }}</p>
+                </div>
+                <div class="hub-card-grid">
+                    {% for title, description in category_editorial_content.steps %}
+                    <article class="hub-card calendar-card calendar-card-{{ loop.index % 4 }}">
+                        <span class="hub-card-index">0{{ loop.index }}</span>
+                        <h3>{{ title }}</h3>
+                        <p>{{ description }}</p>
+                    </article>
+                    {% endfor %}
+                </div>
+                <section class="life-hub-questions" aria-labelledby="category-questions-title">
+                    <div class="section-heading">
+                        <p class="eyebrow">Questions</p>
+                        <h2 id="category-questions-title">자주 묻는 질문</h2>
+                    </div>
+                    <div class="question-list">
+                        {% for question, answer in category_editorial_content.faqs %}
+                        <article class="question-item">
+                            <h3>{{ question }}</h3>
+                            <p>{{ answer }}</p>
+                        </article>
+                        {% endfor %}
+                    </div>
+                </section>
+            </section>
+            {% endif %}
+            {% if posts %}
+            <section class="section-shell editorial-story-list-shell">
+                <div class="editorial-story-list">
+                    {% for post in posts %}
+                    {% set article = article_by_slug[post.slug] %}
+                    <article class="editorial-story-card{% if article.thumbnail %} has-media{% endif %}">
+                        <a class="editorial-story-link" href="{{ url_for('blog_detail', slug=post.slug) }}">
+                            {% if article.thumbnail %}
+                            <span class="editorial-story-media">
+                                <img class="blog-thumb" src="{{ article.thumbnail }}" alt="{{ article.thumbnail_alt }}" width="1200" height="630" loading="lazy">
+                            </span>
+                            {% endif %}
+                            <span class="editorial-story-copy">
+                                {% if post.published_at %}<span class="blog-date editorial-story-meta">{{ post.published_at | blog_datetime('%Y-%m-%d') }}</span>{% endif %}
+                                <span class="editorial-story-title">{{ article.title }}</span>
+                                <span class="blog-excerpt editorial-story-summary">{{ article.summary }}</span>
+                            </span>
+                        </a>
                     </article>
                     {% endfor %}
                 </div>
             </section>
-        </section>
-        {% endif %}
-        {% if posts %}
-        <section class="section-shell">
-            <div class="blog-grid">
-                {% for post in posts %}
-                {% set article = article_by_slug[post.slug] %}
-                <article class="blog-card">
-                    <a class="blog-card-link" href="{{ url_for('blog_detail', slug=post.slug) }}">
-                        {% if article.thumbnail %}<img class="blog-thumb" src="{{ article.thumbnail }}" alt="{{ article.thumbnail_alt }}" width="1200" height="630" loading="lazy">{% endif %}
-                        <h2>{{ article.title }}</h2>
-                        {% if post.published_at %}<p class="blog-date">{{ post.published_at | blog_datetime('%Y-%m-%d') }}</p>{% endif %}
-                        <p class="blog-excerpt">{{ article.summary }}</p>
-                    </a>
-                </article>
-                {% endfor %}
-            </div>
-        </section>
-        {% else %}
-        <div class="result error"><p class="message">현재 공개 중인 글이 없습니다.</p></div>
-        {% endif %}
-        <aside class="editorial-meta">
-            <h2>카테고리 편집 기준</h2>
-            <p>AgeCalc 편집팀이 공개 상태, 기준일, 출처와 만료 여부를 확인합니다.</p>
-        </aside>
-        <nav class="related-paths" aria-label="블로그 탐색">
-            <h2>다른 기준도 함께 보기</h2>
-            <a href="{{ url_for('blog_list') }}">전체 블로그</a>
-            <a href="{{ url_for('age') }}">만나이 계산기</a>
-            <a href="{{ url_for('references') }}">계산 기준과 출처</a>
-        </nav>
-        <nav class="pagination" aria-label="카테고리 페이지 이동">
-            {% if page > 1 %}<a class="page-btn" href="{{ url_for('blog_category', category_slug=category_slug, page=page-1) }}">이전</a>{% endif %}
-            <span class="page-current">{{ page }} / {{ total_pages }}</span>
-            {% if page < total_pages %}<a class="page-btn" href="{{ url_for('blog_category', category_slug=category_slug, page=page+1) }}">다음</a>{% endif %}
-        </nav>
+            {% else %}
+            <div class="result error"><p class="message">현재 공개 중인 글이 없습니다.</p></div>
+            {% endif %}
+            <aside class="editorial-meta" data-editorial-meta-variant="category">
+                <h2>카테고리 편집 기준</h2>
+                <p>AgeCalc 편집팀이 공개 상태, 기준일, 출처와 만료 여부를 확인합니다.</p>
+            </aside>
+            <nav class="related-paths" data-editorial-related-paths="true" aria-label="블로그 탐색">
+                <h2>다른 기준도 함께 보기</h2>
+                <a href="{{ url_for('blog_list') }}">전체 블로그</a>
+                <a href="{{ url_for('age') }}">만나이 계산기</a>
+                <a href="{{ url_for('references') }}">계산 기준과 출처</a>
+            </nav>
+            <nav class="pagination" aria-label="카테고리 페이지 이동">
+                {% if page > 1 %}<a class="page-btn" href="{{ url_for('blog_category', category_slug=category_slug, page=page-1) }}">이전</a>{% endif %}
+                <span class="page-current">{{ page }} / {{ total_pages }}</span>
+                {% if page < total_pages %}<a class="page-btn" href="{{ url_for('blog_category', category_slug=category_slug, page=page+1) }}">다음</a>{% endif %}
+            </nav>
+        </main>
         {% include 'partials/footer.html' %}
     </div>
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>

@@ -1,0 +1,2498 @@
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&display=swap");
+
+@font-face {
+  font-family: "Pretendard";
+  src: url("../fonts/PretendardVariable.subset.woff2") format("woff2-variations");
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+:root {
+  --lux-canvas: #F6F1E8;
+  --lux-surface: #FCF9F3;
+  --lux-espresso: #241D18;
+  --lux-text: #29231F;
+  --lux-muted: #746B63;
+  --lux-sage: #66705A;
+  --lux-gold: #A68B61;
+  --lux-danger: #A34C3D;
+  --lux-border: rgba(36, 29, 24, .14);
+  --lux-border-strong: rgba(36, 29, 24, .24);
+  --lux-sage-soft: rgba(102, 112, 90, .13);
+  --lux-gold-soft: rgba(166, 139, 97, .18);
+  --lux-brand: "Cormorant Garamond", Georgia, serif;
+  --lux-body: var(--site-font);
+  --lux-focus: 0 0 0 3px rgba(102, 112, 90, .28);
+  --lux-shadow-soft: 0 18px 50px rgba(36, 29, 24, .10);
+  --lux-shadow-panel: 0 28px 70px rgba(36, 29, 24, .18);
+  --lux-radius-shell: 18px;
+  --lux-radius-core: 12px;
+  --lux-motion: 180ms ease;
+}
+
+html {
+  overflow-x: clip;
+}
+
+body {
+  color: var(--lux-text);
+  background:
+    radial-gradient(circle at 16% 12%, rgba(166, 139, 97, .16), transparent 28rem),
+    linear-gradient(180deg, var(--lux-canvas), rgba(252, 249, 243, .72) 100%);
+  font-family: var(--site-font);
+}
+
+body #pixel-background,
+body::before,
+body::after {
+  opacity: .16;
+}
+
+/* Public long-text containers can break URLs without affecting result/table UI. */
+body .editorial-prose,
+body .blog-content,
+body .guide-content,
+body .section-shell.direct-answer ~ section:not([class]),
+body .contact-info,
+body .contact-info a,
+body .footer .footer-links a,
+body .editorial-filter-nav a,
+body [data-editorial-related-paths] a,
+body .editorial-article .article-links a,
+body .editorial-story-summary,
+body .coupang-disclosure,
+body .home-coupang-disclosure,
+body .coupang-partners-aside p {
+  overflow-wrap: anywhere;
+}
+
+:focus-visible {
+  outline: 2px solid var(--lux-sage);
+  outline-offset: 3px;
+  box-shadow: var(--lux-focus);
+}
+
+/* Result anchors receive programmatic focus after a calculation submits. */
+.result-container[tabindex="-1"]:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+body .container {
+  max-width: 1220px;
+  color: var(--lux-text);
+}
+
+.editorial-frame {
+  position: relative;
+}
+
+.editorial-panel-shell {
+  padding: 8px;
+  border-radius: var(--lux-radius-shell);
+  background: rgba(36, 29, 24, .08);
+}
+
+.editorial-panel-core {
+  border-radius: var(--lux-radius-core);
+  background: var(--lux-espresso);
+  color: var(--lux-surface);
+}
+
+.editorial-link-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .65rem;
+}
+
+.editorial-result-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .75rem;
+}
+
+.editorial-result-grid output,
+body .metric-value,
+body .age-number,
+body .age-hub-result-index {
+  font-family: var(--site-font);
+  font-variant-numeric: tabular-nums;
+}
+
+body a {
+  color: var(--lux-sage);
+}
+
+body h1,
+body h2,
+body h3 {
+  color: var(--lux-espresso);
+  font-family: var(--site-font);
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+body .brand-word {
+  color: var(--lux-espresso);
+  font-family: var(--lux-brand);
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+body p,
+body li {
+  line-height: 1.78;
+}
+
+body .eyebrow,
+body .command-label,
+body .brand-tag {
+  color: var(--lux-sage);
+  font-family: var(--site-font);
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+body .site-header {
+  border: 0;
+  border-bottom: 1px solid var(--lux-border);
+  border-radius: 0;
+  background: rgba(252, 249, 243, .88);
+  box-shadow: none;
+  backdrop-filter: blur(18px);
+}
+
+body .site-header::before {
+  display: none;
+}
+
+body .brand {
+  color: var(--lux-espresso);
+}
+
+body .brand-word {
+  font-size: 2.35rem;
+  font-weight: 600;
+}
+
+body .brand-note {
+  color: var(--lux-muted);
+}
+
+body .mega-nav,
+body .header-actions {
+  gap: .45rem;
+}
+
+body .mega-nav-trigger,
+body .mega-nav-link,
+body .hub-nav-direct,
+body .menu-toggle {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--lux-espresso);
+  background: transparent;
+  font-family: var(--site-font);
+  font-weight: 600;
+  letter-spacing: 0;
+  transition: transform var(--lux-motion);
+}
+
+body .menu-toggle,
+body .mobile-nav-close {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+body .mega-nav-trigger:hover,
+body .mega-nav-link:hover,
+body .menu-toggle:hover {
+  border-color: rgba(166, 139, 97, .38);
+  background: var(--lux-gold-soft);
+  color: var(--lux-espresso);
+  transform: translateY(-1px);
+}
+
+body .menu-toggle,
+body .menu-toggle:hover,
+body .menu-toggle:focus-visible {
+  border: 0;
+  border-color: transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+body .mega-menu-panel,
+body .mobile-nav-panel {
+  border: 0;
+  border-radius: 0;
+  background: rgba(252, 249, 243, .96);
+  color: var(--lux-text);
+  box-shadow: var(--lux-shadow-panel);
+}
+
+body .mega-menu-link,
+body .mobile-nav-link,
+body .mobile-nav-home,
+body .mobile-nav-blog,
+body .mobile-hub-title {
+  border-color: var(--lux-border);
+  border-radius: 10px;
+  background: rgba(246, 241, 232, .68);
+  color: var(--lux-espresso);
+}
+
+body .hero-band {
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--lux-text);
+  box-shadow: none;
+}
+
+body .hero-band::before {
+  display: none;
+}
+
+body:not(.home-page) .hero-band {
+  border: 0;
+  border-radius: 0;
+}
+
+body .hero-copy h1 {
+  font-size: 6.4rem;
+  line-height: .95;
+}
+
+.home-page .editorial-hero {
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  align-items: start;
+  overflow: hidden;
+}
+
+.home-page .editorial-hero-copy {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1.15rem;
+  max-width: 640px;
+  min-width: 0;
+}
+
+.home-page .editorial-hero-copy h1 {
+  margin: 0;
+  color: var(--lux-espresso);
+  font-family: var(--site-font);
+  font-size: clamp(1.9rem, 2.7vw, 2.4rem);
+  font-weight: 600;
+  line-height: .94;
+  letter-spacing: 0;
+}
+
+.home-page .editorial-hero-copy .page-intro {
+  max-width: 31rem;
+  margin: 0;
+  color: var(--lux-muted);
+  font-size: clamp(1rem, 1.35vw, 1.16rem);
+}
+
+.home-page .editorial-hero .editorial-panel-shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+  justify-self: stretch;
+  width: 100%;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.home-page .editorial-hero .editorial-panel-shell::before,
+.home-page .editorial-hero .editorial-panel-shell::after {
+  display: none;
+}
+
+.home-page .editorial-hero .editorial-panel-core {
+  position: relative;
+  display: grid;
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+  padding: clamp(1.35rem, 3vw, 2rem);
+  border: 0;
+  border-radius: var(--lux-radius-core);
+  background: var(--lux-espresso);
+  box-shadow: none;
+}
+
+.home-age-reference {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid rgba(252, 249, 243, .18);
+}
+
+.home-age-reference .command-label {
+  margin: 0 0 .25rem;
+  color: rgba(252, 249, 243, .7);
+}
+
+.home-age-reference strong {
+  display: block;
+  color: var(--lux-surface);
+  font-family: var(--site-font);
+  font-size: clamp(1.8rem, 3vw, 2.65rem);
+  line-height: 1;
+}
+
+.home-page .editorial-panel-core label {
+  color: var(--lux-surface);
+  font-weight: 700;
+}
+
+.home-page #home-birth-input {
+  min-height: 52px;
+  width: 100%;
+  padding: 0 .95rem;
+  border-color: rgba(252, 249, 243, .42);
+}
+
+.home-page #home-birth-error {
+  min-height: 1.45em;
+  margin: -.35rem 0 0;
+  font-size: .9rem;
+  line-height: 1.45;
+}
+
+.home-page #home-birth-error {
+  color: var(--lux-danger);
+}
+
+.home-page #home-birth-error:not(:empty) {
+  padding: .45rem .65rem;
+  border-radius: 8px;
+  background: var(--lux-surface);
+  color: var(--lux-danger);
+}
+
+.home-page #home-age-form .btn {
+  min-height: 52px;
+  width: 100%;
+  justify-content: center;
+}
+
+.home-page #home-age-result {
+  margin-top: .35rem;
+}
+
+.home-page .home-age-result-card {
+  display: grid;
+  gap: .45rem;
+  min-height: 104px;
+  padding: 1rem;
+  border: 1px solid rgba(252, 249, 243, .16);
+  border-radius: var(--lux-radius-core);
+  background: rgba(252, 249, 243, .08);
+}
+
+.home-page .home-age-result-card span {
+  color: rgba(252, 249, 243, .68);
+  font-size: .82rem;
+}
+
+.home-page .home-age-result-card output,
+.home-page .home-age-result-card a {
+  align-self: end;
+  color: var(--lux-surface);
+  font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.home-page .home-age-result-card a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.home-page .home-age-result-card-primary {
+  background: rgba(166, 139, 97, .18);
+  border-color: rgba(166, 139, 97, .38);
+}
+
+body .page-intro,
+body .section-intro {
+  color: var(--lux-muted);
+  line-height: 1.85;
+}
+
+body:not(.calculator-flat-page) .section-shell,
+body:not(.calculator-flat-page) .age-form,
+body:not(.calculator-flat-page) .result-container.show,
+body:not(.calculator-flat-page) .info {
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-shell);
+  color: var(--lux-text);
+  box-shadow: 0 12px 34px rgba(36, 29, 24, .07);
+}
+
+body:not(.calculator-flat-page) .direct-answer {
+  border-color: rgba(102, 112, 90, .28);
+}
+
+body:not(.calculator-flat-page) .section-card,
+body:not(.calculator-flat-page) .age-right-item,
+body:not(.calculator-flat-page) .metric-card,
+body:not(.calculator-flat-page) .age-hub-result-card,
+body:not(.calculator-flat-page) .home-life-hub-card article,
+body:not(.calculator-flat-page) .home-quick-links a {
+  border: 1px solid rgba(36, 29, 24, .12);
+  border-radius: var(--lux-radius-core);
+  background: rgba(252, 249, 243, .76);
+  color: var(--lux-text);
+  box-shadow: none;
+  transition: transform var(--lux-motion);
+}
+
+body:not(.calculator-flat-page) .section-card:hover,
+body:not(.calculator-flat-page) .age-right-item:hover,
+body:not(.calculator-flat-page) .age-hub-result-card:hover,
+body:not(.calculator-flat-page) .home-life-hub-card:hover article,
+body:not(.calculator-flat-page) .home-quick-links a:hover {
+  border-color: rgba(166, 139, 97, .42);
+  background: var(--lux-surface);
+  box-shadow: 0 16px 36px rgba(36, 29, 24, .10);
+  transform: translateY(-2px);
+}
+
+body .age-hub-dashboard {
+  padding: 8px;
+  border: 1px solid rgba(36, 29, 24, .10);
+  border-radius: var(--lux-radius-shell);
+  background: rgba(36, 29, 24, .08);
+}
+
+body .age-hub-dashboard-head,
+body .age-hub-result-card.is-primary {
+  border-radius: var(--lux-radius-core);
+  background: var(--lux-espresso);
+  color: var(--lux-surface);
+}
+
+body .age-hub-dashboard-head .command-label,
+body .age-hub-result-card.is-primary,
+body .age-hub-result-card.is-primary small {
+  color: var(--lux-surface);
+}
+
+body .btn,
+body button,
+body .page-btn {
+  font-family: var(--site-font);
+  letter-spacing: 0;
+}
+
+body .btn,
+body .page-btn {
+  min-height: 2.9rem;
+  border-radius: 999px;
+  transition: transform var(--lux-motion);
+}
+
+body .btn:hover,
+body .page-btn:hover {
+  transform: translateY(-1px);
+}
+
+body .btn:active,
+body .page-btn:active {
+  transform: translateY(0);
+}
+
+body .btn-primary,
+body .page-btn {
+  border-color: var(--lux-espresso);
+  background: var(--lux-espresso);
+  color: var(--lux-surface);
+  box-shadow: 0 12px 24px rgba(36, 29, 24, .18);
+}
+
+body .btn-primary:hover,
+body .page-btn:hover {
+  border-color: var(--lux-sage);
+  background: var(--lux-sage);
+  color: var(--lux-surface);
+}
+
+body .btn-secondary {
+  border-color: rgba(36, 29, 24, .18);
+  background: rgba(252, 249, 243, .76);
+  color: var(--lux-espresso);
+}
+
+body .btn-secondary:hover {
+  border-color: rgba(166, 139, 97, .48);
+  background: rgba(166, 139, 97, .16);
+  color: var(--lux-espresso);
+}
+
+body input,
+body select,
+body textarea {
+  border: 1px solid var(--lux-border-strong);
+  border-radius: 10px;
+  background: var(--lux-surface);
+  color: var(--lux-espresso);
+  font-family: var(--site-font);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .62);
+}
+
+body input:focus,
+body select:focus,
+body textarea:focus {
+  border-color: var(--lux-sage);
+  outline: none;
+  box-shadow: var(--lux-focus);
+}
+
+body .calendar-toggle {
+  border: 1px solid var(--lux-border);
+  border-radius: 999px;
+  background: rgba(36, 29, 24, .07);
+}
+
+body .calendar-toggle label {
+  border-radius: 999px;
+  color: var(--lux-muted);
+  font-weight: 600;
+}
+
+body .calendar-toggle input:checked + label {
+  color: var(--lux-surface);
+}
+
+body .toggle-slider {
+  background: var(--lux-espresso);
+}
+
+body .input-help,
+body .small {
+  color: var(--lux-muted);
+}
+
+body .error-msg,
+body .field-error,
+body .alert-error {
+  color: var(--lux-danger);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell {
+  display: grid;
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+  /* margin: clamp(1.4rem, 4vw, 2.6rem) 0; */
+}
+
+body.calculator-flat-page .editorial-calculator-shell,
+body.calculator-flat-page .section-shell:has(> .age-form) {
+  display: grid;
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+  width: min(100%, 760px);
+  margin-inline: auto;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .section-shell,
+body.editorial-calculator-page .editorial-calculator-shell .age-form,
+body.editorial-calculator-page .editorial-calculator-shell .result-container.show {
+  margin-block: 0;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .age-form,
+body.editorial-calculator-page .editorial-calculator-shell .result-container.show,
+body.editorial-calculator-page .editorial-calculator-shell #birthday-dday-result:not([hidden]) {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-color: rgba(166, 139, 97, .30);
+  background:
+    linear-gradient(135deg, rgba(252, 249, 243, .94), rgba(246, 241, 232, .80)),
+    radial-gradient(circle at 96% 8%, rgba(166, 139, 97, .14), transparent 18rem);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .age-form {
+  position: relative;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .age-form::before {
+  content: "";
+  position: absolute;
+  inset: .55rem;
+  border: 1px solid rgba(166, 139, 97, .24);
+  border-radius: 13px;
+  pointer-events: none;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .form-group,
+body.editorial-calculator-page .editorial-calculator-shell .date-inputs,
+body.editorial-calculator-page .editorial-calculator-shell .profile-date-control,
+body.editorial-calculator-page .editorial-calculator-shell .pet-input-panel {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell input:not([type="radio"]):not([type="checkbox"]),
+body.editorial-calculator-page .editorial-calculator-shell select,
+body.editorial-calculator-page .editorial-calculator-shell button,
+body.editorial-calculator-page .editorial-calculator-shell .btn,
+body.editorial-calculator-page .editorial-calculator-shell .calendar-toggle label,
+body.editorial-calculator-page .editorial-calculator-shell .result-next-links a,
+body.editorial-calculator-page .editorial-calculator-shell .age-result-links a,
+body.editorial-calculator-page .editorial-calculator-shell .share-section summary {
+  min-height: 44px;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell input:not([type="radio"]):not([type="checkbox"]),
+body.editorial-calculator-page .editorial-calculator-shell select {
+  width: 100%;
+  padding-inline: 1rem;
+  font-size: 1rem;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell input.error,
+body.editorial-calculator-page .editorial-calculator-shell select.error,
+body.editorial-calculator-page .editorial-calculator-shell textarea.error {
+  border-color: var(--lux-danger);
+  box-shadow: 0 0 0 3px rgba(163, 76, 61, .16);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .error-msg:not(:empty) {
+  padding: .65rem .8rem;
+  border: 1px solid rgba(163, 76, 61, .28);
+  border-radius: 10px;
+  background: rgba(163, 76, 61, .08);
+  color: var(--lux-danger);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .input-help,
+body.editorial-calculator-page .editorial-calculator-shell .pet-size-explanation {
+  margin: 0;
+  color: var(--lux-muted);
+  font-size: .94rem;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .calendar-toggle {
+  display: inline-grid;
+  position: relative;
+  grid-auto-flow: initial;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  min-height: 50px;
+  padding: .25rem;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .calendar-toggle label {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 1rem;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .calendar-toggle .toggle-slider {
+  position: absolute;
+  z-index: 0;
+  inset: .25rem auto .25rem .25rem;
+  display: block;
+  width: calc(50% - .25rem);
+  border-radius: inherit;
+  background: var(--lux-espresso);
+  transform: translateX(0);
+  transition: transform 180ms ease;
+  pointer-events: none;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .calendar-toggle input[type="radio"]:checked + label {
+  background: transparent;
+  color: var(--lux-surface);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .calendar-toggle #lunar:checked ~ .toggle-slider {
+  transform: translateX(100%);
+}
+
+body.editorial-calculator-page #age-form .calendar-toggle {
+  min-height: 44px;
+  padding: .125rem;
+}
+
+body.editorial-calculator-page #age-form .calendar-toggle label {
+  min-height: 40px;
+  padding-inline: .875rem;
+  font-size: .9rem;
+}
+
+body.editorial-calculator-page #age-form .date-inputs,
+body.editorial-calculator-page #age-form #birth-input,
+body.editorial-calculator-page #age-form .btn-primary {
+  width: 100%;
+}
+
+body.editorial-calculator-page #age-form #birth-input,
+body.editorial-calculator-page #age-form .btn-primary {
+  box-sizing: border-box;
+  height: 48px;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .result {
+  /* border: 1px solid var(--lux-border); */
+  /* border-radius: var(--lux-radius-core); */
+  /* background: rgba(252, 249, 243, .86); */
+  color: var(--lux-text);
+  /* box-shadow: inset 0 1px 0 rgba(255, 255, 255, .62); */
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .result.success {
+  border-color: rgba(102, 112, 90, .32);
+  /* background:
+    linear-gradient(135deg, rgba(102, 112, 90, .12), rgba(252, 249, 243, .92) 40%),
+    var(--lux-surface); */
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .result.error {
+  border-color: rgba(163, 76, 61, .38);
+  background:
+    linear-gradient(135deg, rgba(163, 76, 61, .12), rgba(252, 249, 243, .92) 38%),
+    var(--lux-surface);
+  color: var(--lux-danger);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .result.loading {
+  align-items: stretch;
+  min-height: 190px;
+  text-align: left;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .result.loading .loading-message {
+  display: grid;
+  gap: .75rem;
+  width: min(100%, 520px);
+  justify-items: stretch;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .result.loading .loading-spinner {
+  display: none;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .result.loading .loading-message::before,
+body.editorial-calculator-page .editorial-calculator-shell .result.loading .loading-message::after,
+body.editorial-calculator-page .editorial-calculator-shell .result.loading .loading-message p {
+  content: "";
+  display: block;
+  min-height: 18px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(36, 29, 24, .10), rgba(166, 139, 97, .18), rgba(36, 29, 24, .08));
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .result.loading .loading-message::before {
+  width: 42%;
+  min-height: 16px;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .result.loading .loading-message::after {
+  width: 72%;
+  min-height: 46px;
+  border-radius: 12px;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .result.loading .loading-message p {
+  width: 58%;
+  overflow: hidden;
+  color: transparent;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .message,
+body.editorial-calculator-page .editorial-calculator-shell .small {
+  color: var(--lux-muted);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .age-number,
+body.editorial-calculator-page .editorial-calculator-shell .age-result-primary .age-number,
+body.editorial-calculator-page .editorial-calculator-shell .age-result-summary-item span,
+body.editorial-calculator-page .editorial-calculator-shell .summary-card span,
+body.editorial-calculator-page .editorial-calculator-shell .birth-year-summary h2,
+body.editorial-calculator-page .editorial-calculator-shell td,
+body.editorial-calculator-page .editorial-calculator-shell th {
+  font-family: var(--site-font);
+  font-variant-numeric: tabular-nums;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .age-result-primary {
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border-radius: var(--lux-radius-core);
+  background: var(--lux-espresso);
+  color: var(--lux-surface);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .age-result-primary .eyebrow,
+body.editorial-calculator-page .editorial-calculator-shell .age-result-primary .message,
+body.editorial-calculator-page .editorial-calculator-shell .age-result-primary .age,
+body.editorial-calculator-page .editorial-calculator-shell .age-result-primary .age-number {
+  color: var(--lux-surface);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .age-result-summary,
+body.editorial-calculator-page .editorial-calculator-shell .summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .75rem;
+  border: 0;
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .age-result-summary-item,
+body.editorial-calculator-page .editorial-calculator-shell .summary-card {
+  display: grid;
+  gap: .4rem;
+  padding: 1rem;
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-core);
+  background: rgba(252, 249, 243, .76);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .age-result-summary-item + .age-result-summary-item {
+  border-left: 1px solid var(--lux-border);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .age-result-next,
+body.editorial-calculator-page .editorial-calculator-shell .result-next {
+  border-top: 1px solid var(--lux-border);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .age-result-links a,
+body.editorial-calculator-page .editorial-calculator-shell .result-next-links a {
+  border-color: var(--lux-border);
+  border-radius: 10px;
+  background: rgba(252, 249, 243, .78);
+  color: var(--lux-espresso);
+  transition: transform var(--lux-motion);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .age-result-links a:hover,
+body.editorial-calculator-page .editorial-calculator-shell .result-next-links a:hover {
+  border-color: rgba(102, 112, 90, .42);
+  color: var(--lux-sage);
+  transform: translateY(-1px);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: .7rem .9rem;
+  border: 1px solid var(--lux-border);
+  border-radius: 10px;
+  background: rgba(252, 249, 243, .78);
+  color: var(--lux-espresso);
+  text-decoration: none;
+  transition: transform var(--lux-motion);
+}
+
+body.editorial-calculator-page .editorial-calculator-shell .footer-links a:hover,
+body.editorial-calculator-page .editorial-calculator-shell .footer-links a:focus-visible {
+  border-color: rgba(102, 112, 90, .42);
+  color: var(--lux-sage);
+  transform: translateY(-1px);
+}
+
+body.editorial-calculator-page .editorial-supporting-content {
+  display: grid;
+  gap: clamp(1rem, 2.2vw, 1.5rem);
+}
+
+body .alert,
+body .notice {
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-core);
+  background: var(--lux-surface);
+  color: var(--lux-text);
+}
+
+body.editorial-content-page {
+  line-height: 1.75;
+}
+
+.editorial-index {
+  display: grid;
+  gap: clamp(1.4rem, 3vw, 2.4rem);
+  margin-block: clamp(1rem, 3vw, 2.5rem);
+}
+
+.editorial-index-hero {
+  position: relative;
+  display: grid;
+  min-height: 320px;
+  align-items: end;
+  padding: clamp(2rem, 5vw, 4.8rem);
+}
+
+.editorial-index-hero .hero-copy {
+  max-width: 720px;
+}
+
+body .editorial-index-hero .hero-copy h1,
+body .editorial-article-header h1 {
+  font-size: 6rem;
+  line-height: .98;
+}
+
+.editorial-filter-nav,
+[data-editorial-related-paths],
+.editorial-article .article-links {
+  gap: .65rem;
+}
+
+.editorial-filter-nav a,
+[data-editorial-related-paths] a,
+.editorial-article .article-links a,
+.editorial-story-link,
+.editorial-article .page-btn,
+.editorial-index .page-btn {
+  min-height: 44px;
+}
+
+.editorial-story-list-shell {
+  overflow: hidden;
+  padding: clamp(1rem, 3vw, 1.7rem);
+}
+
+.editorial-story-list {
+  display: grid;
+  gap: 0;
+  border-block: 1px solid var(--lux-border-strong);
+}
+
+.editorial-story-card {
+  border-bottom: 1px solid var(--lux-border);
+}
+
+.editorial-story-card:last-child {
+  border-bottom: 0;
+}
+
+.editorial-story-link {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1rem, 3vw, 2.2rem);
+  align-items: center;
+  padding: clamp(1.2rem, 3vw, 2rem) .2rem;
+  color: var(--lux-text);
+  text-decoration: none;
+  transition: transform var(--lux-motion);
+}
+
+.editorial-story-card.has-media .editorial-story-link {
+  grid-template-columns: minmax(220px, .58fr) minmax(0, 1fr);
+}
+
+.editorial-story-card.has-media:nth-child(even) .editorial-story-link {
+  grid-template-columns: minmax(0, 1fr) minmax(220px, .58fr);
+}
+
+.editorial-story-card.has-media:nth-child(even) .editorial-story-media {
+  order: 2;
+}
+
+.editorial-story-link:hover,
+.editorial-story-link:focus-visible {
+  transform: translateY(-2px);
+}
+
+.editorial-story-media {
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 1200 / 630;
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-core);
+  background: var(--lux-surface);
+}
+
+.editorial-story-media img,
+.editorial-article .blog-hero {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.editorial-story-copy {
+  display: grid;
+  gap: .55rem;
+  min-width: 0;
+}
+
+.editorial-story-index,
+.editorial-story-meta,
+.editorial-meta dt {
+  color: var(--lux-muted);
+  font-family: var(--site-font);
+  font-size: .78rem;
+  font-weight: 600;
+}
+
+.editorial-story-title {
+  color: var(--lux-espresso);
+  font-family: var(--site-font);
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.editorial-story-summary {
+  max-width: 65ch;
+  color: var(--lux-muted);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.editorial-article {
+  display: grid;
+  gap: clamp(1.4rem, 3vw, 2.3rem);
+  margin-block: clamp(1rem, 3vw, 2.5rem);
+}
+
+.editorial-article-header {
+  display: grid;
+  gap: 1rem;
+  max-width: 880px;
+  padding-block: clamp(1rem, 3vw, 2.5rem);
+}
+
+.editorial-article-header .article-intro,
+.editorial-article-header .page-intro {
+  max-width: 65ch;
+  line-height: 1.75;
+}
+
+.editorial-article .blog-hero {
+  overflow: hidden;
+  max-height: 560px;
+  border: 1px solid var(--lux-border-strong);
+  border-radius: var(--lux-radius-shell);
+  box-shadow: var(--lux-shadow-soft);
+}
+
+.editorial-prose {
+  display: grid;
+  gap: clamp(1.2rem, 2.8vw, 2rem);
+  max-width: 65ch;
+  line-height: 1.75;
+}
+
+.editorial-article .editorial-prose {
+  max-width: 880px;
+}
+
+.editorial-prose > section,
+.guide-content-checklist,
+.guide-content-case-study,
+.guide-content-comparison,
+.guide-content-reference,
+.editorial-prose-section {
+  max-width: 65ch;
+}
+
+.editorial-prose .section-shell,
+.editorial-prose .guide-related-box,
+.editorial-prose .notice,
+.editorial-meta {
+  width: 100%;
+}
+
+.editorial-prose p,
+.editorial-prose li,
+.editorial-prose dd,
+.editorial-meta p,
+.editorial-meta li {
+  line-height: 1.75;
+}
+
+.editorial-prose a,
+.editorial-meta a {
+  text-decoration: underline;
+  text-decoration-thickness: .08em;
+  text-underline-offset: .18em;
+}
+
+.editorial-prose h2,
+.editorial-prose h3,
+.editorial-meta h2,
+.editorial-meta h3 {
+  text-wrap: balance;
+}
+
+.editorial-article .section-card-grid,
+.editorial-index .hub-card-grid {
+  max-width: 100%;
+}
+
+.editorial-article .section-card,
+.editorial-index .hub-card,
+.editorial-index .question-item {
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-core);
+  background: rgba(252, 249, 243, .82);
+}
+
+.editorial-meta {
+  border-color: rgba(166, 139, 97, .42);
+}
+
+.editorial-meta-heading,
+.editorial-meta-facts,
+.editorial-meta-sources,
+.editorial-meta-correction {
+  max-width: 65ch;
+}
+
+.editorial-meta-facts {
+  gap: 0;
+}
+
+.editorial-meta-facts div {
+  border-color: var(--lux-border);
+}
+
+.editorial-ad-slot,
+.info-coupang-promotions,
+.coupang-partners-aside {
+  display: grid;
+  gap: .75rem;
+  padding: 1rem;
+  border: 1px solid rgba(166, 139, 97, .45);
+  border-radius: var(--lux-radius-core);
+  background: rgba(252, 249, 243, .9);
+}
+
+.editorial-ad-label,
+.coupang-disclosure,
+.home-coupang-disclosure,
+.coupang-partners-aside p {
+  color: var(--lux-muted);
+  font-family: var(--site-font);
+  font-size: .75rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.editorial-source-list {
+  position: relative;
+  padding-top: 1rem;
+  border-top: 3px solid var(--lux-gold);
+}
+
+.editorial-reading-progress {
+  background: rgba(36, 29, 24, .1);
+}
+
+.editorial-reading-progress .reading-progress-fill {
+  background: var(--lux-gold);
+}
+
+body .data-table-wrap,
+body .table-scroll {
+  overflow: auto;
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-core);
+  background: var(--lux-surface);
+}
+
+body .data-table-wrap thead th,
+body .table-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+body table,
+body .data-table {
+  border-color: var(--lux-border);
+  background: var(--lux-surface);
+  color: var(--lux-text);
+}
+
+body th,
+body .data-table th {
+  background: rgba(102, 112, 90, .13);
+  color: var(--lux-espresso);
+  font-family: var(--site-font);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+body td,
+body th,
+body .data-table td,
+body .data-table th {
+  border-color: rgba(36, 29, 24, .12);
+}
+
+body .data-table tbody tr.is-selected,
+body tr.is-selected {
+  background: rgba(166, 139, 97, .18);
+}
+
+body .container > h1,
+body .container > h3,
+body .section-shell.direct-answer ~ section:not([class]) {
+  margin-inline: auto;
+}
+
+body .section-shell.direct-answer ~ section:not([class]) {
+  max-width: 65ch;
+}
+
+body .container > h1,
+body .container > h3 {
+  text-align: center;
+}
+
+body .section-shell.direct-answer ~ section:not([class]) {
+  display: grid;
+  gap: .85rem;
+  width: 100%;
+}
+
+body .section-shell.direct-answer ~ section:not([class]) > * {
+  margin: 0;
+}
+
+body .section-shell.direct-answer ~ section:not([class]) h2,
+body .section-shell.direct-answer ~ section:not([class]) h3 {
+}
+
+body .section-shell.direct-answer ~ section:not([class]) ul,
+body .section-shell.direct-answer ~ section:not([class]) ol {
+  display: grid;
+  gap: .65rem;
+  padding-left: 1.2rem;
+}
+
+body .section-shell.direct-answer ~ section:not([class]) .highlight,
+body .section-shell.direct-answer ~ section:not([class]) .warning,
+body .contact-info {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-core);
+  background: rgba(252, 249, 243, .72);
+}
+
+body .faq {
+  display: grid;
+  gap: 1rem;
+}
+
+body .faq > div,
+body .faq details {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--lux-border);
+  border-radius: var(--lux-radius-core);
+  background: rgba(252, 249, 243, .78);
+}
+
+body .faq details summary {
+  min-height: 44px;
+  cursor: pointer;
+  color: var(--lux-espresso);
+  font-weight: 700;
+}
+
+body .faq details[open] summary {
+  margin-bottom: .75rem;
+}
+
+body .faq > div > strong,
+body .faq details summary {
+  display: block;
+  font-family: var(--site-font);
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+body .contact-info {
+  display: grid;
+  gap: .45rem;
+}
+
+body .contact-info p,
+body .contact-info h3 {
+  margin: 0;
+}
+
+body .section-shell .footer-links a,
+body .section-shell .life-hub-link-list a,
+body .hub-card-link {
+  min-height: 44px;
+}
+
+body .life-hub-link-list {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: .75rem;
+  border: 0;
+}
+
+body .life-hub-link-list a {
+  display: grid;
+  align-content: center;
+  gap: .35rem;
+  min-height: 92px;
+  padding: .9rem 1.1rem;
+  border: 1px solid var(--lux-border);
+  border-radius: 10px;
+  background: var(--lux-surface);
+  color: var(--lux-espresso);
+  box-shadow: var(--lux-shadow-soft);
+}
+
+body .life-hub-link-list a:last-child {
+  border-right: 1px solid var(--lux-border);
+}
+
+body .life-hub-link-list a:hover,
+body .life-hub-link-list a:focus-visible {
+  border-color: var(--lux-gold);
+  background: var(--lux-gold-soft);
+  color: var(--lux-espresso);
+  box-shadow: var(--lux-shadow-soft);
+  transform: translateY(-1px);
+}
+
+body .life-hub-link-list strong {
+  color: inherit;
+}
+
+body .life-hub-link-list span {
+  color: var(--lux-muted);
+  font-size: .9rem;
+}
+
+body.life-hub-page .section-intro,
+body.life-hub-page .life-hub-questions .small {
+  max-width: 65ch;
+}
+
+body .footer {
+  border: 1px solid var(--lux-border-strong);
+  border-radius: 22px;
+  background: var(--lux-espresso);
+  color: rgba(252, 249, 243, .82);
+  box-shadow: var(--lux-shadow-panel);
+}
+
+body .footer h4,
+body .footer .eyebrow {
+  color: var(--lux-surface);
+}
+
+body .footer a {
+  color: var(--lux-surface);
+}
+
+body .footer .footer-links a,
+body .footer .support-link {
+  border-color: rgba(252, 249, 243, .18);
+  border-radius: 999px;
+  background: rgba(252, 249, 243, .08);
+  color: var(--lux-surface);
+}
+
+body .footer .footer-links a:hover,
+body .footer .support-link:hover {
+  border-color: rgba(166, 139, 97, .68);
+  background: rgba(166, 139, 97, .20);
+}
+
+body .support-qr {
+  border-color: rgba(252, 249, 243, .18);
+  background: var(--lux-surface);
+}
+
+body .footer-bottom {
+  border-color: rgba(252, 249, 243, .16);
+  color: rgba(252, 249, 243, .62);
+}
+
+body .cookie-banner {
+  border: 1px solid rgba(166, 139, 97, .42);
+  border-radius: var(--lux-radius-shell);
+  background: rgba(252, 249, 243, .96);
+  color: var(--lux-text);
+  box-shadow: var(--lux-shadow-panel);
+  backdrop-filter: blur(14px);
+}
+
+body .cookie-content p {
+  color: var(--lux-muted);
+}
+
+body .scroll-top-btn {
+  border: 1px solid rgba(252, 249, 243, .24);
+  background: var(--lux-espresso);
+  color: var(--lux-surface);
+  box-shadow: 0 14px 34px rgba(36, 29, 24, .22);
+}
+
+@media (max-width: 900px) {
+  body .brand-word {
+    font-size: 2.05rem;
+  }
+
+  body .hero-copy h1 {
+    font-size: 5rem;
+  }
+
+}
+
+@media (max-width: 980px) {
+  .home-page .editorial-hero {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    overflow: hidden;
+  }
+
+  .home-page .editorial-hero-copy {
+    max-width: none;
+  }
+
+  .home-page .editorial-hero-copy h1 {
+    font-size: clamp(2.8rem, 10vw, 5rem);
+  }
+
+  .home-page .editorial-hero .editorial-panel-shell {
+    justify-self: stretch;
+    width: 100%;
+    transform: none;
+  }
+
+  .home-page .editorial-hero .editorial-panel-shell::before,
+  .home-page .editorial-hero .editorial-panel-shell::after {
+    transform: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .editorial-result-grid {
+    grid-template-columns: 1fr;
+  }
+
+  body .container {
+    width: min(100% - 1rem, 1220px);
+  }
+
+  body .hero-band,
+  body .section-shell,
+  body .age-form,
+  body .result-container.show,
+  body .footer {
+    border-radius: 0;
+  }
+
+  body .hero-copy h1 {
+    font-size: 3.4rem;
+  }
+
+  .editorial-index-hero {
+    min-height: 260px;
+    padding: 1.4rem 1.1rem;
+  }
+
+  body .editorial-index-hero .hero-copy h1,
+  body .editorial-article-header h1 {
+    font-size: 3.2rem;
+  }
+
+  .editorial-story-card.has-media .editorial-story-link,
+  .editorial-story-card.has-media:nth-child(even) .editorial-story-link {
+    grid-template-columns: 1fr;
+  }
+
+  .editorial-story-card.has-media:nth-child(even) .editorial-story-media,
+  .editorial-story-copy {
+    order: initial;
+  }
+
+  .editorial-story-title {
+    font-size: 1.55rem;
+  }
+
+  .editorial-prose,
+  .editorial-article .editorial-prose,
+  .editorial-prose > section,
+  .guide-content-checklist,
+  .guide-content-case-study,
+  .guide-content-comparison,
+  .guide-content-reference,
+  .editorial-prose-section {
+    max-width: 100%;
+  }
+
+  .home-page .editorial-hero {
+    padding: 1.4rem 1.1rem 1.2rem;
+  }
+
+  .home-page .editorial-hero-copy h1 {
+    font-size: clamp(2.45rem, 13vw, 3.75rem);
+    line-height: 1.04;
+  }
+
+  .home-page .editorial-hero .editorial-panel-shell {
+    padding: 0;
+    border-radius: 0;
+  }
+
+  .home-page .editorial-hero .editorial-panel-shell::before,
+  .home-page .editorial-hero .editorial-panel-shell::after {
+    display: none;
+  }
+
+  .home-page .editorial-hero .editorial-panel-core {
+    min-height: 0;
+    padding: 1rem;
+  }
+
+  .home-age-reference {
+    display: grid;
+    gap: .3rem;
+  }
+
+  body .brand-word {
+    font-size: 1.85rem;
+  }
+
+  body .footer-grid,
+  body .support-row,
+  body .cookie-content {
+    grid-template-columns: 1fr;
+  }
+
+  body .section-shell.direct-answer ~ section:not([class]) {
+    max-width: 100%;
+  }
+
+  body.editorial-calculator-page .editorial-calculator-shell .profile-date-control,
+  body.editorial-calculator-page .editorial-calculator-shell .age-result-summary,
+  body.editorial-calculator-page .editorial-calculator-shell .summary-grid,
+  body.editorial-calculator-page .editorial-calculator-shell .age-result-links,
+  body.editorial-calculator-page .editorial-calculator-shell .result-next-links {
+    grid-template-columns: 1fr;
+  }
+
+  body.editorial-calculator-page .editorial-calculator-shell .age-form,
+  body.editorial-calculator-page .editorial-calculator-shell .result-container.show,
+  body.editorial-calculator-page .editorial-calculator-shell #birthday-dday-result:not([hidden]) {
+    padding: 1rem;
+  }
+
+  body.editorial-calculator-page .editorial-calculator-shell .age-form::before {
+    inset: .35rem;
+    border-radius: 12px;
+  }
+
+  body.editorial-calculator-page .editorial-calculator-shell .calendar-toggle {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Public sections show the continuous page canvas; controls and result cards remain bounded. */
+body .container > section,
+body .section-shell,
+body .info,
+body .notice,
+body .age-rights-section,
+body .related-paths,
+body .footer {
+  border: 0;
+  border-radius: 0;
+  color: var(--lux-text);
+  box-shadow: none;
+}
+
+/* The footer uses the full viewport width like the header; its contents keep a readable measure. */
+body .footer {
+  width: 100vw;
+  max-width: none;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  box-sizing: border-box;
+  padding-inline: max(1rem, calc((100vw - 1220px) / 2));
+}
+
+body .container > .footer,
+body.home-page .footer {
+  width: 100vw;
+  max-width: none;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
+body .footer-grid,
+body .footer-bottom {
+  width: 100%;
+  max-width: 1220px;
+  margin-inline: auto;
+}
+
+body .footer {
+  box-shadow: none;
+}
+
+/* The footer closes the document edge-to-edge without the former body gutter. */
+body {
+  padding-bottom: 0;
+}
+
+/* Every public hero uses the page canvas; inner forms and content retain their own surfaces. */
+body :is(.hero-band, [class*="-hero"]) {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body [class*="-hero"]::before {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Section shells follow the editorial-meta rhythm: canvas, spacing, and one divider. */
+body .section-shell {
+  border: 0 !important;
+  border-top: 1px solid var(--lux-border-strong) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* The home hub index follows editorial metadata dividers, not card surfaces. */
+body.home-page .home-life-hub-grid {
+  border: 0;
+}
+
+body.home-page .home-life-hub-card {
+  min-height: 0;
+  border: 0;
+  border-bottom: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+body.home-page .home-life-hub-card:last-child {
+  border-right: 0;
+}
+
+body.home-page .home-life-hub-card article {
+  padding: clamp(1rem, 2.5vw, 1.25rem);
+  grid-template-rows: auto auto auto 1fr auto;
+  border: 1px solid rgba(166, 139, 97, .42) !important;
+  border-radius: var(--lux-radius-core) !important;
+  background: var(--lux-surface) !important;
+  box-shadow: 0 16px 36px rgba(36, 29, 24, .10) !important;
+}
+
+body.home-page .home-life-hub-card:hover,
+body.home-page .home-life-hub-card:focus-visible {
+  /* background: var(--lux-surface) !important; */
+  /* box-shadow: 0 16px 36px rgba(36, 29, 24, .10) !important; */
+  /* transform: none !important; */
+}
+
+body.home-page #home-age-form .btn-primary {
+  border-color: var(--lux-gold);
+  background: var(--lux-gold);
+  color: var(--lux-espresso);
+  box-shadow: none;
+}
+
+body.home-page #home-age-form .btn-primary:hover,
+body.home-page #home-age-form .btn-primary:focus-visible {
+  border-color: var(--lux-surface);
+  background: var(--lux-surface);
+  color: var(--lux-espresso);
+}
+
+body .related-paths a,
+body .footer a,
+body .footer h4,
+body .footer .eyebrow {
+  color: var(--lux-sage);
+}
+
+body .footer .footer-links a,
+body .footer .support-link,
+body .footer-bottom {
+  border: 0;
+  background: transparent;
+  color: var(--lux-muted);
+}
+
+/* Calculator-first utility layout: keep the document flat and put the task first. */
+body.calculator-flat-page {
+  background: var(--lux-canvas);
+}
+
+body.calculator-flat-page::before,
+body.calculator-flat-page::after {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  body.home-page .home-life-hub-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+body.calculator-flat-page .container > * {
+  order: 10;
+}
+
+body.calculator-flat-page .container > .site-header {
+  order: 0;
+}
+
+body.calculator-flat-page .container > .breadcrumbs {
+  order: 0;
+}
+
+body.calculator-flat-page .container > .calculator-page-heading {
+  order: 1;
+}
+
+body.calculator-flat-page .calculator-page-heading.hero-band {
+  display: contents;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.calculator-flat-page .calculator-page-heading.hero-band::before,
+body.calculator-flat-page .calculator-page-heading.hero-band::after {
+  display: none;
+}
+
+body.calculator-flat-page .calculator-page-heading.hero-band .hero-copy {
+  display: contents;
+}
+
+body.calculator-flat-page .calculator-page-heading.hero-band .hero-copy > .eyebrow,
+body.calculator-flat-page .calculator-page-heading.hero-band .hero-copy > h1,
+body.calculator-flat-page .calculator-page-heading.hero-band .hero-copy > .page-intro {
+  grid-column: 1 / -1;
+  order: 1;
+  width: min(100%, 760px);
+  margin-inline: auto;
+}
+
+body.calculator-flat-page .calculator-page-heading.hero-band .hero-copy > .eyebrow {
+  /* margin-top: clamp(1rem, 3vw, 2rem); */
+  /* margin-bottom: 0; */
+}
+
+body.calculator-flat-page .calculator-page-heading.hero-band .hero-copy > h1 {
+  margin-bottom: 0;
+}
+
+body.calculator-flat-page .calculator-page-heading.hero-band .hero-copy > .page-intro {
+  margin-top: 0;
+  /* margin-bottom: clamp(1rem, 3vw, 1.75rem); */
+}
+
+body.calculator-flat-page .calculator-page-heading.hero-band .hero-actions,
+body.calculator-flat-page .calculator-page-heading.hero-band .hero-metrics {
+  order: 6;
+  grid-column: 1 / -1;
+  width: min(100%, 760px);
+  margin-inline: auto;
+}
+
+body.calculator-flat-page .calculator-page-heading:not(.hero-band) {
+  display: grid;
+  gap: .35rem;
+  width: min(100%, 760px);
+  margin: clamp(1rem, 3vw, 2rem) auto 0;
+}
+
+body.calculator-flat-page .container > .editorial-calculator-shell,
+body.calculator-flat-page .container > .section-shell:has(.age-form),
+body.calculator-flat-page .container > .age-form {
+  order: 2;
+}
+
+body.calculator-flat-page .container > .result-container,
+body.calculator-flat-page .container > .life-timeline-result,
+body.calculator-flat-page .container > .section-shell:has(.birth-year-summary) {
+  order: 3;
+}
+
+body.calculator-flat-page .container > .section-shell.direct-answer {
+  order: 4;
+}
+
+body.calculator-flat-page .container > .info-coupang-promotions,
+body.calculator-flat-page .container > .home-coupang-rails,
+body.calculator-flat-page .container > .editorial-supporting-content {
+  order: 5;
+}
+
+body.calculator-flat-page .container > .footer {
+  order: 100;
+}
+
+@media (max-width: 760px) {
+  body .footer {
+    padding-block: 1.25rem;
+    padding-inline: 1rem;
+  }
+
+  body .footer-grid {
+    gap: 1.5rem;
+  }
+
+  body .footer-bottom {
+    padding-top: 1rem;
+  }
+}
+
+body.calculator-flat-page .hero-band,
+body.calculator-flat-page .section-shell,
+body.calculator-flat-page .age-form,
+body.calculator-flat-page .result-container.show,
+body.calculator-flat-page .info {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+body.calculator-flat-page .section-shell,
+body.calculator-flat-page .age-form,
+body.calculator-flat-page .result-container.show,
+body.calculator-flat-page .info {
+  padding-inline: 0;
+}
+
+body.calculator-flat-page .age-form::before {
+  display: none;
+}
+
+body.calculator-flat-page .direct-answer {
+  background: transparent;
+}
+
+/* Match the specificity of the global editorial surface rule. */
+body.calculator-flat-page .container > .section-shell.direct-answer {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  padding-inline: 0;
+}
+
+body.calculator-flat-page .editorial-supporting-content .info {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  padding-inline: 0;
+}
+
+body.life-timeline-page.calculator-flat-page .container > .section-shell.direct-answer {
+  order: 2;
+}
+
+/* Explanatory cards should read as one continuous document on calculator pages.
+   Result summary cards remain bounded so the answer is still easy to scan. */
+body.calculator-flat-page .section-card-grid {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+body.calculator-flat-page .section-card:not(.birth-year-summary) {
+  padding-inline: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+body.calculator-flat-page .section-card:not(.birth-year-summary):hover {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Keep the public page hierarchy compact and leave full-screen game headings alone. */
+body h1 {
+  /* font-size: clamp(2.1rem, 4vw, 4.2rem) !important; */
+}
+
+body h2 {
+  font-size: clamp(1.35rem, 2.2vw, 2.1rem) !important;
+}
+
+body h3 {
+  font-size: clamp(1rem, 1.5vw, 1.25rem) !important;
+}
+
+body h4 {
+  font-size: clamp(.95rem, 1.2vw, 1.05rem) !important;
+}
+
+@media (max-width: 760px) {
+  body.calculator-flat-page .section-card-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding-inline: 0;
+  }
+
+  body.calculator-flat-page .section-card:not(.birth-year-summary) {
+    padding-block: 0;
+  }
+}
+/* Desktop navigation owns its layout independently of the mobile drawer. */
+body .desktop-menu-toggle,
+body .desktop-nav-panel,
+body .desktop-nav-overlay { display: none; }
+
+@media (min-width: 901px) {
+  body.desktop-nav-open { overflow: hidden; }
+  body .desktop-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--lux-text);
+    font: inherit;
+    cursor: pointer;
+  }
+  body > .desktop-nav-panel {
+    display: block;
+    position: fixed;
+    top: var(--desktop-header-height);
+    right: 0;
+    bottom: 0;
+    width: min(460px, 100vw);
+    max-width: 100vw;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 20px 24px 32px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    z-index: 1020;
+    border: 0;
+    border-radius: 0;
+    background: var(--lux-surface, #fcf9f3);
+    color: var(--lux-text);
+    transform: translateX(100%);
+    transition: transform 220ms ease;
+  }
+  body > .desktop-nav-overlay {
+    display: block;
+    position: fixed;
+    inset: var(--desktop-header-height) 0 0;
+    z-index: 1010;
+    background: rgba(36, 29, 24, .22);
+    opacity: 0;
+    transition: opacity 220ms ease;
+  }
+  body > .desktop-nav-panel[hidden],
+  body > .desktop-nav-overlay[hidden] { display: none; }
+  body > .desktop-nav-panel.is-open { transform: translateX(0); }
+  body > .desktop-nav-overlay.is-open { opacity: 1; }
+  body .desktop-nav-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  body .desktop-nav-close {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 28px;
+    cursor: pointer;
+  }
+  body .desktop-nav-groups { display: grid; gap: 24px; }
+  body .desktop-nav-links { display: grid; gap: 4px; }
+  body .desktop-nav-category,
+  body .desktop-nav-link {
+    display: block;
+    padding: 10px 12px;
+    color: var(--lux-text);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    transition: transform 160ms ease;
+  }
+  body .desktop-nav-category { font-weight: 700; }
+  body .desktop-nav-link:hover,
+  body .desktop-nav-link:focus-visible,
+  body .desktop-nav-category:hover,
+  body .desktop-nav-category:focus-visible {
+    background: var(--lux-gold-soft);
+    color: var(--lux-espresso);
+    transform: translateX(3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body > .desktop-nav-panel,
+  body > .desktop-nav-overlay,
+  body .desktop-nav-link,
+  body .desktop-nav-category { transition: none; }
+}
+
+/* Shared warm-paper presentation for hubs and public calculation tools.
+   The home and age pages retain their dedicated finishing styles. */
+body.life-hub-page:not(.age-hub-page),
+body.calculator-flat-page:not(.age-page) {
+  --tool-ink: #302a25;
+  --tool-muted: #70665e;
+  --tool-line: #ddd5ca;
+  --tool-panel: #eee8df;
+  --tool-accent: #514238;
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-tools {
+  padding-top: 24px;
+}
+
+body.life-hub-page:not(.age-hub-page) .section-heading {
+  gap: 12px;
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-tools .section-heading {
+  margin-bottom: 24px;
+}
+
+body.life-hub-page:not(.age-hub-page) :is(.life-hub-tools h1, .section-shell h2),
+body.calculator-flat-page:not(.age-page) :is(.calculator-page-heading h1, .hero-copy h1, .page-header h1, .section-shell > h1, .section-shell h2, .result-container > h2) {
+  color: var(--tool-ink);
+  font-family: var(--site-font);
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: -.03em;
+  word-break: keep-all;
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-tools h1,
+body.calculator-flat-page:not(.age-page) :is(.calculator-page-heading h1, .hero-copy h1, .page-header h1, .section-shell > h1) {
+  font-size: clamp(26px, 3vw, 38px);
+}
+
+body.life-hub-page:not(.age-hub-page) .section-shell h2,
+body.calculator-flat-page:not(.age-page) :is(.section-shell h2, .result-container > h2) {
+  font-size: clamp(21px, 2vw, 27px);
+}
+
+body.life-hub-page:not(.age-hub-page) :is(.page-intro, .section-intro, .section-shell p),
+body.calculator-flat-page:not(.age-page) :is(.page-intro, .section-intro, .section-shell p, .info p, .notice p) {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--tool-muted);
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-link-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-link-list a {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 116px;
+  padding: 20px;
+  border: 1px solid var(--tool-line);
+  border-radius: 10px;
+  background: #fffdfa;
+  color: var(--tool-ink);
+  box-shadow: none;
+  text-decoration: none;
+  transform: none;
+  transition: none;
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-link-list a strong {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-link-list a span {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--tool-muted);
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-link-list a:hover,
+body.life-hub-page:not(.age-hub-page) .life-hub-link-list a:focus-visible {
+  border-color: #b9aa9a;
+  background: var(--tool-panel);
+  box-shadow: none;
+  transform: none;
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-link-list a:focus-visible,
+body.calculator-flat-page:not(.age-page) :is(input, select, textarea, button, .btn):focus-visible {
+  outline: 2px solid var(--tool-accent);
+  outline-offset: 3px;
+}
+
+body.calculator-flat-page:not(.age-page) .editorial-calculator-shell .age-form,
+body.calculator-flat-page:not(.age-page) .container > .age-form,
+body.calculator-flat-page:not(.age-page) .section-shell:has(> .age-form) {
+  padding: clamp(20px, 3vw, 32px);
+  border: 0;
+  border-radius: 12px;
+  background: var(--tool-panel);
+  box-shadow: none;
+  color: var(--tool-ink);
+}
+
+body.calculator-flat-page:not(.age-page) .age-form::before,
+body.calculator-flat-page:not(.age-page) .age-form::after {
+  display: none;
+}
+
+body.calculator-flat-page:not(.age-page) :is(.form-group, .date-inputs, .profile-date-control, .pet-input-panel) {
+  gap: 12px;
+}
+
+body.calculator-flat-page:not(.age-page) .age-form :is(h3, .field-label, label) {
+  color: var(--tool-ink);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+body.calculator-flat-page:not(.age-page) .age-form h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+
+body.calculator-flat-page:not(.age-page) .age-form :is(input:not([type="radio"]):not([type="checkbox"]), select, textarea) {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 56px;
+  padding-inline: 16px;
+  border: 1px solid #c9bfb3;
+  border-radius: 8px;
+  background: #fffdfa;
+  color: var(--tool-ink);
+  font-family: var(--site-font);
+  font-size: 16px;
+  line-height: 1.5;
+  box-shadow: none;
+}
+
+body.calculator-flat-page:not(.age-page) .age-form input[inputmode="numeric"] {
+  font-size: 20px;
+  letter-spacing: .05em;
+  font-variant-numeric: tabular-nums;
+}
+
+body.calculator-flat-page:not(.age-page) .age-form :is(input, textarea)::placeholder {
+  color: #887c71;
+  opacity: 1;
+}
+
+body.calculator-flat-page:not(.age-page) .age-form .btn-primary,
+body.calculator-flat-page:not(.age-page) .age-form button[type="submit"] {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 20px;
+  border: 1px solid var(--tool-accent);
+  border-radius: 8px;
+  background: var(--tool-accent);
+  color: #fffdfa;
+  font-family: var(--site-font);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  box-shadow: none;
+  transform: none;
+}
+
+body.calculator-flat-page:not(.age-page) .age-form .btn-primary:hover,
+body.calculator-flat-page:not(.age-page) .age-form .btn-primary:focus-visible,
+body.calculator-flat-page:not(.age-page) .age-form button[type="submit"]:hover,
+body.calculator-flat-page:not(.age-page) .age-form button[type="submit"]:focus-visible {
+  border-color: #382e27;
+  background: #382e27;
+  color: #fffdfa;
+  box-shadow: none;
+  transform: none;
+}
+
+body.calculator-flat-page:not(.age-page) .calendar-toggle {
+  display: inline-grid;
+  position: relative;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  min-height: 50px;
+  padding: .25rem;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 4px;
+  border-color: transparent;
+  background: #e0d8cd;
+  box-shadow: none;
+}
+
+body.calculator-flat-page:not(.age-page) .calendar-toggle label {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  min-height: 42px;
+  padding-inline: 1rem;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--tool-muted);
+  font-size: 14px;
+  transition: transform 180ms ease;
+}
+
+body.calculator-flat-page:not(.age-page) .calendar-toggle input[type="radio"]:checked + label {
+  background: transparent;
+  color: #fffdfa;
+}
+
+body.calculator-flat-page:not(.age-page) .toggle-slider {
+  position: absolute;
+  z-index: 0;
+  inset: .25rem auto .25rem .25rem;
+  display: block;
+  width: calc(50% - .25rem);
+  border-radius: 2px;
+  background: var(--tool-accent);
+  transform: translateX(0);
+  transition: transform 180ms ease;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+body.calculator-flat-page:not(.age-page) .calendar-toggle #mode-since:checked ~ .toggle-slider {
+  transform: translateX(100%);
+}
+
+body.anniversary-page.calculator-flat-page #dday-form > .form-group,
+body.anniversary-page.calculator-flat-page #dday-form .date-inputs,
+body.anniversary-page.calculator-flat-page #dday-form #dday-date,
+body.anniversary-page.calculator-flat-page #dday-form button[type="submit"] {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+body.anniversary-page.calculator-flat-page #dday-form .date-inputs {
+  display: flex;
+  flex-direction: column;
+}
+
+body.calculator-flat-page #hundred-day-form .form-group,
+body.calculator-flat-page #hundred-day-form .date-inputs,
+body.calculator-flat-page #hundred-day-form #hundred-day-date,
+body.calculator-flat-page #hundred-day-form .hero-actions,
+body.calculator-flat-page #hundred-day-form button[type="submit"] {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+body.calculator-flat-page #hundred-day-form .hero-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+body.calculator-flat-page #hundred-day-form .date-inputs {
+  display: flex;
+  flex-direction: column;
+}
+
+body.calculator-flat-page .pet-table-size-select:disabled {
+  border-color: var(--tool-line);
+  background: #e0d8cd;
+  color: var(--tool-muted);
+  cursor: not-allowed;
+  opacity: .72;
+}
+
+body.editorial-calculator-page.calculator-flat-page #pet-age-form[data-pet="dog"] .pet-size-option.active {
+  border: 2px solid var(--tool-accent);
+  background: var(--tool-accent);
+  color: #fffdfa;
+  box-shadow: 0 0 0 3px rgba(81, 66, 56, .18);
+  transform: none;
+}
+
+body.editorial-calculator-page.calculator-flat-page #pet-age-form[data-pet="dog"] .pet-size-option.active::after {
+  content: "선택";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 3px 7px;
+  border: 1px solid rgba(255, 253, 250, .58);
+  border-radius: 999px;
+  color: #fffdfa;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+body.editorial-calculator-page.calculator-flat-page #pet-age-form[data-pet="dog"] .pet-size-option.active .dog-size-illustration {
+  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, .24));
+}
+
+body.editorial-calculator-page.calculator-flat-page #pet-age-form[data-pet="cat"] .cat-age-illustration {
+  display: block;
+  width: clamp(120px, 24vw, 190px);
+  height: auto;
+  margin: 0 auto;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 12px rgba(73, 48, 27, .12));
+}
+
+body.calculator-flat-page:not(.age-page) :is(.input-help, .small, .error-msg) {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--tool-muted);
+}
+
+body.calculator-flat-page:not(.age-page) .error-msg:not(:empty) {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #9a3029;
+}
+
+body.calculator-flat-page:not(.age-page) :is(.result-container.show, .result.success, .result:not(.loading)) {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.calculator-flat-page:not(.age-page) .result-container.show {
+  padding-top: 24px;
+}
+
+body.calculator-flat-page:not(.age-page) :is(.age-result-primary, .birth-year-summary, .result-main, .life-timeline-result-card) {
+  padding: clamp(20px, 3vw, 28px);
+  border: 0;
+  border-radius: 12px;
+  background: var(--tool-panel);
+  color: var(--tool-ink);
+  box-shadow: none;
+}
+
+body.calculator-flat-page:not(.age-page) :is(.age-number, .age-result-primary .age-number, .result-main .age-number) {
+  color: var(--tool-ink);
+  font-size: clamp(30px, 4vw, 40px);
+  line-height: 1.4;
+}
+
+body.calculator-flat-page:not(.age-page) :is(.age-result-summary-item, .summary-card, .result-section, .age-result-links a, .result-next-links a) {
+  border: 1px solid var(--tool-line);
+  border-radius: 8px;
+  background: #fffdfa;
+  box-shadow: none;
+}
+
+body.calculator-flat-page:not(.age-page) :is(.age-result-summary-item, .summary-card, .result-section) {
+  padding: 16px;
+}
+
+body.calculator-flat-page:not(.age-page) :is(.age-result-links a, .result-next-links a) {
+  padding: 16px;
+  color: var(--tool-accent);
+}
+
+body.calculator-flat-page:not(.age-page) :is(.age-result-links a, .result-next-links a):hover,
+body.calculator-flat-page:not(.age-page) :is(.age-result-links a, .result-next-links a):focus-visible {
+  border-color: #b9aa9a;
+  background: var(--tool-panel);
+  color: var(--tool-accent);
+  box-shadow: none;
+  transform: none;
+}
+
+body.calculator-flat-page:not(.age-page) .container > section:not(.hero-band):not(.section-shell):not(.mini-game),
+body.calculator-flat-page:not(.age-page) .section-shell:not(:has(> .age-form)) {
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 1px solid var(--tool-line);
+}
+
+body.calculator-flat-page:not(.age-page) :is(.data-table-wrap, table) {
+  max-width: 100%;
+}
+
+@media (max-width: 600px) {
+  body.life-hub-page:not(.age-hub-page) .life-hub-link-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  body.life-hub-page:not(.age-hub-page) .life-hub-link-list a {
+    min-height: 0;
+    padding: 16px;
+  }
+  body.calculator-flat-page:not(.age-page) :is(.page-intro, .section-intro, .section-shell p, .info p, .notice p) {
+    font-size: 15px;
+  }
+}

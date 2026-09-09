@@ -31,88 +31,64 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/home.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
 
-<body class="home-page">
+<body class="home-page" data-disable-clarity="true">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <section class="hero-band hero-command-board age-hub-hero">
-            <div class="hero-copy age-hub-copy">
-                <p class="eyebrow">Age Calculator Hub</p>
-                <h1>오늘 기준 나이를 바로 계산하세요</h1>
+        <section class="hero-band age-hub-hero editorial-hero" aria-labelledby="home-title">
+            <div class="editorial-hero-copy">
+                <p class="eyebrow">Age calculator & life dates</p>
+                <h1 id="home-title">오늘 기준 나이를 바로 계산하세요</h1>
                 <p class="page-intro">
-                    만나이, 학년, 생일 D-day, 아이 개월수, 반려동물 나이까지 날짜 기준 생활 계산을 한곳에서 확인하세요.
+                    생년월일로 현재 나이와 생활에 필요한 날짜를 확인하세요.
                 </p>
-                <div class="hero-actions">
-                    <a class="btn btn-primary" href="{{ url_for('age') }}">만나이 계산하기</a>
-                    <a class="btn btn-secondary" href="{{ url_for('school_grade_calculator') }}">학년 계산하기</a>
-                    <a class="btn btn-secondary" href="{{ url_for('birthday_dday_calculator') }}">생일 D-day 보기</a>
-                </div>
             </div>
 
-            <div class="age-hub-dashboard" aria-label="자주 찾는 계산">
-                <div class="age-hub-dashboard-head">
-                    <div>
-                        <p class="command-label">기준일: 오늘</p>
+            <div class="editorial-panel-shell">
+                <form id="home-age-form" class="editorial-panel-core" data-clarity-mask="true" data-today="{{ today.isoformat() }}" novalidate>
+                    <div class="home-age-reference">
+                        <p class="command-label">기준일</p>
                         <strong>{{ today.strftime("%Y.%m.%d") }}</strong>
                     </div>
-                    <span>바로 계산</span>
-                </div>
-                <div class="age-hub-result-grid">
-                    <a class="age-hub-result-card is-primary" href="{{ url_for('age') }}">
-                        <span class="age-hub-result-index">01</span>
-                        <strong>만나이</strong>
-                        <small>생년월일 기준 계산</small>
-                    </a>
-                    <a class="age-hub-result-card" href="{{ url_for('school_grade_calculator') }}">
-                        <span class="age-hub-result-index">02</span>
-                        <strong>학년</strong>
-                        <small>출생연도 기준 확인</small>
-                    </a>
-                    <a class="age-hub-result-card" href="{{ url_for('birthday_dday_calculator') }}">
-                        <span class="age-hub-result-index">03</span>
-                        <strong>생일</strong>
-                        <small>다음 생일까지 D-day</small>
-                    </a>
-                    <a class="age-hub-result-card" href="{{ url_for('baby_months') }}">
-                        <span class="age-hub-result-index">04</span>
-                        <strong>아이 개월수</strong>
-                        <small>출생일 기준 월령 계산</small>
-                    </a>
-                    <a class="age-hub-result-card" href="{{ url_for('dog') }}">
-                        <span class="age-hub-result-index">05</span>
-                        <strong>반려동물 나이</strong>
-                        <small>사람 나이로 환산</small>
-                    </a>
-                </div>
+
+                    <label for="home-birth-input">생년월일</label>
+                    <input id="home-birth-input" type="text" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" required autocomplete="bday" aria-describedby="home-birth-error">
+                    <p id="home-birth-error" role="alert"></p>
+
+                    <button class="btn btn-primary" type="submit">계산하기</button>
+
+                    <div class="editorial-result-grid" id="home-age-result" aria-live="polite" hidden>
+                        <div class="home-age-result-card home-age-result-card-primary">
+                            <span>만나이</span>
+                            <output id="home-age-value"></output>
+                        </div>
+                        <div class="home-age-result-card" id="home-grade-result">
+                            <span>학년</span>
+                            <a id="home-grade-link" data-calculator-url="{{ url_for('school_grade_calculator') }}" href="{{ url_for('school_grade_calculator') }}">학년 계산</a>
+                        </div>
+                        <div class="home-age-result-card" id="home-birthday-result">
+                            <span>생일 D-day</span>
+                            <a href="{{ url_for('birthday_dday_calculator') }}">D-day 계산</a>
+                        </div>
+                    </div>
+                </form>
             </div>
         </section>
         {% include 'partials/info_coupang_promotions.html' %}
         {% include 'partials/home_coupang_rails.html' %}
 
-        <section class="section-shell home-quick-tools">
-            <div class="section-heading">
-                <p class="eyebrow">Quick Reference</p>
-                <h2>빠른 표·기준 찾기</h2>
-                <p class="section-intro">날짜를 입력하지 않고 출생연도와 입학 시점, 띠 기준을 바로 확인하세요.</p>
-            </div>
-            <nav class="home-quick-links" aria-label="빠른 표와 기준 찾기">
-                <a href="{{ url_for('birth_year_age_table') }}"><strong>출생연도 나이표</strong><span>몇 년생인지로 현재 나이 확인</span></a>
-                <a href="{{ url_for('school_entry_year_table') }}"><strong>입학년도 계산</strong><span>초·중·고 입학 시점 확인</span></a>
-                <a href="{{ url_for('birth_year_zodiac_table') }}"><strong>띠 나이표</strong><span>출생연도별 띠 확인</span></a>
-            </nav>
-        </section>
-
         <section class="section-shell home-life-hubs" aria-labelledby="home-life-hubs-title">
             <div class="section-heading">
                 <p class="eyebrow">Life Paths</p>
-                <h2 id="home-life-hubs-title">8개의 생활 영역</h2>
-                <p class="section-intro">계산 결과를 가족, 학교, 기념일, 건강과 앞으로의 생애 시점으로 연결합니다.</p>
+                <h2 id="home-life-hubs-title">4개의 생활 영역</h2>
+                <p class="section-intro">나이, 학교, 기념일, 반려동물 관련 계산을 한곳에서 찾아보세요.</p>
             </div>
             <div class="home-life-hub-grid">
                 {% for hub in life_hubs %}
@@ -122,11 +98,24 @@
                         <p class="eyebrow">{{ hub.eyebrow }}</p>
                         <h3>{{ hub.title }}</h3>
                         <p>{{ hub.description }}</p>
-                        <span class="home-life-hub-action">허브 보기 <b aria-hidden="true">↗</b></span>
+                        <span class="home-life-hub-action">계산하러 가기 <b aria-hidden="true">↗</b></span>
                     </article>
                 </a>
                 {% endfor %}
             </div>
+        </section>
+
+        <section class="section-shell home-quick-tools">
+            <div class="section-heading">
+                <p class="eyebrow">Quick Reference</p>
+                <h2>빠른 표·기준 찾기</h2>
+                <p class="section-intro">날짜 입력 없이 출생연도, 입학 시점, 띠를 바로 확인하세요.</p>
+            </div>
+            <nav class="life-hub-link-list" aria-label="빠른 표와 기준 찾기">
+                <a href="{{ url_for('birth_year_age_table') }}"><strong>출생연도 나이표</strong><span>출생연도별 현재 나이 확인</span></a>
+                <a href="{{ url_for('school_grade_calculator') }}"><strong>학년 계산기</strong><span>현재 학년과 초·중·고 입학 시점 확인</span></a>
+                <a href="{{ url_for('birth_year_zodiac_table') }}"><strong>띠 나이표</strong><span>출생연도별 띠 확인</span></a>
+            </nav>
         </section>
 
         <section class="section-shell home-method-note direct-answer">
@@ -156,6 +145,7 @@
 
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
+    <script src="{{ versioned_static('js/home-age-calculator.js') }}" defer></script>
 
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
         ↑

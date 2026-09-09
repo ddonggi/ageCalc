@@ -132,9 +132,6 @@ app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
 )
-_score_lock = threading.Lock()
-_score_file = os.path.join(app.root_path, "data", "snake_scores.json")
-os.makedirs(os.path.dirname(_score_file), exist_ok=True)
 init_db()
 
 BLOG_DRAFT_ACCESS_SESSION_KEY = "blog_draft_access"
@@ -228,6 +225,54 @@ FOOTER_POLICY_LINKS = [
     {"endpoint": "privacy", "label": "개인정보처리방침"},
     {"endpoint": "terms", "label": "이용약관"},
 ]
+
+AGE_RIGHTS = (
+    (14, False, "카카오톡, SNS 등 대부분 온라인 서비스 가입 가능", "https://www.kakaocorp.com/page/"),
+    (14, False, "형사 미성년자(만 14세 미만) → 형사처벌 불가, 만 14세부터는 형사책임 인정", ""),
+    (15, False, "근로기준법상 취직 가능 연령 (부모 동의 필요)", "https://www.moel.go.kr/"),
+    (17, False, "주민등록증 발급 가능", "https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=13100000013"),
+    (18, False, "자동차 운전면허 취득 가능 (2종 보통 기준)", "https://www.safedriving.or.kr/"),
+    (18, False, "선거권 부여 (국회의원, 대통령 선거 모두 가능)", "https://www.nec.go.kr/"),
+    (18, False, "혼인 가능 (민법 개정 후 남녀 모두 만 18세 이상부터)", "https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=12700000050"),
+    (18, False, "일부 청년 정책(교통·문화 할인, 청소년 우대 등) 종료", ""),
+    (19, False, "술·담배 구매 가능 (청소년보호법)", ""),
+    (19, False, "성인영화/게임/유흥업소 출입 가능", ""),
+    (20, False, "군 입대 의무 본격 적용 (징병검사, 현역 입영 가능)", "https://www.mma.go.kr/"),
+    (20, False, "대학 등록금·청년 지원금 일부 제도 만 20세 이상 대상", "https://www.kosaf.go.kr/ko/main.do"),
+    (24, True, "일부 공공기관 청년 우대금리 통장 가입 가능", ""),
+    (34, True, "청년 월세 특별 지원 (국토부, 지자체)", "https://www.molit.go.kr/"),
+    (34, True, "청년 전세자금 대출 (버팀목 전세자금 등)", ""),
+    (34, True, "청년 주택 청약 우대 (신혼부부 특별공급 등은 만 39세 이하까지 확대되기도 함)", ""),
+    (39, True, "청년 주택/장기전세주택 입주 가능 연령", ""),
+    (39, True, "청년 창업 지원 (중소기업청, 창업지원금 등)", "https://www.semas.or.kr/"),
+    (39, True, "일부 지자체 청년 지원 정책 상한선", ""),
+    (40, False, "중장년층 창업 지원 (중소기업청, 중장년 창업지원금)", "https://www.semas.or.kr/"),
+    (40, False, "중장년층 재취업 지원 (고용지원센터)", "https://www.work.go.kr/"),
+    (45, False, "중장년층 전용 주택 청약 (일부 지자체)", "https://www.molit.go.kr/"),
+    (50, False, "중장년층 전용 취업 지원 프로그램", "https://www.work.go.kr/"),
+    (50, False, "중장년층 건강검진 무료 (국가건강검진)", "https://www.nhis.or.kr/"),
+    (55, False, "중장년층 전용 주택 분양 (일부 아파트)", "https://www.molit.go.kr/"),
+    (60, False, "중장년층 특별 지원 (일부 지자체)", "https://www.mohw.go.kr/"),
+    (65, False, "노인복지법상 노인 혜택 시작", "https://www.mohw.go.kr/"),
+    (65, False, "노인교통카드 할인 (대중교통)", "https://www.work.go.kr/"),
+    (65, False, "노인 문화시설 할인 (박물관, 영화관 등)", "https://www.mohw.go.kr/"),
+    (65, False, "기초연금 수급 자격 (만 65세 이상)", "https://www.nps.or.kr/"),
+    (65, False, "노인장기요양보험 수급 자격", "https://www.longtermcare.or.kr/"),
+    (70, False, "노인 우선 대기 및 할인 혜택 확대", "https://www.mohw.go.kr/"),
+)
+
+
+def _age_rights_for(age: int, birth_year: int) -> tuple[dict[str, object], ...]:
+    rights = [
+        {"text": text, "url": url, "available": age <= threshold if maximum else age >= threshold}
+        for threshold, maximum, text, url in AGE_RIGHTS
+    ]
+    for start, end, pension_age in ((1953, 1956, 61), (1957, 1960, 62), (1961, 1964, 63), (1965, 1968, 64), (1969, None, 65)):
+        if birth_year >= start and (end is None or birth_year <= end):
+            cohort = f"{start}-{str(end)[2:]}년생" if end else f"{start}년생 이후"
+            rights.append({"text": f"노령연금 지급 시작 ({cohort})", "url": "https://www.nps.or.kr/", "available": age >= pension_age})
+            break
+    return tuple(rights)
 @app.before_request
 def set_csp_nonce():
     g.csp_nonce = secrets.token_urlsafe(16)
@@ -241,7 +286,11 @@ def _redirect_with_query(target: str, code: int = 301):
 
 LEGACY_HUB_REDIRECTS = {
     "/age/": "/age-tools/",
-    "/health/": "/health-tools/",
+    "/family/": "/age-tools/",
+    "/retirement/": "/age-tools/",
+    "/health/": "/age-tools/",
+    "/health-tools/": "/age-tools/",
+    "/generations/": "/age-tools/",
 }
 TRAILING_SLASH_REDIRECTS = {
     f"{page['path']}/": str(page["path"])
@@ -364,8 +413,6 @@ def cleanup_session(exception=None):
 def add_security_headers(response):
     if request.path == "/health":
         response.headers["X-Robots-Tag"] = "noindex, nofollow"
-    elif request.path == "/minigames" or request.path.startswith("/minigames/"):
-        response.headers["X-Robots-Tag"] = "noindex, nofollow"
     elif getattr(g, "result_query_noindex", False):
         response.headers["X-Robots-Tag"] = "noindex, follow"
     elif ADSENSE_REVIEW_MODE and request.path in ADSENSE_REVIEW_HUB_PATHS:
@@ -397,39 +444,9 @@ def add_security_headers(response):
         "form-action 'self'"
     )
     response.headers["Content-Security-Policy"] = csp
+    if getattr(g, "private_result_query", False):
+        response.headers["Cache-Control"] = "no-store"
     return response
-
-
-def _ensure_score_file():
-    os.makedirs(os.path.dirname(_score_file), exist_ok=True)
-    if not os.path.exists(_score_file):
-        with open(_score_file, "w", encoding="utf-8") as f:
-            json.dump({"scores": []}, f)
-
-
-def _load_scores():
-    _ensure_score_file()
-    with open(_score_file, "r", encoding="utf-8") as f:
-        try:
-            data = json.load(f)
-        except json.JSONDecodeError:
-            data = {"scores": []}
-    return data.get("scores", [])
-
-
-def _save_scores(scores):
-    _ensure_score_file()
-    with open(_score_file, "w", encoding="utf-8") as f:
-        json.dump({"scores": scores}, f, ensure_ascii=False)
-
-
-def _date_key(ts):
-    return ts.strftime("%Y-%m-%d")
-
-
-def _month_key(ts):
-    return ts.strftime("%Y-%m")
-
 
 
 @app.get("/health") 
@@ -688,7 +705,7 @@ def _coupang_partners_is_enabled() -> bool:
 
 
 def _adsense_is_enabled_for_path(path: str, *, blog_public_indexable: bool | None = None) -> bool:
-    excluded_prefixes = ("/minigames", "/blog/drafts", "/blog/review")
+    excluded_prefixes = ("/blog/drafts", "/blog/review")
     if any(path == prefix or path.startswith(f"{prefix}/") for prefix in excluded_prefixes):
         return False
     if path in NON_INDEXABLE_GUIDE_PATHS:
@@ -964,6 +981,18 @@ def _parse_calendar_date(year: int | None, month: int | None, day: int | None):
         return None
 
 
+def _parse_eight_digit_date(raw: str | None, today=None, *, allow_future: bool = False):
+    digits = "".join(ch for ch in str(raw or "") if ch.isdigit())
+    if len(digits) != 8:
+        return None
+    parsed = _parse_calendar_date(int(digits[:4]), int(digits[4:6]), int(digits[6:]))
+    if parsed is None:
+        return None
+    if not allow_future and parsed > (today or _current_local_date()):
+        return None
+    return parsed
+
+
 def _convert_short_birth_year(yy: int, current_year: int) -> int:
     current_yy = current_year % 100
     return 2000 + yy if yy <= current_yy else 1900 + yy
@@ -1229,6 +1258,130 @@ def _build_pet_month_snapshot(pet: str, months: int, size: str = "small") -> dic
     }
 
 
+def _completed_months(start_date, end_date) -> int:
+    months = (end_date.year - start_date.year) * 12 + end_date.month - start_date.month
+    if end_date.day < start_date.day:
+        months -= 1
+    return max(0, months)
+
+
+def _build_baby_months_result(birth_date, today) -> dict[str, object]:
+    months = _completed_months(birth_date, today)
+    return {
+        "birth_date": _format_calendar_date(birth_date),
+        "months": months,
+        "total_days": max(0, (today - birth_date).days),
+        "years": months // 12,
+        "remain": months % 12,
+    }
+
+
+def _build_dday_result(target_date, mode: str, label: str, today) -> dict[str, object]:
+    diff = (target_date - today).days
+    if diff == 0:
+        status_label, tone, caption = "D-Day", "is-neutral", "바로 오늘입니다."
+    elif mode == "since" and diff < 0:
+        status_label, tone, caption = f"+{abs(diff)}일", "is-positive", f"{abs(diff)}일이 지났습니다."
+    elif diff > 0:
+        status_label, tone, caption = f"D-{diff}", "", f"{diff}일 남았습니다."
+    else:
+        status_label, tone, caption = f"D+{abs(diff)}일", "is-positive", f"{abs(diff)}일이 지났습니다."
+    return {
+        "label": label or "기념일",
+        "date": _format_calendar_date(target_date),
+        "mode": mode,
+        "mode_label": "지난 날부터" if mode == "since" else "다가오는 날",
+        "kicker": "경과 일수" if mode == "since" else "남은 일수",
+        "status_label": status_label,
+        "tone": tone,
+        "caption": caption,
+        "days": abs(diff),
+    }
+
+
+def _build_pet_calculator_result(pet: str, mode: str, years: int | None, months: int | None, birth_date, adoption_date, size: str, today):
+    if mode == "adoption-date":
+        if adoption_date is None:
+            return None
+        completed = _completed_months(adoption_date, today)
+        return {"kind": "adoption", "age_text": _format_years_months(completed)}
+    if mode == "birth-date":
+        if birth_date is None:
+            return None
+        months = _completed_months(birth_date, today)
+        years = months // 12
+        remain = months % 12
+    elif mode == "known-age":
+        if years is None or months is None or not (0 <= years <= 30 and 0 <= months <= 11) or years == months == 0:
+            return None
+        remain = months
+    else:
+        return None
+    age_months = years * 12 + remain
+    snapshot = _build_pet_month_snapshot(pet, age_months, size)
+    return {"kind": "age", "age_text": _format_years_months(age_months), **snapshot}
+
+
+def _age_on(as_of, birth_date) -> int:
+    return as_of.year - birth_date.year - ((as_of.month, as_of.day) < (birth_date.month, birth_date.day))
+
+
+def _child_order_label(index: int) -> str:
+    labels = ["첫째", "둘째", "셋째", "넷째", "다섯째", "여섯째", "일곱째", "여덟째", "아홉째", "열째"]
+    return labels[index] if index < len(labels) else f"{index + 1}째"
+
+
+def _build_parent_child_results(parents, children, today):
+    milestones = ((60, "환갑"), (70, "칠순"), (80, "팔순"), (90, "구순"))
+    parent_labels = {"mother": "엄마", "father": "아빠"}
+    child_labels = {"daughter": "딸", "son": "아들"}
+    results = []
+    for parent in parents:
+        for index, child in enumerate(children):
+            if child["birth"] <= parent["birth"]:
+                return None
+            milestone_rows = []
+            for age, label in milestones:
+                milestone_date = _parse_calendar_date(parent["birth"].year + age, parent["birth"].month, parent["birth"].day)
+                if milestone_date is None:
+                    milestone_date = date(parent["birth"].year + age, 3, 1)
+                milestone_rows.append({"year": milestone_date.year, "label": label, "age": age, "child_age": _age_on(milestone_date, child["birth"])})
+            results.append({
+                "parent_label": parent_labels[parent["role"]],
+                "child_label": child_labels[child["role"]],
+                "child_order": _child_order_label(index),
+                "parent_age_at_birth": _age_on(child["birth"], parent["birth"]),
+                "age_gap": _age_on(today, parent["birth"]) - _age_on(today, child["birth"]),
+                "child_birth_year": child["birth"].year,
+                "milestones": milestone_rows,
+            })
+    return results
+
+
+def _constellation(month: int, day: int) -> str:
+    value = month * 100 + day
+    if value >= 1222 or value <= 119:
+        return "염소자리"
+    for boundary, label in ((1123, "사수자리"), (1023, "전갈자리"), (923, "천칭자리"), (823, "처녀자리"), (723, "사자자리"), (622, "게자리"), (521, "쌍둥이자리"), (420, "황소자리"), (321, "양자리"), (219, "물고기자리"), (120, "물병자리")):
+        if value >= boundary:
+            return label
+    return "염소자리"
+
+
+def _build_life_timeline_snapshot(birth_date, today):
+    next_birthday = _next_birthday_date(birth_date.month, birth_date.day, today)
+    zodiac = ["원숭이", "닭", "개", "돼지", "쥐", "소", "호랑이", "토끼", "용", "뱀", "말", "양"][birth_date.year % 12]
+    return {
+        "full_age": _age_on(today, birth_date),
+        "year_age": today.year - birth_date.year,
+        "days_lived": (today - birth_date).days,
+        "next_birthday": next_birthday,
+        "days_until_birthday": (next_birthday - today).days,
+        "zodiac": zodiac,
+        "constellation": _constellation(birth_date.month, birth_date.day),
+    }
+
+
 def _short_school_label(stage: str, grade: int) -> str:
     return {
         "elementary": f"초{grade}",
@@ -1479,9 +1632,24 @@ def _validated_int_query(name, minimum, maximum):
     return value, False
 
 
+def _optional_bounded_int(raw: str, minimum: int, maximum: int):
+    if raw == "":
+        return None, False
+    if not raw.isdigit():
+        return None, True
+    value = int(raw)
+    return (value, False) if minimum <= value <= maximum else (None, True)
+
+
 def _query_keys_are_exact(*expected_keys):
     return set(request.args) == set(expected_keys) and all(
         len(request.args.getlist(key)) == 1 for key in expected_keys
+    )
+
+
+def _query_keys_are_allowed(*allowed_keys):
+    return set(request.args).issubset(allowed_keys) and all(
+        len(request.args.getlist(key)) == 1 for key in request.args
     )
 
 
@@ -1514,10 +1682,34 @@ def index():
 
 @app.get('/life-timeline')
 def life_timeline():
-    """생년월일 기반 통합 결과를 브라우저에서 계산하는 페이지."""
-    if request.args:
+    """생년월일 기반 통합 결과를 표시하는 페이지."""
+    today = _current_local_date()
+    if request.args and not _query_keys_are_exact("birth_date"):
         return redirect(url_for('life_timeline'))
-    return render_template('life-timeline.html', today=_current_local_date())
+    birth_date = _parse_eight_digit_date(request.args.get("birth_date"), today) if request.args else None
+    if request.args and birth_date is None:
+        return redirect(url_for('life_timeline'))
+    timeline = _build_life_timeline_snapshot(birth_date, today) if birth_date else None
+    if timeline:
+        _mark_result_query_noindex()
+        g.private_result_query = True
+    breadcrumbs = [
+        {"label": "홈", "url": f"{SITE_BASE_URL}/", "current": False},
+        {"label": HUB_PAGE_BY_KEY["age"]["title"], "url": f"{SITE_BASE_URL}{HUB_PAGE_BY_KEY['age']['path']}", "current": False},
+        {"label": "생애 타임라인", "url": f"{SITE_BASE_URL}/life-timeline", "current": True},
+    ]
+    breadcrumb_schema = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": index, "name": item["label"], "item": item["url"]}
+            for index, item in enumerate(breadcrumbs, start=1)
+        ],
+    }
+    return render_template(
+        'life-timeline.html', today=today, birth_date=birth_date, timeline=timeline,
+        breadcrumbs=breadcrumbs, breadcrumb_schema=breadcrumb_schema,
+    )
 
 
 @app.get("/<hub_slug>/")
@@ -1539,9 +1731,6 @@ def life_hub(hub_slug):
 @app.route('/age', methods=['GET', 'POST'])
 def age():
     """만나이 계산 페이지 - 나이 계산 폼과 결과를 표시"""
-    if request.method == 'GET' and request.args:
-        return redirect(url_for('age'))
-
     if request.method == 'POST':
         calendar_type = request.form.get('calendar_type', 'solar')
         if calendar_type != 'lunar':
@@ -1561,19 +1750,78 @@ def age():
         return response
 
     today = _current_local_date()
+    requested_birth_date = request.args.get('birth_date', '').strip()
+    calendar_type = request.args.get('calendar_type', 'solar').strip()
+    calendar_type = calendar_type if calendar_type in {'solar', 'lunar'} else 'solar'
+    birth_date_digits = ''.join(char for char in requested_birth_date if char.isdigit())
+    birth_date_value = (
+        f'{birth_date_digits[:4]}-{birth_date_digits[4:6]}-{birth_date_digits[6:]}'
+        if len(birth_date_digits) == 8
+        else requested_birth_date
+    )
+    birth_date_display = (
+        birth_date_digits
+        if len(birth_date_digits) == 8
+        else requested_birth_date
+    )
+    result = (
+        AgeController().calculate_age_from_string(birth_date_value, calendar_type)
+        if requested_birth_date
+        else None
+    )
+    result_details = None
+    if result and result.get('success') and len(birth_date_digits) == 8:
+        birth_year = int(birth_date_digits[:4])
+        birth_month = int(birth_date_digits[4:6])
+        birth_day = int(birth_date_digits[6:])
+        zodiac_animals = (
+            ('🐒', '원숭이'), ('🐔', '닭'), ('🐕', '개'), ('🐷', '돼지'),
+            ('🐭', '쥐'), ('🐮', '소'), ('🐯', '호랑이'), ('🐇', '토끼'),
+            ('🐉', '용'), ('🐍', '뱀'), ('🐴', '말'), ('🐑', '양'),
+        )
+        next_birthday_text = '음력 생일 D-day는 별도 기준 확인이 필요합니다'
+        if calendar_type == 'solar':
+            candidate_year = today.year
+            while True:
+                try:
+                    next_birthday = date(candidate_year, birth_month, birth_day)
+                except ValueError:
+                    candidate_year += 1
+                    continue
+                if next_birthday >= today:
+                    break
+                candidate_year += 1
+            days_until = (next_birthday - today).days
+            next_birthday_text = (
+                '오늘이 생일입니다'
+                if days_until == 0
+                else f'다음 생일까지 D-{days_until}'
+            )
+        zodiac_emoji, zodiac_animal = zodiac_animals[birth_year % 12]
+        result_details = {
+            'birth_year': birth_year,
+            'next_birthday_text': next_birthday_text,
+            'zodiac_text': f'{zodiac_emoji} {zodiac_animal}띠',
+            'rights': _age_rights_for(int(result['age']), birth_year),
+        }
     example_birth_date = date(1992, 10, 2)
     example_man_age = today.year - example_birth_date.year - (
         (today.month, today.day) < (example_birth_date.month, example_birth_date.day)
     )
-    return render_template(
+    response = make_response(render_template(
         'age.html',
-        result=None,
-        calendar_type='solar',
+        result=result,
+        result_details=result_details,
+        calendar_type=calendar_type,
+        birth_date_display=birth_date_display,
         page_path="/age",
         today=today,
         example_man_age=example_man_age,
         example_annual_age=today.year - example_birth_date.year,
-    )
+    ))
+    if requested_birth_date:
+        response.headers['Cache-Control'] = 'no-store'
+    return response
 
 @app.route('/privacy')
 def privacy():
@@ -1690,44 +1938,11 @@ def school_grade_calculator():
 
 @app.route('/school-entry-year-table')
 def school_entry_year_table():
-    """출생년도 기준 입학 학년도 안내 페이지"""
-    today = _current_local_date()
-    school_year = _current_school_year(today)
-    current_year = today.year
-    min_year = max(1900, current_year - 100)
-    max_year = current_year
-
-    selected_year, invalid_query = _validated_int_query("year", min_year, max_year)
-    if invalid_query or (request.args and not _query_keys_are_exact("year")):
-        return redirect(url_for("school_entry_year_table"))
-    if selected_year is not None:
-        _mark_result_query_noindex()
-
-    rows = []
-    selected_row = _build_school_entry_snapshot(selected_year, school_year) if selected_year is not None else None
-    for year in range(max_year, min_year - 1, -1):
-        row = _build_school_entry_snapshot(year, school_year)
-        row["is_selected"] = year == selected_year
-        rows.append(row)
-
-    example_years = [year for year in (2017, 2018, 2019, 2020) if 1900 <= year <= current_year]
-    examples = [_build_school_entry_snapshot(year, school_year) for year in example_years]
-
-    return render_template(
-        'school-entry-year-table.html',
-        school_year=school_year,
-        current_entry_birth_years={
-            "elementary": school_year - 7,
-            "middle": school_year - 13,
-            "high": school_year - 16,
-        },
-        selected_year=selected_year,
-        selected_row=selected_row,
-        school_entry_rows=rows,
-        year_options=range(max_year, min_year - 1, -1),
-        examples=examples,
-        canonical_url=f"{SITE_BASE_URL}/school-entry-year-table",
-        robots_content="index,follow" if selected_year is None else "noindex,follow",
+    """Legacy entry-year URL redirected to the combined grade calculator."""
+    year = request.args.get("year")
+    return redirect(
+        url_for("school_grade_calculator", **({"year": year} if year else {})),
+        code=301,
     )
 
 @app.route('/age-gap-calculator')
@@ -1784,10 +1999,17 @@ def age_gap_calculator():
 @app.route('/100-day-calculator')
 def hundred_day_calculator():
     """시작일 기준 100일째 날짜 안내 페이지"""
-    if request.args:
+    if request.args and not _query_keys_are_exact("start_date"):
         return redirect(url_for('hundred_day_calculator'))
 
     today = _current_local_date()
+    start_date = _parse_eight_digit_date(request.args.get("start_date"), allow_future=True) if request.args else None
+    if request.args and start_date is None:
+        return redirect(url_for('hundred_day_calculator'))
+    selected_snapshot = _build_hundred_day_snapshot(start_date, today) if start_date else None
+    if selected_snapshot:
+        _mark_result_query_noindex()
+        g.private_result_query = True
     current_year = today.year
     today_snapshot = _build_hundred_day_snapshot(today, today)
 
@@ -1807,6 +2029,8 @@ def hundred_day_calculator():
         today=today,
         current_year=current_year,
         today_snapshot=today_snapshot,
+        start_date=start_date,
+        selected_snapshot=selected_snapshot,
         examples=examples,
     )
 
@@ -1917,71 +2141,19 @@ def age_comparison_table():
 
 @app.route('/grade-age-table')
 def grade_age_table():
-    """학년 기준 나이표 페이지"""
-    today = _current_local_date()
-    school_year = _current_school_year(today)
-    current_year = today.year
-
-    valid_stage_grades = {"elementary": 6, "middle": 3, "high": 3}
-    stage, grade, invalid_query = _validated_grade_query(valid_stage_grades)
-    if invalid_query:
-        return redirect(url_for("grade_age_table"))
-
-    rows = []
-    for stage_key, max_grade in valid_stage_grades.items():
-        for grade_number in range(1, max_grade + 1):
-            row = _build_grade_age_snapshot(stage_key, grade_number, school_year, current_year)
-            row["is_selected"] = stage_key == stage and grade_number == grade
-            rows.append(row)
-
-    selected_row = _build_grade_age_snapshot(stage, grade, school_year, current_year) if grade is not None else None
-    if selected_row is not None:
-        _mark_result_query_noindex()
-    examples = [
-        _build_grade_age_snapshot("elementary", 1, school_year, current_year),
-        _build_grade_age_snapshot("middle", 1, school_year, current_year),
-        _build_grade_age_snapshot("high", 1, school_year, current_year),
-    ]
-    featured_grade_rows = [
-        _build_grade_age_snapshot("middle", 1, school_year, current_year),
-        _build_grade_age_snapshot("middle", 3, school_year, current_year),
-        _build_grade_age_snapshot("high", 1, school_year, current_year),
-        _build_grade_age_snapshot("high", 3, school_year, current_year),
-    ]
-    seo_description = (
-        f"{school_year}학년도 중1 {featured_grade_rows[0]['annual_age']}, "
-        f"중3 {featured_grade_rows[1]['annual_age']}, "
-        f"고1 {featured_grade_rows[2]['annual_age']}, "
-        f"고3 {featured_grade_rows[3]['annual_age']}의 연나이와 생일 전후 만나이 범위를 "
-        "확인하는 학년별 나이표입니다."
-    )
-
-    return render_template(
-        'grade-age-table.html',
-        school_year=school_year,
-        selected_stage=stage,
-        selected_grade=grade,
-        selected_row=selected_row,
-        grade_rows=rows,
-        examples=examples,
-        featured_grade_rows=featured_grade_rows,
-        seo_description=seo_description,
-        canonical_url=(
-            f"{SITE_BASE_URL}/grade-age-table"
-        ),
-        robots_content="index,follow" if grade is None else "noindex,follow",
-        seo_title=(
-            f"{_short_grade_label(stage, grade)} 나이 | 연나이·만나이 범위 | AgeCalc"
-            if grade is not None
-            else "학년별 나이표 | 중1·중3·고1·고3은 몇 살? | AgeCalc"
-        ),
-    )
+    """Legacy grade-age URL redirected to the combined grade reference."""
+    query = {
+        key: request.args[key]
+        for key in ("stage", "grade")
+        if request.args.get(key)
+    }
+    return redirect(url_for("grade_birth_year_table", **query), code=301)
 
 
 @app.route('/pet-age-table')
 def pet_age_table():
     """반려동물 나이표 페이지"""
-    if request.args and not _query_keys_are_exact("pet", "years", "size"):
+    if request.args and not _query_keys_are_allowed("pet", "years", "size"):
         return redirect(url_for("pet_age_table"))
     pet = request.args.get("pet", "dog").strip()
     size = request.args.get("size", "small").strip()
@@ -2037,7 +2209,7 @@ def korean_age_guide():
 @app.route('/pet-months-table')
 def pet_months_table():
     """반려동물 월령표 페이지"""
-    if request.args and not _query_keys_are_exact("pet", "months", "size"):
+    if request.args and not _query_keys_are_allowed("pet", "months", "size"):
         return redirect(url_for("pet_months_table"))
     pet = request.args.get("pet", "dog").strip()
     size = request.args.get("size", "small").strip()
@@ -2122,7 +2294,7 @@ def grade_birth_year_table():
         f"{school_year}학년도 중1은 {faq_grade_rows[0]['birth_year_label']}, "
         f"고1은 {faq_grade_rows[1]['birth_year_label']}, "
         f"고3은 {faq_grade_rows[2]['birth_year_label']}입니다. "
-        "학년별 일반 출생연도와 빠른년생·입학유예 예외를 확인하세요."
+        "학년별 일반 출생연도와 연나이·만나이 범위, 빠른년생·입학유예 예외를 확인하세요."
     )
 
     return render_template(
@@ -2140,9 +2312,9 @@ def grade_birth_year_table():
         ),
         robots_content="index,follow" if grade is None else "noindex,follow",
         seo_title=(
-            f"{_short_grade_label(stage, grade)} 몇 년생? 출생연도표 | AgeCalc"
+            f"{_short_grade_label(stage, grade)} 나이·출생연도 | AgeCalc"
             if grade is not None
-            else "학년별 출생연도표 | 중1·고1은 몇 년생? | AgeCalc"
+            else "학년별 나이 계산기 | 중1·고1 나이·출생연도 | AgeCalc"
         ),
     )
 
@@ -2274,6 +2446,7 @@ def birthday_dday_calculator():
     if selected_month_day is not None:
         selected_snapshot = _build_birthday_dday_snapshot(selected_month_day[0], selected_month_day[1], today)
         _mark_result_query_noindex()
+        g.private_result_query = True
 
     example_inputs = [(1, 1), (5, 10), (12, 25)]
     examples = [
@@ -2321,37 +2494,114 @@ def faq():
 @app.route('/dog')
 def dog():
     """강아지 나이 계산 페이지"""
-    if request.args:
+    today = _current_local_date()
+    expected = ("mode", "birth_date", "years", "months", "adoption_date", "size")
+    if request.args and not _query_keys_are_exact(*expected):
         return redirect(url_for('dog'))
-    return render_template('dog.html')
+    values = {key: request.args.get(key, "") for key in expected}
+    if not request.args:
+        values["size"] = "small"
+    mode = values["mode"] or "birth-date"
+    if mode not in {"birth-date", "known-age", "adoption-date"} or values["size"] not in {"small", "medium", "large", "giant"}:
+        return redirect(url_for('dog'))
+    years, invalid_years = _optional_bounded_int(values["years"], 0, 30)
+    months, invalid_months = _optional_bounded_int(values["months"], 0, 11)
+    if invalid_years or invalid_months:
+        return redirect(url_for('dog'))
+    birth_date = _parse_eight_digit_date(values["birth_date"], today) if values["birth_date"] else None
+    adoption_date = _parse_eight_digit_date(values["adoption_date"], today) if values["adoption_date"] else None
+    result = _build_pet_calculator_result("dog", mode, years, months, birth_date, adoption_date, values["size"], today) if request.args else None
+    if request.args and result is None:
+        return redirect(url_for('dog'))
+    if result:
+        _mark_result_query_noindex()
+        g.private_result_query = True
+    return render_template('dog.html', pet_values=values, pet_result=result)
 
 @app.route('/cat')
 def cat():
     """고양이 나이 계산 페이지"""
-    if request.args:
+    today = _current_local_date()
+    expected = ("mode", "birth_date", "years", "months", "adoption_date")
+    if request.args and not _query_keys_are_exact(*expected):
         return redirect(url_for('cat'))
-    return render_template('cat.html')
+    values = {key: request.args.get(key, "") for key in expected}
+    mode = values["mode"] or "birth-date"
+    if mode not in {"birth-date", "known-age", "adoption-date"}:
+        return redirect(url_for('cat'))
+    years, invalid_years = _optional_bounded_int(values["years"], 0, 30)
+    months, invalid_months = _optional_bounded_int(values["months"], 0, 11)
+    if invalid_years or invalid_months:
+        return redirect(url_for('cat'))
+    birth_date = _parse_eight_digit_date(values["birth_date"], today) if values["birth_date"] else None
+    adoption_date = _parse_eight_digit_date(values["adoption_date"], today) if values["adoption_date"] else None
+    result = _build_pet_calculator_result("cat", mode, years, months, birth_date, adoption_date, "small", today) if request.args else None
+    if request.args and result is None:
+        return redirect(url_for('cat'))
+    if result:
+        _mark_result_query_noindex()
+        g.private_result_query = True
+    return render_template('cat.html', pet_values=values, pet_result=result)
 
 @app.route('/baby-months')
 def baby_months():
     """아기 개월 수 계산 페이지"""
-    if request.args:
+    today = _current_local_date()
+    if request.args and not _query_keys_are_exact("birth_date"):
         return redirect(url_for('baby_months'))
-    return render_template('baby-months.html')
+    birth_date = _parse_eight_digit_date(request.args.get("birth_date"), today) if request.args else None
+    if request.args and birth_date is None:
+        return redirect(url_for('baby_months'))
+    result = _build_baby_months_result(birth_date, today) if birth_date else None
+    if result:
+        _mark_result_query_noindex()
+        g.private_result_query = True
+    return render_template('baby-months.html', baby_birth_date=birth_date, baby_result=result)
 
 @app.route('/d-day')
 def d_day():
     """기념일/D-Day 계산 페이지"""
-    if request.args:
+    today = _current_local_date()
+    if request.args and not _query_keys_are_exact("date", "mode", "label"):
         return redirect(url_for("d_day"))
-    return render_template('d-day.html')
+    values = {key: request.args.get(key, "") for key in ("date", "mode", "label")}
+    if request.args and (values["mode"] not in {"until", "since"} or len(values["label"]) > 40):
+        return redirect(url_for("d_day"))
+    target_date = _parse_eight_digit_date(values["date"], allow_future=True) if values["date"] else None
+    if request.args and target_date is None:
+        return redirect(url_for("d_day"))
+    result = _build_dday_result(target_date, values["mode"], values["label"], today) if target_date else None
+    if result:
+        _mark_result_query_noindex()
+        g.private_result_query = True
+    return render_template('d-day.html', dday_values=values, dday_result=result)
 
 @app.route('/parent-child')
 def parent_child():
     """부모·자녀 나이 관계 계산 페이지"""
-    if request.args:
+    expected = {"parent_role", "parent_birth", "child_role", "child_birth"}
+    if request.args and set(request.args) != expected:
         return redirect(url_for('parent_child'))
-    return render_template('parent-child.html')
+    parent_roles = request.args.getlist("parent_role")
+    parent_births = request.args.getlist("parent_birth")
+    child_roles = request.args.getlist("child_role")
+    child_births = request.args.getlist("child_birth")
+    if request.args and (not parent_roles or len(parent_roles) != len(parent_births) or len(child_roles) != len(child_births) or len(parent_roles) > 2 or len(child_roles) > 20):
+        return redirect(url_for('parent_child'))
+    today = _current_local_date()
+    parents = [{"role": role, "birth": _parse_eight_digit_date(birth, today)} for role, birth in zip(parent_roles, parent_births)]
+    children = [{"role": role, "birth": _parse_eight_digit_date(birth, today)} for role, birth in zip(child_roles, child_births)]
+    if request.args and (any(item["role"] not in {"mother", "father"} or item["birth"] is None for item in parents) or any(item["role"] not in {"daughter", "son"} or item["birth"] is None for item in children)):
+        return redirect(url_for('parent_child'))
+    results = _build_parent_child_results(parents, children, today) if request.args else None
+    if request.args and results is None:
+        return redirect(url_for('parent_child'))
+    if results:
+        _mark_result_query_noindex()
+        g.private_result_query = True
+    form_parents = [{"role": item["role"], "birth": item["birth"].strftime("%Y%m%d") if item["birth"] else ""} for item in parents] or [{}]
+    form_children = [{"role": item["role"], "birth": item["birth"].strftime("%Y%m%d") if item["birth"] else ""} for item in children] or [{}]
+    return render_template('parent-child.html', parent_results=results, parent_inputs=form_parents, child_inputs=form_children)
 
 
 @app.post("/page-feedback")
@@ -2713,197 +2963,6 @@ def blog_review_approve(post_id):
         db_session.commit()
         _invalidate_blog_public_count_cache()
     return redirect(url_for('blog_detail', slug=post.slug))
-
-@app.route('/minigames')
-def minigames():
-    """미니게임 모음 페이지"""
-    return render_template('minigames.html')
-
-@app.route('/minigames/guess')
-def guess_game():
-    """숫자 맞추기 게임 페이지"""
-    return render_template('guess.html')
-
-@app.route('/minigames/snake')
-def snake_game():
-    """스네이크 게임 페이지"""
-    return render_template('snake.html')
-
-@app.route('/minigames/tictactoe')
-def tictactoe_game():
-    """틱택토 게임 페이지"""
-    return render_template('tictactoe.html')
-
-@app.route('/minigames/rps')
-def rps_game():
-    """가위바위보 게임 페이지"""
-    return render_template('rps.html')
-
-@app.route('/minigames/nim')
-def nim_game():
-    """님 게임 페이지"""
-    return render_template('nim.html')
-
-@app.route('/minigames/pong')
-def pong_game():
-    """퐁 게임 페이지"""
-    return render_template('pong.html')
-
-@app.route('/minigames/hangman')
-def hangman_game():
-    """행맨 게임 페이지"""
-    return render_template('hangman.html')
-
-@app.route('/minigames/memory')
-def memory_game():
-    """메모리 매치 게임 페이지"""
-    return render_template('memory.html')
-
-@app.route('/minigames/connect4')
-def connect4_game():
-    """커넥트4 게임 페이지"""
-    return render_template('connect4.html')
-
-@app.route('/minigames/lightsout')
-def lightsout_game():
-    """라이츠아웃 게임 페이지"""
-    return render_template('lightsout.html')
-
-@app.route('/minigames/minesweeper')
-def minesweeper_game():
-    """지뢰찾기 게임 페이지"""
-    return render_template('minesweeper.html')
-
-@app.route('/minigames/simon')
-def simon_game():
-    """사이먼 게임 페이지"""
-    return render_template('simon.html')
-
-@app.route('/minigames/2048')
-def game_2048():
-    """2048 게임 페이지"""
-    return render_template('2048.html')
-
-@app.route('/minigames/blackjack')
-def blackjack_game():
-    """블랙잭 게임 페이지"""
-    return render_template('blackjack.html')
-
-@app.route('/minigames/breakout')
-def breakout_game():
-    """브레이크아웃 게임 페이지"""
-    return render_template('breakout.html')
-
-@app.route('/minigames/hanoi')
-def hanoi_game():
-    """하노이 게임 페이지"""
-    return render_template('hanoi.html')
-
-@app.route('/minigames/pig')
-def pig_game():
-    """피그 다이스 게임 페이지"""
-    return render_template('pig.html')
-
-@app.route('/minigames/gomoku')
-def gomoku_game():
-    """오목 게임 페이지"""
-    return render_template('gomoku.html')
-
-@app.route('/minigames/reversi')
-def reversi_game():
-    """리버시 게임 페이지"""
-    return render_template('reversi.html')
-
-@app.route('/minigames/dotsandboxes')
-def dotsandboxes_game():
-    """점 잇기 게임 페이지"""
-    return render_template('dotsandboxes.html')
-
-@app.route('/minigames/mancala')
-def mancala_game():
-    """만칼라 게임 페이지"""
-    return render_template('mancala.html')
-
-@app.route('/minigames/mastermind')
-def mastermind_game():
-    """마스터마인드 게임 페이지"""
-    return render_template('mastermind.html')
-
-@app.route('/minigames/war')
-def war_game():
-    """카드 전쟁 게임 페이지"""
-    return render_template('war.html')
-
-@app.route('/minigames/battleship')
-def battleship_game():
-    """해전 게임 페이지"""
-    return render_template('battleship.html')
-
-@app.route('/minigames/checkers')
-def checkers_game():
-    """체커 게임 페이지"""
-    return render_template('checkers.html')
-
-@app.route('/minigames/fifteen')
-def fifteen_game():
-    """15 퍼즐 게임 페이지"""
-    return render_template('fifteen.html')
-
-@app.route('/minigames/pegsolitaire')
-def pegsolitaire_game():
-    """페그 솔리테어 게임 페이지"""
-    return render_template('pegsolitaire.html')
-
-@app.route('/minigames/yahtzee')
-def yahtzee_game():
-    """야추 게임 페이지"""
-    return render_template('yahtzee.html')
-
-
-
-@app.post("/snake-score")
-def snake_score():
-    data = request.get_json(silent=True) or {}
-    try:
-        score = int(data.get("score", 0))
-    except (TypeError, ValueError):
-        score = 0
-    if score < 0:
-        score = 0
-
-    now = datetime.now()
-    today = _date_key(now)
-    month = _month_key(now)
-
-    with _score_lock:
-        scores = _load_scores()
-        today_scores = [s for s in scores if s.get("date") == today]
-        prev_daily_best = max([s.get("score", 0) for s in today_scores], default=0)
-        scores.append({
-            "score": score,
-            "ts": now.isoformat(),
-            "date": today,
-            "month": month
-        })
-        # Keep recent 5000 scores
-        if len(scores) > 5000:
-            scores = scores[-5000:]
-        _save_scores(scores)
-
-    today_scores = [s for s in scores if s.get("date") == today]
-    month_scores = [s for s in scores if s.get("month") == month]
-    daily_best = max([s.get("score", 0) for s in today_scores], default=0)
-    monthly_best = max([s.get("score", 0) for s in month_scores], default=0)
-    higher = sum(1 for s in today_scores if s.get("score", 0) > score)
-    rank = higher + 1
-    total = len(today_scores)
-    is_new_daily_best = score > prev_daily_best and score > 0
-    return jsonify({
-        "ok": True,
-        "rank": rank,
-        "total": total
-    })
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000, host='0.0.0.0')

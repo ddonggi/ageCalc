@@ -15,15 +15,38 @@ class ParentChildCalculator {
     }
 
     init() {
-        this.loadFromUrl().then(() => {
-            if (this.parents.length === 0) this.addParentLine();
-            if (this.children.length === 0) this.addChildLine();
-            this.bindControls();
-            this.updateResult();
-        });
+        const form = document.getElementById('parent-child-form');
+        try {
+            this.parents = JSON.parse(form?.dataset.parentInputs || '[]');
+            this.children = JSON.parse(form?.dataset.childInputs || '[]');
+        } catch {
+            this.parents = [];
+            this.children = [];
+        }
+        if (this.parents.length === 0) this.addParentLine();
+        if (this.children.length === 0) this.addChildLine();
+        this.bindControls();
     }
 
     bindControls() {
+        document.getElementById('parent-child-form')?.addEventListener('submit', (event) => {
+            const result = this.buildResults();
+            if (result.error) {
+                event.preventDefault();
+                this.showError(result.error);
+                return;
+            }
+            document.querySelectorAll('[data-parent-child-query]').forEach((node) => node.remove());
+            const form = event.currentTarget;
+            for (const parent of this.parents) {
+                this.appendQueryField(form, 'parent_role', parent.role);
+                this.appendQueryField(form, 'parent_birth', this.digitsOnly(parent.birth));
+            }
+            for (const child of this.children) {
+                this.appendQueryField(form, 'child_role', child.role);
+                this.appendQueryField(form, 'child_birth', this.digitsOnly(child.birth));
+            }
+        });
         document.getElementById('add-parent-line')?.addEventListener('click', () => {
             if (this.parents.length >= this.maxParents) {
                 alert('부모는 두 분까지 기록할 수 있어요.');
@@ -78,7 +101,7 @@ class ParentChildCalculator {
             this.children = this.children.filter(c => c.id !== id);
             this.renderLines('child');
         }
-        this.updateResult();
+        this.showError('');
     }
 
     renderLines(kind) {
@@ -115,7 +138,7 @@ class ParentChildCalculator {
                 </div>
                 <div class="date-inputs">
                     <label class="field-label" for="birth-${item.id}">${selectedLabel} 생년월일 8자리</label>
-                    <input type="text" id="birth-${item.id}" data-kind="${kind}" data-id="${item.id}" data-field="birth" placeholder="1992.10.02" inputmode="numeric" pattern="[0-9.]*" maxlength="10" value="${AgeCalcDateRules.formatDateDigits(item.birth || '')}" aria-describedby="parent-child-error" data-clarity-mask="true">
+                    <input type="text" id="birth-${item.id}" data-kind="${kind}" data-id="${item.id}" data-field="birth" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" value="${AgeCalcDateRules.formatDateDigits(item.birth || '')}" aria-describedby="parent-child-error" data-clarity-mask="true">
                 </div>
                 <button type="button" class="line-remove" title="삭제">-</button>
             `;
@@ -137,7 +160,7 @@ class ParentChildCalculator {
                     button.textContent = roleOptions.find(opt => opt.value === value)?.label || defaultLabel;
                     button.setAttribute('aria-expanded', 'false');
                     dropdown.classList.remove('open');
-                    this.updateResult();
+                    this.showError('');
                 });
             });
 
@@ -146,7 +169,7 @@ class ParentChildCalculator {
                     const field = e.target.dataset.field;
                     if (field === 'birth') e.target.value = AgeCalcDateRules.formatDateDigits(e.target.value);
                     item[field] = e.target.value;
-                    this.updateResult();
+                    this.showError('');
                 });
             });
 
@@ -160,6 +183,15 @@ class ParentChildCalculator {
             const btn = node.querySelector('.role-btn');
             if (btn) btn.setAttribute('aria-expanded', 'false');
         });
+    }
+
+    appendQueryField(form, name, value) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        input.dataset.parentChildQuery = 'true';
+        form.appendChild(input);
     }
 
     normalizeBirthValue(data) {
@@ -282,7 +314,7 @@ class ParentChildCalculator {
                             <div class="footer-links">
                                 <a href="/guides/sixtieth-seventieth-eightieth-age-guide">환갑·칠순 기준 보기</a>
                                 <a href="/school-grade-calculator?year=${childBirthYear}">자녀 학교 시점 보기</a>
-                                <a href="/school-entry-year-table?year=${childBirthYear}">자녀 입학년도 보기</a>
+                                <a href="/school-grade-calculator?year=${childBirthYear}">자녀 학년과 입학 시점 보기</a>
                             </div>
                         </div>
                     </div>

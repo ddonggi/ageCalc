@@ -149,9 +149,9 @@ STATIC_PAGE_REGISTRY = (
         "/school-grade-calculator",
         "education",
         "학년 계산기",
-        "출생연도 기준 현재 학년 확인",
+        "출생연도 기준 현재 학년과 초·중·고 입학 시점 확인",
         priority="core",
-        related_endpoints=("grade_age_table", "grade_birth_year_table", "school_entry_year_table"),
+        related_endpoints=("grade_birth_year_table", "college_entry_year_calculator"),
         lastmod="2026-08-13",
     ),
     _page(
@@ -160,14 +160,16 @@ STATIC_PAGE_REGISTRY = (
         "education",
         "출생연도별 입학년도",
         "출생연도 기준 초·중·고 입학년도 확인",
+        content_action="merge",
+        indexable=False,
         priority="core",
-        related_endpoints=("school_grade_calculator", "college_entry_year_calculator", "grade_birth_year_table"),
+        related_endpoints=("school_grade_calculator",),
         lastmod="2026-08-13",
     ),
     _page(
         "age_gap_calculator",
         "/age-gap-calculator",
-        "family",
+        "age",
         "나이 차이 계산기",
         "두 출생연도의 나이 차이와 만나이 범위 비교",
         related_endpoints=("parent_child", "age", "birth_year_age_table"),
@@ -186,7 +188,7 @@ STATIC_PAGE_REGISTRY = (
     _page(
         "baby_months_table",
         "/baby-months-table",
-        "family",
+        "age",
         "개월수 계산표",
         "생후 개월 수별 연령 환산표 확인",
         related_endpoints=("baby_months", "hundred_day_calculator", "school_grade_calculator"),
@@ -214,7 +216,9 @@ STATIC_PAGE_REGISTRY = (
         "education",
         "학년별 나이표",
         "중1·중3·고1·고3 등 학년별 일반 나이 확인",
-        related_endpoints=("school_grade_calculator", "grade_birth_year_table", "school_entry_year_table"),
+        content_action="merge",
+        indexable=False,
+        related_endpoints=("grade_birth_year_table",),
         lastmod="2026-08-13",
     ),
     _page(
@@ -246,9 +250,9 @@ STATIC_PAGE_REGISTRY = (
         "grade_birth_year_table",
         "/grade-birth-year-table",
         "education",
-        "학년별 출생연도표",
-        "중1·중3·고1·고3 등 학년별 일반 출생연도 확인",
-        related_endpoints=("school_grade_calculator", "grade_age_table", "school_entry_year_table"),
+        "학년별 나이 계산기",
+        "학년별 일반 출생연도와 연나이·만나이 범위 확인",
+        related_endpoints=("school_grade_calculator", "college_entry_year_calculator"),
         lastmod="2026-08-13",
     ),
     _page(
@@ -266,7 +270,7 @@ STATIC_PAGE_REGISTRY = (
         "education",
         "학번 계산기",
         "대학 학번 기준 출생연도와 현재 나이 확인",
-        related_endpoints=("school_entry_year_table", "birth_year_age_table", "grade_birth_year_table"),
+        related_endpoints=("school_grade_calculator", "grade_birth_year_table", "parent_child"),
         lastmod="2026-08-13",
     ),
     _page(
@@ -336,7 +340,7 @@ STATIC_PAGE_REGISTRY = (
     _page(
         "baby_months",
         "/baby-months",
-        "family",
+        "age",
         "아이 개월 수 계산기",
         "출생일 기준 현재 아이 월령 계산",
         priority="core",
@@ -356,7 +360,7 @@ STATIC_PAGE_REGISTRY = (
     _page(
         "parent_child",
         "/parent-child",
-        "family",
+        "age",
         "부모·자녀 나이 관계 계산기",
         "부모와 자녀의 나이 차이와 주요 생애 시점 계산",
         priority="core",
@@ -381,7 +385,7 @@ def _guide_page(page: dict[str, object]) -> dict[str, object]:
         "school": "education",
         "anniversary": "anniversary",
         "pet": "pets",
-        "family": "family",
+        "family": "age",
     }
     slug = str(page["slug"])
     related_endpoints = tuple(endpoint for endpoint, _label in page["related_links"])
@@ -562,13 +566,9 @@ def indexable_guide_pages() -> tuple[dict[str, object], ...]:
 SITEMAP_GROUPS = (
     "core",
     "age",
-    "family",
     "education",
     "anniversary",
-    "retirement",
-    "health",
     "pets",
-    "generations",
     "guides",
 )
 

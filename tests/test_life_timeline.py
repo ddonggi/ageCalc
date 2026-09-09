@@ -202,10 +202,9 @@ process.stdout.write(JSON.stringify(events));
         self.assertEqual(0, completed.returncode, completed.stderr)
         self.assertEqual(
             [
-                {"name": "life_timeline_complete", "params": {"calculator": "life_timeline"}, "rendered": True},
-                {"name": "life_timeline_related_tool_click", "params": {"calculator": "life_timeline", "destination": "age"}, "rendered": True},
-                {"name": "life_timeline_related_tool_click", "params": {"calculator": "life_timeline", "destination": "birthday_dday"}, "rendered": True},
-                {"name": "life_timeline_related_tool_click", "params": {"calculator": "life_timeline", "destination": "birth_year_zodiac"}, "rendered": True},
+                {"name": "life_timeline_related_tool_click", "params": {"calculator": "life_timeline", "destination": "age"}, "rendered": False},
+                {"name": "life_timeline_related_tool_click", "params": {"calculator": "life_timeline", "destination": "birthday_dday"}, "rendered": False},
+                {"name": "life_timeline_related_tool_click", "params": {"calculator": "life_timeline", "destination": "birth_year_zodiac"}, "rendered": False},
             ],
             json.loads(completed.stdout),
         )
@@ -216,7 +215,7 @@ class LifeTimelinePageTests(unittest.TestCase):
         app.config.update(TESTING=True)
         self.client = app.test_client()
 
-    def test_page_is_client_only_and_masks_birth_date(self):
+    def test_page_uses_a_masked_get_result_form(self):
         response = self.client.get("/life-timeline")
         html = response.get_data(as_text=True)
 
@@ -228,16 +227,26 @@ class LifeTimelinePageTests(unittest.TestCase):
         self.assertNotIn("js/clarity-init.js", html)
         self.assertIn("life-timeline.js", html)
         self.assertIn('id="life-timeline-result"', html)
+        self.assertIn('action="/life-timeline#life-timeline-result" method="get"', html)
 
-    def test_query_and_post_cannot_carry_birth_date(self):
+    def test_empty_state_prioritizes_the_form_without_a_decorative_orbit(self):
+        html = self.client.get("/life-timeline").get_data(as_text=True)
+        hero = html.split('<section class="hero-band life-timeline-hero calculator-page-heading">', 1)[1].split("</section>", 1)[0]
+        form_section = html.split('<section class="section-shell direct-answer">', 1)[1].split("</section>", 1)[0]
+
+        self.assertNotIn('class="life-orbit"', hero)
+        self.assertIn('id="life-timeline-form"', form_section)
+
+    def test_query_renders_a_private_result_page_and_post_is_not_allowed(self):
         query_response = self.client.get("/life-timeline?birth_date=2000-08-24")
         post_response = self.client.post(
             "/life-timeline",
             data={"birth_date": "2000-08-24"},
         )
 
-        self.assertEqual(302, query_response.status_code)
-        self.assertEqual("/life-timeline", query_response.headers["Location"])
+        self.assertEqual(200, query_response.status_code)
+        self.assertEqual("no-store", query_response.headers["Cache-Control"])
+        self.assertIn("출생 프로필", query_response.get_data(as_text=True))
         self.assertEqual(405, post_response.status_code)
 
 

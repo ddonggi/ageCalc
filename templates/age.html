@@ -67,7 +67,7 @@
          "@context": "https://schema.org",
          "@type": "FAQPage",
          "mainEntity": [
-          {"@type":"Question","name":"만나이는 어떻게 확인하나요?","acceptedAnswer":{"@type":"Answer","text":"양력 또는 음력 생년월일 8자리를 입력하면 오늘 날짜를 기준으로 생일 전후를 반영한 만나이를 확인할 수 있습니다."}},
+          {"@type":"Question","name":"만나이는 어떻게 확인하나요?","acceptedAnswer":{"@type":"Answer","text":"양력이나 음력 생년월일 8자리를 입력하면 오늘 기준으로 생일 전후를 반영한 만나이가 나옵니다."}},
           {"@type":"Question","name":"음력 생일을 입력하면 무엇을 계산하나요?","acceptedAnswer":{"@type":"Answer","text":"입력한 평달 음력 생년월일을 양력 출생일로 환산한 뒤 오늘 기준 만나이를 계산합니다."}},
           {"@type":"Question","name":"올해 음력 생일의 양력 날짜도 확인할 수 있나요?","acceptedAnswer":{"@type":"Answer","text":"아니요. 이 도구는 출생 당시의 음력 생년월일로 만나이를 계산하며, 올해 돌아오는 음력 생일 날짜를 찾는 기념일 변환기는 아닙니다."}},
           {"@type":"Question","name":"윤달 생일도 계산할 수 있나요?","acceptedAnswer":{"@type":"Answer","text":"현재 윤달 선택은 지원하지 않으며 입력한 음력 날짜를 평달로 계산합니다."}},
@@ -87,27 +87,28 @@
 
     <!-- CSS-->
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/age-pages.css') }}" />
 
     <!-- 스크립트 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
     <script src="{{ url_for('static', filename='js/date-rules.js') }}?v=age-input-20260810a" defer></script>
-    <script src="{{ url_for('static', filename='js/age-calculator.js') }}?v=age-result-20260824a" defer></script>
+    <script src="{{ url_for('static', filename='js/age-calculator.js') }}?v=age-submit-20260907a" defer></script>
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <!-- Google tag (gtag.js) -->
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
 
-    <script src="{{ versioned_static('js/profile-date.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 
 </head>
 
-<body class="age-page">
+<body class="age-page editorial-calculator-page calculator-flat-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
-        <section class="hero-band utility-hero">
+        <section class="hero-band utility-hero calculator-page-heading">
             <div class="hero-copy">
                 <p class="eyebrow">대표 도구</p>
                 <h1>만나이 계산기</h1>
@@ -143,56 +144,106 @@
                 정확한 결과에는 연·월·일이 모두 필요하며, 이 페이지에 표시된 {{ today.isoformat() }}이 기준일입니다.
             </p>
         </section>
-        <form class="age-form" id="age-form" action="{{ url_for('age') }}" method="post" autocomplete="off" data-clarity-mask="true">
-            <div class="form-group">
-                <h3>생년월일을 입력하세요 (8자리)</h3>
+        <div class="editorial-calculator-shell">
+            <form class="age-form" id="age-form" action="{{ url_for('age') }}#result-container" method="get" autocomplete="off" data-clarity-mask="true">
+                <div class="form-group">
+                    <h3>생년월일을 입력하세요 (8자리)</h3>
 
-                <!-- 음력/양력 토글 -->
-                <div class="calendar-toggle-container">
-                    <div class="calendar-toggle">
-                        <input type="radio" id="solar" name="calendar_type" value="solar" checked>
-                        <label for="solar">양력</label>
-                        <input type="radio" id="lunar" name="calendar_type" value="lunar">
-                        <label for="lunar">음력</label>
-                        <span class="toggle-slider"></span>
+                    <!-- 음력/양력 토글 -->
+                    <div class="calendar-toggle-container">
+                        <div class="calendar-toggle">
+                            <input type="radio" id="solar" name="calendar_type" value="solar" {% if calendar_type == 'solar' %}checked{% endif %}>
+                            <label for="solar">양력</label>
+                            <input type="radio" id="lunar" name="calendar_type" value="lunar" {% if calendar_type == 'lunar' %}checked{% endif %}>
+                            <label for="lunar">음력</label>
+                            <span class="toggle-slider"></span>
+                        </div>
                     </div>
+
+                    <div class="date-inputs">
+                        <label class="field-label" for="birth-input">생년월일 8자리</label>
+                        <input type="text" id="birth-input" name="birth_date" placeholder="19921002" inputmode="numeric"
+                            pattern="[0-9]*" maxlength="8" required aria-describedby="birth-error" data-clarity-mask="true" data-profile-date-calendar="solar" value="{{ birth_date_display or '' }}">
+                    </div>
+
+                    <button class="btn btn-primary" type="submit">계산하기</button>
+
+                    <p class="input-help">
+                        음력 입력은 출생 당시의 음력 날짜를 양력 출생일로 환산해 만나이를 계산합니다.
+                        윤달 선택은 지원하지 않으며 평달로 계산합니다. 올해 돌아오는 음력 생일의 양력 날짜를 찾는 기능은 아닙니다.
+                        자세한 기준은 <a href="{{ url_for('guide_detail', slug='lunar-birthday-age-guide') }}">음력 생일의 만나이 계산 기준</a>에서 확인하세요.
+                    </p>
+
+                    <small id="birth-error" class="error-msg" aria-live="polite"></small>
                 </div>
+            </form>
 
-                <div class="date-inputs">
-                    <label class="field-label" for="birth-input">생년월일 8자리</label>
-                    <input type="text" id="birth-input" name="birth-input" placeholder="1992.10.02" inputmode="numeric"
-                        pattern="[0-9.]*" maxlength="10" required aria-describedby="birth-error profile-date-note" data-clarity-mask="true" data-profile-date-input="full" data-profile-date-calendar="solar">
+            <div class="result-container{% if result %} show{% endif %}" id="result-container" aria-live="polite" data-clarity-mask="true" tabindex="-1">
+                <h2>계산 결과</h2>
+                <div id="result-content">
+                    {% if result %}
+                        {% if result.success %}
+                        <div class="result success">
+                            <div class="age-result-primary">
+                                <p class="eyebrow">오늘 기준 만나이</p>
+                                <p class="age"><span class="age-number">만 {{ result.age }}세</span></p>
+                                <p class="message">{{ result.message }}</p>
+                            </div>
+                            <div class="age-result-summary" aria-label="만나이 관련 요약">
+                                <div class="age-result-summary-item">
+                                    <strong>다음 생일</strong>
+                                    <span>{{ result_details.next_birthday_text }}</span>
+                                </div>
+                                <div class="age-result-summary-item">
+                                    <strong>출생연도 기준</strong>
+                                    <span>{{ result_details.zodiac_text }}</span>
+                                </div>
+                            </div>
+                            <section class="rights-info" aria-label="현재 나이로 가능한 권리와 제도">
+                                <h4>🧑 현재 나이로 가능한 권리·제도</h4>
+                                <div class="rights-list">
+                                    {% for right in result_details.rights %}
+                                    <div class="right-item {% if right.available %}available{% else %}locked{% endif %}">
+                                        <span class="right-icon">{% if right.available %}✅{% else %}🔒{% endif %}</span>
+                                        {% if right.url %}<a href="{{ right.url }}" target="_blank" rel="noopener noreferrer">{{ right.text }}</a>{% else %}<span>{{ right.text }}</span>{% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </section>
+                            <nav class="age-result-next" aria-label="계산 결과 관련 도구">
+                                <h4>이어서 확인하기</h4>
+                                <div class="age-result-links">
+                                    <a href="{{ url_for('birth_year_age_table', year=result_details.birth_year) }}"><strong>{{ result_details.birth_year }}년생 나이표</strong><span>연나이와 만나이 범위 보기</span></a>
+                                    <a href="{{ url_for('annual_age_calculator', birth_year=result_details.birth_year) }}"><strong>연나이 확인</strong><span>출생연도로 바로 계산</span></a>
+                                    <a href="{{ url_for('school_grade_calculator', year=result_details.birth_year) }}"><strong>학년 계산기</strong><span>현재 학년과 초·중·고 입학 시점 보기</span></a>
+                                    <a href="{{ url_for('birthday_dday_calculator') }}"><strong>생일 D-day</strong><span>생일까지 남은 날짜 계산</span></a>
+                                </div>
+                            </nav>
+                            <details class="share-section">
+                                <summary>결과 공유하기</summary>
+                                <div class="share-tools">
+                                    <button class="link-copy-btn btn btn-secondary" type="button">링크 복사</button>
+                                    <button class="image-save-btn btn btn-secondary" type="button">이미지로 저장</button>
+                                </div>
+                            </details>
+                        </div>
+                        {% else %}
+                        <div class="result error">
+                            <p class="message">{{ result.message }}</p>
+                        </div>
+                        {% endif %}
+                    {% endif %}
                 </div>
-
-                <div class="profile-date-control">
-                    <label for="profile-date-consent"><input type="checkbox" id="profile-date-consent"> <span>양력 생년월일을 이 기기에서 다음 계산에도 사용</span></label>
-                    <button type="button" class="btn btn-secondary" id="profile-date-clear">저장값 삭제</button>
-                </div>
-                <p class="input-help" id="profile-date-note">선택하면 양력 생년월일만 이 브라우저에 저장됩니다. 공용 기기에서는 사용하지 말고, 언제든 저장값을 삭제하세요.</p>
-
-                <p class="input-help">
-                    음력 입력은 출생 당시의 음력 날짜를 양력 출생일로 환산해 만나이를 계산합니다.
-                    윤달 선택은 지원하지 않으며 평달로 계산합니다. 올해 돌아오는 음력 생일의 양력 날짜를 찾는 기능은 아닙니다.
-                    자세한 기준은 <a href="{{ url_for('guide_detail', slug='lunar-birthday-age-guide') }}">음력 생일의 만나이 계산 기준</a>에서 확인하세요.
-                </p>
-
-                <small id="birth-error" class="error-msg" aria-live="polite"></small>
-            </div>
-        </form>
-
-        <div class="result-container" id="result-container" aria-live="polite" data-clarity-mask="true">
-            <h2>계산 결과</h2>
-            <div id="result-content">
-                <!-- 결과 내용이 JavaScript로 동적 생성됨 -->
             </div>
         </div>
+        <div class="editorial-supporting-content">
         {% include 'partials/info_coupang_promotions.html' %}
         {% include 'partials/home_coupang_rails.html' %}
         <div class="info">
             <h3>사용법</h3>
             <ul>
                 <li>생년월일을 입력하세요</li>
-                <li>입력이 완료되면 자동으로 나이가 계산됩니다</li>
+                <li>생년월일을 입력한 뒤 계산하기를 누르세요</li>
                 <li>정확한 만나이가 표시됩니다</li>
             </ul>
         </div>
@@ -254,11 +305,40 @@
                 <p class="eyebrow">공식 기준 우선</p>
                 <h2>연령별 제도는 공식 기준을 확인하세요</h2>
                 <p>복지·주거·연금·자격 제도는 나이 외에도 소득, 거주지, 가입 기간과 시행 시점에 따라 달라집니다. 계산 결과만으로 신청 가능 여부를 판단하지 마세요.</p>
-                <div class="footer-links">
+                <div class="footer-links editorial-link-row">
                     <a href="{{ url_for('references') }}">계산 기준과 공식 출처 확인</a>
                     <a href="{{ url_for('about') }}">콘텐츠 검수 원칙 보기</a>
                 </div>
             </article>
+        </section>
+
+        <section class="age-rights-section" aria-labelledby="age-rights-title">
+            <div class="section-heading">
+                <p class="eyebrow">Age-based reference</p>
+                <h2 id="age-rights-title">🧑 연령별 주요 권리·제도 (만나이 기준)</h2>
+            </div>
+            <div class="age-rights-grid">
+                <article class="age-right-item" data-age="14"><div class="age-header"><span class="age-number">14</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.kakaocorp.com/page/" target="_blank" rel="noopener noreferrer">카카오톡, SNS 등 대부분 온라인 서비스 가입 가능</a></li><li>형사 미성년자(만 14세 미만) → 형사처벌 불가, 만 14세부터는 형사책임 인정</li></ul></article>
+                <article class="age-right-item" data-age="15"><div class="age-header"><span class="age-number">15</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.moel.go.kr/" target="_blank" rel="noopener noreferrer">근로기준법상 취직 가능 연령 (부모 동의 필요)</a></li></ul></article>
+                <article class="age-right-item" data-age="17"><div class="age-header"><span class="age-number">17</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=13100000013" target="_blank" rel="noopener noreferrer">주민등록증 발급 가능</a></li></ul></article>
+                <article class="age-right-item" data-age="18"><div class="age-header"><span class="age-number">18</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.safedriving.or.kr/" target="_blank" rel="noopener noreferrer">자동차 운전면허 취득 가능 (2종 보통 기준)</a></li><li><a href="https://www.nec.go.kr/" target="_blank" rel="noopener noreferrer">선거권 부여 (국회의원, 대통령 선거 모두 가능)</a></li><li><a href="https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=12700000050" target="_blank" rel="noopener noreferrer">혼인 가능 (민법 개정 후 남녀 모두 만 18세 이상부터)</a></li><li>일부 청년 정책(교통·문화 할인, 청소년 우대 등) 종료</li></ul></article>
+                <article class="age-right-item" data-age="19"><div class="age-header"><span class="age-number">19</span><span class="age-unit">세 이상</span></div><ul><li>술·담배 구매 가능 (청소년보호법)</li><li>성인 등급 콘텐츠 및 일부 성인 전용 시설 출입 가능</li></ul></article>
+                <article class="age-right-item" data-age="20"><div class="age-header"><span class="age-number">20</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.mma.go.kr/" target="_blank" rel="noopener noreferrer">군 입대 의무 본격 적용 (징병검사, 현역 입영 가능)</a></li><li><a href="https://www.kosaf.go.kr/ko/main.do" target="_blank" rel="noopener noreferrer">대학 등록금·청년 지원금 일부 제도 만 20세 이상 대상</a></li></ul></article>
+                <article class="age-right-item" data-age="24"><div class="age-header"><span class="age-number">24</span><span class="age-unit">세 이하</span></div><ul><li>일부 공공기관 청년 우대금리 통장 가입 가능</li></ul></article>
+                <article class="age-right-item" data-age="34"><div class="age-header"><span class="age-number">34</span><span class="age-unit">세 이하</span></div><ul><li><a href="https://www.molit.go.kr/" target="_blank" rel="noopener noreferrer">청년 월세 특별 지원 (국토부, 지자체)</a></li><li>청년 전세자금 대출 (버팀목 전세자금 등)</li><li>청년 주택 청약 우대 (신혼부부 특별공급 등은 만 39세 이하까지 확대되기도 함)</li></ul></article>
+                <article class="age-right-item" data-age="39"><div class="age-header"><span class="age-number">39</span><span class="age-unit">세 이하</span></div><ul><li>청년 주택/장기전세주택 입주 가능 연령</li><li><a href="https://www.semas.or.kr/" target="_blank" rel="noopener noreferrer">청년 창업 지원 (중소기업청, 창업지원금 등)</a></li><li>일부 지자체 청년 지원 정책 상한선</li></ul></article>
+                <article class="age-right-item" data-age="40"><div class="age-header"><span class="age-number">40</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.semas.or.kr/" target="_blank" rel="noopener noreferrer">중장년층 창업 지원 (중소기업청, 중장년 창업지원금)</a></li><li><a href="https://www.work.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 재취업 지원 (고용지원센터)</a></li></ul></article>
+                <article class="age-right-item" data-age="45"><div class="age-header"><span class="age-number">45</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.molit.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 전용 주택 청약 (일부 지자체)</a></li></ul></article>
+                <article class="age-right-item" data-age="50"><div class="age-header"><span class="age-number">50</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.work.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 전용 취업 지원 프로그램</a></li><li><a href="https://www.nhis.or.kr/" target="_blank" rel="noopener noreferrer">중장년층 건강검진 무료 (국가건강검진)</a></li></ul></article>
+                <article class="age-right-item" data-age="55"><div class="age-header"><span class="age-number">55</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.molit.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 전용 주택 분양 (일부 아파트)</a></li></ul></article>
+                <article class="age-right-item" data-age="60"><div class="age-header"><span class="age-number">60</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 특별 지원 (일부 지자체)</a></li></ul></article>
+                <article class="age-right-item" data-age="61"><div class="age-header"><span class="age-number">61</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">노령연금 지급 시작 (1953-56년생)</a></li></ul></article>
+                <article class="age-right-item" data-age="62"><div class="age-header"><span class="age-number">62</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">노령연금 지급 시작 (1957-60년생)</a></li></ul></article>
+                <article class="age-right-item" data-age="63"><div class="age-header"><span class="age-number">63</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">노령연금 지급 시작 (1961-64년생)</a></li></ul></article>
+                <article class="age-right-item" data-age="64"><div class="age-header"><span class="age-number">64</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">노령연금 지급 시작 (1965-68년생)</a></li></ul></article>
+                <article class="age-right-item" data-age="65"><div class="age-header"><span class="age-number">65</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">노인복지법상 노인 혜택 시작</a></li><li><a href="https://www.work.go.kr/" target="_blank" rel="noopener noreferrer">노인교통카드 할인 (대중교통)</a></li><li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">노인 문화시설 할인 (박물관, 영화관 등)</a></li><li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">기초연금 수급 자격 (만 65세 이상)</a></li><li><a href="https://www.longtermcare.or.kr/" target="_blank" rel="noopener noreferrer">노인장기요양보험 수급 자격</a></li></ul></article>
+                <article class="age-right-item" data-age="70"><div class="age-header"><span class="age-number">70</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">노인 우선 대기 및 할인 혜택 확대</a></li></ul></article>
+            </div>
         </section>
 
         <section aria-labelledby="how-works" style="margin-top:40px">
@@ -291,12 +371,12 @@
             </article>
             <article class="section-card">
                 <p class="eyebrow">다음 행동</p>
-                <h2>계산 결과 다음에 확인할 일</h2>
+                <h2>계산한 뒤 함께 볼 내용</h2>
                 <p>
                     정확한 만나이를 확인했다면 신청서의 기준일, 다음 생일까지 남은 기간, 학교나 가족의 주요 시점을 이어서 볼 수 있습니다.
                     연도만 빠르게 비교하려면 출생년도별 나이표를, 생일과 무관한 연도 기준 숫자가 필요하면 연나이 계산기를 선택하세요.
                 </p>
-                <div class="footer-links">
+                <div class="footer-links editorial-link-row">
                     <a href="{{ url_for('birthday_dday_calculator') }}">다음 생일 확인</a>
                     <a href="{{ url_for('birth_year_age_table') }}">출생연도표 보기</a>
                     <a href="{{ url_for('annual_age_calculator') }}">연나이 계산</a>
@@ -341,7 +421,7 @@
             <h2 id="faq">자주 묻는 질문</h2>
 
             <h3>Q. 만나이는 어떻게 확인하나요?</h3>
-            <p>A. 양력 또는 음력 생년월일 8자리를 입력하면 오늘 날짜를 기준으로 생일 전후를 반영한 만나이를 확인할 수 있습니다.</p>
+            <p>A. 양력이나 음력 생년월일 8자리를 입력하면 오늘 기준으로 생일 전후를 반영한 만나이가 나옵니다.</p>
 
             <h3>Q. 음력 생일을 입력하면 무엇을 계산하나요?</h3>
             <p>A. 입력한 평달 음력 생년월일을 양력 출생일로 환산한 뒤 오늘 기준 만나이를 계산합니다.</p>
@@ -371,7 +451,7 @@
             <p>A. 네, 반응형으로 동작하며 주요 모바일 브라우저를 지원합니다.</p>
 
             <h3>Q. 잘못 입력했을 때 어떻게 하나요?</h3>
-            <p>A. 입력값을 수정하면 즉시 재계산됩니다. 비정상 날짜는 오류 안내가 표시됩니다.</p>
+            <p>A. 입력값을 수정하면 오류 여부를 바로 확인할 수 있습니다. 수정한 뒤 계산하기를 누르세요.</p>
         </section>
 
         <section aria-labelledby="notice">
@@ -388,7 +468,7 @@
         </section>
 
 
-        {% include 'partials/page-feedback.html' with context %}
+        </div>
 
         <!-- 푸터 -->
         {% include 'partials/footer.html' %}
@@ -410,7 +490,6 @@
     </button>
 
     <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/page-feedback.js') }}" defer></script>
 </body>
 
 </html>

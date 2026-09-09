@@ -28,27 +28,26 @@ class BirthdayDDayCalculator {
         this.error = document.getElementById('birthday-dday-error');
         this.result = document.getElementById('birthday-dday-result');
         this.resultContent = document.getElementById('birthday-dday-result-content');
-        this.clearButton = document.getElementById('birthday-dday-clear');
+        this.monthInput = document.getElementById('birthday-dday-month');
+        this.dayInput = document.getElementById('birthday-dday-day');
         if (!this.form || !this.input) return;
         this.bindEvents();
     }
 
     bindEvents() {
-        this.form.addEventListener('submit', (event) => event.preventDefault());
+        this.form.addEventListener('submit', (event) => {
+            try {
+                const parsed = AgeCalcDateRules.parseMonthDayDigits(this.input.value);
+                this.monthInput.value = parsed.month;
+                this.dayInput.value = parsed.day;
+            } catch {
+                event.preventDefault();
+                this.error.textContent = '존재하는 생일을 입력해 주세요.';
+            }
+        });
         this.input.addEventListener('input', () => {
             this.input.value = AgeCalcDateRules.formatMonthDayDigits(this.input.value);
-            const digits = this.input.value.replace(/\D/g, '');
-            if (digits.length < 4) {
-                this.clearState();
-                return;
-            }
-            this.calculate();
-        });
-        this.clearButton?.addEventListener('click', () => {
-            this.input.value = '';
-            this.clearState();
-            this.input.focus();
-            window.history.replaceState({}, document.title, window.location.pathname);
+            this.error.textContent = '';
         });
     }
 
@@ -70,27 +69,6 @@ class BirthdayDDayCalculator {
         return { candidate, todayUtc };
     }
 
-    calculate() {
-        let parsed;
-        try {
-            parsed = AgeCalcDateRules.parseMonthDayDigits(this.input.value);
-        } catch (error) {
-            this.error.textContent = '존재하는 생일을 입력해 주세요.';
-            this.result.hidden = true;
-            return;
-        }
-        const { candidate, todayUtc } = this.nextBirthday(parsed.month, parsed.day);
-        const days = Math.round((candidate.getTime() - todayUtc) / 86400000);
-        const birthdayLabel = `${parsed.month}월 ${parsed.day}일`;
-        const nextDate = `${candidate.getUTCFullYear()}.${String(parsed.month).padStart(2, '0')}.${String(parsed.day).padStart(2, '0')}`;
-        const statusLabel = days === 0 ? 'D-Day' : `D-${days}`;
-        const statusNote = days === 0 ? '바로 오늘이 생일입니다.' : `다음 생일까지 ${days}일 남았습니다.`;
-        this.error.textContent = '';
-        this.resultContent.innerHTML = buildBirthdayResultHTML({
-            birthdayLabel, nextDate, statusLabel, days, statusNote
-        });
-        this.result.hidden = false;
-    }
 }
 
 document.addEventListener('DOMContentLoaded', () => new BirthdayDDayCalculator());

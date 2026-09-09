@@ -23,6 +23,7 @@
         href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
 
     <!-- 파비콘/매니페스트 -->
     <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
@@ -39,16 +40,20 @@
 
 </head>
 
-<body>
+<body class="guide-page editorial-content-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
-        <header>
-            <h1>나이 계산 가이드</h1>
-            <h3 style="text-align: center;">헷갈리기 쉬운 만나이, 연나이, 한국식 나이의 차이를 차근차근 정리했습니다.</h3>
+        <main class="editorial-index editorial-index--guide">
+        <header class="hero-band editorial-index-hero guide-hero-band">
+            <div class="hero-copy">
+                <p class="eyebrow">AgeCalc Guide</p>
+                <h1>나이 계산 가이드</h1>
+                <p class="page-intro">헷갈리기 쉬운 만나이, 연나이, 한국식 나이의 차이를 차근차근 정리했습니다.</p>
+            </div>
         </header>
 
-        <section class="section-shell direct-answer" aria-label="나이 계산 가이드 바로 답변">
+        <section class="section-shell direct-answer editorial-prose" aria-label="나이 계산 가이드 바로 답변">
             <div class="section-heading">
                 <p class="eyebrow">바로 답변</p>
                 <h2>나이 계산에서 가장 먼저 확인할 기준은 무엇인가요?</h2>
@@ -59,6 +64,7 @@
             </div>
         </section>
 
+        <div class="editorial-prose">
         <section>
             <h2>만나이란?</h2>
             <p>
@@ -127,22 +133,24 @@
             <p>A. 통계나 설문 등 일부 비공식 영역에서 참고용으로 쓰입니다.</p>
         </section>
 
-        <section class="section-shell">
+        <section class="section-shell editorial-story-list-shell">
             <div class="section-heading">
                 <p class="eyebrow">추천 가이드</p>
                 <h2>계산 기준을 더 자세히 보기</h2>
                 <p class="section-intro">나이, 학년, 기념일, 반려동물 나이를 실제 계산 예시와 함께 정리했습니다.</p>
             </div>
-            <div class="hub-card-grid">
+            <div class="editorial-story-list">
                 {% for guide_page in static_guide_pages %}
-                <a class="hub-card-link" href="{{ url_for('guide_detail', slug=guide_page.slug) }}">
-                    <article class="hub-card calendar-card calendar-card-{{ loop.index % 4 }}">
-                        <span class="hub-card-index">{{ "%02d"|format(loop.index) }}</span>
-                        <span class="guide-category-label">{{ guide_page.category_label }}</span>
-                        <strong>{{ guide_page.title }}</strong>
-                        <p>{{ guide_page.description }}</p>
-                    </article>
-                </a>
+                <article class="editorial-story-card">
+                    <a class="editorial-story-link" href="{{ url_for('guide_detail', slug=guide_page.slug) }}">
+                        <span class="editorial-story-index">{{ "%02d"|format(loop.index) }}</span>
+                        <span class="editorial-story-copy">
+                            <span class="guide-category-label editorial-story-meta">{{ guide_page.category_label }}</span>
+                            <span class="editorial-story-title">{{ guide_page.title }}</span>
+                            <span class="editorial-story-summary">{{ guide_page.description }}</span>
+                        </span>
+                    </a>
+                </article>
                 {% endfor %}
             </div>
         </section>
@@ -155,6 +163,8 @@
                 <li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">국민연금공단</a></li>
             </ul>
         </section>
+        </div>
+        </main>
 
         <!-- 푸터 -->
         {% include 'partials/footer.html' %}

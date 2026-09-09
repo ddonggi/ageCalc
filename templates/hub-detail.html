@@ -24,33 +24,32 @@
     <link rel="icon" href="{{ url_for('static', filename='images/favicon-32x32.png') }}" sizes="32x32" />
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
+    {% if hub.key == 'age' %}<link rel="stylesheet" href="{{ versioned_static('css/age-pages.css') }}" />{% endif %}
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
 
-<body class="life-hub-page hub-theme-{{ hub.accent }}">
+<body class="life-hub-page hub-theme-{{ hub.accent }}{% if hub.key == 'age' %} age-hub-page{% endif %}">
     <div class="container">
         {% include 'partials/header.html' %}
         {% include 'partials/home_coupang_rails.html' %}
 
-        <section class="life-hub-hero">
-            <div class="life-hub-copy">
-                <p class="eyebrow">{{ hub.eyebrow }} Life Calendar</p>
-                <h1>{{ hub.title }}</h1>
+        <section class="section-shell life-hub-tools" aria-labelledby="hub-tools-title">
+            <div class="section-heading">
+                <p class="eyebrow">계산기 목록</p>
+                <h1 id="hub-tools-title">{{ hub.title }} 계산기</h1>
                 <p class="page-intro">{{ hub.intro }}</p>
-                <a class="btn btn-primary" href="{{ url_for(hub.primary_links[0].endpoint) }}">{{ hub.primary_links[0].label }} 시작</a>
+                <p class="small">{{ hub.description }}</p>
             </div>
-            <div class="life-hub-index" aria-label="{{ hub.title }} 대표 도구 목록">
-                <span class="life-hub-stamp" aria-hidden="true">{{ "%02d"|format(hub_number) }}</span>
-                <ol>
-                    {% for link in hub.primary_links %}
-                    <li>
-                        <span>{{ "%02d"|format(loop.index) }}</span>
-                        <a href="{{ url_for(link.endpoint) }}">{{ link.label }}</a>
-                    </li>
-                    {% endfor %}
-                </ol>
+            <div class="life-hub-link-list hub-tool-link-list">
+                {% for link in hub.tool_links %}
+                <a href="{{ url_for(link.endpoint) }}">
+                    <strong>{{ link.label }}</strong>
+                    <span>{{ link.summary }}</span>
+                </a>
+                {% endfor %}
             </div>
         </section>
 
@@ -61,25 +60,6 @@
             </div>
             <p>{{ hub.intro }}</p>
             <p class="small">{{ hub.description }}</p>
-        </section>
-
-        <section class="section-shell life-hub-tools">
-            <div class="section-heading">
-                <p class="eyebrow">대표 도구</p>
-                <h2>{{ hub.title }}에서 먼저 확인할 것</h2>
-                <p class="section-intro">{{ hub.description }}</p>
-            </div>
-            <div class="hub-card-grid">
-                {% for link in hub.primary_links %}
-                <a class="hub-card-link" href="{{ url_for(link.endpoint) }}">
-                    <article class="hub-card calendar-card calendar-card-{{ loop.index % 4 }}">
-                        <span class="hub-card-index">{{ "%02d"|format(loop.index) }}</span>
-                        <strong>{{ link.label }}</strong>
-                        <p>{{ link.summary }}</p>
-                    </article>
-                </a>
-                {% endfor %}
-            </div>
         </section>
 
         <section class="section-shell life-hub-usage-guide" aria-labelledby="hub-usage-guide-title">

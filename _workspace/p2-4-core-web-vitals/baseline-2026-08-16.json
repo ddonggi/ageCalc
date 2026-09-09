@@ -15,23 +15,21 @@
       "https://agecalc.cloud/college-entry-year-calculator"
     ],
     "lab_tbt_over_200ms_urls": [
-      "https://agecalc.cloud/grade-birth-year-table",
-      "https://agecalc.cloud/school-grade-calculator",
-      "https://agecalc.cloud/school-entry-year-table",
-      "https://agecalc.cloud/college-entry-year-calculator"
+      "https://agecalc.cloud/",
+      "https://agecalc.cloud/school-grade-calculator"
     ],
     "largest_payload": {
-      "bytes": 14091577.0,
-      "url": "https://agecalc.cloud/age"
+      "bytes": 1345001.0,
+      "url": "https://agecalc.cloud/"
     },
     "url_groups": [
       {
         "median": {
           "cls": 0.0,
-          "lcp_ms": 9076.342,
-          "performance_score": 56.0,
-          "tbt_ms": 184.5,
-          "total_bytes": 1251473.0,
+          "lcp_ms": 7654.1,
+          "performance_score": 57.0,
+          "tbt_ms": 110.0,
+          "total_bytes": 1011094.0,
           "ttfb_ms": 2.0
         },
         "name": "input_calculators",
@@ -39,11 +37,11 @@
       },
       {
         "median": {
-          "cls": 0.0,
-          "lcp_ms": 9443.4095,
-          "performance_score": 56.0,
-          "tbt_ms": 130.25,
-          "total_bytes": 1082066.0,
+          "cls": 0.003346,
+          "lcp_ms": 8295.3305,
+          "performance_score": 58.0,
+          "tbt_ms": 70.25,
+          "total_bytes": 936824.0,
           "ttfb_ms": 1.5
         },
         "name": "table_pages",
@@ -51,11 +49,11 @@
       },
       {
         "median": {
-          "cls": 0.0,
-          "lcp_ms": 9977.61,
-          "performance_score": 53.0,
-          "tbt_ms": 259.0,
-          "total_bytes": 1211062.0,
+          "cls": 0.018725,
+          "lcp_ms": 7658.547,
+          "performance_score": 60.0,
+          "tbt_ms": 110.0,
+          "total_bytes": 1011959.0,
           "ttfb_ms": 2.0
         },
         "name": "college_calculator",
@@ -64,11 +62,11 @@
       {
         "median": {
           "cls": 0.0,
-          "lcp_ms": 6500.021,
-          "performance_score": 62.0,
-          "tbt_ms": 80.5,
-          "total_bytes": 1208440.0,
-          "ttfb_ms": 2.0
+          "lcp_ms": 6042.065,
+          "performance_score": 60.0,
+          "tbt_ms": 242.0,
+          "total_bytes": 1345001.0,
+          "ttfb_ms": 1.0
         },
         "name": "shared_home",
         "url_count": 1
@@ -458,88 +456,88 @@
       "diagnostics": {
         "lcp_elements": [],
         "median_resource_bytes": {
-          "ads": 638823,
+          "ads": 725759,
           "first_party_scripts": 4918,
-          "fonts": 378606,
-          "images": 6471,
-          "other": 179622
+          "fonts": 449170,
+          "images": 4318,
+          "other": 160836
         },
         "third_parties": []
       },
       "errors": [],
       "median": {
         "cls": 0.0,
-        "fcp_ms": 5971.873,
-        "lcp_ms": 6500.021,
-        "performance_score": 62.0,
-        "tbt_ms": 80.5,
-        "total_bytes": 1208440.0,
-        "ttfb_ms": 2.0
+        "fcp_ms": 5515.715,
+        "lcp_ms": 6042.065,
+        "performance_score": 60.0,
+        "tbt_ms": 242.0,
+        "total_bytes": 1345001.0,
+        "ttfb_ms": 1.0
       },
       "required_runs": 3,
       "runs": [
         {
           "cls": 0.0,
-          "fcp_ms": 5971.873,
+          "fcp_ms": 5515.715,
           "final_url": "https://agecalc.cloud/",
           "lcp_element": "not_available",
-          "lcp_ms": 6500.021,
+          "lcp_ms": 6042.065,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:23:40.372Z",
-          "performance_score": 62,
+          "measured_at": "2026-08-28T07:38:04.329Z",
+          "performance_score": 60,
           "resource_bytes": {
-            "ads": 638823,
+            "ads": 725759,
             "first_party_scripts": 4918,
-            "fonts": 378606,
-            "images": 6471,
-            "other": 179622
+            "fonts": 449170,
+            "images": 4318,
+            "other": 160836
           },
-          "tbt_ms": 80.5,
+          "tbt_ms": 242.0,
           "third_parties": [],
-          "total_bytes": 1208440,
-          "ttfb_ms": 2.0
+          "total_bytes": 1345001,
+          "ttfb_ms": 1.0
         },
         {
           "cls": 0.0,
-          "fcp_ms": 5971.873,
+          "fcp_ms": 5515.715,
           "final_url": "https://agecalc.cloud/",
           "lcp_element": "not_available",
-          "lcp_ms": 6500.021,
+          "lcp_ms": 6042.065,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:23:40.372Z",
-          "performance_score": 62,
+          "measured_at": "2026-08-28T07:38:04.329Z",
+          "performance_score": 60,
           "resource_bytes": {
-            "ads": 638823,
+            "ads": 725759,
             "first_party_scripts": 4918,
-            "fonts": 378606,
-            "images": 6471,
-            "other": 179622
+            "fonts": 449170,
+            "images": 4318,
+            "other": 160836
           },
-          "tbt_ms": 80.5,
+          "tbt_ms": 242.0,
           "third_parties": [],
-          "total_bytes": 1208440,
-          "ttfb_ms": 2.0
+          "total_bytes": 1345001,
+          "ttfb_ms": 1.0
         },
         {
           "cls": 0.0,
-          "fcp_ms": 5971.873,
+          "fcp_ms": 5515.715,
           "final_url": "https://agecalc.cloud/",
           "lcp_element": "not_available",
-          "lcp_ms": 6500.021,
+          "lcp_ms": 6042.065,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:23:40.372Z",
-          "performance_score": 62,
+          "measured_at": "2026-08-28T07:38:04.329Z",
+          "performance_score": 60,
           "resource_bytes": {
-            "ads": 638823,
+            "ads": 725759,
             "first_party_scripts": 4918,
-            "fonts": 378606,
-            "images": 6471,
-            "other": 179622
+            "fonts": 449170,
+            "images": 4318,
+            "other": 160836
           },
-          "tbt_ms": 80.5,
+          "tbt_ms": 242.0,
           "third_parties": [],
-          "total_bytes": 1208440,
-          "ttfb_ms": 2.0
+          "total_bytes": 1345001,
+          "ttfb_ms": 1.0
         }
       ],
       "status": "complete",
@@ -550,87 +548,87 @@
       "diagnostics": {
         "lcp_elements": [],
         "median_resource_bytes": {
-          "ads": 764859,
+          "ads": 437365,
           "first_party_scripts": 4918,
-          "fonts": 307328,
-          "images": 6471,
-          "other": 159401
+          "fonts": 307346,
+          "images": 4318,
+          "other": 142952
         },
         "third_parties": []
       },
       "errors": [],
       "median": {
         "cls": 0.0,
-        "fcp_ms": 7138.769,
-        "lcp_ms": 10494.218,
-        "performance_score": 55.0,
-        "tbt_ms": 201.5,
-        "total_bytes": 1242977.0,
+        "fcp_ms": 7085.029,
+        "lcp_ms": 8733.824,
+        "performance_score": 58.0,
+        "tbt_ms": 59.0,
+        "total_bytes": 896899.0,
         "ttfb_ms": 1.0
       },
       "required_runs": 3,
       "runs": [
         {
           "cls": 0.0,
-          "fcp_ms": 7138.769,
+          "fcp_ms": 7085.029,
           "final_url": "https://agecalc.cloud/grade-birth-year-table",
           "lcp_element": "not_available",
-          "lcp_ms": 10494.218,
+          "lcp_ms": 8733.824,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:23:57.782Z",
-          "performance_score": 55,
+          "measured_at": "2026-08-28T07:38:26.577Z",
+          "performance_score": 58,
           "resource_bytes": {
-            "ads": 764859,
+            "ads": 437365,
             "first_party_scripts": 4918,
-            "fonts": 307328,
-            "images": 6471,
-            "other": 159401
+            "fonts": 307346,
+            "images": 4318,
+            "other": 142952
           },
-          "tbt_ms": 201.5,
+          "tbt_ms": 59.0,
           "third_parties": [],
-          "total_bytes": 1242977,
+          "total_bytes": 896899,
           "ttfb_ms": 1.0
         },
         {
           "cls": 0.0,
-          "fcp_ms": 7138.769,
+          "fcp_ms": 7085.029,
           "final_url": "https://agecalc.cloud/grade-birth-year-table",
           "lcp_element": "not_available",
-          "lcp_ms": 10494.218,
+          "lcp_ms": 8733.824,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:23:57.782Z",
-          "performance_score": 55,
+          "measured_at": "2026-08-28T07:38:26.577Z",
+          "performance_score": 58,
           "resource_bytes": {
-            "ads": 764859,
+            "ads": 437365,
             "first_party_scripts": 4918,
-            "fonts": 307328,
-            "images": 6471,
-            "other": 159401
+            "fonts": 307346,
+            "images": 4318,
+            "other": 142952
           },
-          "tbt_ms": 201.5,
+          "tbt_ms": 59.0,
           "third_parties": [],
-          "total_bytes": 1242977,
+          "total_bytes": 896899,
           "ttfb_ms": 1.0
         },
         {
           "cls": 0.0,
-          "fcp_ms": 7138.769,
+          "fcp_ms": 7085.029,
           "final_url": "https://agecalc.cloud/grade-birth-year-table",
           "lcp_element": "not_available",
-          "lcp_ms": 10494.218,
+          "lcp_ms": 8733.824,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:23:57.782Z",
-          "performance_score": 55,
+          "measured_at": "2026-08-28T07:38:26.577Z",
+          "performance_score": 58,
           "resource_bytes": {
-            "ads": 764859,
+            "ads": 437365,
             "first_party_scripts": 4918,
-            "fonts": 307328,
-            "images": 6471,
-            "other": 159401
+            "fonts": 307346,
+            "images": 4318,
+            "other": 142952
           },
-          "tbt_ms": 201.5,
+          "tbt_ms": 59.0,
           "third_parties": [],
-          "total_bytes": 1242977,
+          "total_bytes": 896899,
           "ttfb_ms": 1.0
         }
       ],
@@ -642,88 +640,88 @@
       "diagnostics": {
         "lcp_elements": [],
         "median_resource_bytes": {
-          "ads": 323326,
+          "ads": 419107,
           "first_party_scripts": 4918,
-          "fonts": 320743,
+          "fonts": 372556,
           "images": 4318,
-          "other": 143658
+          "other": 146122
         },
         "third_parties": []
       },
       "errors": [],
       "median": {
         "cls": 0.0,
-        "fcp_ms": 5930.549,
-        "lcp_ms": 7471.706,
-        "performance_score": 61.0,
-        "tbt_ms": 59.0,
-        "total_bytes": 796963.0,
-        "ttfb_ms": 2.0
+        "fcp_ms": 7432.877,
+        "lcp_ms": 9884.126,
+        "performance_score": 58.0,
+        "tbt_ms": 21.0,
+        "total_bytes": 947021.0,
+        "ttfb_ms": 1.0
       },
       "required_runs": 3,
       "runs": [
         {
           "cls": 0.0,
-          "fcp_ms": 5930.549,
+          "fcp_ms": 7432.877,
           "final_url": "https://agecalc.cloud/birth-year-age-table",
           "lcp_element": "not_available",
-          "lcp_ms": 7471.706,
+          "lcp_ms": 9884.126,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:24:16.751Z",
-          "performance_score": 61,
+          "measured_at": "2026-08-28T07:38:43.382Z",
+          "performance_score": 58,
           "resource_bytes": {
-            "ads": 323326,
+            "ads": 419107,
             "first_party_scripts": 4918,
-            "fonts": 320743,
+            "fonts": 372556,
             "images": 4318,
-            "other": 143658
+            "other": 146122
           },
-          "tbt_ms": 59.0,
+          "tbt_ms": 21.0,
           "third_parties": [],
-          "total_bytes": 796963,
-          "ttfb_ms": 2.0
+          "total_bytes": 947021,
+          "ttfb_ms": 1.0
         },
         {
           "cls": 0.0,
-          "fcp_ms": 5930.549,
+          "fcp_ms": 7432.877,
           "final_url": "https://agecalc.cloud/birth-year-age-table",
           "lcp_element": "not_available",
-          "lcp_ms": 7471.706,
+          "lcp_ms": 9884.126,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:24:16.751Z",
-          "performance_score": 61,
+          "measured_at": "2026-08-28T07:38:43.382Z",
+          "performance_score": 58,
           "resource_bytes": {
-            "ads": 323326,
+            "ads": 419107,
             "first_party_scripts": 4918,
-            "fonts": 320743,
+            "fonts": 372556,
             "images": 4318,
-            "other": 143658
+            "other": 146122
           },
-          "tbt_ms": 59.0,
+          "tbt_ms": 21.0,
           "third_parties": [],
-          "total_bytes": 796963,
-          "ttfb_ms": 2.0
+          "total_bytes": 947021,
+          "ttfb_ms": 1.0
         },
         {
           "cls": 0.0,
-          "fcp_ms": 5930.549,
+          "fcp_ms": 7432.877,
           "final_url": "https://agecalc.cloud/birth-year-age-table",
           "lcp_element": "not_available",
-          "lcp_ms": 7471.706,
+          "lcp_ms": 9884.126,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:24:16.751Z",
-          "performance_score": 61,
+          "measured_at": "2026-08-28T07:38:43.382Z",
+          "performance_score": 58,
           "resource_bytes": {
-            "ads": 323326,
+            "ads": 419107,
             "first_party_scripts": 4918,
-            "fonts": 320743,
+            "fonts": 372556,
             "images": 4318,
-            "other": 143658
+            "other": 146122
           },
-          "tbt_ms": 59.0,
+          "tbt_ms": 21.0,
           "third_parties": [],
-          "total_bytes": 796963,
-          "ttfb_ms": 2.0
+          "total_bytes": 947021,
+          "ttfb_ms": 1.0
         }
       ],
       "status": "complete",
@@ -734,87 +732,87 @@
       "diagnostics": {
         "lcp_elements": [],
         "median_resource_bytes": {
-          "ads": 454375,
-          "first_party_scripts": 20502,
-          "fonts": 395807,
-          "images": 36103,
-          "other": 13184790
+          "ads": 510961,
+          "first_party_scripts": 20678,
+          "fonts": 389066,
+          "images": 4318,
+          "other": 146167
         },
         "third_parties": []
       },
       "errors": [],
       "median": {
-        "cls": 0.083873,
-        "fcp_ms": 7255.089,
-        "lcp_ms": 9076.342,
-        "performance_score": 56.0,
-        "tbt_ms": 31.0,
-        "total_bytes": 14091577.0,
+        "cls": 0.090295,
+        "fcp_ms": 6053.794,
+        "lcp_ms": 7654.1,
+        "performance_score": 57.0,
+        "tbt_ms": 110.0,
+        "total_bytes": 1071190.0,
         "ttfb_ms": 2.0
       },
       "required_runs": 3,
       "runs": [
         {
-          "cls": 0.083873,
-          "fcp_ms": 7255.089,
+          "cls": 0.090295,
+          "fcp_ms": 6053.794,
           "final_url": "https://agecalc.cloud/age",
           "lcp_element": "not_available",
-          "lcp_ms": 9076.342,
+          "lcp_ms": 7654.1,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:24:34.267Z",
-          "performance_score": 56,
+          "measured_at": "2026-08-28T07:39:00.045Z",
+          "performance_score": 57,
           "resource_bytes": {
-            "ads": 454375,
-            "first_party_scripts": 20502,
-            "fonts": 395807,
-            "images": 36103,
-            "other": 13184790
+            "ads": 510961,
+            "first_party_scripts": 20678,
+            "fonts": 389066,
+            "images": 4318,
+            "other": 146167
           },
-          "tbt_ms": 31.0,
+          "tbt_ms": 110.0,
           "third_parties": [],
-          "total_bytes": 14091577,
+          "total_bytes": 1071190,
           "ttfb_ms": 2.0
         },
         {
-          "cls": 0.083873,
-          "fcp_ms": 7255.089,
+          "cls": 0.090295,
+          "fcp_ms": 6053.794,
           "final_url": "https://agecalc.cloud/age",
           "lcp_element": "not_available",
-          "lcp_ms": 9076.342,
+          "lcp_ms": 7654.1,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:24:34.267Z",
-          "performance_score": 56,
+          "measured_at": "2026-08-28T07:39:00.045Z",
+          "performance_score": 57,
           "resource_bytes": {
-            "ads": 454375,
-            "first_party_scripts": 20502,
-            "fonts": 395807,
-            "images": 36103,
-            "other": 13184790
+            "ads": 510961,
+            "first_party_scripts": 20678,
+            "fonts": 389066,
+            "images": 4318,
+            "other": 146167
           },
-          "tbt_ms": 31.0,
+          "tbt_ms": 110.0,
           "third_parties": [],
-          "total_bytes": 14091577,
+          "total_bytes": 1071190,
           "ttfb_ms": 2.0
         },
         {
-          "cls": 0.083873,
-          "fcp_ms": 7255.089,
+          "cls": 0.090295,
+          "fcp_ms": 6053.794,
           "final_url": "https://agecalc.cloud/age",
           "lcp_element": "not_available",
-          "lcp_ms": 9076.342,
+          "lcp_ms": 7654.1,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:24:34.267Z",
-          "performance_score": 56,
+          "measured_at": "2026-08-28T07:39:00.045Z",
+          "performance_score": 57,
           "resource_bytes": {
-            "ads": 454375,
-            "first_party_scripts": 20502,
-            "fonts": 395807,
-            "images": 36103,
-            "other": 13184790
+            "ads": 510961,
+            "first_party_scripts": 20678,
+            "fonts": 389066,
+            "images": 4318,
+            "other": 146167
           },
-          "tbt_ms": 31.0,
+          "tbt_ms": 110.0,
           "third_parties": [],
-          "total_bytes": 14091577,
+          "total_bytes": 1071190,
           "ttfb_ms": 2.0
         }
       ],
@@ -826,88 +824,88 @@
       "diagnostics": {
         "lcp_elements": [],
         "median_resource_bytes": {
-          "ads": 743974,
+          "ads": 522458,
           "first_party_scripts": 4918,
-          "fonts": 333477,
-          "images": 6471,
-          "other": 162633
+          "fonts": 333473,
+          "images": 4318,
+          "other": 145927
         },
         "third_parties": []
       },
       "errors": [],
       "median": {
         "cls": 0.0,
-        "fcp_ms": 6580.861,
-        "lcp_ms": 9538.357,
-        "performance_score": 51.0,
-        "tbt_ms": 349.0,
-        "total_bytes": 1251473.0,
-        "ttfb_ms": 2.0
+        "fcp_ms": 5772.507,
+        "lcp_ms": 7370.367,
+        "performance_score": 56.0,
+        "tbt_ms": 238.0,
+        "total_bytes": 1011094.0,
+        "ttfb_ms": 1.0
       },
       "required_runs": 3,
       "runs": [
         {
           "cls": 0.0,
-          "fcp_ms": 6580.861,
+          "fcp_ms": 5772.507,
           "final_url": "https://agecalc.cloud/school-grade-calculator",
           "lcp_element": "not_available",
-          "lcp_ms": 9538.357,
+          "lcp_ms": 7370.367,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:24:54.924Z",
-          "performance_score": 51,
+          "measured_at": "2026-08-28T07:39:20.623Z",
+          "performance_score": 56,
           "resource_bytes": {
-            "ads": 743974,
+            "ads": 522458,
             "first_party_scripts": 4918,
-            "fonts": 333477,
-            "images": 6471,
-            "other": 162633
+            "fonts": 333473,
+            "images": 4318,
+            "other": 145927
           },
-          "tbt_ms": 349.0,
+          "tbt_ms": 238.0,
           "third_parties": [],
-          "total_bytes": 1251473,
-          "ttfb_ms": 2.0
+          "total_bytes": 1011094,
+          "ttfb_ms": 1.0
         },
         {
           "cls": 0.0,
-          "fcp_ms": 6580.861,
+          "fcp_ms": 5772.507,
           "final_url": "https://agecalc.cloud/school-grade-calculator",
           "lcp_element": "not_available",
-          "lcp_ms": 9538.357,
+          "lcp_ms": 7370.367,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:24:54.924Z",
-          "performance_score": 51,
+          "measured_at": "2026-08-28T07:39:20.623Z",
+          "performance_score": 56,
           "resource_bytes": {
-            "ads": 743974,
+            "ads": 522458,
             "first_party_scripts": 4918,
-            "fonts": 333477,
-            "images": 6471,
-            "other": 162633
+            "fonts": 333473,
+            "images": 4318,
+            "other": 145927
           },
-          "tbt_ms": 349.0,
+          "tbt_ms": 238.0,
           "third_parties": [],
-          "total_bytes": 1251473,
-          "ttfb_ms": 2.0
+          "total_bytes": 1011094,
+          "ttfb_ms": 1.0
         },
         {
           "cls": 0.0,
-          "fcp_ms": 6580.861,
+          "fcp_ms": 5772.507,
           "final_url": "https://agecalc.cloud/school-grade-calculator",
           "lcp_element": "not_available",
-          "lcp_ms": 9538.357,
+          "lcp_ms": 7370.367,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:24:54.924Z",
-          "performance_score": 51,
+          "measured_at": "2026-08-28T07:39:20.623Z",
+          "performance_score": 56,
           "resource_bytes": {
-            "ads": 743974,
+            "ads": 522458,
             "first_party_scripts": 4918,
-            "fonts": 333477,
-            "images": 6471,
-            "other": 162633
+            "fonts": 333473,
+            "images": 4318,
+            "other": 145927
           },
-          "tbt_ms": 349.0,
+          "tbt_ms": 238.0,
           "third_parties": [],
-          "total_bytes": 1251473,
-          "ttfb_ms": 2.0
+          "total_bytes": 1011094,
+          "ttfb_ms": 1.0
         }
       ],
       "status": "complete",
@@ -918,88 +916,88 @@
       "diagnostics": {
         "lcp_elements": [],
         "median_resource_bytes": {
-          "ads": 464037,
+          "ads": 466800,
           "first_party_scripts": 4918,
           "fonts": 307538,
           "images": 4318,
-          "other": 140344
+          "other": 143053
         },
         "third_parties": []
       },
       "errors": [],
       "median": {
-        "cls": 0.074653,
-        "fcp_ms": 7246.797,
-        "lcp_ms": 9293.242,
-        "performance_score": 57.0,
-        "tbt_ms": 31.0,
-        "total_bytes": 921155.0,
-        "ttfb_ms": 1.0
+        "cls": 0.006692,
+        "fcp_ms": 5958.626,
+        "lcp_ms": 7841.261,
+        "performance_score": 58.0,
+        "tbt_ms": 183.0,
+        "total_bytes": 926627.0,
+        "ttfb_ms": 2.0
       },
       "required_runs": 3,
       "runs": [
         {
-          "cls": 0.074653,
-          "fcp_ms": 7246.797,
+          "cls": 0.006692,
+          "fcp_ms": 5958.626,
           "final_url": "https://agecalc.cloud/grade-age-table",
           "lcp_element": "not_available",
-          "lcp_ms": 9293.242,
+          "lcp_ms": 7841.261,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:25:16.931Z",
-          "performance_score": 57,
+          "measured_at": "2026-08-28T07:39:44.607Z",
+          "performance_score": 58,
           "resource_bytes": {
-            "ads": 464037,
+            "ads": 466800,
             "first_party_scripts": 4918,
             "fonts": 307538,
             "images": 4318,
-            "other": 140344
+            "other": 143053
           },
-          "tbt_ms": 31.0,
+          "tbt_ms": 183.0,
           "third_parties": [],
-          "total_bytes": 921155,
-          "ttfb_ms": 1.0
+          "total_bytes": 926627,
+          "ttfb_ms": 2.0
         },
         {
-          "cls": 0.074653,
-          "fcp_ms": 7246.797,
+          "cls": 0.006692,
+          "fcp_ms": 5958.626,
           "final_url": "https://agecalc.cloud/grade-age-table",
           "lcp_element": "not_available",
-          "lcp_ms": 9293.242,
+          "lcp_ms": 7841.261,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:25:16.931Z",
-          "performance_score": 57,
+          "measured_at": "2026-08-28T07:39:44.607Z",
+          "performance_score": 58,
           "resource_bytes": {
-            "ads": 464037,
+            "ads": 466800,
             "first_party_scripts": 4918,
             "fonts": 307538,
             "images": 4318,
-            "other": 140344
+            "other": 143053
           },
-          "tbt_ms": 31.0,
+          "tbt_ms": 183.0,
           "third_parties": [],
-          "total_bytes": 921155,
-          "ttfb_ms": 1.0
+          "total_bytes": 926627,
+          "ttfb_ms": 2.0
         },
         {
-          "cls": 0.074653,
-          "fcp_ms": 7246.797,
+          "cls": 0.006692,
+          "fcp_ms": 5958.626,
           "final_url": "https://agecalc.cloud/grade-age-table",
           "lcp_element": "not_available",
-          "lcp_ms": 9293.242,
+          "lcp_ms": 7841.261,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:25:16.931Z",
-          "performance_score": 57,
+          "measured_at": "2026-08-28T07:39:44.607Z",
+          "performance_score": 58,
           "resource_bytes": {
-            "ads": 464037,
+            "ads": 466800,
             "first_party_scripts": 4918,
             "fonts": 307538,
             "images": 4318,
-            "other": 140344
+            "other": 143053
           },
-          "tbt_ms": 31.0,
+          "tbt_ms": 183.0,
           "third_parties": [],
-          "total_bytes": 921155,
-          "ttfb_ms": 1.0
+          "total_bytes": 926627,
+          "ttfb_ms": 2.0
         }
       ],
       "status": "complete",
@@ -1010,87 +1008,87 @@
       "diagnostics": {
         "lcp_elements": [],
         "median_resource_bytes": {
-          "ads": 783882,
+          "ads": 591043,
           "first_party_scripts": 4918,
-          "fonts": 316033,
-          "images": 6470,
-          "other": 170597
+          "fonts": 316039,
+          "images": 4318,
+          "other": 146151
         },
         "third_parties": []
       },
       "errors": [],
       "median": {
-        "cls": 0.0,
-        "fcp_ms": 6854.533,
-        "lcp_ms": 9593.577,
-        "performance_score": 54.0,
-        "tbt_ms": 252.0,
-        "total_bytes": 1281900.0,
+        "cls": 0.008204,
+        "fcp_ms": 6155.135,
+        "lcp_ms": 7856.837,
+        "performance_score": 60.0,
+        "tbt_ms": 81.5,
+        "total_bytes": 1062469.0,
         "ttfb_ms": 2.0
       },
       "required_runs": 3,
       "runs": [
         {
-          "cls": 0.0,
-          "fcp_ms": 6854.533,
+          "cls": 0.008204,
+          "fcp_ms": 6155.135,
           "final_url": "https://agecalc.cloud/school-entry-year-table",
           "lcp_element": "not_available",
-          "lcp_ms": 9593.577,
+          "lcp_ms": 7856.837,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:25:33.197Z",
-          "performance_score": 54,
+          "measured_at": "2026-08-28T07:40:04.535Z",
+          "performance_score": 60,
           "resource_bytes": {
-            "ads": 783882,
+            "ads": 591043,
             "first_party_scripts": 4918,
-            "fonts": 316033,
-            "images": 6470,
-            "other": 170597
+            "fonts": 316039,
+            "images": 4318,
+            "other": 146151
           },
-          "tbt_ms": 252.0,
+          "tbt_ms": 81.5,
           "third_parties": [],
-          "total_bytes": 1281900,
+          "total_bytes": 1062469,
           "ttfb_ms": 2.0
         },
         {
-          "cls": 0.0,
-          "fcp_ms": 6854.533,
+          "cls": 0.008204,
+          "fcp_ms": 6155.135,
           "final_url": "https://agecalc.cloud/school-entry-year-table",
           "lcp_element": "not_available",
-          "lcp_ms": 9593.577,
+          "lcp_ms": 7856.837,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:25:33.197Z",
-          "performance_score": 54,
+          "measured_at": "2026-08-28T07:40:04.535Z",
+          "performance_score": 60,
           "resource_bytes": {
-            "ads": 783882,
+            "ads": 591043,
             "first_party_scripts": 4918,
-            "fonts": 316033,
-            "images": 6470,
-            "other": 170597
+            "fonts": 316039,
+            "images": 4318,
+            "other": 146151
           },
-          "tbt_ms": 252.0,
+          "tbt_ms": 81.5,
           "third_parties": [],
-          "total_bytes": 1281900,
+          "total_bytes": 1062469,
           "ttfb_ms": 2.0
         },
         {
-          "cls": 0.0,
-          "fcp_ms": 6854.533,
+          "cls": 0.008204,
+          "fcp_ms": 6155.135,
           "final_url": "https://agecalc.cloud/school-entry-year-table",
           "lcp_element": "not_available",
-          "lcp_ms": 9593.577,
+          "lcp_ms": 7856.837,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:25:33.197Z",
-          "performance_score": 54,
+          "measured_at": "2026-08-28T07:40:04.535Z",
+          "performance_score": 60,
           "resource_bytes": {
-            "ads": 783882,
+            "ads": 591043,
             "first_party_scripts": 4918,
-            "fonts": 316033,
-            "images": 6470,
-            "other": 170597
+            "fonts": 316039,
+            "images": 4318,
+            "other": 146151
           },
-          "tbt_ms": 252.0,
+          "tbt_ms": 81.5,
           "third_parties": [],
-          "total_bytes": 1281900,
+          "total_bytes": 1062469,
           "ttfb_ms": 2.0
         }
       ],
@@ -1102,87 +1100,87 @@
       "diagnostics": {
         "lcp_elements": [],
         "median_resource_bytes": {
-          "ads": 383088,
-          "first_party_scripts": 7507,
-          "fonts": 282033,
+          "ads": 449519,
+          "first_party_scripts": 7656,
+          "fonts": 324933,
           "images": 4318,
-          "other": 139759
+          "other": 142277
         },
         "third_parties": []
       },
       "errors": [],
       "median": {
         "cls": 0.0,
-        "fcp_ms": 5286.864,
-        "lcp_ms": 7377.318,
-        "performance_score": 59.0,
-        "tbt_ms": 184.5,
-        "total_bytes": 816705.0,
+        "fcp_ms": 7255.231,
+        "lcp_ms": 8980.475,
+        "performance_score": 58.0,
+        "tbt_ms": 40.5,
+        "total_bytes": 928703.0,
         "ttfb_ms": 2.0
       },
       "required_runs": 3,
       "runs": [
         {
           "cls": 0.0,
-          "fcp_ms": 5286.864,
+          "fcp_ms": 7255.231,
           "final_url": "https://agecalc.cloud/100-day-calculator",
           "lcp_element": "not_available",
-          "lcp_ms": 7377.318,
+          "lcp_ms": 8980.475,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:25:54.280Z",
-          "performance_score": 59,
+          "measured_at": "2026-08-28T07:40:25.586Z",
+          "performance_score": 58,
           "resource_bytes": {
-            "ads": 383088,
-            "first_party_scripts": 7507,
-            "fonts": 282033,
+            "ads": 449519,
+            "first_party_scripts": 7656,
+            "fonts": 324933,
             "images": 4318,
-            "other": 139759
+            "other": 142277
           },
-          "tbt_ms": 184.5,
+          "tbt_ms": 40.5,
           "third_parties": [],
-          "total_bytes": 816705,
+          "total_bytes": 928703,
           "ttfb_ms": 2.0
         },
         {
           "cls": 0.0,
-          "fcp_ms": 5286.864,
+          "fcp_ms": 7255.231,
           "final_url": "https://agecalc.cloud/100-day-calculator",
           "lcp_element": "not_available",
-          "lcp_ms": 7377.318,
+          "lcp_ms": 8980.475,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:25:54.280Z",
-          "performance_score": 59,
+          "measured_at": "2026-08-28T07:40:25.586Z",
+          "performance_score": 58,
           "resource_bytes": {
-            "ads": 383088,
-            "first_party_scripts": 7507,
-            "fonts": 282033,
+            "ads": 449519,
+            "first_party_scripts": 7656,
+            "fonts": 324933,
             "images": 4318,
-            "other": 139759
+            "other": 142277
           },
-          "tbt_ms": 184.5,
+          "tbt_ms": 40.5,
           "third_parties": [],
-          "total_bytes": 816705,
+          "total_bytes": 928703,
           "ttfb_ms": 2.0
         },
         {
           "cls": 0.0,
-          "fcp_ms": 5286.864,
+          "fcp_ms": 7255.231,
           "final_url": "https://agecalc.cloud/100-day-calculator",
           "lcp_element": "not_available",
-          "lcp_ms": 7377.318,
+          "lcp_ms": 8980.475,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:25:54.280Z",
-          "performance_score": 59,
+          "measured_at": "2026-08-28T07:40:25.586Z",
+          "performance_score": 58,
           "resource_bytes": {
-            "ads": 383088,
-            "first_party_scripts": 7507,
-            "fonts": 282033,
+            "ads": 449519,
+            "first_party_scripts": 7656,
+            "fonts": 324933,
             "images": 4318,
-            "other": 139759
+            "other": 142277
           },
-          "tbt_ms": 184.5,
+          "tbt_ms": 40.5,
           "third_parties": [],
-          "total_bytes": 816705,
+          "total_bytes": 928703,
           "ttfb_ms": 2.0
         }
       ],
@@ -1194,87 +1192,87 @@
       "diagnostics": {
         "lcp_elements": [],
         "median_resource_bytes": {
-          "ads": 732008,
+          "ads": 551548,
           "first_party_scripts": 4918,
-          "fonts": 307544,
-          "images": 6470,
-          "other": 160122
+          "fonts": 307570,
+          "images": 4318,
+          "other": 143605
         },
         "third_parties": []
       },
       "errors": [],
       "median": {
-        "cls": 0.0,
-        "fcp_ms": 7067.113,
-        "lcp_ms": 9977.61,
-        "performance_score": 53.0,
-        "tbt_ms": 259.0,
-        "total_bytes": 1211062.0,
+        "cls": 0.018725,
+        "fcp_ms": 5867.397,
+        "lcp_ms": 7658.547,
+        "performance_score": 60.0,
+        "tbt_ms": 110.0,
+        "total_bytes": 1011959.0,
         "ttfb_ms": 2.0
       },
       "required_runs": 3,
       "runs": [
         {
-          "cls": 0.0,
-          "fcp_ms": 7067.113,
+          "cls": 0.018725,
+          "fcp_ms": 5867.397,
           "final_url": "https://agecalc.cloud/college-entry-year-calculator",
           "lcp_element": "not_available",
-          "lcp_ms": 9977.61,
+          "lcp_ms": 7658.547,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:26:16.201Z",
-          "performance_score": 53,
+          "measured_at": "2026-08-28T07:40:43.931Z",
+          "performance_score": 60,
           "resource_bytes": {
-            "ads": 732008,
+            "ads": 551548,
             "first_party_scripts": 4918,
-            "fonts": 307544,
-            "images": 6470,
-            "other": 160122
+            "fonts": 307570,
+            "images": 4318,
+            "other": 143605
           },
-          "tbt_ms": 259.0,
+          "tbt_ms": 110.0,
           "third_parties": [],
-          "total_bytes": 1211062,
+          "total_bytes": 1011959,
           "ttfb_ms": 2.0
         },
         {
-          "cls": 0.0,
-          "fcp_ms": 7067.113,
+          "cls": 0.018725,
+          "fcp_ms": 5867.397,
           "final_url": "https://agecalc.cloud/college-entry-year-calculator",
           "lcp_element": "not_available",
-          "lcp_ms": 9977.61,
+          "lcp_ms": 7658.547,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:26:16.201Z",
-          "performance_score": 53,
+          "measured_at": "2026-08-28T07:40:43.931Z",
+          "performance_score": 60,
           "resource_bytes": {
-            "ads": 732008,
+            "ads": 551548,
             "first_party_scripts": 4918,
-            "fonts": 307544,
-            "images": 6470,
-            "other": 160122
+            "fonts": 307570,
+            "images": 4318,
+            "other": 143605
           },
-          "tbt_ms": 259.0,
+          "tbt_ms": 110.0,
           "third_parties": [],
-          "total_bytes": 1211062,
+          "total_bytes": 1011959,
           "ttfb_ms": 2.0
         },
         {
-          "cls": 0.0,
-          "fcp_ms": 7067.113,
+          "cls": 0.018725,
+          "fcp_ms": 5867.397,
           "final_url": "https://agecalc.cloud/college-entry-year-calculator",
           "lcp_element": "not_available",
-          "lcp_ms": 9977.61,
+          "lcp_ms": 7658.547,
           "lighthouse_version": "13.4.1",
-          "measured_at": "2026-08-15T17:26:16.201Z",
-          "performance_score": 53,
+          "measured_at": "2026-08-28T07:40:43.931Z",
+          "performance_score": 60,
           "resource_bytes": {
-            "ads": 732008,
+            "ads": 551548,
             "first_party_scripts": 4918,
-            "fonts": 307544,
-            "images": 6470,
-            "other": 160122
+            "fonts": 307570,
+            "images": 4318,
+            "other": 143605
           },
-          "tbt_ms": 259.0,
+          "tbt_ms": 110.0,
           "third_parties": [],
-          "total_bytes": 1211062,
+          "total_bytes": 1011959,
           "ttfb_ms": 2.0
         }
       ],

@@ -2,7 +2,8 @@ class DDayCalculator {
     constructor() {
         this.labelInput = document.getElementById("dday-label");
         this.dateInput = document.getElementById("dday-date");
-        this.modeInputs = Array.from(document.querySelectorAll('input[name="dday-mode"]'));
+        this.modeInputs = Array.from(document.querySelectorAll('input[name="mode"]'));
+        this.form = document.getElementById("dday-form");
         this.errorEl = document.getElementById("dday-error");
         this.resultContainer = document.getElementById("dday-result-container");
         this.resultContent = document.getElementById("dday-result-content");
@@ -20,13 +21,20 @@ class DDayCalculator {
             ["input", "change"].forEach((eventName) => {
                 input.addEventListener(eventName, () => {
                     this.normalizeInputs();
-                    this.updateResult();
+                    this.showError("");
                 });
             });
         });
 
         this.modeInputs.forEach((input) => {
-            input.addEventListener("change", () => this.updateResult());
+            input.addEventListener("change", () => this.showError(""));
+        });
+        this.form?.addEventListener("submit", (event) => {
+            const validation = this.validate();
+            if (!validation.valid) {
+                event.preventDefault();
+                this.showError(validation.message || "올바른 날짜를 입력해 주세요.");
+            }
         });
     }
 
@@ -109,47 +117,6 @@ class DDayCalculator {
             tone: "is-positive",
             caption: `${Math.abs(diff)}일이 지났습니다.`,
         };
-    }
-
-    updateResult() {
-        const validation = this.validate();
-        if (!validation.valid) {
-            this.showError(validation.incomplete ? "" : validation.message);
-            this.clearResult();
-            return;
-        }
-
-        const mode = this.getMode();
-        const eventName = this.getEventName();
-        const diff = this.diffDays(validation.date);
-        const primary = this.buildPrimaryLabel(mode, diff);
-        const absDiff = Math.abs(diff);
-
-        this.showError("");
-        this.resultContent.innerHTML = `
-            <div class="result success">
-                <p class="message">${eventName}</p>
-                <div class="count-pill ${primary.tone}">${primary.label}</div>
-                <p class="result-kicker">${mode === "since" ? "경과 일수" : "남은 일수"}</p>
-                <p>${this.formatDate(validation.date)} 기준으로 ${primary.caption}</p>
-                <div class="summary-grid">
-                    <div class="summary-card">
-                        <strong>기준 날짜</strong>
-                        <span>${this.formatDate(validation.date)}</span>
-                    </div>
-                    <div class="summary-card">
-                        <strong>오늘 기준 차이</strong>
-                        <span>${absDiff}일</span>
-                    </div>
-                    <div class="summary-card">
-                        <strong>표시 방식</strong>
-                        <span>${mode === "since" ? "지난 날부터" : "다가오는 날"}</span>
-                    </div>
-                </div>
-                <p class="small">오늘 제외 기준입니다. 같은 날짜면 D-Day로 표시합니다.</p>
-            </div>
-        `;
-        this.resultContainer.classList.add("show");
     }
 
     showError(message) {

@@ -15,14 +15,14 @@ class PetAgeCalculator {
         this.monthsInput = document.getElementById('pet-months');
         this.birthDateInput = document.getElementById('pet-birth-date');
         this.adoptionDateInput = document.getElementById('pet-adoption-date');
-        this.modeInputs = Array.from(document.querySelectorAll('input[name="pet-age-mode"]'));
+        this.modeInputs = Array.from(document.querySelectorAll('input[name="mode"]'));
         this.inputPanels = Array.from(document.querySelectorAll('[data-pet-panel]'));
         this.errorEl = document.getElementById('pet-error');
         this.resultContainer = document.getElementById('pet-result-container');
         this.resultContent = document.getElementById('pet-result-content');
         this.petType = this.form ? this.form.getAttribute('data-pet') : 'dog';
         this.sizeOptions = document.querySelectorAll('.pet-size-option');
-        this.sizeRadios = document.querySelectorAll('input[name="pet-size"]');
+        this.sizeRadios = document.querySelectorAll('input[name="size"]');
         this.dogAgeTable = {
             small: [15, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80],
             medium: [15, 24, 28, 32, 36, 42, 47, 51, 56, 60, 65, 69, 74, 78, 83, 87],
@@ -39,37 +39,45 @@ class PetAgeCalculator {
         ['input', 'change'].forEach(evt => {
             this.yearsInput?.addEventListener(evt, () => {
                 this.normalizeInputs();
-                this.updateResult();
+                this.showError('');
             });
             this.monthsInput?.addEventListener(evt, () => {
                 this.normalizeInputs();
-                this.updateResult();
+                this.showError('');
             });
         });
 
         [this.birthDateInput, this.adoptionDateInput].forEach(input => {
             input?.addEventListener('input', () => {
                 input.value = AgeCalcDateRules.formatDateDigits(input.value);
-                this.updateResult();
+                this.showError('');
             });
         });
 
         this.modeInputs.forEach(input => {
             input.addEventListener('change', () => {
                 this.updateModeUI();
-                this.updateResult();
+                this.showError('');
             });
         });
 
         this.sizeRadios.forEach(radio => {
             radio.addEventListener('change', () => {
                 this.updateSizeUI();
-                this.updateResult();
+                this.showError('');
             });
         });
 
         this.updateSizeUI();
         this.updateModeUI();
+        this.form.addEventListener('submit', (event) => {
+            this.normalizeInputs();
+            const validation = this.validate();
+            if (!validation.valid) {
+                event.preventDefault();
+                this.showError(validation.incomplete ? '필수 입력값을 채워 주세요.' : validation.msg);
+            }
+        });
     }
 
     normalizeInputs() {
@@ -262,12 +270,12 @@ class PetAgeCalculator {
     }
 
     getDogSize() {
-        const selected = document.querySelector('input[name="pet-size"]:checked');
+        const selected = document.querySelector('input[name="size"]:checked');
         return selected ? selected.value : 'small';
     }
 
     getDogSizeLabel() {
-        const selected = document.querySelector('input[name="pet-size"]:checked');
+        const selected = document.querySelector('input[name="size"]:checked');
         if (!selected) return '';
         if (selected.value === 'large') return '(대형견)';
         if (selected.value === 'giant') return '(초대형견)';

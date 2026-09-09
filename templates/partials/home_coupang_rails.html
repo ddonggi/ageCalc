@@ -1,5 +1,6 @@
 {% if coupang_partners_enabled %}
-{% set mobile_coupang_category = current_hub_key|default('', true) %}
+{% set family_promotion_endpoints = ('baby_months', 'baby_months_table', 'parent_child', 'age_gap_calculator') %}
+{% set mobile_coupang_category = 'family' if current_page and current_page.endpoint in family_promotion_endpoints else current_hub_key|default('', true) %}
 <aside class="coupang-mobile-banner" aria-label="쿠팡 파트너스 추천 광고">
     <p class="home-coupang-disclosure">쿠팡 파트너스 활동으로 일정액의 수수료를 제공받습니다.</p>
     {% if mobile_coupang_category == 'family' %}

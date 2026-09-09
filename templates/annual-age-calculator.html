@@ -28,17 +28,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
 
-<body>
+<body class="editorial-calculator-page calculator-flat-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <section class="hero-band">
+        <section class="hero-band calculator-page-heading">
             <div class="hero-copy">
                 <p class="eyebrow">연도 기준 계산</p>
                 <h1>연나이 계산기</h1>
@@ -77,28 +78,29 @@
             </p>
         </section>
 
-        <section class="section-shell">
-            <div class="section-heading">
-                <h2 id="annual-age-search">출생연도 입력</h2>
-                <p class="section-intro">연나이는 월·일과 무관하므로 개인 생년월일 대신 출생연도만 입력받습니다.</p>
-            </div>
-            <form class="age-form" method="get" action="{{ url_for('annual_age_calculator') }}">
-                <div class="form-group">
-                    <div class="date-inputs">
-                        <input type="number" name="birth_year" min="1900" max="{{ current_year }}" value="{{ birth_year or '' }}" aria-label="출생연도 4자리">
-                    </div>
-                    <div class="hero-actions">
-                        <button class="btn btn-primary" type="submit">연나이 계산</button>
-                        {% if birth_year %}
-                        <a class="btn btn-secondary" href="{{ url_for('annual_age_calculator') }}">입력 지우기</a>
+        <div class="editorial-calculator-shell">
+            <section class="section-shell">
+                <div class="section-heading">
+                    <h2 id="annual-age-search">출생연도 입력</h2>
+                    <p class="section-intro">연나이는 월·일과 무관하므로 개인 생년월일 대신 출생연도만 입력받습니다.</p>
+                </div>
+                <form class="age-form" method="get" action="{{ url_for('annual_age_calculator') }}">
+                    <div class="form-group">
+                        <div class="date-inputs">
+                            <input type="number" name="birth_year" min="1900" max="{{ current_year }}" value="{{ birth_year or '' }}" aria-label="출생연도 4자리">
+                        </div>
+                        <div class="hero-actions">
+                            <button class="btn btn-primary" type="submit">연나이 계산</button>
+                            {% if birth_year %}
+                            <a class="btn btn-secondary" href="{{ url_for('annual_age_calculator') }}">입력 지우기</a>
+                            {% endif %}
+                        </div>
+                        {% if invalid_date %}
+                        <small class="error-msg">1900년부터 {{ current_year }}년 사이의 출생연도를 입력해 주세요.</small>
                         {% endif %}
                     </div>
-                    {% if invalid_date %}
-                    <small class="error-msg">1900년부터 {{ current_year }}년 사이의 출생연도를 입력해 주세요.</small>
-                    {% endif %}
-                </div>
-            </form>
-        </section>
+                </form>
+            </section>
         {% include 'partials/info_coupang_promotions.html' %}
         {% include 'partials/home_coupang_rails.html' %}
 
@@ -126,10 +128,12 @@
         </section>
         {% endif %}
 
+        </div>
+        <div class="editorial-supporting-content">
         <section class="section-shell">
             <div class="section-heading">
-                <h2>예시로 보는 연나이</h2>
-                <p class="section-intro">자주 비교하는 출생연도를 예시로 먼저 정리했습니다.</p>
+                <h2>연나이 계산 예시</h2>
+                <p class="section-intro">자주 비교하는 출생연도 예시를 모았습니다.</p>
             </div>
             <div class="section-card-grid">
                 {% for example in examples %}
@@ -192,6 +196,7 @@
             <div><strong>연나이는 생일 전후에 달라지나요?</strong><p>아니요. 연나이는 현재 연도에서 출생연도를 빼므로 같은 해에는 변하지 않습니다.</p></div>
             <div><strong>연나이와 만나이는 언제 다른가요?</strong><p>생일 전에는 만나이가 연나이보다 한 살 적고, 생일이 지나면 일반적으로 같은 숫자가 됩니다.</p></div>
         </section>
+        </div>
 
         {% include 'partials/footer.html' %}
     </div>

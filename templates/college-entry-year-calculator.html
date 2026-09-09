@@ -28,17 +28,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
 
-<body>
+<body class="calculator-flat-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <section class="hero-band">
+        <section class="hero-band calculator-page-heading">
             <div class="hero-copy">
                 <p class="eyebrow">대학 입학 기준 안내</p>
                 <h1>{% if selected_row %}{{ selected_row.cohort_label }} 나이·몇년생 확인{% else %}학번 계산기{% endif %}</h1>
@@ -79,7 +80,7 @@
         <section class="section-shell">
             <div class="section-heading">
                 <h2 id="college-entry-search">학번 선택</h2>
-                <p class="section-intro">찾고 싶은 학번을 고르면 해당 학번의 보통 출생연도와 현재 나이를 바로 요약해 보여드립니다.</p>
+                <p class="section-intro">찾는 학번을 고르면 보통 출생연도와 현재 나이가 바로 나옵니다.</p>
             </div>
             <form class="age-form birth-year-form" method="get" action="{{ url_for('college_entry_year_calculator') }}">
                 <div class="form-group">
@@ -136,7 +137,7 @@
         <section class="section-shell">
             <div class="section-heading">
                 <h2>많이 찾는 학번 빠른 답변</h2>
-                <p class="section-intro">26학번 몇년생, 22학번 나이, 19학번 나이처럼 많이 찾는 학번 질문을 먼저 정리했습니다.</p>
+                <p class="section-intro">26학번 몇년생, 22학번 나이, 19학번 나이처럼 자주 찾는 학번 질문을 모았습니다.</p>
             </div>
             <div class="section-card-grid">
                 {% for example in examples %}

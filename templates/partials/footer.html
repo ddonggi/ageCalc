@@ -11,7 +11,7 @@
 
         <section class="footer-section footer-policies">
             <h4>운영 및 정책</h4>
-            <div class="footer-links footer-links-compact">
+            <div class="footer-links footer-links-compact editorial-link-row">
                 {% for link in footer_policy_links %}
                 <a href="{{ url_for(link.endpoint) }}">{{ link.label }}</a>
                 {% endfor %}

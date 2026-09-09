@@ -27,17 +27,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
 
-<body>
+<body class="calculator-flat-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <section class="hero-band">
+        <section class="hero-band calculator-page-heading">
             <div class="hero-copy">
                 <p class="eyebrow">12간지 안내</p>
                 <h1>연도별 띠표</h1>
@@ -79,7 +80,7 @@
         <section class="section-shell">
             <div class="section-heading">
                 <h2 id="zodiac-search">출생연도 선택</h2>
-                <p class="section-intro">찾고 싶은 연도를 고르면 해당 연도의 띠와 같은 띠 연도를 바로 보여드립니다.</p>
+                <p class="section-intro">찾는 연도를 고르면 해당 띠와 같은 띠인 연도를 바로 보여줍니다.</p>
             </div>
             <form class="age-form birth-year-form" method="get" action="{{ url_for('birth_year_zodiac_table') }}">
                 <div class="form-group">
@@ -130,7 +131,7 @@
         <section class="section-shell">
             <div class="section-heading">
                 <h2>예시로 보는 띠</h2>
-                <p class="section-intro">많이 찾는 출생연도를 예시로 먼저 정리했습니다.</p>
+                <p class="section-intro">많이 찾는 출생연도 예시를 모았습니다.</p>
             </div>
             <div class="section-card-grid">
                 {% for example in examples %}

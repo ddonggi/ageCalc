@@ -115,7 +115,7 @@
                 () => initGoogleAnalytics(config.ga_measurement_id)
             );
         }
-        if (config.clarity_project_id) {
+        if (config.clarity_project_id && document.body?.dataset.disableClarity !== 'true') {
             initClarity(config.clarity_project_id);
         }
     };

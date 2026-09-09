@@ -27,6 +27,7 @@ function buildBabyMonthsResultHTML({ months, totalDays, years, remain }) {
 class BabyMonthsCalculator {
     constructor() {
         this.birthInput = document.getElementById('baby-birth-input');
+        this.form = document.getElementById('baby-months-form');
         this.errorEl = document.getElementById('baby-error');
         this.resultContainer = document.getElementById('baby-result-container');
         this.resultContent = document.getElementById('baby-result-content');
@@ -37,11 +38,13 @@ class BabyMonthsCalculator {
     }
 
     bindEvents() {
-        ['input', 'change'].forEach(evt => {
-            this.birthInput.addEventListener(evt, () => {
-                this.normalizeInputs();
-                this.updateResult();
-            });
+        this.birthInput.addEventListener('input', () => this.normalizeInputs());
+        this.form?.addEventListener('submit', (event) => {
+            const validation = this.validate();
+            if (!validation.valid) {
+                event.preventDefault();
+                this.showError(validation.msg);
+            }
         });
     }
 
@@ -92,32 +95,6 @@ class BabyMonthsCalculator {
         const today = this.getToday();
         const diffMs = today.getTime() - birth.getTime();
         return Math.max(0, Math.floor(diffMs / 86400000));
-    }
-
-    updateResult() {
-        const digits = String(this.birthInput.value || '').replace(/\D/g, '');
-        if (digits.length < 8) {
-            this.showError('');
-            this.clearResult();
-            return;
-        }
-        const v = this.validate();
-        if (!v.valid) {
-            this.showError(v.msg);
-            this.clearResult();
-            return;
-        }
-
-        this.showError('');
-        const months = this.calculateMonths(v.birth);
-        const totalDays = this.calculateTotalDays(v.birth);
-        const years = Math.floor(months / 12);
-        const remain = months % 12;
-
-        this.resultContent.innerHTML = buildBabyMonthsResultHTML({
-            months, totalDays, years, remain
-        });
-        this.resultContainer.classList.add('show');
     }
 
     showError(msg) {

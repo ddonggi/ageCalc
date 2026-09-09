@@ -19,9 +19,9 @@ from content.page_registry import (
 class PageRegistryTests(unittest.TestCase):
     def test_registry_covers_current_static_and_guide_pages(self):
         self.assertEqual(31, len(STATIC_PAGE_REGISTRY))
-        self.assertEqual(8, len(HUB_PAGE_REGISTRY))
+        self.assertEqual(4, len(HUB_PAGE_REGISTRY))
         self.assertEqual(20, len(GUIDE_PAGE_REGISTRY))
-        self.assertEqual(59, len(PUBLIC_PAGE_REGISTRY))
+        self.assertEqual(55, len(PUBLIC_PAGE_REGISTRY))
 
         self.assertEqual(
             {"index", "age", "blog_list"},
@@ -59,17 +59,11 @@ class PageRegistryTests(unittest.TestCase):
             find_page("age", {})["key"],
         )
         self.assertEqual(
-            "hub:family",
-            find_page("life_hub", {"hub_slug": "family"})["key"],
-        )
-        self.assertEqual(
             "hub:age",
             find_page("life_hub", {"hub_slug": "age-tools"})["key"],
         )
-        self.assertEqual(
-            "hub:health",
-            find_page("life_hub", {"hub_slug": "health-tools"})["key"],
-        )
+        self.assertIsNone(find_page("life_hub", {"hub_slug": "family"}))
+        self.assertIsNone(find_page("life_hub", {"hub_slug": "health-tools"}))
         self.assertEqual(
             "guide:age-calculation-2026",
             find_page("guide_detail", {"slug": "age-calculation-2026"})["key"],
@@ -87,7 +81,6 @@ class PageRegistryTests(unittest.TestCase):
 
         by_key = {page["key"]: page for page in HUB_PAGE_REGISTRY}
         self.assertEqual("/age-tools/", by_key["hub:age"]["path"])
-        self.assertEqual("/health-tools/", by_key["hub:health"]["path"])
         self.assertEqual(
             {"hub_slug": "age-tools"},
             by_key["hub:age"]["route_values"],

@@ -38,6 +38,7 @@
         href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <!-- 스크립트 -->
     <script src="{{ url_for('static', filename='js/age-calculator.js') }}" defer></script>
 
@@ -79,8 +80,8 @@
                 <p class="eyebrow">바로 답변</p>
                 <h2>AgeCalc는 계산 입력값을 저장하나요?</h2>
                 <p class="section-intro">
-                    양력 생년월일은 브라우저 안에서 계산합니다. 음력 생년월일은 양력 변환을 위해서만 서버로 전송하며 별도 데이터베이스에 저장하지 않습니다.
-                    계산기 공유 주소에는 생년월일을 넣지 않습니다.
+                    날짜·가족 입력 계산기는 결과를 다시 확인할 수 있도록 계산 결과 URL에 입력값이 포함될 수 있습니다. 별도 데이터베이스에는 저장하지 않습니다.
+                    음력 생년월일은 양력 변환을 위해 서버에서 처리합니다. 결과 URL을 다른 사람과 공유하지 마세요.
                     문의 이메일, 보안 로그, 동의 후 광고·분석 쿠키처럼 운영상 필요한 항목은 아래 기준에 따라 제한적으로 처리합니다.
                 </p>
             </div>
@@ -89,7 +90,7 @@
         <section>
             <h2>1. 처리 목적</h2>
             <ul>
-                <li><strong>나이 계산 서비스 제공</strong>: 브라우저 안에서 양력 만나이 계산, 필요한 경우에만 음력 날짜 변환</li>
+                <li><strong>계산 서비스 제공</strong>: 결과 URL의 날짜·가족 입력값으로 계산, 필요한 경우 음력 날짜 변환</li>
                 <li><strong>서비스 품질 개선</strong>: 오류 복구, 보안 강화, 이용 통계 분석(동의 시)</li>
                 <li><strong>고객 지원</strong>: 문의 대응 및 기술 지원</li>
             </ul>
@@ -98,7 +99,7 @@
         <section>
             <h2>2. 수집 항목 및 수집 방법</h2>
             <div class="highlight">
-                <p><strong>핵심 원칙</strong>: 양력 계산은 브라우저에서 끝나며 서버로 전송하지 않습니다. 음력 입력만 양력 변환을 위해 서버로 전송하고 저장하지 않습니다. 공유 주소에는 생년월일을 넣지 않습니다.</p>
+                <p><strong>핵심 원칙</strong>: 날짜·가족 입력 계산의 결과 URL에는 생년월일, 기념일 또는 가족 관계 입력값이 포함될 수 있습니다. 서버는 결과를 표시하기 위해 이를 처리하지만 별도 데이터베이스에 저장하지 않습니다. 결과 URL을 다른 사람과 공유하지 마세요.</p>
             </div>
             <ul>
                 <li><strong>직접 수집</strong>: (필수) 없음 / (선택) 문의 시 이메일 주소</li>

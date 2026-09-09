@@ -15,23 +15,21 @@
     <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
     <link rel="icon" href="/favicon.ico">
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ versioned_static('js/date-rules.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
-<body class="life-timeline-page">
+<body class="life-timeline-page calculator-flat-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
-        <section class="hero-band life-timeline-hero">
+        <section class="hero-band life-timeline-hero calculator-page-heading">
             <div class="hero-copy">
                 <p class="eyebrow">My Life · Today</p>
                 <h1>내 생애 타임라인 계산기</h1>
-                <p class="page-intro">생년월일 한 번으로 지금의 나이부터 살아온 날, 다음 생일과 출생 프로필까지 하나의 흐름으로 확인하세요.</p>
-            </div>
-            <div class="life-orbit" aria-hidden="true">
-                <span>탄생</span><i></i><span>오늘</span><i></i><span>다음 생일</span>
+                <p class="page-intro">생년월일을 한 번 입력하면 지금 나이, 살아온 날, 다음 생일, 출생 프로필을 한 화면에서 확인할 수 있습니다.</p>
             </div>
         </section>
 
@@ -40,20 +38,24 @@
                 <p class="eyebrow">한 번만 입력하세요</p>
                 <h2>모든 결과는 {{ today.strftime('%Y년 %-m월 %-d일') }}을 같은 기준일로 계산합니다</h2>
             </div>
-            <form class="age-form life-timeline-form" id="life-timeline-form" data-today="{{ today.isoformat() }}" autocomplete="off" data-clarity-mask="true">
+            <form class="age-form life-timeline-form" id="life-timeline-form" action="{{ url_for('life_timeline') }}#life-timeline-result" method="get" data-today="{{ today.isoformat() }}" autocomplete="off" data-clarity-mask="true">
                 <label class="field-label" for="life-birth-date">생년월일 8자리</label>
-                <input type="text" id="life-birth-date" placeholder="1992.10.02" inputmode="numeric" pattern="[0-9.]*" maxlength="10" required aria-describedby="life-timeline-help profile-date-note life-timeline-error" data-profile-date-input="full" />
-                <p class="input-help" id="life-timeline-help">입력한 날짜는 브라우저 안에서만 계산하며 URL이나 서버로 전송하지 않습니다.</p>
-                <div class="profile-date-control">
-                    <label for="profile-date-consent"><input type="checkbox" id="profile-date-consent" /> <span>이 기기에서 다음 계산에도 사용</span></label>
-                    <button type="button" class="btn btn-secondary" id="profile-date-clear">저장값 삭제</button>
-                </div>
-                <p class="input-help" id="profile-date-note">선택하면 이 브라우저에만 저장됩니다. 공용 기기에서는 사용하지 말고, 언제든 저장값을 삭제하세요.</p>
+                <input type="text" id="life-birth-date" name="birth_date" value="{% if birth_date %}{{ birth_date.strftime('%Y%m%d') }}{% endif %}" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" required aria-describedby="life-timeline-error" />
                 <small class="error-msg" id="life-timeline-error" aria-live="polite"></small>
+                <button class="btn btn-primary" type="submit">계산하기</button>
             </form>
         </section>
 
-        <section class="life-timeline-result" id="life-timeline-result" aria-live="polite" aria-label="생애 타임라인 계산 결과" hidden></section>
+        <section class="life-timeline-result" id="life-timeline-result" aria-live="polite" aria-label="생애 타임라인 계산 결과" {% if not timeline %}hidden{% endif %}>
+            {% if timeline %}
+            <div class="life-timeline-track">
+                <article class="life-moment is-now"><span class="life-moment-dot" aria-hidden="true"></span><p class="eyebrow">지금</p><h3>만 {{ timeline.full_age }}세</h3><p>출생연도 기준 연 나이는 {{ timeline.year_age }}세입니다.</p><a href="/age">만 나이 계산 기준 보기</a></article>
+                <article class="life-moment"><span class="life-moment-dot" aria-hidden="true"></span><p class="eyebrow">지나온 시간</p><h3>{{ '{:,}'.format(timeline.days_lived) }}일</h3><p>출생일부터 오늘까지의 순수한 날짜 차이입니다.</p></article>
+                <article class="life-moment is-next"><span class="life-moment-dot" aria-hidden="true"></span><p class="eyebrow">다음 생일 · {% if timeline.days_until_birthday == 0 %}오늘{% else %}D-{{ timeline.days_until_birthday }}{% endif %}</p><h3>{{ timeline.next_birthday.strftime('%Y년 %-m월 %-d일') }}</h3><p>{% if timeline.days_until_birthday == 0 %}오늘이 생일입니다.{% else %}다음 생일까지 {{ timeline.days_until_birthday }}일 남았습니다.{% endif %}</p><a href="/birthday-dday-calculator">생일 D-day 자세히 보기</a></article>
+                <article class="life-moment is-profile"><span class="life-moment-dot" aria-hidden="true"></span><p class="eyebrow">출생 프로필</p><h3>{{ timeline.zodiac }}띠 · {{ timeline.constellation }}</h3><p>띠는 출생연도 기준이며 음력 설·입춘 기준과 다를 수 있습니다.</p><a href="/birth-year-zodiac-table">출생연도별 띠표 보기</a></article>
+            </div>
+            {% endif %}
+        </section>
 
         <section class="section-shell section-card-grid">
             <article class="section-card">
@@ -69,7 +71,7 @@
         </section>
 
         <section class="section-shell">
-            <div class="section-heading"><h2>타임라인 다음에 확인할 도구</h2></div>
+            <div class="section-heading"><h2>타임라인을 본 뒤 함께 볼 도구</h2></div>
             <div class="footer-links">
                 <a href="{{ url_for('age') }}">만 나이 기준 자세히 보기</a>
                 <a href="{{ url_for('birthday_dday_calculator') }}">생일 D-day 계산하기</a>
@@ -81,7 +83,6 @@
         {% include 'partials/footer.html' %}
     </div>
     <div class="cookie-banner" id="cookie-banner"><div class="cookie-content"><p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 거부해도 계산 기능은 그대로 이용할 수 있습니다.</p><div class="cookie-buttons"><button id="accept-cookies" class="btn btn-primary">동의</button><button id="reject-cookies" class="btn btn-secondary">거부</button></div></div></div>
-    <script src="{{ versioned_static('js/profile-date.js') }}" defer></script>
     <script src="{{ versioned_static('js/life-timeline.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>

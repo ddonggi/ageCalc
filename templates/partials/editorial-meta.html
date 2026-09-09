@@ -39,7 +39,7 @@
     {% if editorial_metadata.disclaimer %}
     <p class="editorial-disclaimer">{{ editorial_metadata.disclaimer }}</p>
     {% endif %}
-    <p class="editorial-correction">
+    <p class="editorial-correction editorial-meta-correction">
         <a href="{{ url_for('about') }}">검수 절차</a>를 확인하거나,
         기준 오류와 수정 제안은 <a href="{{ url_for('contact') }}">문의 페이지</a>로 보내주세요.
     </p>

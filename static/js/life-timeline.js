@@ -145,28 +145,19 @@
 
         input.addEventListener('input', () => {
             input.value = root.AgeCalcDateRules.formatDateDigits(input.value);
-            const digits = input.value.replace(/\D/g, '');
-            if (digits.length < 8) {
-                error.textContent = '';
-                result.hidden = true;
-                result.innerHTML = '';
-                return;
-            }
+            error.textContent = '';
+        });
+        form.addEventListener('submit', (event) => {
             try {
                 const birthDate = root.AgeCalcDateRules.parseDateDigits(input.value);
-                const timeline = buildLifeTimeline(iso(birthDate), asOf);
                 error.textContent = '';
                 input.classList.remove('error');
-                result.innerHTML = renderResult(timeline);
-                result.hidden = false;
-                trackEvent('life_timeline_complete', { calculator: 'life_timeline' });
             } catch (exception) {
+                event.preventDefault();
                 error.textContent = String(exception.message).includes('future')
                     ? '미래 날짜는 입력할 수 없습니다.'
                     : '존재하는 생년월일 8자리를 입력해 주세요.';
                 input.classList.add('error');
-                result.hidden = true;
-                result.innerHTML = '';
             }
         });
     }
