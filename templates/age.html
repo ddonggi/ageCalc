@@ -93,8 +93,8 @@
     <!-- 스크립트 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"
         referrerpolicy="no-referrer"></script>
-    <script src="{{ url_for('static', filename='js/date-rules.js') }}?v=age-input-20260810a" defer></script>
-    <script src="{{ url_for('static', filename='js/age-calculator.js') }}?v=age-submit-20260907a" defer></script>
+    <script src="{{ versioned_static('js/date-rules.js') }}" defer></script>
+    <script src="{{ versioned_static('js/age-calculator.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <!-- Google tag (gtag.js) -->

@@ -76,6 +76,16 @@ class StaticAssetVersioningTests(unittest.TestCase):
             )
         self.assertIn(f"/static/css/style.css?v={expected}", html)
 
+    def test_age_page_hashes_date_input_scripts_to_replace_stale_formatters(self):
+        client = app_module.app.test_client()
+        html = client.get("/age").get_data(as_text=True)
+
+        for filename in ("js/date-rules.js", "js/age-calculator.js"):
+            expected = hashlib.sha256(
+                (app_module.PROJECT_ROOT / "static" / filename).read_bytes()
+            ).hexdigest()[:12]
+            self.assertIn(f"/static/{filename}?v={expected}", html)
+
 
 if __name__ == "__main__":
     unittest.main()
