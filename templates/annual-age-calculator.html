@@ -84,7 +84,7 @@
                     <h2 id="annual-age-search">출생연도 입력</h2>
                     <p class="section-intro">연나이는 월·일과 무관하므로 개인 생년월일 대신 출생연도만 입력받습니다.</p>
                 </div>
-                <form class="age-form" method="get" action="{{ url_for('annual_age_calculator') }}">
+                <form class="age-form" method="get" action="{{ url_for('annual_age_calculator') }}#annual-age-result">
                     <div class="form-group">
                         <div class="date-inputs">
                             <input type="number" name="birth_year" min="1900" max="{{ current_year }}" value="{{ birth_year or '' }}" placeholder="1992" aria-label="출생연도 4자리">
@@ -105,7 +105,7 @@
         {% include 'partials/home_coupang_rails.html' %}
 
         {% if selected_snapshot %}
-        <section class="section-shell section-card-grid">
+        <section class="section-shell section-card-grid" id="annual-age-result" tabindex="-1">
             <article class="section-card birth-year-summary">
                 <p class="eyebrow">선택한 출생연도</p>
                 <h2>{{ selected_snapshot.birth_year }}년생 연나이 안내</h2>
@@ -124,6 +124,15 @@
                         <span>{{ selected_snapshot.man_age_range }}</span>
                     </div>
                 </div>
+                <nav class="age-result-next" aria-label="계산 결과 관련 도구">
+                    <h4>이어서 확인하기</h4>
+                    <div class="age-result-links">
+                        <a href="{{ url_for('birth_year_age_table', year=selected_snapshot.birth_year) }}"><strong>{{ selected_snapshot.birth_year }}년생 나이표</strong><span>연나이와 만나이 범위 보기</span></a>
+                        <a href="{{ url_for('age') }}"><strong>만나이 계산</strong><span>생년월일로 정확한 만나이 확인</span></a>
+                        <a href="{{ url_for('school_grade_calculator', year=selected_snapshot.birth_year) }}"><strong>학년 계산기</strong><span>현재 학년과 입학 시점 보기</span></a>
+                        <a href="{{ url_for('birthday_dday_calculator') }}"><strong>생일 D-day</strong><span>다음 생일까지 남은 날짜 계산</span></a>
+                    </div>
+                </nav>
             </article>
         </section>
         {% endif %}
