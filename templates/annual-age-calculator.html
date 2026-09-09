@@ -87,7 +87,7 @@
                 <form class="age-form" method="get" action="{{ url_for('annual_age_calculator') }}">
                     <div class="form-group">
                         <div class="date-inputs">
-                            <input type="number" name="birth_year" min="1900" max="{{ current_year }}" value="{{ birth_year or '' }}" aria-label="출생연도 4자리">
+                            <input type="number" name="birth_year" min="1900" max="{{ current_year }}" value="{{ birth_year or '' }}" placeholder="1992" aria-label="출생연도 4자리">
                         </div>
                         <div class="hero-actions">
                             <button class="btn btn-primary" type="submit">연나이 계산</button>

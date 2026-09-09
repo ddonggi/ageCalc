@@ -159,16 +159,16 @@
                 </p>
                 <div class="pet-input-panel" data-pet-panel="birth-date">
                     <label class="field-label" for="pet-birth-date">생년월일 8자리</label>
-                    <input type="text" id="pet-birth-date" name="birth_date" value="{{ pet_values.birth_date }}" placeholder="20210510" inputmode="numeric" pattern="[0-9]*" maxlength="8" aria-describedby="pet-error">
+                    <input type="text" id="pet-birth-date" name="birth_date" value="{{ pet_values.birth_date }}" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" aria-describedby="pet-error">
                 </div>
                 <div class="pet-input-panel date-inputs" data-pet-panel="known-age" hidden>
                     <label class="field-label" for="pet-years">현재 나이</label>
-                    <input type="text" id="pet-years" name="years" value="{{ pet_values.years }}" placeholder="년" inputmode="numeric" pattern="[0-9]*" maxlength="2" aria-label="강아지 나이 년">
-                    <input type="text" id="pet-months" name="months" value="{{ pet_values.months }}" placeholder="개월" inputmode="numeric" pattern="[0-9]*" maxlength="2" aria-label="강아지 나이 개월">
+                    <input type="text" id="pet-years" name="years" value="{{ pet_values.years }}" placeholder="2" inputmode="numeric" pattern="[0-9]*" maxlength="2" aria-label="강아지 나이 년">
+                    <input type="text" id="pet-months" name="months" value="{{ pet_values.months }}" placeholder="6" inputmode="numeric" pattern="[0-9]*" maxlength="2" aria-label="강아지 나이 개월">
                 </div>
                 <div class="pet-input-panel" data-pet-panel="adoption-date" hidden>
                     <label class="field-label" for="pet-adoption-date">데려온 날 8자리</label>
-                    <input type="text" id="pet-adoption-date" name="adoption_date" value="{{ pet_values.adoption_date }}" placeholder="20240301" inputmode="numeric" pattern="[0-9]*" maxlength="8" aria-describedby="pet-error">
+                    <input type="text" id="pet-adoption-date" name="adoption_date" value="{{ pet_values.adoption_date }}" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" aria-describedby="pet-error">
                     <p class="input-help">실제 나이가 아니라 오늘까지 함께한 기간을 계산합니다.</p>
                 </div>
                 <small id="pet-error" class="error-msg" aria-live="polite"></small>

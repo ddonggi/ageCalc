@@ -70,7 +70,7 @@
                 <h3>출생일을 입력하세요 (8자리)</h3>
                 <div class="date-inputs">
                     <label class="field-label" for="baby-birth-input">출생일 8자리</label>
-                    <input type="text" id="baby-birth-input" name="birth_date" value="{% if baby_birth_date %}{{ baby_birth_date.strftime('%Y%m%d') }}{% endif %}" placeholder="20250615" inputmode="numeric" pattern="[0-9]*" maxlength="8" required aria-describedby="baby-error" data-clarity-mask="true">
+                    <input type="text" id="baby-birth-input" name="birth_date" value="{% if baby_birth_date %}{{ baby_birth_date.strftime('%Y%m%d') }}{% endif %}" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" required aria-describedby="baby-error" data-clarity-mask="true">
                 </div>
                 <small id="baby-error" class="error-msg" aria-live="polite"></small>
                 <button class="btn btn-primary" type="submit">계산하기</button>
