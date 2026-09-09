@@ -35,7 +35,7 @@
     <!-- Google tag (gtag.js) -->
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
 
-    <script src="{{ url_for('static', filename='js/date-rules.js') }}" defer></script>
+    <script src="{{ versioned_static('js/date-rules.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 
 </head>

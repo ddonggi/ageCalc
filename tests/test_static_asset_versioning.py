@@ -78,13 +78,31 @@ class StaticAssetVersioningTests(unittest.TestCase):
 
     def test_age_page_hashes_date_input_scripts_to_replace_stale_formatters(self):
         client = app_module.app.test_client()
-        html = client.get("/age").get_data(as_text=True)
+        expected_date_rules = hashlib.sha256(
+            (app_module.PROJECT_ROOT / "static/js/date-rules.js").read_bytes()
+        ).hexdigest()[:12]
+        for path in (
+            "/age",
+            "/baby-months",
+            "/parent-child",
+            "/dog",
+            "/cat",
+            "/d-day",
+            "/100-day-calculator",
+            "/birthday-dday-calculator",
+            "/life-timeline",
+        ):
+            with self.subTest(path=path):
+                html = client.get(path).get_data(as_text=True)
+                self.assertIn(
+                    f"/static/js/date-rules.js?v={expected_date_rules}",
+                    html,
+                )
 
-        for filename in ("js/date-rules.js", "js/age-calculator.js"):
-            expected = hashlib.sha256(
-                (app_module.PROJECT_ROOT / "static" / filename).read_bytes()
-            ).hexdigest()[:12]
-            self.assertIn(f"/static/{filename}?v={expected}", html)
+        expected_age_calculator = hashlib.sha256(
+            (app_module.PROJECT_ROOT / "static/js/age-calculator.js").read_bytes()
+        ).hexdigest()[:12]
+        self.assertIn(f"/static/js/age-calculator.js?v={expected_age_calculator}", client.get("/age").get_data(as_text=True))
 
 
 if __name__ == "__main__":
