@@ -1,0 +1,139 @@
+{% macro date_fields(name, label, year=true) -%}
+<fieldset data-date="{{ name }}">
+    <legend>{{ label }}</legend>
+    <div class="global-date-fields">
+        {% for field in locale_config.date_order if year or field != 'year' %}
+        <label for="{{ name }}-{{ field }}">{{ ui[field] }}
+            {% if field == 'month' %}
+            <select id="{{ name }}-month" data-part="month" required aria-describedby="calculator-error">
+                <option value="">{{ ui.choose_month }}</option>
+                {% for month_name in ui.months %}<option value="{{ loop.index }}">{{ month_name }}</option>{% endfor %}
+            </select>
+            {% else %}
+            <input id="{{ name }}-{{ field }}" data-part="{{ field }}" type="text" inputmode="numeric" autocomplete="off" maxlength="{{ 4 if field == 'year' else 2 }}" required aria-describedby="calculator-error" />
+            {% endif %}
+        </label>
+        {% endfor %}
+    </div>
+</fieldset>
+{%- endmacro %}
+<!DOCTYPE html>
+<html lang="{{ locale_code }}">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{{ copy.title }}</title>
+    <meta name="description" content="{{ copy.description }}" />
+    <link rel="canonical" href="{{ page_canonical_url }}" />
+    {% include 'partials/hreflang.html' %}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="{{ copy.title }}" />
+    <meta property="og:description" content="{{ copy.description }}" />
+    <meta property="og:url" content="{{ page_canonical_url }}" />
+    <meta property="og:image" content="{{ site_base_url }}/static/images/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="{{ copy.title }}" />
+    <meta name="twitter:description" content="{{ copy.description }}" />
+    <meta name="twitter:image" content="{{ site_base_url }}/static/images/og-image.png" />
+    <meta name="naver-site-verification" content="2c9ad0c903ffdf79a53d4fa573c983641577ac34" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/i18n.css') }}" />
+    {% for schema in global_schema %}
+    <script type="application/ld+json" nonce="{{ csp_nonce }}">{{ schema | tojson }}</script>
+    {% endfor %}
+    {% include 'partials/adsense.html' %}
+    <script id="calculator-config" type="application/json" nonce="{{ csp_nonce }}">{{ calculator_config | tojson }}</script>
+    <script src="{{ versioned_static('js/date-rules.js') }}" defer></script>
+    <script src="{{ versioned_static('js/global-calculations.js') }}" defer></script>
+    <script src="{{ versioned_static('js/global-calculator.js') }}" defer></script>
+    <script src="{{ versioned_static('js/cookie-consent.js') }}" defer></script>
+    <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
+</head>
+<body class="global-page">
+    <div class="container">
+        <header class="global-header">
+            <div><a class="brand" href="{{ global_home }}">AgeCalc</a><p class="brand-note">{{ ui.tagline }}</p></div>
+            {% include 'partials/language-switcher.html' %}
+        </header>
+        <nav class="global-tools" aria-label="{{ ui.tools }}">
+            {% for tool in global_nav %}<a href="{{ tool.url }}"{% if tool.url == request.path %} aria-current="page"{% endif %}>{{ tool.label }}</a>{% endfor %}
+        </nav>
+        <main>
+            <nav class="breadcrumbs" aria-label="{{ ui.tools }}">
+                {% for item in global_breadcrumbs %}{% if not loop.last %}<a href="{{ item.url }}">{{ item.label }}</a> / {% else %}<span aria-current="page">{{ item.label }}</span>{% endif %}{% endfor %}
+            </nav>
+            <section class="global-hero">
+                <h1>{{ copy.h1 }}</h1>
+                <p>{{ copy.intro }}</p>
+            </section>
+            <div class="global-workspace">
+                <section class="global-panel">
+                    <h2>{{ copy.form_title }}</h2>
+                    <p id="calculator-unavailable" class="small">{{ ui.js_required }}</p>
+                    <form id="global-calculator" autocomplete="off" novalidate data-clarity-mask="true">
+                        <fieldset id="calculator-inputs" disabled>
+                            {% if page_key in ('age', 'baby_months') %}
+                            {{ date_fields('birth', ui.birth_date) }}
+                            {% elif page_key == 'birthday_dday_calculator' %}
+                            {{ date_fields('birthday', ui.birthday, false) }}
+                            {% elif page_key == 'hundred_day_calculator' %}
+                            {{ date_fields('start', ui.start_date) }}
+                            {% elif page_key == 'd_day' %}
+                            <label for="event-label">{{ ui.event_name }}<input id="event-label" type="text" maxlength="40" placeholder="{{ ui.event_placeholder }}" /></label>
+                            <fieldset><legend>{{ ui.target_date }}</legend><div class="global-options">
+                                <label><input type="radio" name="mode" value="until" checked />{{ ui.until }}</label>
+                                <label><input type="radio" name="mode" value="since" />{{ ui.since }}</label>
+                            </div></fieldset>
+                            {{ date_fields('target', ui.target_date) }}
+                            {% elif page_key == 'age_gap_calculator' %}
+                            {% for field in ('year_a', 'year_b') %}
+                            <label for="{{ field }}">{{ ui[field] }}<select id="{{ field }}" data-birth-year required aria-describedby="calculator-error"><option value="">{{ ui.year }}</option></select></label>
+                            {% endfor %}
+                            {% endif %}
+                            {% if page_key == 'age' %}
+                            <fieldset><legend>{{ ui.reference_date }}</legend><div class="global-options">
+                                <label><input type="radio" name="reference_mode" value="today" checked />{{ ui.today }}</label>
+                                <label><input type="radio" name="reference_mode" value="specific" />{{ ui.specific_date }}</label>
+                            </div></fieldset>
+                            <div id="reference-fields" hidden>{{ date_fields('reference', ui.reference_date) }}</div>
+                            {% endif %}
+                            <p class="global-error" id="calculator-error" role="alert"></p>
+                            <div class="global-actions"><button type="submit">{{ ui.calculate }}</button><button type="reset">{{ ui.reset }}</button></div>
+                        </fieldset>
+                    </form>
+                    <p class="small">{{ ui.privacy_note }}</p>
+                </section>
+                <section class="global-panel" id="global-result" aria-live="polite" tabindex="-1" data-clarity-mask="true" hidden>
+                    <h2 id="result-title">{{ ui.result }}</h2>
+                    <p id="result-event"></p>
+                    <dl id="result-values"></dl>
+                    <p id="result-note"></p>
+                </section>
+            </div>
+            <div class="global-copy">
+                {% for section in copy.sections if not section.get('feature') or features.get(section.feature, false) %}
+                <section><h2>{{ section.heading }}</h2>{% for paragraph in section.paragraphs %}<p>{{ paragraph }}</p>{% endfor %}</section>
+                {% endfor %}
+                <section><h2>{{ ui.faq }}</h2>
+                    {% for faq in copy.faq %}<details><summary>{{ faq.question }}</summary><p>{{ faq.answer }}</p></details>{% endfor %}
+                </section>
+            </div>
+            <nav aria-label="{{ ui.related }}"><h2>{{ ui.related }}</h2><div class="global-tools">
+                {% for tool in global_nav if tool.url != request.path %}<a href="{{ tool.url }}">{{ tool.label }}</a>{% endfor %}
+            </div></nav>
+        </main>
+        <footer class="global-footer">
+            <p>{{ ui.footer }}</p>
+            <nav>{% for endpoint in ('about', 'contact', 'privacy', 'terms') %}<a href="{{ url_for(endpoint) }}">{{ ui[endpoint] }} ({{ ui.korean_only }})</a>{% endfor %}</nav>
+            <p><a href="mailto:{{ contact_email }}">{{ ui.contact }}</a></p>
+            <p class="small">© 2026 AgeCalc. {{ ui.copyright }}</p>
+        </footer>
+    </div>
+    <div class="cookie-banner" id="cookie-banner" role="region" aria-label="{{ ui.privacy }}">
+        <p>{{ ui.cookie_notice }} <a href="{{ url_for('privacy') }}">{{ ui.privacy }} ({{ ui.korean_only }})</a></p>
+        <div class="global-actions"><button id="accept-cookies" type="button">{{ ui.accept }}</button><button id="reject-cookies" class="secondary" type="button">{{ ui.reject }}</button></div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{% if navigation_language_links %}
+<link rel="stylesheet" href="{{ versioned_static('css/language-switcher.css') }}" />
+<script src="{{ versioned_static('js/language-switcher.js') }}" defer></script>
+<details class="language-switcher">
+    <summary aria-label="{{ language_label }}: {{ locale_config.name }}">{{ locale_config.name }} <span aria-hidden="true">⌄</span></summary>
+    <nav aria-label="{{ language_label }}"{% if navigation_language_links | selectattr('fallback') | list %} aria-describedby="language-fallback-notice"{% endif %}>
+        {% if navigation_language_links | selectattr('fallback') | list %}
+        <p class="language-switcher-note" id="language-fallback-notice">{{ language_fallback_notice }}</p>
+        {% endif %}
+        {% for link in navigation_language_links %}
+        <a href="{{ link.path }}" lang="{{ link.hreflang }}" hreflang="{{ link.hreflang }}"{% if link.locale == locale_code %} aria-current="true"{% endif %}>{{ link.name }}</a>
+        {% endfor %}
+    </nav>
+</details>
+{% endif %}

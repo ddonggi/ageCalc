@@ -1,3 +1,6 @@
+{% if locale_code | default('ko') != 'ko' %}
+{% include 'partials/global-calculator.html' %}
+{% else %}
 <!DOCTYPE html>
 <html lang="ko">
 
@@ -32,6 +35,7 @@
     <script src="{{ versioned_static('js/date-rules.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/birthday-dday.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
+    {% include 'partials/hreflang.html' %}
 </head>
 
 <body class="editorial-calculator-page calculator-flat-page">
@@ -230,3 +234,4 @@
 </body>
 
 </html>
+{% endif %}

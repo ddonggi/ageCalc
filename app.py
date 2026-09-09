@@ -32,6 +32,7 @@ from content.page_registry import (
     find_page,
     indexable_pages_for_sitemap,
 )
+from content.i18n import i18n_context, localized_sitemap_entries, register_localized_routes
 from db import SessionLocal, close_db_session, init_db
 from models.blog_models import GeneratedPost, PageFeedback
 from scripts.adsense_blog_review import audit_post
@@ -324,7 +325,7 @@ def inject_csp_nonce():
         else 0
     )
     blog_public_indexable = _is_blog_public_indexable(blog_public_count)
-    current_page = find_page(request.endpoint, request.view_args)
+    current_page = getattr(g, 'localized_page', None) or find_page(request.endpoint, request.view_args)
     page_canonical_url = getattr(g, "page_canonical_url", None)
     if page_canonical_url is None and current_page:
         page_canonical_url = f"{SITE_BASE_URL}{current_page['path']}"
@@ -368,6 +369,7 @@ def inject_csp_nonce():
         }
 
     return {
+        **i18n_context(current_page, SITE_BASE_URL),
         "csp_nonce": getattr(g, "csp_nonce", ""),
         "versioned_static": versioned_static,
         "csrf_token": _get_or_create_csrf_token,
@@ -1530,11 +1532,11 @@ def sitemap_group(group):
             f"{SITE_BASE_URL}{page['path']}",
             str(page["lastmod"]),
         )
-        for page in indexable_pages_for_sitemap(
+        for page in localized_sitemap_entries(indexable_pages_for_sitemap(
             group,
             blog_public_indexable=blog_public_indexable,
             include_hubs=not ADSENSE_REVIEW_MODE,
-        )
+        ))
     ]
     if group == "guides" and blog_public_indexable:
         for post in posts:
@@ -2967,6 +2969,8 @@ def blog_review_approve(post_id):
         db_session.commit()
         _invalidate_blog_public_count_cache()
     return redirect(url_for('blog_detail', slug=post.slug))
+
+register_localized_routes(app, SITE_BASE_URL)
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000, host='0.0.0.0')

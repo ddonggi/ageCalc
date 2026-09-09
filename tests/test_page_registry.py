@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 from app import app
+from tests.i18n_expected import REVIEW_URLS
 from content.page_registry import (
     CONTENT_ACTIONS,
     GUIDE_PAGE_REGISTRY,
@@ -128,8 +129,8 @@ class PageRegistryTests(unittest.TestCase):
             child_xml = client.get(child_path).get_data(as_text=True)
             urls.extend(re.findall(r"<loc>(.*?)</loc>", child_xml))
 
-        self.assertEqual(46, len(urls))
-        self.assertEqual(46, len(set(urls)))
+        self.assertEqual(REVIEW_URLS, set(urls))
+        self.assertEqual(len(urls), len(set(urls)))
         self.assertNotIn("https://agecalc.cloud/blog", urls)
         self.assertIn("https://agecalc.cloud/age", urls)
         self.assertNotIn("https://agecalc.cloud/age/", urls)

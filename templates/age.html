@@ -1,3 +1,6 @@
+{% if locale_code | default('ko') != 'ko' %}
+{% include 'partials/global-calculator.html' %}
+{% else %}
 <!DOCTYPE html>
 <html lang="ko">
 
@@ -102,6 +105,7 @@
 
     {% include 'partials/adsense.html' %}
 
+    {% include 'partials/hreflang.html' %}
 </head>
 
 <body class="age-page editorial-calculator-page calculator-flat-page">
@@ -493,3 +497,4 @@
 </body>
 
 </html>
+{% endif %}

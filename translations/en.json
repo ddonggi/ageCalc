@@ -1,0 +1,119 @@
+{
+  "common": {
+    "language_fallback_notice": "If this page is unavailable in your chosen language, you will open an age calculator in that language.",
+    "language": "Language", "tagline": "Everyday dates, clearly calculated.", "tools": "Calculators",
+    "calculate": "Calculate", "reset": "Reset", "result": "Your result", "year": "Year", "month": "Month", "day": "Day",
+    "choose_month": "Choose a month", "birth_date": "Date of birth", "reference_date": "Calculate age on",
+    "today": "Today", "specific_date": "A specific date", "birthday": "Birthday", "start_date": "Start date",
+    "target_date": "Event date", "event_name": "Event name (optional)", "event_placeholder": "A trip, exam or anniversary",
+    "until": "Days until", "since": "Days since", "year_a": "First birth year", "year_b": "Second birth year",
+    "date_help": "Select the month and enter the day and four-digit year.",
+    "privacy_note": "Your dates stay in this browser. They are not sent to our server or saved.",
+    "js_required": "Enable JavaScript to use the calculator. You can still read the instructions and examples below.",
+    "faq": "Frequently asked questions", "related": "Try another calculator", "how": "How it works", "reference_label": "Reference date",
+    "current_age": "Age in completed years", "exact_age": "Age in years, months and days", "total_days": "Days lived",
+    "total_months": "Completed months", "next_birthday": "Next birthday", "days_until": "Days until birthday",
+    "birthday_today": "Your birthday is today!", "days_remaining": "Days remaining", "days_elapsed": "Days elapsed",
+    "hundredth_date": "100th day", "year_gap": "Difference between birth years", "years_months": "Years and months",
+    "same_day": "That date is today.", "before_start": "The start date is still ahead.",
+    "invalid_date": "Enter a real calendar date with a four-digit year.", "required": "Complete all the required fields.",
+    "future_birth": "The date of birth cannot be in the future.", "reference_before_birth": "The reference date must be on or after the date of birth.",
+    "invalid_year": "Choose a birth year from the available range.", "date_range": "The calculated date is outside the supported four-digit year range.",
+    "about": "About", "privacy": "Privacy", "terms": "Terms", "contact": "Contact", "korean_only": "in Korean",
+    "footer": "Free tools for understanding ages and calendar dates.", "copyright": "All rights reserved.",
+    "cookie_notice": "We use cookies for analytics and advertising. You can accept or decline optional tracking.",
+    "accept": "Accept", "reject": "Decline", "back_top": "Back to top",
+    "units": {"year": {"one": "{n} year", "other": "{n} years"}, "month": {"one": "{n} month", "other": "{n} months"}, "day": {"one": "{n} day", "other": "{n} days"}},
+    "duration_separator": " ",
+    "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+  },
+  "pages": {
+    "age": {
+      "title": "Age Calculator — Calculate Your Exact Age | AgeCalc", "h1": "Age Calculator",
+      "description": "Calculate your age in years, months and days, total days lived and your next birthday. Find your age today or on a specific date.",
+      "intro": "How old am I today? Enter your date of birth to see your age, the calendar time you have lived and the countdown to your next birthday.",
+      "form_title": "Calculate your exact age",
+      "sections": [
+        {"heading": "Age today or on a specific date", "paragraphs": ["Choose Today to use the current date on your device. To look back or plan ahead, choose a specific reference date. The result always shows the date used for the calculation.", "Completed age is the reference year minus the birth year, with one year subtracted if the birthday has not yet arrived. For example, someone born on 2 October 1992 is 33 on 1 October 2026 and turns 34 the next day."]},
+        {"heading": "Years, months, days and total time lived", "paragraphs": ["The detailed duration starts with completed years, then counts up to 11 whole calendar months and the remaining days. Months use their actual lengths; days lived counts the date difference with the birth date at zero.", "Completed months is a separate month-based measure. A monthly anniversary falls on the last day of a shorter month: 31 January to 28 February counts as one month. It may not equal the year-and-month breakdown around a leap-day birthday."]},
+        {"heading": "Next birthday and leap years", "paragraphs": ["The birthday countdown uses the selected reference date. A birthday on that date has zero days remaining. For 29 February, the next birthday date is the next actual 29 February, which may be several years away.", "Completed age for a 29 February birth increases on 1 March in a non-leap year. This is a calendar calculation convention, not a statement about legal age rules in your country."]}
+      ],
+      "faq": [
+        {"question": "How do I calculate my age on a particular date?", "answer": "Enter your birth date, select A specific date and enter the reference date. You can use a past or future reference date on or after your birth date."},
+        {"question": "Does this calculate Korean age?", "answer": "This page calculates completed age based on birthdays. It does not add a year at birth or at the start of the calendar year."},
+        {"question": "Are my birth date and results stored?", "answer": "No. Calculations happen in your browser. The dates you enter are not submitted to our server, added to the URL or saved."},
+        {"question": "Does the calculator include hours or time zones?", "answer": "It uses calendar dates without birth times. Today follows your device's local date, while day differences are calculated without daylight-saving clock changes."}
+      ]
+    },
+    "birthday_dday_calculator": {
+      "title": "Birthday Countdown — Days Until Your Birthday | AgeCalc", "h1": "Birthday Countdown",
+      "description": "Find how many days are left until your next birthday. Enter a month and day to see the next birthday date and countdown.",
+      "intro": "Find the next occurrence of your birthday and count the days until it arrives. No birth year is needed.", "form_title": "When is your birthday?",
+      "sections": [
+        {"heading": "Count down to your next birthday", "paragraphs": ["Choose your birth month and day. The calculator finds the nearest matching date on or after today and counts the calendar days between them.", "If today is 9 September and your birthday is 10 September, there is 1 day left. On your birthday, the countdown is 0. Once it has passed, the calculator looks ahead to the next year."]},
+        {"heading": "A birthday on 29 February", "paragraphs": ["This tool looks for an actual 29 February in the calendar, so it counts down to the next leap-year birthday. It does not substitute 28 February or 1 March.", "If you celebrate on another date in a non-leap year, use the Days Until / Since calculator for that chosen date."]}
+      ],
+      "faq": [
+        {"question": "Do I need to enter my birth year?", "answer": "No. Only the month and day are needed to find your next birthday."},
+        {"question": "Does the countdown include today?", "answer": "It measures the date difference: tomorrow is 1 day away and today is 0 days away."},
+        {"question": "Which time zone does Today use?", "answer": "Today uses the local date on your device at the time you calculate. Clock changes do not add or remove a calendar day."}
+      ]
+    },
+    "d_day": {
+      "title": "Days Until / Since Calculator — Count Calendar Days | AgeCalc", "h1": "Days Until / Since Calculator",
+      "description": "Count the days until an event or the days since a past date. Plan a trip, anniversary, deadline or personal milestone.",
+      "intro": "See how many calendar days remain before an event, or how many have passed since it happened.", "form_title": "Choose an event date",
+      "sections": [
+        {"heading": "A simple date difference", "paragraphs": ["Enter the date and choose Days until or Days since. An optional event name helps identify the result and stays only in this page.", "From 1 January to 10 January, 9 days pass. The event date and today's date being the same gives 0 days. This tool does not count the start date as day one."]},
+        {"heading": "Plan with calendar days", "paragraphs": ["All days count, including weekends and holidays. The calculation uses calendar dates, not 24-hour periods measured from a particular time.", "If an event is already past, the result reports days elapsed. If it is in the future, it reports days remaining, even when you selected the opposite mode."]}
+      ],
+      "faq": [
+        {"question": "Is this a business-day calculator?", "answer": "No. It counts every calendar day and does not exclude public holidays or weekends."},
+        {"question": "Can I calculate days since a past date?", "answer": "Yes. Select Days since and enter the date. The result shows the number of calendar days elapsed."},
+        {"question": "Can I count the start date as day one?", "answer": "This calculator uses a date difference with a zero-day start. For a milestone that counts the start date as day one, use the 100th Day Calculator."}
+      ]
+    },
+    "baby_months": {
+      "title": "Baby Age in Months Calculator | AgeCalc", "h1": "Baby Age in Months Calculator",
+      "description": "Calculate your baby's age in completed months, years and months, and total days from their date of birth.",
+      "intro": "Turn a birth date into completed calendar months and total days. A clear way to keep track of your baby's age.", "form_title": "Enter your baby's birth date",
+      "sections": [
+        {"heading": "Count completed calendar months", "paragraphs": ["A completed month runs from a birth date to its next monthly anniversary. For example, a baby born on 15 June has completed 7 months on 14 February and 8 months on 15 February.", "The result also shows years and remaining months, plus the total number of days since birth. The birth date itself is day zero for elapsed days."]},
+        {"heading": "When a month has fewer days", "paragraphs": ["If the original day does not exist in the target month, the monthly anniversary falls on that month's last day. A baby born on 31 January completes one month on 28 February in a non-leap year.", "This page reports calendar age only. It does not calculate corrected age for premature birth or assess development, feeding needs or medical milestones."]}
+      ],
+      "faq": [
+        {"question": "Are four weeks the same as one month?", "answer": "No. Four weeks is 28 days, while calendar months have different lengths. This tool counts completed calendar months."},
+        {"question": "How are years and months displayed?", "answer": "Every 12 completed months is shown as one year. For example, 14 completed months is 1 year and 2 months."},
+        {"question": "Is the birth date stored?", "answer": "No. The date is used in your browser for this calculation and is not sent to our server or saved."}
+      ]
+    },
+    "hundred_day_calculator": {
+      "title": "100th Day Calculator — Start Date Included | AgeCalc", "h1": "100th Day Calculator",
+      "description": "Find the 100th day from a start date, counting the start as day one. See the milestone date and days remaining.",
+      "intro": "Find a 100-day milestone for a personal challenge, project or anniversary, with the counting rule made explicit.", "form_title": "Choose your first day",
+      "sections": [
+        {"heading": "The 100th day includes the start date", "paragraphs": ["The start date is day 1. Add 99 calendar days to find day 100. This is one day earlier than adding 100 days after a date.", "Starting on 1 January 2026 makes 10 April 2026 the 100th day. Starting on 1 January 2024, a leap year, makes 9 April 2024 the 100th day."]},
+        {"heading": "Use the same rule across months", "paragraphs": ["Weekends, holidays, February and leap days all count. You can use a past or future start date.", "The result gives the milestone date and the calendar days remaining until it, or the days elapsed if it has already passed. It uses the current date on your device."]}
+      ],
+      "faq": [
+        {"question": "Is the 100th day the same as 100 days after the start?", "answer": "No. When the start date is day 1, the 100th day is start date plus 99 days. Adding 100 days gives the following date."},
+        {"question": "Can I enter a future start date?", "answer": "Yes. The calculator can find a milestone for a planned start date as well as an event that has already begun."},
+        {"question": "Does it account for leap years?", "answer": "Yes. It adds actual calendar days, including 29 February when that date occurs within the interval."}
+      ]
+    },
+    "age_gap_calculator": {
+      "title": "Birth Year Difference Calculator | AgeCalc", "h1": "Birth Year Difference Calculator",
+      "description": "Compare two birth years and calculate their difference. Understand why a birth-year gap is not an exact age difference.",
+      "intro": "Compare two years of birth in a moment. This tool reports the difference between the years, without assuming either person's birthday.", "form_title": "Compare two birth years",
+      "sections": [
+        {"heading": "Subtract the earlier year from the later year", "paragraphs": ["The difference between 1990 and 1995 is 5 years. The order of entry does not matter. Two people born in the same year have a birth-year difference of 0.", "The selectable range follows this site's existing birth-year tool: from the later of 1900 or 100 years before the current year, through the current year."]},
+        {"heading": "Birth-year difference is not exact age difference", "paragraphs": ["Without both full birth dates, this result cannot tell you the exact time between two births or the difference between the ages they have reached today.", "Two people born in the same year can still be almost a year apart. Use the Age Calculator separately for each person when you need completed age on a particular date."]}
+      ],
+      "faq": [
+        {"question": "Can I enter the younger person's year first?", "answer": "Yes. The calculator returns the absolute difference, so the order of the two birth years does not affect the result."},
+        {"question": "Does a result of zero mean the same birthday?", "answer": "No. It means only that the two birth years are equal. The month and day may be different."},
+        {"question": "Does this calculate an exact age gap?", "answer": "No. It compares birth years only. Exact elapsed time between births requires both complete birth dates."}
+      ]
+    }
+  }
+}

@@ -2,6 +2,18 @@ from __future__ import annotations
 
 from content.guide_pages import GUIDE_PAGES
 from content.hub_pages import HUB_PAGE_BY_KEY, HUB_PAGES
+from content.locale_config import ALL_LOCALES
+
+
+# These are functional equivalents; Korean paths remain the established paths.
+LOCALIZED_PAGE_SETTINGS = {
+    'age': {'slug': 'age-calculator', 'template': 'age.html'},
+    'birthday_dday_calculator': {'slug': 'birthday-dday-calculator', 'template': 'birthday-dday-calculator.html'},
+    'd_day': {'slug': 'd-day', 'template': 'd-day.html'},
+    'baby_months': {'slug': 'baby-months', 'template': 'baby-months.html'},
+    'hundred_day_calculator': {'slug': '100-day-calculator', 'template': '100-day-calculator.html'},
+    'age_gap_calculator': {'slug': 'age-gap-calculator', 'template': 'age-gap-calculator.html'},
+}
 
 
 CONTENT_ACTIONS = frozenset({"keep", "strengthen", "merge", "noindex"})
@@ -61,6 +73,9 @@ def _page(
     priority: str = "supporting",
     related_endpoints: tuple[str, ...] = (),
     lastmod: str = "2026-06-22",
+    locales: tuple[str, ...] | None = None,
+    culture: str | None = None,
+    locale_features: dict[str, dict[str, bool]] | None = None,
 ) -> dict[str, object]:
     return {
         "key": endpoint,
@@ -77,6 +92,10 @@ def _page(
         "priority": priority,
         "related_endpoints": related_endpoints,
         "related_link_groups": _related_link_groups(endpoint, related_endpoints),
+        "supported_locales": locales if locales is not None else (ALL_LOCALES if endpoint in LOCALIZED_PAGE_SETTINGS else ('ko',)),
+        "culture": culture or ('global' if endpoint in LOCALIZED_PAGE_SETTINGS else 'korean'),
+        "locale_features": locale_features or {},
+        "localization": LOCALIZED_PAGE_SETTINGS.get(endpoint),
     }
 
 

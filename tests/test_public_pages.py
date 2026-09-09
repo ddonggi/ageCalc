@@ -17,6 +17,7 @@ import content.guide_pages as guide_pages_module
 from content.hub_pages import HUB_PAGES
 from content.page_registry import PUBLIC_PAGE_REGISTRY
 from app import PUBLIC_SITEMAP_ENDPOINTS, app, _current_local_date
+from tests.i18n_expected import REVIEW_URLS
 from db import Base
 from content.guide_pages import (
     GUIDE_CATEGORIES,
@@ -989,14 +990,14 @@ assert.strictEqual(publisherRefreshes, 0);
         for path in ("/age-tools/", "/education/", "/anniversary/", "/pets/"):
             self.assertIn(f'href="{path}"', home_html)
 
-    def test_adsense_review_mode_exposes_only_46_sitemap_urls(self):
+    def test_adsense_review_mode_exposes_supported_sitemap_urls(self):
         client = app.test_client()
         root_xml = client.get("/sitemap.xml").get_data(as_text=True)
         locations = _sitemap_leaf_locations(client)
         joined_locations = "\n".join(locations)
 
-        self.assertEqual(46, len(locations))
-        self.assertEqual(46, len(set(locations)))
+        self.assertEqual(REVIEW_URLS, set(locations))
+        self.assertEqual(len(locations), len(set(locations)))
         self.assertNotIn("/blog", joined_locations)
         for key in (
             "age",
@@ -2111,7 +2112,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         locations = _sitemap_leaf_locations(app.test_client())
         for hub in HUB_PAGES:
             self.assertNotIn(f"https://agecalc.cloud{hub['path']}", locations)
-        self.assertEqual(46, len(locations))
+        self.assertEqual(REVIEW_URLS, set(locations))
 
     def test_life_hubs_render_direct_answers_and_contextual_paths(self):
         client = app.test_client()
@@ -2870,7 +2871,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         locations = _sitemap_leaf_locations(client)
         joined_locations = "\n".join(locations)
 
-        self.assertEqual(46, len(locations))
+        self.assertEqual(REVIEW_URLS, set(locations))
         self.assertNotIn("/minigames", joined_locations)
         self.assertNotIn("/blog/drafts", joined_locations)
         self.assertNotIn("/blog/review", joined_locations)
@@ -4913,8 +4914,8 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 self.assertEqual(xml.count("<loc>"), xml.count("<lastmod>"))
                 public_locations.extend(re.findall(r"<loc>(.*?)</loc>", xml))
 
-        self.assertEqual(46, len(public_locations))
-        self.assertEqual(46, len(set(public_locations)))
+        self.assertEqual(REVIEW_URLS, set(public_locations))
+        self.assertEqual(len(public_locations), len(set(public_locations)))
         for forbidden in ("?", "#", "/minigames", "/blog/drafts", "/blog/review"):
             self.assertNotIn(forbidden, "\n".join(public_locations))
 
