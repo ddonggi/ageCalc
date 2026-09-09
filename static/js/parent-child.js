@@ -24,7 +24,9 @@ class ParentChildCalculator {
             this.children = [];
         }
         if (this.parents.length === 0) this.addParentLine();
+        else this.renderLines('parent');
         if (this.children.length === 0) this.addChildLine();
+        else this.renderLines('child');
         this.bindControls();
     }
 
@@ -313,6 +315,7 @@ class ParentChildCalculator {
                             <h4>다음 가족 시점 확인</h4>
                             <div class="footer-links">
                                 <a href="/guides/sixtieth-seventieth-eightieth-age-guide">환갑·칠순 기준 보기</a>
+                                <a href="/school-entry-year-table?year=${childBirthYear}">자녀 입학년도 보기</a>
                                 <a href="/school-grade-calculator?year=${childBirthYear}">자녀 학교 시점 보기</a>
                                 <a href="/school-grade-calculator?year=${childBirthYear}">자녀 학년과 입학 시점 보기</a>
                             </div>
