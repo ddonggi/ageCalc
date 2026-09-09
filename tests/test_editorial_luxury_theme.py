@@ -410,6 +410,8 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
 
         self.assertNotIn(".hub-nav-direct:hover", theme_css)
         self.assertNotIn(".hub-nav-direct:hover", base_css)
+        self.assertNotIn(".mega-nav-link:hover", theme_css)
+        self.assertNotIn(".mega-nav-link:hover", base_css)
         self.assertIn(":focus-visible", theme_css)
 
     def test_mobile_menu_toggle_stays_flat_when_interacted_with(self):

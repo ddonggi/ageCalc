@@ -569,9 +569,7 @@ button {
 }
 
 .mega-nav-trigger:hover,
-.mega-nav-trigger:focus-visible,
-.mega-nav-link:hover,
-.mega-nav-link:focus-visible {
+.mega-nav-trigger:focus-visible {
     color: var(--accent-1);
     border-bottom-color: rgba(190, 77, 36, 0.28);
 }

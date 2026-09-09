@@ -71,6 +71,14 @@ class BirthDatePrivacyTests(unittest.TestCase):
         app.config.update(TESTING=True)
         self.client = app.test_client()
 
+    def test_dog_adoption_date_query_renders_a_result_without_disabled_size(self):
+        response = self.client.get(
+            "/dog?mode=adoption-date&birth_date=&years=&months=&adoption_date=20240301"
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("오늘까지 함께한 기간", response.get_data(as_text=True))
+
     def test_solar_age_post_is_rejected_as_client_only(self):
         response = self.client.post(
             "/age",

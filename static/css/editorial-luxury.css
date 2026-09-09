@@ -209,7 +209,6 @@ body .mobile-nav-close {
 }
 
 body .mega-nav-trigger:hover,
-body .mega-nav-link:hover,
 body .menu-toggle:hover {
   border-color: rgba(166, 139, 97, .38);
   background: var(--lux-gold-soft);

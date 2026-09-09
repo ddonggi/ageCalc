@@ -2496,10 +2496,14 @@ def dog():
     """강아지 나이 계산 페이지"""
     today = _current_local_date()
     expected = ("mode", "birth_date", "years", "months", "adoption_date", "size")
-    if request.args and not _query_keys_are_exact(*expected):
+    required = tuple(key for key in expected if key != "size")
+    if request.args and (
+        not _query_keys_are_allowed(*expected)
+        or any(key not in request.args for key in required)
+    ):
         return redirect(url_for('dog'))
     values = {key: request.args.get(key, "") for key in expected}
-    if not request.args:
+    if not values["size"]:
         values["size"] = "small"
     mode = values["mode"] or "birth-date"
     if mode not in {"birth-date", "known-age", "adoption-date"} or values["size"] not in {"small", "medium", "large", "giant"}:
