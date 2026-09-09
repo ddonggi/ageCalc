@@ -84,19 +84,25 @@
   function reorderTableSections() {
     if (!document.body || !document.body.classList.contains("calculator-flat-page")) return;
     var calculator = document.querySelector(".editorial-calculator-shell");
+    if (!calculator) {
+      var form = document.querySelector("body.calculator-flat-page form");
+      calculator = form && form.closest("section");
+    }
     var directAnswer = document.querySelector(".direct-answer");
     if (!calculator || !directAnswer) return;
     var tableSections = Array.from(document.querySelectorAll("table.data-table"))
       .map(function (table) { return table.closest("section"); })
       .filter(function (section, index, sections) { return section && sections.indexOf(section) === index; });
     var anchor = calculator;
+    var selectedResult = document.querySelector(".birth-year-summary")?.closest("section");
+    if (selectedResult) anchor = selectedResult;
     tableSections.forEach(function (section) { anchor.after(section); anchor = section; });
     anchor.after(directAnswer);
   }
 
   function scrollToLoadedResult() {
     if (!window.location.search || !document.body || !document.body.classList.contains("calculator-flat-page")) return;
-    var target = document.querySelector(".result-container.show, [id$='-result']:not([hidden]), table.data-table");
+    var target = document.querySelector(".result-container.show, [id$='-result']:not([hidden]), .birth-year-summary, table.data-table");
     if (!target) return;
     target = target.closest("section") || target;
     window.setTimeout(function () { target.scrollIntoView({ behavior: "smooth", block: "start" }); }, 0);

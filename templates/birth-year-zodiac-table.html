@@ -82,7 +82,7 @@
                 <h2 id="zodiac-search">출생연도 선택</h2>
                 <p class="section-intro">찾는 연도를 고르면 해당 띠와 같은 띠인 연도를 바로 보여줍니다.</p>
             </div>
-            <form class="age-form birth-year-form" method="get" action="{{ url_for('birth_year_zodiac_table') }}">
+            <form class="age-form birth-year-form" method="get" action="{{ url_for('birth_year_zodiac_table') }}#birth-year-zodiac-result">
                 <div class="form-group">
                     <div class="date-inputs">
                         <select name="year" aria-label="출생연도 선택">
@@ -105,7 +105,7 @@
         {% include 'partials/home_coupang_rails.html' %}
 
         {% if selected_row %}
-        <section class="section-shell section-card-grid">
+        <section class="section-shell section-card-grid" id="birth-year-zodiac-result" tabindex="-1">
             <article class="section-card birth-year-summary">
                 <p class="eyebrow">선택한 출생연도</p>
                 <h2>{{ selected_row.label }}</h2>
