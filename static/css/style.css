@@ -4203,6 +4203,14 @@ body.snake-page .game-panel {
         gap: 18px;
     }
 
+    .google-auto-placed,
+    ins.adsbygoogle {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-inline: auto !important;
+        overflow: hidden;
+    }
+
     .home-page {
         padding-top: 0;
     }

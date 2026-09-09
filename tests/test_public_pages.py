@@ -4373,6 +4373,23 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         self.assertRegex(body, r"\.coupang-mobile-banner\s*\{[^}]*width:\s*min\(100%,\s*300px\);")
         self.assertRegex(body, r"\.coupang-mobile-banner-link,\s*\.coupang-mobile-banner-link img\s*\{[^}]*width:\s*min\(100%,\s*300px\);")
 
+    def test_mobile_adsense_auto_ads_stay_centered_inside_the_page_width(self):
+        css = Path("static/css/style.css").read_text(encoding="utf-8")
+        mobile_css = re.search(r"@media\s*\(max-width:\s*760px\)\s*\{(?P<body>.*)\n\}", css, re.DOTALL)
+
+        self.assertIsNotNone(mobile_css)
+        body = mobile_css.group("body")
+        auto_ad_rule = re.search(
+            r"\.google-auto-placed,\s*ins\.adsbygoogle\s*\{(?P<declarations>[^}]*)\}",
+            body,
+        )
+        self.assertIsNotNone(auto_ad_rule)
+        declarations = auto_ad_rule.group("declarations")
+        self.assertRegex(declarations, r"width:\s*100%\s*!important;")
+        self.assertRegex(declarations, r"max-width:\s*100%\s*!important;")
+        self.assertRegex(declarations, r"margin-inline:\s*auto\s*!important;")
+        self.assertRegex(declarations, r"overflow:\s*hidden;")
+
     def test_home_coupang_rails_are_positioned_in_side_columns(self):
         css = Path("static/css/style.css").read_text(encoding="utf-8")
         rail_rule = re.search(r"body:not\(\.snake-page\)\s+\.coupang-side-rail\s*\{(?P<body>[^}]*)\}", css)
