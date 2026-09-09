@@ -65,6 +65,7 @@
         <form class="age-form" id="pet-age-form" action="{{ url_for('cat') }}#pet-result-container" method="get" data-pet="cat" autocomplete="off" data-clarity-mask="true">
             <div class="form-group">
                 <h3>고양이 나이를 입력하세요</h3>
+                <img class="cat-age-illustration" src="{{ url_for('static', filename='images/cat-age.png') }}" alt="앉아 있는 고양이 일러스트" width="1254" height="1254">
                 <fieldset class="pet-mode-fieldset">
                     <legend>알고 있는 정보를 선택하세요</legend>
                     <div class="pet-mode-options">

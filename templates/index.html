@@ -32,6 +32,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/home.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
@@ -112,7 +113,7 @@
             </div>
             <nav class="life-hub-link-list" aria-label="빠른 표와 기준 찾기">
                 <a href="{{ url_for('birth_year_age_table') }}"><strong>출생연도 나이표</strong><span>출생연도별 현재 나이 확인</span></a>
-                <a href="{{ url_for('school_entry_year_table') }}"><strong>입학년도 계산</strong><span>초·중·고 입학 시점 확인</span></a>
+                <a href="{{ url_for('school_grade_calculator') }}"><strong>학년 계산기</strong><span>현재 학년과 초·중·고 입학 시점 확인</span></a>
                 <a href="{{ url_for('birth_year_zodiac_table') }}"><strong>띠 나이표</strong><span>출생연도별 띠 확인</span></a>
             </nav>
         </section>

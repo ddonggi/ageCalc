@@ -470,7 +470,7 @@ class AgeCalculatorUI {
                     <div class="age-result-links">
                         <a href="/birth-year-age-table?year=${year}"><strong>${year}년생 나이표</strong><span>연나이와 만나이 범위 보기</span></a>
                         <a href="/annual-age-calculator?birth_year=${year}"><strong>연나이 확인</strong><span>출생연도로 바로 계산</span></a>
-                        <a href="/school-entry-year-table?year=${year}"><strong>입학년도 확인</strong><span>초·중·고 입학 시점 보기</span></a>
+                        <a href="/school-grade-calculator?year=${year}"><strong>학년 계산기</strong><span>현재 학년과 초·중·고 입학 시점 보기</span></a>
                         <a href="/birthday-dday-calculator"><strong>생일 D-day</strong><span>저장에 동의했다면 생일 자동 입력</span></a>
                     </div>
                 </nav>` : ''}

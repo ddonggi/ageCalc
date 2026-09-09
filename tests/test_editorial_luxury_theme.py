@@ -341,6 +341,14 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
         title_rules = self._css_rule_bodies(theme_css, ".home-page .editorial-hero-copy h1")
         self.assertNotIn("max-width:", title_rules)
 
+    def test_life_timeline_keeps_its_form_in_the_document_column(self):
+        theme_css = Path("static/css/editorial-luxury.css").read_text()
+        selector = "body.life-timeline-page.calculator-flat-page .container > .section-shell.direct-answer"
+
+        rules = self._css_rule_bodies(theme_css, selector)
+        self.assertNotIn("display: contents;", rules)
+        self.assertIn("order: 2;", rules)
+
     def test_hub_tool_list_uses_the_life_hub_link_list_structure(self):
         source = Path("templates/hub-detail.html").read_text()
         tool_list = source.split('aria-labelledby="hub-tools-title"', 1)[1].split("</section>", 1)[0]

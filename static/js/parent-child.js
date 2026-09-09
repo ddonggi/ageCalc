@@ -314,7 +314,7 @@ class ParentChildCalculator {
                             <div class="footer-links">
                                 <a href="/guides/sixtieth-seventieth-eightieth-age-guide">환갑·칠순 기준 보기</a>
                                 <a href="/school-grade-calculator?year=${childBirthYear}">자녀 학교 시점 보기</a>
-                                <a href="/school-entry-year-table?year=${childBirthYear}">자녀 입학년도 보기</a>
+                                <a href="/school-grade-calculator?year=${childBirthYear}">자녀 학년과 입학 시점 보기</a>
                             </div>
                         </div>
                     </div>

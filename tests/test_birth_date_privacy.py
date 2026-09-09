@@ -109,7 +109,7 @@ class BirthDatePrivacyTests(unittest.TestCase):
         for href in (
             'href="/birth-year-age-table?year=1992"',
             'href="/annual-age-calculator?birth_year=1992"',
-            'href="/school-entry-year-table?year=1992"',
+            'href="/school-grade-calculator?year=1992"',
             'href="/birthday-dday-calculator"',
         ):
             self.assertIn(href, age_html)

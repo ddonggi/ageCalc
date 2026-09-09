@@ -2385,32 +2385,6 @@ input.error {
     display: none !important;
 }
 
-.life-timeline-hero {
-    overflow: hidden;
-}
-
-.life-orbit {
-    min-height: 180px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 22px;
-    border: 1px solid rgba(190, 77, 36, 0.16);
-    border-radius: 999px;
-    background: radial-gradient(circle at center, rgba(255, 246, 229, 0.96), rgba(255, 255, 255, 0.38));
-    color: var(--surface-dark);
-    font-size: 0.82rem;
-    font-weight: 800;
-    text-align: center;
-}
-
-.life-orbit i {
-    width: clamp(18px, 4vw, 48px);
-    height: 1px;
-    background: rgba(190, 77, 36, 0.34);
-}
-
 .life-timeline-form {
     max-width: 620px;
     margin: 22px auto 0;
@@ -2515,12 +2489,6 @@ input.error {
 }
 
 @media (max-width: 620px) {
-    .life-orbit {
-        min-height: 120px;
-        border-radius: 28px;
-        padding: 18px 12px;
-    }
-
     .life-timeline-result {
         padding: 24px 18px;
     }
@@ -4226,6 +4194,12 @@ input.error {
         z-index: 1000;
     }
 
+    .menu-toggle,
+    .mobile-nav-panel,
+    .mobile-nav-overlay {
+        display: none !important;
+    }
+
     .mega-menu-panel {
         z-index: 1010;
     }
@@ -4257,7 +4231,4 @@ input.error {
         display: inline-flex;
     }
 
-    .menu-toggle {
-        display: none;
-    }
 }

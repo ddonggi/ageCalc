@@ -243,7 +243,7 @@ assert.match(html, /다음 생일까지/);
 assert.match(html, /이어서 확인하기/);
 assert.match(html, /href="\/birth-year-age-table\?year=1992"/);
 assert.match(html, /href="\/annual-age-calculator\?birth_year=1992"/);
-assert.match(html, /href="\/school-entry-year-table\?year=1992"/);
+assert.match(html, /href="\/school-grade-calculator\?year=1992"/);
 assert.match(html, /href="\/birthday-dday-calculator"/);
 assert.strictEqual((html.match(/class="age-result-links"[\s\S]*?<\/div>/) || [''])[0].match(/<a /g).length, 4);
 assert.doesNotMatch(html, /birth_date=/);
@@ -1178,7 +1178,7 @@ assert.strictEqual(publisherRefreshes, 0);
 
         expected_links = (
             'href="/annual-age-calculator?birth_year=1992"',
-            'href="/school-entry-year-table?year=1992"',
+            'href="/school-grade-calculator?year=1992"',
             'href="/birth-year-zodiac-table?year=1992"',
             'href="/age"',
         )
@@ -1219,6 +1219,30 @@ assert.strictEqual(publisherRefreshes, 0);
         html = response.get_data(as_text=True)
         self.assertIn('<option value="1990" selected>1990년생</option>', html)
         self.assertIn("고등학교 졸업 이후", html)
+
+    def test_duplicate_school_routes_permanently_redirect_to_the_combined_tools(self):
+        client = app.test_client()
+
+        entry_response = client.get("/school-entry-year-table?year=2018")
+        self.assertEqual(entry_response.status_code, 301)
+        self.assertEqual(entry_response.headers["Location"], "/school-grade-calculator?year=2018")
+
+        age_response = client.get("/grade-age-table?stage=middle&grade=1")
+        self.assertEqual(age_response.status_code, 301)
+        self.assertEqual(
+            age_response.headers["Location"],
+            "/grade-birth-year-table?stage=middle&grade=1",
+        )
+
+        education_hub = next(hub for hub in HUB_PAGES if hub["key"] == "education")
+        self.assertEqual(
+            [(link["endpoint"], link["label"]) for link in education_hub["tool_links"]],
+            [
+                ("school_grade_calculator", "학년 계산기"),
+                ("college_entry_year_calculator", "학번 계산기"),
+                ("grade_birth_year_table", "학년별 나이 계산기"),
+            ],
+        )
 
     def test_school_entry_year_table_page_is_public(self):
         client = app.test_client()
@@ -1413,6 +1437,28 @@ assert.strictEqual(publisherRefreshes, 0);
         for affiliate_marker in ("info-coupang-promotions", "home-coupang-rail-left"):
             if affiliate_marker in html:
                 self.assertLess(direct_answer, html.index(affiliate_marker))
+
+    def test_d_day_uses_calendar_day_differences_and_an_animated_mode_toggle(self):
+        client = app.test_client()
+        with mock.patch.object(app_module, "_current_local_date", return_value=date(2026, 9, 9)):
+            future = client.get("/d-day?date=20260910&mode=until&label=%EA%B2%80%EC%A6%9D")
+            past = client.get("/d-day?date=20260908&mode=since&label=%EA%B2%80%EC%A6%9D")
+            today = client.get("/d-day?date=20260909&mode=until&label=%EA%B2%80%EC%A6%9D")
+
+        self.assertIn("D-1", future.get_data(as_text=True))
+        self.assertIn("+1일", past.get_data(as_text=True))
+        self.assertIn("D-Day", today.get_data(as_text=True))
+
+        html = client.get("/d-day").get_data(as_text=True)
+        css = Path("static/css/editorial-luxury.css").read_text(encoding="utf-8")
+        self.assertIn('src="/static/js/date-rules.js"', html)
+        self.assertIn('<span class="toggle-slider" aria-hidden="true"></span>', html)
+        self.assertIn('#mode-since:checked ~ .toggle-slider', css)
+
+    def test_d_day_date_input_uses_the_same_full_width_column_as_submit(self):
+        css = Path("static/css/editorial-luxury.css").read_text(encoding="utf-8")
+
+        self.assertIn("#dday-form .date-inputs {\n  display: flex;\n  flex-direction: column;", css)
 
     def test_baby_months_table_page_is_public(self):
         client = app.test_client()
@@ -1669,6 +1715,22 @@ assert.strictEqual(publisherRefreshes, 0);
         self.assertIn("강아지 2살", html)
         self.assertIn("24세", html)
 
+    def test_pet_table_forms_disable_dog_size_selection_for_cats(self):
+        client = app.test_client()
+
+        for path in ("/pet-age-table?pet=cat&years=2", "/pet-months-table?pet=cat&months=6"):
+            with self.subTest(path=path):
+                response = client.get(path)
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                self.assertRegex(
+                    html,
+                    r'<select name="size"[^>]*class="pet-table-size-select"[^>]*disabled[^>]*>',
+                )
+
+        behavior = Path("static/js/pet-table-form.js").read_text(encoding="utf-8")
+        self.assertIn("sizeSelect.disabled = isCat", behavior)
+
     def test_korean_age_guide_page_is_public(self):
         client = app.test_client()
         response = client.get("/korean-age-guide")
@@ -1702,6 +1764,13 @@ assert.strictEqual(publisherRefreshes, 0);
         self.assertIn("강아지 6개월", html)
         self.assertIn("소형견", html)
         self.assertIn("8세", html)
+
+    def test_hundred_day_date_input_uses_the_same_full_width_column_as_submit(self):
+        css = Path("static/css/editorial-luxury.css").read_text(encoding="utf-8")
+
+        self.assertIn("#hundred-day-form .date-inputs", css)
+        self.assertIn("#hundred-day-form button[type=\"submit\"]", css)
+        self.assertIn("#hundred-day-form .date-inputs {\n  display: flex;\n  flex-direction: column;", css)
 
     def test_grade_birth_year_table_page_is_public(self):
         client = app.test_client()
@@ -2070,6 +2139,16 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 for endpoint in expected_tool_endpoints[str(hub["key"])]:
                     path = app.url_map.bind("").build(endpoint)
                     self.assertIn(f'href="{path}"', html)
+
+    def test_anniversary_hub_lists_only_anniversary_calculators(self):
+        html = app.test_client().get("/anniversary/").get_data(as_text=True)
+        tool_section = html.split('class="section-shell life-hub-tools"', 1)[1].split("</section>", 1)[0]
+
+        self.assertEqual(3, tool_section.count("<a "))
+        for path in ("/d-day", "/birthday-dday-calculator", "/100-day-calculator"):
+            self.assertIn(f'href="{path}"', tool_section)
+        for path in ("/parent-child", "/baby-months", "/guide"):
+            self.assertNotIn(f'href="{path}"', tool_section)
 
     def test_life_hubs_render_unique_usage_guides(self):
         client = app.test_client()
@@ -2501,6 +2580,13 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         self.assertIn('id="pet-size-explanation"', html)
         self.assertIn("데려온 날만으로는 실제 나이를 알 수 없어", html)
         self.assertIn('aria-describedby="pet-size-explanation"', html)
+
+    def test_dog_size_selection_has_a_clear_active_state(self):
+        css = Path("static/css/editorial-luxury.css").read_text(encoding="utf-8")
+
+        self.assertIn('#pet-age-form[data-pet="dog"] .pet-size-option.active', css)
+        self.assertIn('content: "선택";', css)
+        self.assertIn('background: var(--tool-accent);', css)
 
     def test_priority_calculator_forms_precede_promotions(self):
         client = app.test_client()
@@ -4710,6 +4796,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
 
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
+        self.assertIn('images/cat-age.png', html)
         self.assertIn("반려묘의 실제 나이를 사람 나이로 환산해 보여드립니다.", html)
         self.assertNotIn("반려묘 나이를 사람 나이로 환산해 보세요", html)
 
@@ -4902,8 +4989,39 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 re.DOTALL,
             ),
         )
-        self.assertIn("window.innerWidth > 900", navigation)
+        self.assertNotIn("window.innerWidth > 900", navigation)
         self.assertNotIn("window.innerWidth > 980", navigation)
+
+    def test_desktop_header_exposes_the_full_category_menu_panel(self):
+        css = Path("static/css/style.css").read_text(encoding="utf-8")
+        navigation = Path("static/js/navigation.js").read_text(encoding="utf-8")
+
+        self.assertRegex(
+            css,
+            re.compile(
+                r"@media\s*\(min-width:\s*901px\)\s*\{.*?"
+                r"\.menu-toggle\s*\{[^}]*display:\s*inline-flex;.*?"
+                r"\.mobile-nav-panel\s*\{[^}]*top:\s*var\(--desktop-header-height\);",
+                re.DOTALL,
+            ),
+        )
+        self.assertNotIn("window.innerWidth > 900", navigation)
+
+    def test_desktop_full_menu_uses_a_right_aligned_vertical_drawer(self):
+        css = Path("static/css/style.css").read_text(encoding="utf-8")
+
+        self.assertRegex(
+            css,
+            re.compile(
+                r"@media\s*\(min-width:\s*901px\)\s*\{.*?"
+                r"\.mobile-nav-panel\s*\{[^}]*top:\s*var\(--desktop-header-height\);[^}]*right:\s*0;[^}]*bottom:\s*0;[^}]*"
+                r"height:\s*calc\(100vh\s*-\s*var\(--desktop-header-height\)\);[^}]*"
+                r"width:\s*min\(460px,\s*92vw\);[^}]*transform:\s*translateX\(100%\);.*?"
+                r"\.mobile-nav-panel\.is-open\s*\{[^}]*transform:\s*translateX\(0\);.*?"
+                r"\.mobile-hub-groups\s*\{[^}]*grid-template-columns:\s*1fr;",
+                re.DOTALL,
+            ),
+        )
 
     def test_mobile_navigation_starts_below_the_header(self):
         css = Path("static/css/style.css").read_text(encoding="utf-8")

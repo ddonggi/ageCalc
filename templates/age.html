@@ -88,6 +88,7 @@
     <!-- CSS-->
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/age-pages.css') }}" />
 
     <!-- 스크립트 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"
@@ -214,7 +215,7 @@
                                 <div class="age-result-links">
                                     <a href="{{ url_for('birth_year_age_table', year=result_details.birth_year) }}"><strong>{{ result_details.birth_year }}년생 나이표</strong><span>연나이와 만나이 범위 보기</span></a>
                                     <a href="{{ url_for('annual_age_calculator', birth_year=result_details.birth_year) }}"><strong>연나이 확인</strong><span>출생연도로 바로 계산</span></a>
-                                    <a href="{{ url_for('school_entry_year_table', year=result_details.birth_year) }}"><strong>입학년도 확인</strong><span>초·중·고 입학 시점 보기</span></a>
+                                    <a href="{{ url_for('school_grade_calculator', year=result_details.birth_year) }}"><strong>학년 계산기</strong><span>현재 학년과 초·중·고 입학 시점 보기</span></a>
                                     <a href="{{ url_for('birthday_dday_calculator') }}"><strong>생일 D-day</strong><span>생일까지 남은 날짜 계산</span></a>
                                 </div>
                             </nav>

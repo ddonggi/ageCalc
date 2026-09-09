@@ -17,7 +17,7 @@ class AdsensePreflightTests(unittest.TestCase):
         report = run_local_preflight()
 
         self.assertTrue(report.ok, format_report(report))
-        self.assertEqual(46, report.sitemap_urls)
+        self.assertEqual(44, report.sitemap_urls)
         self.assertEqual(46, report.checked_pages)
         self.assertEqual(31, len(PUBLIC_SITEMAP_ENDPOINTS))
         self.assertGreater(report.content_quality_warnings, 0)
@@ -55,7 +55,7 @@ class AdsensePreflightTests(unittest.TestCase):
     def test_operational_preflight_checks_only_sitemap_quality_pages(self):
         report = run_local_preflight()
 
-        self.assertEqual(46, report.sitemap_urls)
+        self.assertEqual(44, report.sitemap_urls)
         self.assertEqual(0, report.content_quality_failures)
         self.assertGreater(report.content_quality_warnings, 0)
         self.assertTrue(report.ok, format_report(report))

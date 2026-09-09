@@ -1834,8 +1834,7 @@ body.calculator-flat-page .calculator-page-heading.hero-band .hero-copy > .page-
 }
 
 body.calculator-flat-page .calculator-page-heading.hero-band .hero-actions,
-body.calculator-flat-page .calculator-page-heading.hero-band .hero-metrics,
-body.calculator-flat-page .calculator-page-heading.hero-band > .life-orbit {
+body.calculator-flat-page .calculator-page-heading.hero-band .hero-metrics {
   order: 6;
   grid-column: 1 / -1;
   width: min(100%, 760px);
@@ -1937,15 +1936,6 @@ body.calculator-flat-page .editorial-supporting-content .info {
 }
 
 body.life-timeline-page.calculator-flat-page .container > .section-shell.direct-answer {
-  display: contents;
-  order: 2;
-}
-
-body.life-timeline-page.calculator-flat-page .section-shell.direct-answer > .section-heading {
-  order: 4;
-}
-
-body.life-timeline-page.calculator-flat-page .section-shell.direct-answer > .age-form {
   order: 2;
 }
 
@@ -1999,5 +1989,510 @@ body h4 {
 
   body.calculator-flat-page .section-card:not(.birth-year-summary) {
     padding-block: 0;
+  }
+}
+/* Desktop navigation owns its layout independently of the mobile drawer. */
+body .desktop-menu-toggle,
+body .desktop-nav-panel,
+body .desktop-nav-overlay { display: none; }
+
+@media (min-width: 901px) {
+  body.desktop-nav-open { overflow: hidden; }
+  body .desktop-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--lux-text);
+    font: inherit;
+    cursor: pointer;
+  }
+  body > .desktop-nav-panel {
+    display: block;
+    position: fixed;
+    top: var(--desktop-header-height);
+    right: 0;
+    bottom: 0;
+    width: min(460px, 100vw);
+    max-width: 100vw;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 20px 24px 32px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    z-index: 1020;
+    border: 0;
+    border-radius: 0;
+    background: var(--lux-surface, #fcf9f3);
+    color: var(--lux-text);
+    transform: translateX(100%);
+    transition: transform 220ms ease;
+  }
+  body > .desktop-nav-overlay {
+    display: block;
+    position: fixed;
+    inset: var(--desktop-header-height) 0 0;
+    z-index: 1010;
+    background: rgba(36, 29, 24, .22);
+    opacity: 0;
+    transition: opacity 220ms ease;
+  }
+  body > .desktop-nav-panel[hidden],
+  body > .desktop-nav-overlay[hidden] { display: none; }
+  body > .desktop-nav-panel.is-open { transform: translateX(0); }
+  body > .desktop-nav-overlay.is-open { opacity: 1; }
+  body .desktop-nav-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  body .desktop-nav-close {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 28px;
+    cursor: pointer;
+  }
+  body .desktop-nav-groups { display: grid; gap: 24px; }
+  body .desktop-nav-links { display: grid; gap: 4px; }
+  body .desktop-nav-category,
+  body .desktop-nav-link {
+    display: block;
+    padding: 10px 12px;
+    color: var(--lux-text);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    transition: transform 160ms ease;
+  }
+  body .desktop-nav-category { font-weight: 700; }
+  body .desktop-nav-link:hover,
+  body .desktop-nav-link:focus-visible,
+  body .desktop-nav-category:hover,
+  body .desktop-nav-category:focus-visible {
+    background: var(--lux-gold-soft);
+    color: var(--lux-espresso);
+    transform: translateX(3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body > .desktop-nav-panel,
+  body > .desktop-nav-overlay,
+  body .desktop-nav-link,
+  body .desktop-nav-category { transition: none; }
+}
+
+/* Shared warm-paper presentation for hubs and public calculation tools.
+   The home and age pages retain their dedicated finishing styles. */
+body.life-hub-page:not(.age-hub-page),
+body.calculator-flat-page:not(.age-page) {
+  --tool-ink: #302a25;
+  --tool-muted: #70665e;
+  --tool-line: #ddd5ca;
+  --tool-panel: #eee8df;
+  --tool-accent: #514238;
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-tools {
+  padding-top: 24px;
+}
+
+body.life-hub-page:not(.age-hub-page) .section-heading {
+  gap: 12px;
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-tools .section-heading {
+  margin-bottom: 24px;
+}
+
+body.life-hub-page:not(.age-hub-page) :is(.life-hub-tools h1, .section-shell h2),
+body.calculator-flat-page:not(.age-page) :is(.calculator-page-heading h1, .hero-copy h1, .page-header h1, .section-shell > h1, .section-shell h2, .result-container > h2) {
+  color: var(--tool-ink);
+  font-family: var(--site-font);
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: -.03em;
+  word-break: keep-all;
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-tools h1,
+body.calculator-flat-page:not(.age-page) :is(.calculator-page-heading h1, .hero-copy h1, .page-header h1, .section-shell > h1) {
+  font-size: clamp(26px, 3vw, 38px);
+}
+
+body.life-hub-page:not(.age-hub-page) .section-shell h2,
+body.calculator-flat-page:not(.age-page) :is(.section-shell h2, .result-container > h2) {
+  font-size: clamp(21px, 2vw, 27px);
+}
+
+body.life-hub-page:not(.age-hub-page) :is(.page-intro, .section-intro, .section-shell p),
+body.calculator-flat-page:not(.age-page) :is(.page-intro, .section-intro, .section-shell p, .info p, .notice p) {
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--tool-muted);
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-link-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-link-list a {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 116px;
+  padding: 20px;
+  border: 1px solid var(--tool-line);
+  border-radius: 10px;
+  background: #fffdfa;
+  color: var(--tool-ink);
+  box-shadow: none;
+  text-decoration: none;
+  transform: none;
+  transition: none;
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-link-list a strong {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-link-list a span {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--tool-muted);
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-link-list a:hover,
+body.life-hub-page:not(.age-hub-page) .life-hub-link-list a:focus-visible {
+  border-color: #b9aa9a;
+  background: var(--tool-panel);
+  box-shadow: none;
+  transform: none;
+}
+
+body.life-hub-page:not(.age-hub-page) .life-hub-link-list a:focus-visible,
+body.calculator-flat-page:not(.age-page) :is(input, select, textarea, button, .btn):focus-visible {
+  outline: 2px solid var(--tool-accent);
+  outline-offset: 3px;
+}
+
+body.calculator-flat-page:not(.age-page) .editorial-calculator-shell .age-form,
+body.calculator-flat-page:not(.age-page) .container > .age-form,
+body.calculator-flat-page:not(.age-page) .section-shell:has(> .age-form) {
+  padding: clamp(20px, 3vw, 32px);
+  border: 0;
+  border-radius: 12px;
+  background: var(--tool-panel);
+  box-shadow: none;
+  color: var(--tool-ink);
+}
+
+body.calculator-flat-page:not(.age-page) .age-form::before,
+body.calculator-flat-page:not(.age-page) .age-form::after {
+  display: none;
+}
+
+body.calculator-flat-page:not(.age-page) :is(.form-group, .date-inputs, .profile-date-control, .pet-input-panel) {
+  gap: 12px;
+}
+
+body.calculator-flat-page:not(.age-page) .age-form :is(h3, .field-label, label) {
+  color: var(--tool-ink);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+body.calculator-flat-page:not(.age-page) .age-form h3 {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+
+body.calculator-flat-page:not(.age-page) .age-form :is(input:not([type="radio"]):not([type="checkbox"]), select, textarea) {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 56px;
+  padding-inline: 16px;
+  border: 1px solid #c9bfb3;
+  border-radius: 8px;
+  background: #fffdfa;
+  color: var(--tool-ink);
+  font-family: var(--site-font);
+  font-size: 16px;
+  line-height: 1.5;
+  box-shadow: none;
+}
+
+body.calculator-flat-page:not(.age-page) .age-form input[inputmode="numeric"] {
+  font-size: 20px;
+  letter-spacing: .05em;
+  font-variant-numeric: tabular-nums;
+}
+
+body.calculator-flat-page:not(.age-page) .age-form :is(input, textarea)::placeholder {
+  color: #887c71;
+  opacity: 1;
+}
+
+body.calculator-flat-page:not(.age-page) .age-form .btn-primary,
+body.calculator-flat-page:not(.age-page) .age-form button[type="submit"] {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 20px;
+  border: 1px solid var(--tool-accent);
+  border-radius: 8px;
+  background: var(--tool-accent);
+  color: #fffdfa;
+  font-family: var(--site-font);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  box-shadow: none;
+  transform: none;
+}
+
+body.calculator-flat-page:not(.age-page) .age-form .btn-primary:hover,
+body.calculator-flat-page:not(.age-page) .age-form .btn-primary:focus-visible,
+body.calculator-flat-page:not(.age-page) .age-form button[type="submit"]:hover,
+body.calculator-flat-page:not(.age-page) .age-form button[type="submit"]:focus-visible {
+  border-color: #382e27;
+  background: #382e27;
+  color: #fffdfa;
+  box-shadow: none;
+  transform: none;
+}
+
+body.calculator-flat-page:not(.age-page) .calendar-toggle {
+  display: inline-grid;
+  position: relative;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  min-height: 50px;
+  padding: .25rem;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 4px;
+  border-color: transparent;
+  background: #e0d8cd;
+  box-shadow: none;
+}
+
+body.calculator-flat-page:not(.age-page) .calendar-toggle label {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  min-height: 42px;
+  padding-inline: 1rem;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--tool-muted);
+  font-size: 14px;
+  transition: transform 180ms ease;
+}
+
+body.calculator-flat-page:not(.age-page) .calendar-toggle input[type="radio"]:checked + label {
+  background: transparent;
+  color: #fffdfa;
+}
+
+body.calculator-flat-page:not(.age-page) .toggle-slider {
+  position: absolute;
+  z-index: 0;
+  inset: .25rem auto .25rem .25rem;
+  display: block;
+  width: calc(50% - .25rem);
+  border-radius: 2px;
+  background: var(--tool-accent);
+  transform: translateX(0);
+  transition: transform 180ms ease;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+body.calculator-flat-page:not(.age-page) .calendar-toggle #mode-since:checked ~ .toggle-slider {
+  transform: translateX(100%);
+}
+
+body.anniversary-page.calculator-flat-page #dday-form > .form-group,
+body.anniversary-page.calculator-flat-page #dday-form .date-inputs,
+body.anniversary-page.calculator-flat-page #dday-form #dday-date,
+body.anniversary-page.calculator-flat-page #dday-form button[type="submit"] {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+body.anniversary-page.calculator-flat-page #dday-form .date-inputs {
+  display: flex;
+  flex-direction: column;
+}
+
+body.calculator-flat-page #hundred-day-form .form-group,
+body.calculator-flat-page #hundred-day-form .date-inputs,
+body.calculator-flat-page #hundred-day-form #hundred-day-date,
+body.calculator-flat-page #hundred-day-form .hero-actions,
+body.calculator-flat-page #hundred-day-form button[type="submit"] {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+body.calculator-flat-page #hundred-day-form .hero-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+body.calculator-flat-page #hundred-day-form .date-inputs {
+  display: flex;
+  flex-direction: column;
+}
+
+body.calculator-flat-page .pet-table-size-select:disabled {
+  border-color: var(--tool-line);
+  background: #e0d8cd;
+  color: var(--tool-muted);
+  cursor: not-allowed;
+  opacity: .72;
+}
+
+body.editorial-calculator-page.calculator-flat-page #pet-age-form[data-pet="dog"] .pet-size-option.active {
+  border: 2px solid var(--tool-accent);
+  background: var(--tool-accent);
+  color: #fffdfa;
+  box-shadow: 0 0 0 3px rgba(81, 66, 56, .18);
+  transform: none;
+}
+
+body.editorial-calculator-page.calculator-flat-page #pet-age-form[data-pet="dog"] .pet-size-option.active::after {
+  content: "선택";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 3px 7px;
+  border: 1px solid rgba(255, 253, 250, .58);
+  border-radius: 999px;
+  color: #fffdfa;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+body.editorial-calculator-page.calculator-flat-page #pet-age-form[data-pet="dog"] .pet-size-option.active .dog-size-illustration {
+  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, .24));
+}
+
+body.editorial-calculator-page.calculator-flat-page #pet-age-form[data-pet="cat"] .cat-age-illustration {
+  display: block;
+  width: clamp(120px, 24vw, 190px);
+  height: auto;
+  margin: 0 auto;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 12px rgba(73, 48, 27, .12));
+}
+
+body.calculator-flat-page:not(.age-page) :is(.input-help, .small, .error-msg) {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--tool-muted);
+}
+
+body.calculator-flat-page:not(.age-page) .error-msg:not(:empty) {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #9a3029;
+}
+
+body.calculator-flat-page:not(.age-page) :is(.result-container.show, .result.success, .result:not(.loading)) {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.calculator-flat-page:not(.age-page) .result-container.show {
+  padding-top: 24px;
+}
+
+body.calculator-flat-page:not(.age-page) :is(.age-result-primary, .birth-year-summary, .result-main, .life-timeline-result-card) {
+  padding: clamp(20px, 3vw, 28px);
+  border: 0;
+  border-radius: 12px;
+  background: var(--tool-panel);
+  color: var(--tool-ink);
+  box-shadow: none;
+}
+
+body.calculator-flat-page:not(.age-page) :is(.age-number, .age-result-primary .age-number, .result-main .age-number) {
+  color: var(--tool-ink);
+  font-size: clamp(30px, 4vw, 40px);
+  line-height: 1.4;
+}
+
+body.calculator-flat-page:not(.age-page) :is(.age-result-summary-item, .summary-card, .result-section, .age-result-links a, .result-next-links a) {
+  border: 1px solid var(--tool-line);
+  border-radius: 8px;
+  background: #fffdfa;
+  box-shadow: none;
+}
+
+body.calculator-flat-page:not(.age-page) :is(.age-result-summary-item, .summary-card, .result-section) {
+  padding: 16px;
+}
+
+body.calculator-flat-page:not(.age-page) :is(.age-result-links a, .result-next-links a) {
+  padding: 16px;
+  color: var(--tool-accent);
+}
+
+body.calculator-flat-page:not(.age-page) :is(.age-result-links a, .result-next-links a):hover,
+body.calculator-flat-page:not(.age-page) :is(.age-result-links a, .result-next-links a):focus-visible {
+  border-color: #b9aa9a;
+  background: var(--tool-panel);
+  color: var(--tool-accent);
+  box-shadow: none;
+  transform: none;
+}
+
+body.calculator-flat-page:not(.age-page) .container > section:not(.hero-band):not(.section-shell):not(.mini-game),
+body.calculator-flat-page:not(.age-page) .section-shell:not(:has(> .age-form)) {
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 1px solid var(--tool-line);
+}
+
+body.calculator-flat-page:not(.age-page) :is(.data-table-wrap, table) {
+  max-width: 100%;
+}
+
+@media (max-width: 600px) {
+  body.life-hub-page:not(.age-hub-page) .life-hub-link-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  body.life-hub-page:not(.age-hub-page) .life-hub-link-list a {
+    min-height: 0;
+    padding: 16px;
+  }
+  body.calculator-flat-page:not(.age-page) :is(.page-intro, .section-intro, .section-shell p, .info p, .notice p) {
+    font-size: 15px;
   }
 }

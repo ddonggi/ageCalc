@@ -1647,6 +1647,12 @@ def _query_keys_are_exact(*expected_keys):
     )
 
 
+def _query_keys_are_allowed(*allowed_keys):
+    return set(request.args).issubset(allowed_keys) and all(
+        len(request.args.getlist(key)) == 1 for key in request.args
+    )
+
+
 def _mark_result_query_noindex():
     g.result_query_noindex = True
 
@@ -1932,44 +1938,11 @@ def school_grade_calculator():
 
 @app.route('/school-entry-year-table')
 def school_entry_year_table():
-    """출생년도 기준 입학 학년도 안내 페이지"""
-    today = _current_local_date()
-    school_year = _current_school_year(today)
-    current_year = today.year
-    min_year = max(1900, current_year - 100)
-    max_year = current_year
-
-    selected_year, invalid_query = _validated_int_query("year", min_year, max_year)
-    if invalid_query or (request.args and not _query_keys_are_exact("year")):
-        return redirect(url_for("school_entry_year_table"))
-    if selected_year is not None:
-        _mark_result_query_noindex()
-
-    rows = []
-    selected_row = _build_school_entry_snapshot(selected_year, school_year) if selected_year is not None else None
-    for year in range(max_year, min_year - 1, -1):
-        row = _build_school_entry_snapshot(year, school_year)
-        row["is_selected"] = year == selected_year
-        rows.append(row)
-
-    example_years = [year for year in (2017, 2018, 2019, 2020) if 1900 <= year <= current_year]
-    examples = [_build_school_entry_snapshot(year, school_year) for year in example_years]
-
-    return render_template(
-        'school-entry-year-table.html',
-        school_year=school_year,
-        current_entry_birth_years={
-            "elementary": school_year - 7,
-            "middle": school_year - 13,
-            "high": school_year - 16,
-        },
-        selected_year=selected_year,
-        selected_row=selected_row,
-        school_entry_rows=rows,
-        year_options=range(max_year, min_year - 1, -1),
-        examples=examples,
-        canonical_url=f"{SITE_BASE_URL}/school-entry-year-table",
-        robots_content="index,follow" if selected_year is None else "noindex,follow",
+    """Legacy entry-year URL redirected to the combined grade calculator."""
+    year = request.args.get("year")
+    return redirect(
+        url_for("school_grade_calculator", **({"year": year} if year else {})),
+        code=301,
     )
 
 @app.route('/age-gap-calculator')
@@ -2168,71 +2141,19 @@ def age_comparison_table():
 
 @app.route('/grade-age-table')
 def grade_age_table():
-    """학년 기준 나이표 페이지"""
-    today = _current_local_date()
-    school_year = _current_school_year(today)
-    current_year = today.year
-
-    valid_stage_grades = {"elementary": 6, "middle": 3, "high": 3}
-    stage, grade, invalid_query = _validated_grade_query(valid_stage_grades)
-    if invalid_query:
-        return redirect(url_for("grade_age_table"))
-
-    rows = []
-    for stage_key, max_grade in valid_stage_grades.items():
-        for grade_number in range(1, max_grade + 1):
-            row = _build_grade_age_snapshot(stage_key, grade_number, school_year, current_year)
-            row["is_selected"] = stage_key == stage and grade_number == grade
-            rows.append(row)
-
-    selected_row = _build_grade_age_snapshot(stage, grade, school_year, current_year) if grade is not None else None
-    if selected_row is not None:
-        _mark_result_query_noindex()
-    examples = [
-        _build_grade_age_snapshot("elementary", 1, school_year, current_year),
-        _build_grade_age_snapshot("middle", 1, school_year, current_year),
-        _build_grade_age_snapshot("high", 1, school_year, current_year),
-    ]
-    featured_grade_rows = [
-        _build_grade_age_snapshot("middle", 1, school_year, current_year),
-        _build_grade_age_snapshot("middle", 3, school_year, current_year),
-        _build_grade_age_snapshot("high", 1, school_year, current_year),
-        _build_grade_age_snapshot("high", 3, school_year, current_year),
-    ]
-    seo_description = (
-        f"{school_year}학년도 중1 {featured_grade_rows[0]['annual_age']}, "
-        f"중3 {featured_grade_rows[1]['annual_age']}, "
-        f"고1 {featured_grade_rows[2]['annual_age']}, "
-        f"고3 {featured_grade_rows[3]['annual_age']}의 연나이와 생일 전후 만나이 범위를 "
-        "확인하는 학년별 나이표입니다."
-    )
-
-    return render_template(
-        'grade-age-table.html',
-        school_year=school_year,
-        selected_stage=stage,
-        selected_grade=grade,
-        selected_row=selected_row,
-        grade_rows=rows,
-        examples=examples,
-        featured_grade_rows=featured_grade_rows,
-        seo_description=seo_description,
-        canonical_url=(
-            f"{SITE_BASE_URL}/grade-age-table"
-        ),
-        robots_content="index,follow" if grade is None else "noindex,follow",
-        seo_title=(
-            f"{_short_grade_label(stage, grade)} 나이 | 연나이·만나이 범위 | AgeCalc"
-            if grade is not None
-            else "학년별 나이표 | 중1·중3·고1·고3은 몇 살? | AgeCalc"
-        ),
-    )
+    """Legacy grade-age URL redirected to the combined grade reference."""
+    query = {
+        key: request.args[key]
+        for key in ("stage", "grade")
+        if request.args.get(key)
+    }
+    return redirect(url_for("grade_birth_year_table", **query), code=301)
 
 
 @app.route('/pet-age-table')
 def pet_age_table():
     """반려동물 나이표 페이지"""
-    if request.args and not _query_keys_are_exact("pet", "years", "size"):
+    if request.args and not _query_keys_are_allowed("pet", "years", "size"):
         return redirect(url_for("pet_age_table"))
     pet = request.args.get("pet", "dog").strip()
     size = request.args.get("size", "small").strip()
@@ -2288,7 +2209,7 @@ def korean_age_guide():
 @app.route('/pet-months-table')
 def pet_months_table():
     """반려동물 월령표 페이지"""
-    if request.args and not _query_keys_are_exact("pet", "months", "size"):
+    if request.args and not _query_keys_are_allowed("pet", "months", "size"):
         return redirect(url_for("pet_months_table"))
     pet = request.args.get("pet", "dog").strip()
     size = request.args.get("size", "small").strip()
@@ -2373,7 +2294,7 @@ def grade_birth_year_table():
         f"{school_year}학년도 중1은 {faq_grade_rows[0]['birth_year_label']}, "
         f"고1은 {faq_grade_rows[1]['birth_year_label']}, "
         f"고3은 {faq_grade_rows[2]['birth_year_label']}입니다. "
-        "학년별 일반 출생연도와 빠른년생·입학유예 예외를 확인하세요."
+        "학년별 일반 출생연도와 연나이·만나이 범위, 빠른년생·입학유예 예외를 확인하세요."
     )
 
     return render_template(
@@ -2391,9 +2312,9 @@ def grade_birth_year_table():
         ),
         robots_content="index,follow" if grade is None else "noindex,follow",
         seo_title=(
-            f"{_short_grade_label(stage, grade)} 몇 년생? 출생연도표 | AgeCalc"
+            f"{_short_grade_label(stage, grade)} 나이·출생연도 | AgeCalc"
             if grade is not None
-            else "학년별 출생연도표 | 중1·고1은 몇 년생? | AgeCalc"
+            else "학년별 나이 계산기 | 중1·고1 나이·출생연도 | AgeCalc"
         ),
     )
 

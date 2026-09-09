@@ -25,12 +25,13 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
+    {% if hub.key == 'age' %}<link rel="stylesheet" href="{{ versioned_static('css/age-pages.css') }}" />{% endif %}
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
 
-<body class="life-hub-page hub-theme-{{ hub.accent }}">
+<body class="life-hub-page hub-theme-{{ hub.accent }}{% if hub.key == 'age' %} age-hub-page{% endif %}">
     <div class="container">
         {% include 'partials/header.html' %}
         {% include 'partials/home_coupang_rails.html' %}

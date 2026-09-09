@@ -24,6 +24,9 @@
     </nav>
 
     <div class="header-actions">
+        <button class="desktop-menu-toggle" type="button" aria-expanded="false" aria-controls="desktop-nav-panel" data-desktop-nav-toggle>
+            <span>메뉴 열기</span><span aria-hidden="true">≡</span>
+        </button>
         <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav-panel" data-nav-toggle>
             <span class="menu-toggle-label">메뉴 열기</span>
             <span class="menu-toggle-icon" aria-hidden="true">≡</span>
@@ -70,7 +73,30 @@
     {% endif %}
 </aside>
 
-<script src="{{ url_for('static', filename='js/navigation.js') }}" defer></script>
+<div class="desktop-nav-overlay" hidden data-desktop-nav-overlay></div>
+<aside class="desktop-nav-panel" id="desktop-nav-panel" hidden data-desktop-nav-panel aria-label="전체 계산 카테고리 메뉴">
+    <div class="desktop-nav-head">
+        <strong>전체 메뉴</strong>
+        <button class="desktop-nav-close" type="button" data-desktop-nav-close aria-label="메뉴 닫기">×</button>
+    </div>
+    <nav class="desktop-nav-groups" aria-label="카테고리별 계산기">
+        {% for hub in life_hubs %}
+        <div class="desktop-nav-group">
+            <a class="desktop-nav-category" href="{{ hub.path }}">{{ hub.title }}</a>
+            <div class="desktop-nav-links">
+                {% for link in hub.tool_links %}
+                <a class="desktop-nav-link" href="{{ url_for(link.endpoint) }}">{{ link.label }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        {% if blog_public_indexable %}
+        <a class="desktop-nav-category" href="{{ url_for('blog_list') }}">블로그</a>
+        {% endif %}
+    </nav>
+</aside>
+
+<script src="{{ versioned_static('js/navigation.js') }}" defer></script>
 <script src="{{ url_for('static', filename='js/calculator-form-focus.js') }}" defer></script>
 {% if reading_progress_enabled %}
 <script src="{{ url_for('static', filename='js/reading-progress.js') }}?v=mobile-stable-20260810a" defer></script>

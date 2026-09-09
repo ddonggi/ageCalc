@@ -229,6 +229,14 @@ class LifeTimelinePageTests(unittest.TestCase):
         self.assertIn('id="life-timeline-result"', html)
         self.assertIn('action="/life-timeline#life-timeline-result" method="get"', html)
 
+    def test_empty_state_prioritizes_the_form_without_a_decorative_orbit(self):
+        html = self.client.get("/life-timeline").get_data(as_text=True)
+        hero = html.split('<section class="hero-band life-timeline-hero calculator-page-heading">', 1)[1].split("</section>", 1)[0]
+        form_section = html.split('<section class="section-shell direct-answer">', 1)[1].split("</section>", 1)[0]
+
+        self.assertNotIn('class="life-orbit"', hero)
+        self.assertIn('id="life-timeline-form"', form_section)
+
     def test_query_renders_a_private_result_page_and_post_is_not_allowed(self):
         query_response = self.client.get("/life-timeline?birth_date=2000-08-24")
         post_response = self.client.post(

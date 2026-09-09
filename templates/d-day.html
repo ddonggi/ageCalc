@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/date-rules.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
 
@@ -83,6 +84,7 @@
                             <label for="mode-until">다가오는 날</label>
                             <input type="radio" id="mode-since" name="mode" value="since" {% if dday_values.mode == 'since' %}checked{% endif %}>
                             <label for="mode-since">지난 날부터</label>
+                            <span class="toggle-slider" aria-hidden="true"></span>
                         </div>
                     </div>
                     <small class="small">필요에 따라 남은 일수와 경과 일수를 전환해 볼 수 있습니다.</small>
