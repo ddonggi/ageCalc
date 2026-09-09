@@ -104,6 +104,14 @@ class StaticAssetVersioningTests(unittest.TestCase):
         ).hexdigest()[:12]
         self.assertIn(f"/static/js/age-calculator.js?v={expected_age_calculator}", client.get("/age").get_data(as_text=True))
 
+        expected_baby_months = hashlib.sha256(
+            (app_module.PROJECT_ROOT / "static/js/baby-months.js").read_bytes()
+        ).hexdigest()[:12]
+        self.assertIn(
+            f"/static/js/baby-months.js?v={expected_baby_months}",
+            client.get("/baby-months").get_data(as_text=True),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
