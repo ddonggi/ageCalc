@@ -22,6 +22,7 @@ KOREAN_REVIEW_PATHS = frozenset('''
 /100-day-calculator
 /birthday-dday-calculator
 /d-day
+/days-between-dates
 /pet-age-table
 /pet-months-table
 /dog
@@ -45,7 +46,7 @@ KOREAN_REVIEW_PATHS = frozenset('''
 /guides/baby-anniversary-calculation-guide
 /guides/parent-child-age-gap-guide
 '''.split())
-GLOBAL_SLUGS = ('age-calculator', 'birthday-dday-calculator', 'd-day', 'baby-months', '100-day-calculator', 'age-gap-calculator')
+GLOBAL_SLUGS = ('age-calculator', 'birthday-dday-calculator', 'd-day', 'baby-months', '100-day-calculator', 'age-gap-calculator', 'days-between-dates')
 GLOBAL_PREFIXES = ('en', 'ja', 'es', 'pt-br', 'zh-cn')
 REVIEW_URLS = {'https://agecalc.cloud' + path for path in KOREAN_REVIEW_PATHS} | {
     f'https://agecalc.cloud/{prefix}/{slug}' for prefix in GLOBAL_PREFIXES for slug in GLOBAL_SLUGS

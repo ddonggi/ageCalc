@@ -49,6 +49,13 @@
         return (date(end) - date(start)) / DAY;
     }
 
+    function dateRange(start, end, includeEnd = false) {
+        const difference = daysBetween(start, end);
+        if (difference < 0) throw new Error('end_before_start');
+        const days = difference + (includeEnd ? 1 : 0);
+        return {days, weeks: Math.floor(days / 7), remainingDays: days % 7};
+    }
+
     function monthlyAnchor(birth, months) {
         const first = utc(birth.getUTCFullYear(), birth.getUTCMonth() + months, 1);
         const lastDay = utc(first.getUTCFullYear(), first.getUTCMonth() + 1, 0).getUTCDate();
@@ -129,5 +136,5 @@
         return Math.abs(values[0] - values[1]);
     }
 
-    return {isoParts, today, daysBetween, completedMonths, duration, birthday, age, baby, hundred, yearGap};
+    return {isoParts, today, daysBetween, dateRange, completedMonths, duration, birthday, age, baby, hundred, yearGap};
 }));

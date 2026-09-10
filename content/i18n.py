@@ -82,7 +82,8 @@ def localized_sitemap_entries(pages):
         yield page
         for locale in supported_locales(page):
             if locale != 'ko':
-                yield {**page, 'path': localized_url(page['key'], locale), 'lastmod': '2026-09-09'}
+                yield {**page, 'path': localized_url(page['key'], locale),
+                       'lastmod': (page.get('localization') or {}).get('lastmod', '2026-09-09')}
 
 
 def _leaf_strings(value, path=''):
@@ -115,7 +116,7 @@ def validate_translations():
         if not set(supported_locales(page)).issubset(LOCALE_CONFIG):
             raise ValueError(f'Unsupported page locale: {page["key"]}')
     for locale in LOCALE_CONFIG:
-        if locale != 'ko':
+        if locale != 'ko' or catalog(locale)['pages']:
             validate_section(catalog(locale)['common'], catalog('en')['common'], locale)
         for page in PUBLIC_PAGE_REGISTRY:
             if locale not in supported_locales(page):
@@ -124,12 +125,12 @@ def validate_translations():
             if path in paths:
                 raise ValueError(f'Duplicate locale URL: {path}')
             paths.add(path)
-            if locale != 'ko':
+            if locale != 'ko' or (page.get('localization') or {}).get('register_ko'):
                 if page['key'] not in catalog(locale)['pages']:
                     raise ValueError(f'Missing page translation: {locale}/{page["key"]}')
                 # Compare only real language equivalents; a culture-specific page
                 # need not exist in English or in every other foreign catalog.
-                reference_locale = next(code for code in supported_locales(page) if code != 'ko')
+                reference_locale = next((code for code in supported_locales(page) if code != 'ko'), locale)
                 validate_section(catalog(locale)['pages'][page['key']], catalog(reference_locale)['pages'][page['key']], locale)
 
 
@@ -143,8 +144,10 @@ def register_localized_routes(app, base_url):
         g.page_canonical_url = base_url + localized_url(page_key, locale)
         resources = catalog(locale)
         copy = resources['pages'][page_key]
-        nav = [{'url': localized_url(p['key'], locale), 'label': resources['pages'][p['key']]['h1']}
-               for p in PUBLIC_PAGE_REGISTRY if locale in supported_locales(p)]
+        ui = {**resources['common'], **copy.get('ui', {})}
+        nav = [{'url': localized_url(p['key'], locale),
+                'label': resources['pages'].get(p['key'], {}).get('h1', p['title'])}
+               for p in PUBLIC_PAGE_REGISTRY if locale in supported_locales(p) and p.get('localization')]
         home_key = 'age' if locale in supported_locales(PAGE_BY_KEY['age']) else page_key
         breadcrumb_items = [
             {'label': f"AgeCalc ({resources['common']['korean_only']})", 'url': base_url + '/'},
@@ -167,12 +170,14 @@ def register_localized_routes(app, base_url):
                  'mainEntity': [{'@type': 'Question', 'name': f['question'],
                                  'acceptedAnswer': {'@type': 'Answer', 'text': f['answer']}} for f in copy['faq']]},
             ]
-        return render_template(page['localization']['template'], copy=copy, ui=resources['common'],
+        if locale == 'ko':
+            schema = [item for item in schema if item['@type'] != 'BreadcrumbList']
+        return render_template(page['localization']['template'], copy=copy, ui=ui,
                                global_nav=nav, global_schema=schema, page_key=page_key,
                                global_breadcrumbs=breadcrumb_items,
                                global_home=localized_url(home_key, locale),
                                calculator_config={'kind': page_key, 'locale': LOCALE_CONFIG[locale]['intl'],
-                                                  'ui': resources['common']})
+                                                  'ui': ui})
 
     def normalize_localized(page_key, locale):
         # A language link always points at the public document, never a result.
@@ -180,9 +185,10 @@ def register_localized_routes(app, base_url):
 
     for page in PUBLIC_PAGE_REGISTRY:
         for locale in supported_locales(page):
-            if locale == 'ko':
+            if locale == 'ko' and not (page.get('localization') or {}).get('register_ko'):
                 continue
             path = localized_url(page['key'], locale)
             defaults = {'page_key': page['key'], 'locale': locale}
-            app.add_url_rule(path, endpoint=f'i18n_{locale}_{page["key"]}', view_func=render_localized, defaults=defaults)
+            endpoint = page['endpoint'] if locale == 'ko' else f'i18n_{locale}_{page["key"]}'
+            app.add_url_rule(path, endpoint=endpoint, view_func=render_localized, defaults=defaults)
             app.add_url_rule(path + '/', endpoint=f'i18n_slash_{locale}_{page["key"]}', view_func=normalize_localized, defaults=defaults)

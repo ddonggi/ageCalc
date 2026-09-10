@@ -28,6 +28,62 @@
     "months": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
   },
   "pages": {
+    "days_between_dates": {
+      "title": "Days Between Dates Calculator — Count Days and Weeks | AgeCalc",
+      "h1": "Days Between Dates Calculator",
+      "description": "Calculate the days between any two dates, with weeks and remaining days. Optionally include both dates when counting a trip, event or project period.",
+      "intro": "Choose a start and end date to measure a calendar period. Unlike a countdown from today, both dates can be in the past or future.",
+      "form_title": "Calculate a date difference",
+      "ui": {
+        "end_date": "End date",
+        "swap_dates": "Swap dates",
+        "include_end": "Include both start and end dates",
+        "count_help": "By default, the same date is 0 days. Including both dates adds 1 day.",
+        "range_days": "Total days",
+        "range_weeks": "Weeks and remaining days",
+        "end_before_start": "The end date is before the start date. Swap the dates or choose a later end date.",
+        "inclusive_note": "Both dates are included: the calendar difference plus 1 day.",
+        "exclusive_note": "Calendar difference: the start date is included and the end date is excluded.",
+        "unit_week": {
+          "one": "{n} week",
+          "other": "{n} weeks"
+        }
+      },
+      "sections": [
+        {
+          "heading": "Count days for trips, projects and events",
+          "paragraphs": [
+            "Use any two Gregorian calendar dates to measure a period. Weekends and public holidays count as ordinary days. This tool does not calculate business days, working hours or legal deadlines."
+          ]
+        },
+        {
+          "heading": "Should I include the end date?",
+          "paragraphs": [
+            "From 1 September to 10 September 2026, the date difference is 9 days: 1 week and 2 days. Including both dates gives 10 days: 1 week and 3 days. For a trip, choose the option that matches whether you want calendar dates visited or the elapsed date difference."
+          ]
+        },
+        {
+          "heading": "Calendar days, not hours",
+          "paragraphs": [
+            "A leap day counts when it falls inside the selected interval. The calculation compares dates without times or time zones, so daylight-saving clock changes do not create fractional days. Dates stay in your browser."
+          ]
+        }
+      ],
+      "faq": [
+        {
+          "question": "How many days are between the same date?",
+          "answer": "The difference is 0 days. Select Include both start and end dates to count that calendar date as 1 day."
+        },
+        {
+          "question": "What happens if my dates are reversed?",
+          "answer": "The calculator asks you to correct the order. Use Swap dates to exchange the fields; it will not silently change your dates."
+        },
+        {
+          "question": "How is this different from Days Until / Since?",
+          "answer": "Days Until / Since compares today with one target date. This calculator lets you choose both the start and end dates."
+        }
+      ]
+    },
     "age": {
       "title": "Age Calculator — Calculate Your Exact Age | AgeCalc", "h1": "Age Calculator",
       "description": "Calculate your age in years, months and days, total days lived and your next birthday. Find your age today or on a specific date.",

@@ -16,7 +16,7 @@
     const note = document.getElementById('result-note');
 
     function unit(n, kind) {
-        const messages = ui.units[kind];
+        const messages = kind === 'week' ? ui.unit_week : ui.units[kind];
         return (messages[plurals.select(n)] || messages.other).replace('{n}', numbers.format(n));
     }
 
@@ -71,6 +71,15 @@
         values.replaceChildren();
         window.setTimeout(syncReference, 0);
     });
+    document.getElementById('swap-dates')?.addEventListener('click', () => {
+        for (const part of ['year', 'month', 'day']) {
+            const start = document.getElementById(`start-${part}`);
+            const end = document.getElementById(`end-${part}`);
+            [start.value, end.value] = [end.value, start.value];
+        }
+        errorElement.textContent = '';
+        result.hidden = true;
+    });
     form.addEventListener('submit', event => {
         event.preventDefault();
         values.replaceChildren();
@@ -82,7 +91,17 @@
         try {
             const today = rules.today();
             let reference = today;
-            if (config.kind === 'age') {
+            if (config.kind === 'days_between_dates') {
+                const start = readDate('start').iso;
+                const end = readDate('end').iso;
+                const inclusive = document.getElementById('include-end').checked;
+                const answer = rules.dateRange(start, end, inclusive);
+                row('range_days', unit(answer.days, 'day'));
+                row('range_weeks', [unit(answer.weeks, 'week'), unit(answer.remainingDays, 'day')].join(ui.duration_separator));
+                row('start_date', formatDate(start));
+                row('end_date', formatDate(end));
+                note.textContent = inclusive ? ui.inclusive_note : ui.exclusive_note;
+            } else if (config.kind === 'age') {
                 const birth = readDate('birth').iso;
                 if (birth > today) throw new Error('future_birth');
                 if (form.querySelector('[name="reference_mode"]:checked').value === 'specific') reference = readDate('reference').iso;
@@ -122,7 +141,7 @@
             } else if (config.kind === 'age_gap_calculator') {
                 row('year_gap', unit(rules.yearGap(document.getElementById('year_a').value, document.getElementById('year_b').value, today), 'year'));
             }
-            row('reference_label', formatDate(reference));
+            if (config.kind !== 'days_between_dates') row('reference_label', formatDate(reference));
             result.hidden = false;
             result.focus({preventScroll: true});
             result.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'nearest'});

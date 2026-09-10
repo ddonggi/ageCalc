@@ -7,6 +7,7 @@ from content.locale_config import ALL_LOCALES
 
 # These are functional equivalents; Korean paths remain the established paths.
 LOCALIZED_PAGE_SETTINGS = {
+    'days_between_dates': {'slug': 'days-between-dates', 'template': 'partials/global-calculator.html', 'register_ko': True, 'lastmod': '2026-09-10'},
     'age': {'slug': 'age-calculator', 'template': 'age.html'},
     'birthday_dday_calculator': {'slug': 'birthday-dday-calculator', 'template': 'birthday-dday-calculator.html'},
     'd_day': {'slug': 'd-day', 'template': 'd-day.html'},
@@ -365,6 +366,16 @@ STATIC_PAGE_REGISTRY = (
         priority="core",
         related_endpoints=("parent_child", "school_grade_calculator"),
         lastmod="2026-08-15",
+    ),
+    _page(
+        "days_between_dates",
+        "/days-between-dates",
+        "anniversary",
+        "두 날짜 사이 일수 계산기",
+        "시작일과 종료일 사이의 일수 및 주 수 계산",
+        priority="core",
+        related_endpoints=("d_day", "hundred_day_calculator", "birthday_dday_calculator"),
+        lastmod="2026-09-10",
     ),
     _page(
         "d_day",

@@ -13,6 +13,7 @@ from flask import g
 
 
 PATHS = {
+    '/days-between-dates': 'days-between-dates',
     '/age': 'age-calculator',
     '/birthday-dday-calculator': 'birthday-dday-calculator',
     '/d-day': 'd-day',
@@ -83,7 +84,7 @@ class LocalizedPageTests(unittest.TestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual('en', Markup(response.get_data(as_text=True)).attrs('html')[0]['lang'])
 
-    def test_sitemap_adds_exactly_thirty_localized_urls(self):
+    def test_sitemap_adds_only_supported_localized_urls(self):
         with patch('app.ADSENSE_REVIEW_MODE', True):
             root = self.client.get('/sitemap.xml').get_data(as_text=True)
             urls = []

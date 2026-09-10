@@ -4,6 +4,62 @@
     "language": "Idioma", "tagline": "Fechas cotidianas, calculadas con claridad.", "tools": "Calculadoras", "calculate": "Calcular", "reset": "Restablecer", "result": "Resultado", "year": "Año", "month": "Mes", "day": "Día", "choose_month": "Elige un mes", "birth_date": "Fecha de nacimiento", "reference_date": "Calcular la edad en", "today": "Hoy", "specific_date": "Una fecha específica", "birthday": "Cumpleaños", "start_date": "Fecha de inicio", "target_date": "Fecha del evento", "event_name": "Nombre del evento (opcional)", "event_placeholder": "Un viaje, examen o aniversario", "until": "Días que faltan", "since": "Días transcurridos", "year_a": "Primer año de nacimiento", "year_b": "Segundo año de nacimiento", "date_help": "Selecciona el mes e introduce el día y el año con cuatro cifras.", "privacy_note": "Tus fechas permanecen en este navegador. No se envían a nuestro servidor ni se guardan.", "js_required": "Activa JavaScript para usar la calculadora. Aun así, puedes leer las instrucciones y los ejemplos de abajo.", "faq": "Preguntas frecuentes", "related": "Prueba otra calculadora", "how": "Cómo funciona", "reference_label": "Fecha de referencia", "current_age": "Edad en años cumplidos", "exact_age": "Edad en años, meses y días", "total_days": "Días vividos", "total_months": "Meses cumplidos", "next_birthday": "Próximo cumpleaños", "days_until": "Días hasta el cumpleaños", "birthday_today": "¡Hoy es tu cumpleaños!", "days_remaining": "Días restantes", "days_elapsed": "Días transcurridos", "hundredth_date": "Día 100", "year_gap": "Diferencia entre años de nacimiento", "years_months": "Años y meses", "same_day": "Esa fecha es hoy.", "before_start": "La fecha de inicio aún no ha llegado.", "invalid_date": "Introduce una fecha real con un año de cuatro cifras.", "required": "Completa todos los campos obligatorios.", "future_birth": "La fecha de nacimiento no puede estar en el futuro.", "reference_before_birth": "La fecha de referencia debe ser igual o posterior a la fecha de nacimiento.", "invalid_year": "Elige un año de nacimiento dentro del intervalo disponible.", "date_range": "La fecha calculada está fuera del intervalo admitido de años con cuatro cifras.", "about": "Acerca de", "privacy": "Privacidad", "terms": "Términos", "contact": "Contacto", "korean_only": "en coreano", "footer": "Herramientas gratuitas para entender edades y fechas del calendario.", "copyright": "Todos los derechos reservados.", "cookie_notice": "Usamos cookies para análisis y publicidad. Puedes aceptar o rechazar el seguimiento opcional.", "accept": "Aceptar", "reject": "Rechazar", "back_top": "Volver arriba", "units": {"year": {"one": "{n} año", "other": "{n} años"}, "month": {"one": "{n} mes", "other": "{n} meses"}, "day": {"one": "{n} día", "other": "{n} días"}}, "duration_separator": " ", "months": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
   },
   "pages": {
+    "days_between_dates": {
+      "title": "Días entre fechas — Calculadora de días y semanas | AgeCalc",
+      "h1": "Calculadora de días entre fechas",
+      "description": "Calcula cuántos días hay entre dos fechas y consulta el resultado en semanas y días. Puedes incluir ambas fechas al contar un viaje, un evento o un proyecto.",
+      "intro": "Elige una fecha inicial y una final para calcular un período. No hace falta partir de hoy: ambas fechas pueden estar en el pasado o en el futuro.",
+      "form_title": "Calcula la diferencia entre fechas",
+      "ui": {
+        "end_date": "Fecha final",
+        "swap_dates": "Intercambiar fechas",
+        "include_end": "Incluir las fechas inicial y final",
+        "count_help": "Por defecto, la diferencia entre fechas iguales es 0 días. Incluir ambas fechas suma 1 día.",
+        "range_days": "Total de días",
+        "range_weeks": "Semanas y días restantes",
+        "end_before_start": "La fecha final es anterior a la inicial. Intercambia las fechas o elige una fecha final posterior.",
+        "inclusive_note": "Se incluyen ambas fechas: la diferencia entre fechas más 1 día.",
+        "exclusive_note": "Diferencia entre fechas: se incluye la fecha inicial y se excluye la final.",
+        "unit_week": {
+          "one": "{n} semana",
+          "other": "{n} semanas"
+        }
+      },
+      "sections": [
+        {
+          "heading": "Cuenta los días de un viaje o proyecto",
+          "paragraphs": [
+            "Puedes elegir dos fechas del calendario gregoriano. Se cuentan los fines de semana y festivos. No es una calculadora de días laborables, horas de trabajo ni plazos legales."
+          ]
+        },
+        {
+          "heading": "Cuándo incluir la fecha final",
+          "paragraphs": [
+            "Del 1 al 10 de septiembre de 2026 hay una diferencia de 9 días: 1 semana y 2 días. Al incluir ambas fechas, son 10 días: 1 semana y 3 días. Elige según quieras contar las fechas de estancia o la diferencia entre fechas."
+          ]
+        },
+        {
+          "heading": "Días del calendario, no horas",
+          "paragraphs": [
+            "El 29 de febrero se cuenta si está dentro del intervalo elegido. El cálculo no utiliza horas ni zonas horarias, por lo que el cambio de horario no produce fracciones de día. Tus fechas se procesan solo en el navegador."
+          ]
+        }
+      ],
+      "faq": [
+        {
+          "question": "¿Qué pasa si las fechas son iguales?",
+          "answer": "La diferencia es de 0 días. Al incluir ambas fechas, se cuenta ese día como 1 día."
+        },
+        {
+          "question": "¿Puedo introducir las fechas al revés?",
+          "answer": "Verás un aviso si la fecha final es anterior. Usa Intercambiar fechas para corregir el orden; no se cambia automáticamente."
+        },
+        {
+          "question": "¿En qué se diferencia de Días hasta / desde?",
+          "answer": "Días hasta / desde compara hoy con una fecha. Aquí puedes elegir tanto la fecha inicial como la final."
+        }
+      ]
+    },
     "age": {"title": "Calculadora de edad — Calcula tu edad exacta | AgeCalc", "h1": "Calculadora de edad", "description": "Calcula tu edad en años, meses y días, los días totales vividos y tu próximo cumpleaños. Averigua tu edad hoy o en una fecha concreta.", "intro": "¿Qué edad tengo hoy? Introduce tu fecha de nacimiento para ver tu edad, el tiempo natural vivido y la cuenta atrás para tu próximo cumpleaños.", "form_title": "Calcula tu edad exacta", "sections": [
       {"heading": "Edad de hoy o de una fecha específica", "paragraphs": ["Elige Hoy para usar la fecha actual de tu dispositivo. Para consultar el pasado o planificar el futuro, elige una fecha de referencia específica. El resultado siempre muestra la fecha usada en el cálculo.", "La edad cumplida es el año de referencia menos el año de nacimiento, restando un año si el cumpleaños aún no ha llegado. Por ejemplo, una persona nacida el 2 de octubre de 1992 tiene 33 años el 1 de octubre de 2026 y cumple 34 al día siguiente."]},
       {"heading": "Años, meses, días y tiempo total vivido", "paragraphs": ["La duración detallada comienza por los años completos, después cuenta hasta 11 meses naturales completos y, por último, los días restantes. Los meses conservan su duración real; los días vividos cuentan la diferencia entre fechas tomando el nacimiento como día cero.", "Los meses cumplidos son una medida mensual independiente. Si un mes es más corto, el aniversario mensual cae en su último día: del 31 de enero al 28 de febrero cuenta como un mes. Cerca de un cumpleaños el 29 de febrero, puede no coincidir con el desglose en años y meses."]},
