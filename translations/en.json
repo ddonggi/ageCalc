@@ -84,6 +84,31 @@
         }
       ]
     },
+    "date_add_subtract": {
+      "title": "Date Add or Subtract Calculator — Days, Weeks, Months | AgeCalc",
+      "h1": "Date Add or Subtract Calculator",
+      "description": "Add or subtract days, weeks, months or years from a start date. Find the resulting date, weekday and actual number of calendar days moved.",
+      "intro": "Choose a start date, direction, amount and unit to find a date in the future or past. The result includes the weekday and the actual calendar-day difference.",
+      "form_title": "Add or subtract time from a date",
+      "ui": {
+        "operation": "Operation", "add": "Add", "subtract": "Subtract", "amount": "Amount", "unit": "Unit",
+        "unit_day": "Days", "unit_week": "Weeks", "unit_month": "Months", "unit_year": "Years",
+        "result_date": "Calculated date", "calendar_days_moved": "Calendar days moved",
+        "month_end_note": "If the same day does not exist in the target month, the calculation uses that month's last day.",
+        "fixed_days_note": "Days move by one calendar day each; weeks move by seven calendar days each.",
+        "invalid_operation": "Choose Add or Subtract.", "invalid_amount": "Enter a whole number of zero or more.", "invalid_unit": "Choose a valid time unit."
+      },
+      "sections": [
+        {"heading": "How month ends and leap years are handled", "paragraphs": ["Days and weeks move by fixed numbers of calendar days. Months and years preserve the original day when possible; otherwise, the result is the last day of the target month. For example, 31 January 2025 plus one month is 28 February 2025, and 29 February 2024 plus one year is 28 February 2025."]},
+        {"heading": "The 100th day is not 100 days after", "paragraphs": ["This calculator treats the start date as day zero. Adding 100 days moves forward by 100 days. If the start date is day one, as with a baby's 100th day or a couple's 100-day milestone, add 99 days or use the 100th Day Calculator."]}
+      ],
+      "faq": [
+        {"question": "Can I calculate a date in the past?", "answer": "Yes. Choose Subtract to find a date before the start date."},
+        {"question": "What happens if I enter zero?", "answer": "The calculated date is the same as the start date."},
+        {"question": "Does one month mean 30 days?", "answer": "No. Months follow the actual Gregorian calendar month, including different month lengths and leap years."},
+        {"question": "Are the dates I enter saved?", "answer": "No. The calculation runs in your browser, and your dates are not sent to our server or saved."}
+      ]
+    },
     "age": {
       "title": "Age Calculator — Calculate Your Exact Age | AgeCalc", "h1": "Age Calculator",
       "description": "Calculate your age in years, months and days, total days lived and your next birthday. Find your age today or on a specific date.",

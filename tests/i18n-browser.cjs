@@ -2,7 +2,7 @@
 const assert = require('node:assert/strict');
 const {chromium} = require(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const base = process.env.I18N_TEST_BASE || 'http://127.0.0.1:8123';
-const slugs = ['age-calculator', 'birthday-dday-calculator', 'd-day', 'baby-months', '100-day-calculator', 'age-gap-calculator'];
+const slugs = ['age-calculator', 'birthday-dday-calculator', 'd-day', 'baby-months', '100-day-calculator', 'age-gap-calculator', 'days-between-dates', 'date-add-subtract-calculator'];
 
 (async () => {
     const browser = await chromium.launch({headless: true});
@@ -46,6 +46,14 @@ const slugs = ['age-calculator', 'birthday-dday-calculator', 'd-day', 'baby-mont
                     await fillDate('birth', '2025', '1', '31');
                 } else if (slug === '100-day-calculator') {
                     await fillDate('start', '2026', '1', '1');
+                } else if (slug === 'days-between-dates') {
+                    await fillDate('start', '2026', '9', '1');
+                    await fillDate('end', '2026', '9', '10');
+                } else if (slug === 'date-add-subtract-calculator') {
+                    await fillDate('start', '2025', '1', '31');
+                    await page.locator('[name="operation"][value="add"]').check();
+                    await page.locator('#shift-amount').fill('1');
+                    await page.locator('#shift-unit').selectOption('month');
                 } else {
                     await page.locator('#year_a').selectOption('1990');
                     await page.locator('#year_b').selectOption('1995');
@@ -54,7 +62,7 @@ const slugs = ['age-calculator', 'birthday-dday-calculator', 'd-day', 'baby-mont
                 await page.locator('#global-result').waitFor({state: 'visible'});
                 assert.equal(await page.locator('#calculator-error').innerText(), '');
                 const result = await page.locator('#result-values').innerText();
-                const expected = {'age-calculator': '34', 'birthday-dday-calculator': '0', 'd-day': '1', 'baby-months': '19', '100-day-calculator': '2026', 'age-gap-calculator': '5'};
+                const expected = {'age-calculator': '34', 'birthday-dday-calculator': '0', 'd-day': '1', 'baby-months': '19', '100-day-calculator': '2026', 'age-gap-calculator': '5', 'days-between-dates': '9', 'date-add-subtract-calculator': '2025'};
                 assert.ok(result.includes(expected[slug]), `${locale}/${slug}: ${result}`);
                 if (slug === 'd-day') {
                     const previousTitle = await page.locator('#result-title').innerText();
@@ -81,7 +89,7 @@ const slugs = ['age-calculator', 'birthday-dday-calculator', 'd-day', 'baby-mont
             assert.deepEqual(errors, []);
             await page.locator('.language-switcher summary').click();
             await page.locator('.language-switcher a[lang="ko"]').click();
-            assert.equal(page.url(), `${base}/age-gap-calculator`);
+            assert.equal(page.url(), `${base}/date-add-subtract-calculator`);
             await context.close();
         }
         const nojs = await browser.newContext({javaScriptEnabled: false, viewport: {width: 375, height: 812}});
@@ -111,7 +119,7 @@ const slugs = ['age-calculator', 'birthday-dday-calculator', 'd-day', 'baby-mont
         await page.screenshot({path: '/tmp/agecalc-i18n-korean.png'});
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'Korean language selector overflow');
         await desktop.close();
-        console.log('PASS 30 browser flows, JS-off language navigation, privacy and responsive checks');
+        console.log('PASS 40 browser flows, JS-off language navigation, privacy and responsive checks');
     } finally {
         await browser.close();
     }

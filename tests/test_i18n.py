@@ -14,6 +14,7 @@ from flask import g
 
 PATHS = {
     '/days-between-dates': 'days-between-dates',
+    '/date-add-subtract-calculator': 'date-add-subtract-calculator',
     '/age': 'age-calculator',
     '/birthday-dday-calculator': 'birthday-dday-calculator',
     '/d-day': 'd-day',
@@ -149,6 +150,25 @@ class LocalizedPageTests(unittest.TestCase):
             with app.test_request_context('/en/age-calculator'):
                 g.locale_code = 'en'
                 self.assertTrue(i18n_context(page, 'https://agecalc.cloud')['features']['year_age'])
+
+    def test_date_shift_calculator_has_six_indexable_equivalent_pages(self):
+        page = PAGE_BY_KEY['date_add_subtract']
+        paths = [entry['path'] for entry in localized_sitemap_entries([page])]
+        self.assertEqual([
+            '/date-add-subtract-calculator',
+            '/en/date-add-subtract-calculator',
+            '/ja/date-add-subtract-calculator',
+            '/es/date-add-subtract-calculator',
+            '/pt-br/date-add-subtract-calculator',
+            '/zh-cn/date-add-subtract-calculator',
+        ], paths)
+        for path in paths:
+            response = self.client.get(path)
+            self.assertEqual(200, response.status_code, path)
+            markup = Markup(response.get_data(as_text=True))
+            self.assertEqual(1, len(markup.attrs('h1')))
+            self.assertEqual(6, len(markup.attrs('link', rel='alternate')))
+            self.assertNotIn('noindex', response.headers.get('X-Robots-Tag', ''))
 
     def test_localized_tool_renders_when_age_does_not_support_its_language(self):
         with patch.dict(PAGE_BY_KEY['age'], {'supported_locales': ('ko', 'en')}), \

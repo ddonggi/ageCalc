@@ -127,7 +127,7 @@
                 </div>
                 <p>{{ selected_row.high_graduation_date }} 고등학교 졸업 시점 역산 기준입니다.</p>
                 <div class="footer-links">
-                    <a href="{{ url_for('school_entry_year_table', year=selected_row.birth_year) }}">{{ selected_row.birth_year_label }} 초·중·고 입학연도 확인</a>
+                    <a href="{{ url_for('school_grade_calculator', year=selected_row.birth_year) }}">{{ selected_row.birth_year_label }} 초·중·고 입학연도 확인</a>
                     <a href="{{ url_for('birth_year_age_table', year=selected_row.birth_year) }}">{{ selected_row.birth_year_label }} 현재 나이 확인</a>
                 </div>
             </article>
@@ -218,7 +218,7 @@
                 <p class="eyebrow">같이 보기</p>
                 <h2>연관 페이지</h2>
                 <div class="footer-links">
-                    <a href="{{ url_for('school_entry_year_table') }}">출생연도로 초·중·고 입학연도 확인</a>
+                    <a href="{{ url_for('school_grade_calculator') }}">출생연도로 초·중·고 입학연도 확인</a>
                     <a href="{{ url_for('birth_year_age_table') }}">출생연도로 현재 나이 확인</a>
                     <a href="{{ url_for('grade_birth_year_table') }}">현재 학년으로 출생연도 확인</a>
                 </div>

@@ -7,6 +7,7 @@ from content.locale_config import ALL_LOCALES
 
 # These are functional equivalents; Korean paths remain the established paths.
 LOCALIZED_PAGE_SETTINGS = {
+    'date_add_subtract': {'slug': 'date-add-subtract-calculator', 'template': 'partials/global-calculator.html', 'register_ko': True, 'lastmod': '2026-09-10'},
     'days_between_dates': {'slug': 'days-between-dates', 'template': 'partials/global-calculator.html', 'register_ko': True, 'lastmod': '2026-09-10'},
     'age': {'slug': 'age-calculator', 'template': 'age.html'},
     'birthday_dday_calculator': {'slug': 'birthday-dday-calculator', 'template': 'birthday-dday-calculator.html'},
@@ -375,6 +376,16 @@ STATIC_PAGE_REGISTRY = (
         "시작일과 종료일 사이의 일수 및 주 수 계산",
         priority="core",
         related_endpoints=("d_day", "hundred_day_calculator", "birthday_dday_calculator"),
+        lastmod="2026-09-10",
+    ),
+    _page(
+        "date_add_subtract",
+        "/date-add-subtract-calculator",
+        "anniversary",
+        "날짜 더하기·빼기 계산기",
+        "시작 날짜에 일·주·개월·연수를 더하거나 빼서 도착 날짜와 요일, 실제로 이동한 달력 일수 확인",
+        priority="core",
+        related_endpoints=("days_between_dates", "d_day", "hundred_day_calculator"),
         lastmod="2026-09-10",
     ),
     _page(

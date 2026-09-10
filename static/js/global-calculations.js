@@ -20,6 +20,7 @@
     }
 
     function iso(value) {
+        if (!(value instanceof Date) || !Number.isFinite(value.getTime())) throw new Error('date_range');
         const year = value.getUTCFullYear();
         if (year < 1 || year > 9999) throw new Error('date_range');
         return `${String(year).padStart(4, '0')}-${String(value.getUTCMonth() + 1).padStart(2, '0')}-${String(value.getUTCDate()).padStart(2, '0')}`;
@@ -54,6 +55,26 @@
         if (difference < 0) throw new Error('end_before_start');
         const days = difference + (includeEnd ? 1 : 0);
         return {days, weeks: Math.floor(days / 7), remainingDays: days % 7};
+    }
+
+    function dateShift(start, operation, amount, unit) {
+        const origin = date(start);
+        if (!['add', 'subtract'].includes(operation)) throw new Error('invalid_operation');
+        if (typeof amount !== 'number' || !Number.isSafeInteger(amount) || amount < 0) throw new Error('invalid_amount');
+        const count = amount;
+        if (!['day', 'week', 'month', 'year'].includes(unit)) throw new Error('invalid_unit');
+        const signed = operation === 'subtract' ? -count : count;
+        let shifted;
+        if (unit === 'day' || unit === 'week') {
+            shifted = rules.addUtcDays(origin, signed * (unit === 'week' ? 7 : 1));
+        } else {
+            const months = signed * (unit === 'year' ? 12 : 1);
+            const first = utc(origin.getUTCFullYear(), origin.getUTCMonth() + months, 1);
+            const lastDay = utc(first.getUTCFullYear(), first.getUTCMonth() + 1, 0).getUTCDate();
+            shifted = utc(first.getUTCFullYear(), first.getUTCMonth(), Math.min(origin.getUTCDate(), lastDay));
+        }
+        const shiftedIso = iso(shifted);
+        return {date: shiftedIso, days: daysBetween(start, shiftedIso)};
     }
 
     function monthlyAnchor(birth, months) {
@@ -136,5 +157,5 @@
         return Math.abs(values[0] - values[1]);
     }
 
-    return {isoParts, today, daysBetween, dateRange, completedMonths, duration, birthday, age, baby, hundred, yearGap};
+    return {isoParts, today, daysBetween, dateRange, dateShift, completedMonths, duration, birthday, age, baby, hundred, yearGap};
 }));

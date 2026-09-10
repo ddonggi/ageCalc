@@ -60,6 +60,20 @@
         }
       ]
     },
+    "date_add_subtract": {
+      "title": "Calculadora para sumar o restar fechas | AgeCalc", "h1": "Calculadora para sumar o restar fechas", "description": "Suma o resta días, semanas, meses o años a una fecha. Consulta la fecha resultante, el día de la semana y los días naturales desplazados.", "intro": "Elige una fecha inicial, si quieres sumar o restar, una cantidad y una unidad para encontrar una fecha pasada o futura.", "form_title": "Suma o resta tiempo a una fecha",
+      "ui": {"operation": "Operación", "add": "Sumar", "subtract": "Restar", "amount": "Cantidad", "unit": "Unidad", "unit_day": "Días", "unit_week": "Semanas", "unit_month": "Meses", "unit_year": "Años", "result_date": "Fecha calculada", "calendar_days_moved": "Días naturales desplazados", "month_end_note": "Si el mismo día no existe en el mes de destino, se usa el último día de ese mes.", "fixed_days_note": "Cada día avanza un día natural y cada semana, siete días naturales.", "invalid_operation": "Elige Sumar o Restar.", "invalid_amount": "Introduce un número entero igual o mayor que cero.", "invalid_unit": "Elige una unidad de tiempo válida."},
+      "sections": [
+        {"heading": "Cómo se calculan los finales de mes y los años bisiestos", "paragraphs": ["Los días y las semanas avanzan una cantidad fija de días naturales. Los meses y los años conservan el día original cuando existe; si no, el resultado es el último día del mes de destino. Por ejemplo, el 31 de enero de 2025 más un mes es el 28 de febrero de 2025."]},
+        {"heading": "El día 100 no es lo mismo que 100 días después", "paragraphs": ["Esta calculadora considera la fecha inicial como día cero. Para calcular el día 100 contando la fecha inicial como primer día, suma 99 días o usa la Calculadora del día 100."]}
+      ],
+      "faq": [
+        {"question": "¿Puedo calcular una fecha pasada?", "answer": "Sí. Elige Restar para buscar una fecha anterior a la fecha inicial."},
+        {"question": "¿Qué ocurre si introduzco cero?", "answer": "La fecha calculada será la misma que la fecha inicial."},
+        {"question": "¿Un mes equivale a 30 días?", "answer": "No. Los meses siguen el calendario gregoriano real, con meses de distinta duración y años bisiestos."},
+        {"question": "¿Se guardan las fechas que introduzco?", "answer": "No. El cálculo se realiza en el navegador y las fechas no se envían al servidor ni se guardan."}
+      ]
+    },
     "age": {"title": "Calculadora de edad — Calcula tu edad exacta | AgeCalc", "h1": "Calculadora de edad", "description": "Calcula tu edad en años, meses y días, los días totales vividos y tu próximo cumpleaños. Averigua tu edad hoy o en una fecha concreta.", "intro": "¿Qué edad tengo hoy? Introduce tu fecha de nacimiento para ver tu edad, el tiempo natural vivido y la cuenta atrás para tu próximo cumpleaños.", "form_title": "Calcula tu edad exacta", "sections": [
       {"heading": "Edad de hoy o de una fecha específica", "paragraphs": ["Elige Hoy para usar la fecha actual de tu dispositivo. Para consultar el pasado o planificar el futuro, elige una fecha de referencia específica. El resultado siempre muestra la fecha usada en el cálculo.", "La edad cumplida es el año de referencia menos el año de nacimiento, restando un año si el cumpleaños aún no ha llegado. Por ejemplo, una persona nacida el 2 de octubre de 1992 tiene 33 años el 1 de octubre de 2026 y cumple 34 al día siguiente."]},
       {"heading": "Años, meses, días y tiempo total vivido", "paragraphs": ["La duración detallada comienza por los años completos, después cuenta hasta 11 meses naturales completos y, por último, los días restantes. Los meses conservan su duración real; los días vividos cuentan la diferencia entre fechas tomando el nacimiento como día cero.", "Los meses cumplidos son una medida mensual independiente. Si un mes es más corto, el aniversario mensual cae en su último día: del 31 de enero al 28 de febrero cuenta como un mes. Cerca de un cumpleaños el 29 de febrero, puede no coincidir con el desglose en años y meses."]},

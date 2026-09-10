@@ -19,10 +19,10 @@ from content.page_registry import (
 
 class PageRegistryTests(unittest.TestCase):
     def test_registry_covers_current_static_and_guide_pages(self):
-        self.assertEqual(32, len(STATIC_PAGE_REGISTRY))
+        self.assertEqual(33, len(STATIC_PAGE_REGISTRY))
         self.assertEqual(4, len(HUB_PAGE_REGISTRY))
         self.assertEqual(20, len(GUIDE_PAGE_REGISTRY))
-        self.assertEqual(56, len(PUBLIC_PAGE_REGISTRY))
+        self.assertEqual(57, len(PUBLIC_PAGE_REGISTRY))
 
         self.assertEqual(
             {"index", "age", "blog_list"},

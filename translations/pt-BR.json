@@ -60,6 +60,20 @@
         }
       ]
     },
+    "date_add_subtract": {
+      "title": "Calculadora para somar ou subtrair datas | AgeCalc", "h1": "Calculadora para somar ou subtrair datas", "description": "Some ou subtraia dias, semanas, meses ou anos de uma data. Veja a data resultante, o dia da semana e os dias corridos deslocados.", "intro": "Escolha a data inicial, a operação, a quantidade e a unidade para encontrar uma data no futuro ou no passado.", "form_title": "Some ou subtraia tempo de uma data",
+      "ui": {"operation": "Operação", "add": "Somar", "subtract": "Subtrair", "amount": "Quantidade", "unit": "Unidade", "unit_day": "Dias", "unit_week": "Semanas", "unit_month": "Meses", "unit_year": "Anos", "result_date": "Data calculada", "calendar_days_moved": "Dias corridos deslocados", "month_end_note": "Se o mesmo dia não existir no mês de destino, será usado o último dia desse mês.", "fixed_days_note": "Cada dia avança um dia corrido e cada semana, sete dias corridos.", "invalid_operation": "Escolha Somar ou Subtrair.", "invalid_amount": "Digite um número inteiro igual ou maior que zero.", "invalid_unit": "Escolha uma unidade de tempo válida."},
+      "sections": [
+        {"heading": "Como funcionam o fim do mês e os anos bissextos", "paragraphs": ["Dias e semanas avançam quantidades fixas de dias corridos. Meses e anos mantêm o dia original quando ele existe; caso contrário, o resultado é o último dia do mês de destino. Por exemplo, 31 de janeiro de 2025 mais um mês é 28 de fevereiro de 2025."]},
+        {"heading": "O 100º dia não é 100 dias depois", "paragraphs": ["Esta calculadora considera a data inicial como dia zero. Para encontrar o 100º dia contando a data inicial como dia um, some 99 dias ou use a Calculadora do 100º dia."]}
+      ],
+      "faq": [
+        {"question": "Posso calcular uma data no passado?", "answer": "Sim. Escolha Subtrair para encontrar uma data anterior à data inicial."},
+        {"question": "O que acontece se eu digitar zero?", "answer": "A data calculada será igual à data inicial."},
+        {"question": "Um mês significa 30 dias?", "answer": "Não. Os meses seguem o calendário gregoriano real, inclusive meses com durações diferentes e anos bissextos."},
+        {"question": "As datas digitadas são salvas?", "answer": "Não. O cálculo acontece no navegador, e as datas não são enviadas ao servidor nem salvas."}
+      ]
+    },
     "age": {"title": "Calculadora de idade — Calcule sua idade exata | AgeCalc", "h1": "Calculadora de idade", "description": "Calcule sua idade em anos, meses e dias, o total de dias vividos e seu próximo aniversário. Descubra sua idade hoje ou em uma data específica.", "intro": "Quantos anos tenho hoje? Informe sua data de nascimento para ver sua idade, o tempo de calendário vivido e a contagem regressiva para o próximo aniversário.", "form_title": "Calcule sua idade exata", "sections": [
       {"heading": "Idade hoje ou em uma data específica", "paragraphs": ["Escolha Hoje para usar a data atual do seu dispositivo. Para consultar o passado ou planejar o futuro, escolha uma data de referência específica. O resultado sempre mostra a data usada no cálculo.", "A idade completa é o ano de referência menos o ano de nascimento, subtraindo mais um se o aniversário ainda não chegou. Por exemplo, alguém que nasceu em 2 de outubro de 1992 tem 33 anos em 1º de outubro de 2026 e faz 34 no dia seguinte."]},
       {"heading": "Anos, meses, dias e tempo total vivido", "paragraphs": ["A duração detalhada começa pelos anos completos, depois conta até 11 meses inteiros e, por fim, os dias restantes. Os meses usam suas durações reais; os dias vividos são a diferença entre as datas, com o nascimento como dia zero.", "Meses completos são uma medida mensal separada. Quando o mês é mais curto, a data mensal correspondente cai no último dia: de 31 de janeiro a 28 de fevereiro conta como um mês. Perto de um aniversário em 29 de fevereiro, o valor pode não coincidir com a divisão em anos e meses."]},

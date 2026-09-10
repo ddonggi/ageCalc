@@ -389,7 +389,11 @@ assert.strictEqual(publisherRefreshes, 0);
     def test_public_structured_data_uses_the_page_canonical(self):
         client = app.test_client()
         urls = [
-            *(str(page["path"]) for page in PUBLIC_PAGE_REGISTRY),
+            *(
+                str(page["path"])
+                for page in PUBLIC_PAGE_REGISTRY
+                if page.get("indexable", True)
+            ),
             "/birth-year-age-table?year=2010",
             "/college-entry-year-calculator?year=2024",
             "/college-entry-year-calculator?year=2025",
@@ -498,6 +502,8 @@ assert.strictEqual(publisherRefreshes, 0);
         self.assertEqual(404, client.get("/llms.txt/", follow_redirects=False).status_code)
 
         for page in PUBLIC_PAGE_REGISTRY:
+            if not page.get("indexable", True):
+                continue
             path = str(page["path"])
             with self.subTest(canonical_path=path):
                 self.assertEqual(200, client.get(path).status_code)
@@ -588,8 +594,6 @@ assert.strictEqual(publisherRefreshes, 0);
             "/birth-year-age-table?year=unknown": "/birth-year-age-table",
             "/birth-year-age-table?year=1800": "/birth-year-age-table",
             "/school-grade-calculator?year=": "/school-grade-calculator",
-            "/school-entry-year-table?year=2024~2026": "/school-entry-year-table",
-            "/grade-age-table?stage=middle&grade=4": "/grade-age-table",
             "/grade-birth-year-table?stage=unknown&grade=1": "/grade-birth-year-table",
             "/college-entry-year-calculator?year=": "/college-entry-year-calculator",
             "/college-entry-year-calculator?year=2024~2026": "/college-entry-year-calculator",
@@ -606,8 +610,6 @@ assert.strictEqual(publisherRefreshes, 0);
         invalid_urls = {
             "/birth-year-age-table?year=2010&year=2011": "/birth-year-age-table",
             "/school-grade-calculator?year=02010": "/school-grade-calculator",
-            "/school-entry-year-table?year=2019&utm_source=test": "/school-entry-year-table",
-            "/grade-age-table?stage=middle&grade=1&grade=2": "/grade-age-table",
             "/grade-birth-year-table?stage=middle&grade=1&extra=1": "/grade-birth-year-table",
             "/college-entry-year-calculator?year=2026&year=2025": "/college-entry-year-calculator",
             "/age-gap-calculator?year_a=2000": "/age-gap-calculator",
@@ -618,7 +620,6 @@ assert.strictEqual(publisherRefreshes, 0);
             "/baby-months-table?months=-1": "/baby-months-table",
             "/annual-age-calculator?birth_year=unknown": "/annual-age-calculator",
             "/age-comparison-table?year=2010&extra=1": "/age-comparison-table",
-            "/pet-age-table?pet=dog&years=2": "/pet-age-table",
             "/pet-months-table?pet=bird&months=6&size=small": "/pet-months-table",
             "/birth-year-zodiac-table?year=2024~2026": "/birth-year-zodiac-table",
             "/birthday-dday-calculator?month=2&day=30": "/birthday-dday-calculator",
@@ -653,8 +654,6 @@ assert.strictEqual(publisherRefreshes, 0);
         client = app.test_client()
         cases = {
             "/school-grade-calculator?year=2019": "/school-grade-calculator",
-            "/school-entry-year-table?year=2019": "/school-entry-year-table",
-            "/grade-age-table?stage=middle&grade=1": "/grade-age-table",
             "/grade-birth-year-table?stage=high&grade=1": "/grade-birth-year-table",
             "/age-gap-calculator?year_a=2000&year_b=2002": "/age-gap-calculator",
             "/age-gap-calculator?year_a=1990&year_b=1995": "/age-gap-calculator",
@@ -699,7 +698,6 @@ assert.strictEqual(publisherRefreshes, 0);
         client = app.test_client()
         cases = {
             "/school-grade-calculator?year=2015": "/school-grade-calculator",
-            "/school-entry-year-table?year=2015": "/school-entry-year-table",
             "/birth-year-age-table?year=2015": "/birth-year-age-table",
             "/college-entry-year-calculator?year=2021": "/college-entry-year-calculator",
             "/college-entry-year-calculator?year=2022": "/college-entry-year-calculator",
@@ -742,7 +740,6 @@ assert.strictEqual(publisherRefreshes, 0);
     def test_grade_result_queries_are_noindex_with_clean_canonicals(self):
         client = app.test_client()
         cases = {
-            "/grade-age-table?stage=middle&grade=1": "/grade-age-table",
             "/grade-birth-year-table?stage=high&grade=1": "/grade-birth-year-table",
         }
 
@@ -766,7 +763,7 @@ assert.strictEqual(publisherRefreshes, 0);
             *(f"stage=high&amp;grade={grade}" for grade in range(1, 4)),
         ]
 
-        for base_path in ("/grade-age-table", "/grade-birth-year-table"):
+        for base_path in ("/grade-birth-year-table",):
             html = client.get(base_path).get_data(as_text=True)
             for query in grade_variants:
                 with self.subTest(base_path=base_path, query=query):
@@ -783,10 +780,8 @@ assert.strictEqual(publisherRefreshes, 0);
     def test_priority_pages_use_search_intent_metadata(self):
         client = app.test_client()
         expected = {
-            "/grade-birth-year-table": "학년별 출생연도표 | 중1·고1은 몇 년생? | AgeCalc",
-            "/grade-age-table": "학년별 나이표 | 중1·중3·고1·고3은 몇 살? | AgeCalc",
+            "/grade-birth-year-table": "학년별 나이 계산기 | 중1·고1 나이·출생연도 | AgeCalc",
             "/school-grade-calculator": "학년 계산기 | 출생연도별 현재 학년 확인 | AgeCalc",
-            "/school-entry-year-table": "입학년도 계산기 | 출생연도별 초·중·고 입학년도 | AgeCalc",
             "/birth-year-age-table": "몇년생 몇살? 출생연도별 만나이·연나이 표 | AgeCalc",
             "/age": "만나이 계산기 | 생년월일·음력 생일로 현재 나이 계산 | AgeCalc",
             "/annual-age-calculator": "연나이 계산기 | 출생연도만으로 올해 연나이 확인 | AgeCalc",
@@ -836,15 +831,6 @@ assert.strictEqual(publisherRefreshes, 0);
     def test_school_page_group_keeps_one_owner_for_each_search_direction(self):
         client = app.test_client()
 
-        grade_age_html = client.get(
-            "/grade-age-table?stage=middle&grade=1"
-        ).get_data(as_text=True)
-        self.assertIn(
-            "<title>중1 나이 | 연나이·만나이 범위 | AgeCalc</title>",
-            grade_age_html,
-        )
-        self.assertNotIn("<title>중1 나이 | 몇 살·몇 년생?", grade_age_html)
-
         grade_birth_html = client.get("/grade-birth-year-table").get_data(as_text=True)
         for phrase in ("중1은 보통 2013년생", "고1은 보통 2010년생", "고3은 보통 2008년생"):
             with self.subTest(phrase=phrase):
@@ -861,10 +847,9 @@ assert.strictEqual(publisherRefreshes, 0);
             app_module, "_current_local_date", return_value=date(2026, 8, 13)
         ):
             grade_birth_html = client.get("/grade-birth-year-table").get_data(as_text=True)
-            grade_age_html = client.get("/grade-age-table").get_data(as_text=True)
 
         self.assertIn(
-            '<meta name="description" content="2026학년도 중1은 2013년생, 고1은 2010년생, 고3은 2008년생입니다. 학년별 일반 출생연도와 빠른년생·입학유예 예외를 확인하세요." />',
+            '<meta name="description" content="2026학년도 중1은 2013년생, 고1은 2010년생, 고3은 2008년생입니다. 학년별 일반 출생연도와 연나이·만나이 범위, 빠른년생·입학유예 예외를 확인하세요." />',
             grade_birth_html,
         )
         self.assertIn(
@@ -872,50 +857,19 @@ assert.strictEqual(publisherRefreshes, 0);
             grade_birth_html,
         )
         self.assertIn(
-            '<meta name="description" content="2026학년도 중1 13세, 중3 15세, 고1 16세, 고3 18세의 연나이와 생일 전후 만나이 범위를 확인하는 학년별 나이표입니다." />',
-            grade_age_html,
-        )
-        self.assertIn(
-            "2026학년도 중1은 연나이 13세, 중3은 15세, 고1은 16세, 고3은 18세입니다",
-            grade_age_html,
-        )
-        self.assertIn(
-            "중1은 만 12~13세, 중3은 만 14~15세, 고1은 만 15~16세, 고3은 만 17~18세",
-            grade_age_html,
-        )
-
-        self.assertIn(
-            "<title>학년별 출생연도표 | 중1·고1은 몇 년생? | AgeCalc</title>",
+            "<title>학년별 나이 계산기 | 중1·고1 나이·출생연도 | AgeCalc</title>",
             grade_birth_html,
         )
-        self.assertIn("<h1>학년별 출생연도표</h1>", grade_birth_html)
-        self.assertIn(
-            "<title>학년별 나이표 | 중1·중3·고1·고3은 몇 살? | AgeCalc</title>",
-            grade_age_html,
-        )
-        self.assertIn("<h1>학년별 나이표</h1>", grade_age_html)
+        self.assertIn("<h1>학년별 나이 계산기</h1>", grade_birth_html)
 
     def test_school_page_group_uses_directional_related_tool_anchors(self):
         client = app.test_client()
         expectations = {
             "/grade-birth-year-table": (
-                ('href="/grade-age-table"', "학년을 알 때 나이 범위 확인"),
                 ('href="/school-grade-calculator"', "출생연도로 현재 학년 확인"),
-                ('href="/school-entry-year-table"', "출생연도로 입학년도 확인"),
-            ),
-            "/grade-age-table": (
-                ('href="/grade-birth-year-table"', "학년을 알 때 출생연도 확인"),
-                ('href="/school-grade-calculator"', "출생연도로 현재 학년 확인"),
-                ('href="/school-entry-year-table"', "출생연도로 입학년도 확인"),
             ),
             "/school-grade-calculator": (
-                ('href="/grade-age-table"', "학년을 알 때 나이 범위 확인"),
-                ('href="/grade-birth-year-table"', "학년을 알 때 출생연도 확인"),
-                ('href="/school-entry-year-table"', "출생연도로 입학년도 확인"),
-            ),
-            "/school-entry-year-table": (
-                ('href="/school-grade-calculator"', "출생연도로 현재 학년 확인"),
-                ('href="/grade-birth-year-table"', "학년을 알 때 출생연도 확인"),
+                ('href="/grade-birth-year-table"', "학년별 나이와 출생연도 확인"),
             ),
         }
 
@@ -933,7 +887,6 @@ assert.strictEqual(publisherRefreshes, 0);
         self.assertTrue(all("?" not in location and "#" not in location for location in locations))
         for path in (
             "/birth-year-age-table",
-            "/grade-age-table",
             "/grade-birth-year-table",
             "/college-entry-year-calculator",
         ):
@@ -1051,12 +1004,10 @@ assert.strictEqual(publisherRefreshes, 0);
             "/age",
             "/birth-year-age-table",
             "/school-grade-calculator",
-            "/school-entry-year-table",
             "/age-gap-calculator",
             "/100-day-calculator",
             "/annual-age-calculator",
             "/age-comparison-table",
-            "/grade-age-table",
             "/pet-age-table",
             "/korean-age-guide",
             "/pet-months-table",
@@ -1200,7 +1151,7 @@ assert.strictEqual(publisherRefreshes, 0);
         self.assertIn("초등학교 입학", html)
         self.assertIn("중학교 입학", html)
         self.assertIn("현재 몇 학년인지", html)
-        self.assertIn("입학 시점만 확인하려면 입학년도 계산표를 보세요.", html)
+        self.assertIn("현재 학년을 확인한 뒤 가족의 나이와 학교생활 시점을 함께 살펴보세요.", html)
 
     def test_school_grade_calculator_highlights_selected_year(self):
         client = app.test_client()
@@ -1244,91 +1195,6 @@ assert.strictEqual(publisherRefreshes, 0);
                 ("grade_birth_year_table", "학년별 나이 계산기"),
             ],
         )
-
-    def test_school_entry_year_table_page_is_public(self):
-        client = app.test_client()
-        response = client.get("/school-entry-year-table")
-
-        self.assertEqual(response.status_code, 200)
-        html = response.get_data(as_text=True)
-        self.assertIn("입학년도 계산기", html)
-        self.assertIn("초등학교 입학년도", html)
-        self.assertIn("중학교 입학년도", html)
-        self.assertIn("고등학교 입학년도", html)
-        self.assertIn("입학년도 계산기", html)
-        self.assertIn("현재 학년이 아니라 입학 시점을 빠르게 확인할 때 사용합니다.", html)
-
-    def test_school_entry_year_table_leads_with_current_entry_year_answers(self):
-        client = app.test_client()
-        with mock.patch.object(app_module, "_current_local_date", return_value=date(2026, 8, 13)):
-            html = client.get("/school-entry-year-table").get_data(as_text=True)
-
-        self.assertIn("2026학년도 초등학교 입학생은 보통 2019년생", html)
-        self.assertIn("중학교는 2013년생", html)
-        self.assertIn("고등학교는 2010년생", html)
-        self.assertIn("출생연도 + 7·13·16", html)
-        self.assertIn("정확한 입학식 날짜는 학교 일정을 확인하세요", html)
-
-        direct_answer = html.index('aria-label="입학년도 바로 답변"')
-        for affiliate_marker in (
-            "info-coupang-promotions",
-            "coupang-mobile-banner",
-            "home-coupang-rail-left",
-        ):
-            if affiliate_marker in html:
-                self.assertLess(direct_answer, html.index(affiliate_marker))
-
-    def test_school_entry_year_table_uses_previous_school_year_in_january(self):
-        with mock.patch.object(app_module, "_current_local_date", return_value=date(2026, 1, 15)):
-            html = app.test_client().get("/school-entry-year-table").get_data(as_text=True)
-
-        self.assertIn("2025학년도 초등학교 입학생은 보통 2018년생", html)
-        self.assertIn("중학교는 2012년생", html)
-        self.assertIn("고등학교는 2009년생", html)
-
-    def test_school_entry_year_selected_result_is_an_entry_year_answer(self):
-        html = app.test_client().get(
-            "/school-entry-year-table?year=2018"
-        ).get_data(as_text=True)
-
-        self.assertIn(
-            "2018년생은 초등학교 2025학년도, 중학교 2031학년도, 고등학교 2034학년도 입학",
-            html,
-        )
-        self.assertIn("현재 학년은 학년 계산기에서 따로 확인하세요", html)
-
-    def test_school_entry_year_faq_matches_visible_copy(self):
-        html = app.test_client().get("/school-entry-year-table").get_data(as_text=True)
-        schemas, visible_text = _parse_page_markup(html)
-        visible_text = re.sub(r"\s+", " ", visible_text)
-        faq_pages = [schema for schema in schemas if schema.get("@type") == "FAQPage"]
-
-        self.assertEqual(1, len(faq_pages))
-        for question in faq_pages[0]["mainEntity"]:
-            self.assertIn(re.sub(r"\s+", " ", question["name"]), visible_text)
-            self.assertIn(
-                re.sub(r"\s+", " ", question["acceptedAnswer"]["text"]),
-                visible_text,
-            )
-
-    def test_school_entry_year_table_highlights_selected_year(self):
-        client = app.test_client()
-        response = client.get("/school-entry-year-table?year=2018")
-
-        self.assertEqual(response.status_code, 200)
-        html = response.get_data(as_text=True)
-        self.assertIn("선택한 출생년도", html)
-        self.assertIn("2018년생", html)
-        self.assertIn("2025학년도", html)
-
-    def test_school_entry_year_table_includes_adult_birth_year_options(self):
-        client = app.test_client()
-        response = client.get("/school-entry-year-table?year=1990")
-
-        self.assertEqual(response.status_code, 200)
-        html = response.get_data(as_text=True)
-        self.assertIn('<option value="1990" selected>1990년생</option>', html)
-        self.assertIn("초등학교 입학은 1997학년도", html)
 
     def test_age_gap_calculator_page_is_public(self):
         client = app.test_client()
@@ -1452,7 +1318,7 @@ assert.strictEqual(publisherRefreshes, 0);
 
         html = client.get("/d-day").get_data(as_text=True)
         css = Path("static/css/editorial-luxury.css").read_text(encoding="utf-8")
-        self.assertIn('src="/static/js/date-rules.js"', html)
+        self.assertRegex(html, r'src="/static/js/date-rules\.js\?v=[^"]+"')
         self.assertIn('<span class="toggle-slider" aria-hidden="true"></span>', html)
         self.assertIn('#mode-since:checked ~ .toggle-slider', css)
 
@@ -1574,7 +1440,7 @@ assert.strictEqual(publisherRefreshes, 0);
         html = response.get_data(as_text=True)
 
         self.assertEqual(200, response.status_code)
-        self.assertIn('href="/school-entry-year-table?year=2007"', html)
+        self.assertIn('href="/school-grade-calculator?year=2007"', html)
         self.assertIn("2007년생 초·중·고 입학연도 확인", html)
         self.assertIn('href="/birth-year-age-table?year=2007"', html)
         self.assertIn("2007년생 현재 나이 확인", html)
@@ -1672,28 +1538,6 @@ assert.strictEqual(publisherRefreshes, 0);
         self.assertIn("1992년생", html)
         self.assertIn("34세", html)
         self.assertIn("만 33~34세", html)
-
-    def test_grade_age_table_page_is_public(self):
-        client = app.test_client()
-        response = client.get("/grade-age-table")
-
-        self.assertEqual(response.status_code, 200)
-        html = response.get_data(as_text=True)
-        self.assertIn("학년 기준 나이표", html)
-        self.assertIn("초등학교 1학년", html)
-        self.assertIn("중학교 1학년", html)
-        self.assertIn("고등학교 1학년", html)
-
-    def test_grade_age_table_highlights_selected_grade(self):
-        client = app.test_client()
-        response = client.get("/grade-age-table?stage=elementary&grade=1")
-
-        self.assertEqual(response.status_code, 200)
-        html = response.get_data(as_text=True)
-        self.assertIn("선택한 학년", html)
-        self.assertIn("초등학교 1학년", html)
-        self.assertIn("2019년생", html)
-        self.assertIn("만 6~7세", html)
 
     def test_pet_age_table_page_is_public(self):
         client = app.test_client()
@@ -2123,8 +1967,8 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 "baby_months_table", "parent_child", "life_timeline",
             },
             "education": {
-                "school_grade_calculator", "school_entry_year_table", "college_entry_year_calculator",
-                "grade_age_table", "grade_birth_year_table",
+                "school_grade_calculator", "college_entry_year_calculator",
+                "grade_birth_year_table",
             },
             "anniversary": {"d_day", "birthday_dday_calculator", "hundred_day_calculator"},
             "pets": {"dog", "cat", "pet_age_table", "pet_months_table"},
@@ -2219,12 +2063,10 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
             "/age",
             "/birth-year-age-table",
             "/school-grade-calculator",
-            "/school-entry-year-table",
             "/age-gap-calculator",
             "/100-day-calculator",
             "/annual-age-calculator",
             "/age-comparison-table",
-            "/grade-age-table",
             "/pet-age-table",
             "/korean-age-guide",
             "/pet-months-table",
@@ -2238,7 +2080,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
             "/parent-child",
         )
 
-        self.assertEqual(20, len(core_paths))
+        self.assertEqual(18, len(core_paths))
         for path in core_paths:
             with self.subTest(path=path):
                 response = client.get(path)
@@ -2261,8 +2103,6 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         ymyl_paths = (
             "/age",
             "/school-grade-calculator",
-            "/school-entry-year-table",
-            "/grade-age-table",
             "/dog",
             "/cat",
             "/baby-months",
@@ -2333,18 +2173,6 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 "출생연도로 현재 학년과 졸업 예정 학년도를 계산합니다",
                 "현재 학년 계산",
                 "학년도와 1~2월 기준",
-                "조기입학·입학유예·해외 학제",
-            ),
-            "/school-entry-year-table": (
-                "출생연도로 초등학교·중학교·고등학교 입학 학년도를 확인합니다",
-                "입학 시점 계산",
-                "취학통지서와 실제 입학",
-                "조기입학·입학유예·해외 학제",
-            ),
-            "/grade-age-table": (
-                "학년을 선택하면 일반적인 나이 범위가 나옵니다",
-                "학년별 나이 해석",
-                "같은 학년의 나이가 다른 이유",
                 "조기입학·입학유예·해외 학제",
             ),
             "/grade-birth-year-table": (
@@ -2446,9 +2274,8 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
 
         self.assertIn("/guides/sixtieth-seventieth-eightieth-age-guide", script)
         self.assertIn("/school-grade-calculator?year=", script)
-        self.assertIn("/school-entry-year-table?year=", script)
         self.assertIn("환갑·칠순 기준 보기", script)
-        self.assertIn("자녀 학교 시점 보기", script)
+        self.assertIn("자녀 학년과 입학 시점 보기", script)
 
     def test_core_pet_pages_have_distinct_deep_content_sections(self):
         client = app.test_client()
@@ -2521,8 +2348,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 "h1": "부모·자녀 나이 관계 계산기",
                 "links": (
                     '<a href="/age-gap-calculator">두 출생연도의 나이 차이 비교</a>',
-                    '<a href="/school-grade-calculator">자녀의 현재 학년 확인</a>',
-                    '<a href="/school-entry-year-table">자녀의 초·중·고 입학년도 확인</a>',
+                    '<a href="/school-grade-calculator">자녀 학년과 입학 시점 보기</a>',
                     '<a href="/guides/sixtieth-seventieth-eightieth-age-guide">환갑·칠순·팔순 기준 읽기</a>',
                 ),
             },
@@ -2602,16 +2428,14 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
             "/birthday-dday-calculator": 'id="birthday-dday-form"',
             "/birth-year-age-table": 'action="/birth-year-age-table"',
             "/school-grade-calculator": 'action="/school-grade-calculator"',
-            "/school-entry-year-table": 'action="/school-entry-year-table"',
-            "/age-gap-calculator": 'action="/age-gap-calculator"',
+            "/age-gap-calculator": 'action="/age-gap-calculator#age-gap-result"',
             "/baby-months-table": 'action="/baby-months-table"',
-            "/annual-age-calculator": 'action="/annual-age-calculator"',
+            "/annual-age-calculator": 'action="/annual-age-calculator#annual-age-result"',
             "/age-comparison-table": 'action="/age-comparison-table"',
-            "/grade-age-table": 'action="/grade-age-table"',
             "/pet-age-table": 'action="/pet-age-table"',
             "/pet-months-table": 'action="/pet-months-table"',
             "/grade-birth-year-table": 'action="/grade-birth-year-table"',
-            "/birth-year-zodiac-table": 'action="/birth-year-zodiac-table"',
+            "/birth-year-zodiac-table": 'action="/birth-year-zodiac-table#birth-year-zodiac-result"',
             "/college-entry-year-calculator": 'action="/college-entry-year-calculator"',
         }
 
@@ -2635,7 +2459,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         client = app.test_client()
         page_forms = {
             "/age": 'id="age-form"',
-            "/annual-age-calculator": 'action="/annual-age-calculator"',
+            "/annual-age-calculator": 'action="/annual-age-calculator#annual-age-result"',
             "/school-grade-calculator": 'action="/school-grade-calculator"',
             "/birthday-dday-calculator": 'id="birthday-dday-form"',
             "/baby-months": 'id="baby-months-form"',
@@ -2645,16 +2469,14 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
             "/parent-child": 'id="parent-child-form"',
             "/life-timeline": 'id="life-timeline-form"',
             "/100-day-calculator": 'id="hundred-day-form"',
-            "/age-gap-calculator": 'action="/age-gap-calculator"',
+            "/age-gap-calculator": 'action="/age-gap-calculator#age-gap-result"',
             "/age-comparison-table": 'action="/age-comparison-table"',
             "/birth-year-age-table": 'action="/birth-year-age-table"',
-            "/birth-year-zodiac-table": 'action="/birth-year-zodiac-table"',
+            "/birth-year-zodiac-table": 'action="/birth-year-zodiac-table#birth-year-zodiac-result"',
             "/baby-months-table": 'action="/baby-months-table"',
-            "/grade-age-table": 'action="/grade-age-table"',
             "/grade-birth-year-table": 'action="/grade-birth-year-table"',
             "/pet-age-table": 'action="/pet-age-table"',
             "/pet-months-table": 'action="/pet-months-table"',
-            "/school-entry-year-table": 'action="/school-entry-year-table"',
             "/college-entry-year-calculator": 'action="/college-entry-year-calculator"',
         }
 
@@ -2767,19 +2589,6 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
             "/school-grade-calculator?year=2015": (
                 "2028학년도 중학교 입학",
                 "2034년 2월 고등학교 졸업 예정",
-                'href="/school-entry-year-table?year=2015"',
-                'href="/parent-child"',
-            ),
-            "/school-entry-year-table?year=2019": (
-                "2026학년도 초등학교 입학",
-                "2038년 2월 고등학교 졸업 예정",
-                'href="/school-grade-calculator?year=2019"',
-                'href="/parent-child"',
-            ),
-            "/grade-age-table?stage=middle&grade=1": (
-                "중학교 1학년",
-                "고등학교 입학 시점 확인",
-                'href="/school-entry-year-table',
                 'href="/parent-child"',
             ),
             "/grade-birth-year-table?stage=high&grade=1": (
@@ -2811,7 +2620,6 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
             "/age",
             "/birth-year-age-table",
             "/school-grade-calculator",
-            "/school-entry-year-table",
             "/100-day-calculator",
             "/pet-age-table",
             "/birthday-dday-calculator",
@@ -3520,7 +3328,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         client = app.test_client()
 
         with mock.patch.object(app_module, "COUPANG_PARTNERS_ENABLED", True):
-            for path in ["/college-entry-year-calculator", "/school-entry-year-table", "/school-grade-calculator"]:
+            for path in ["/college-entry-year-calculator", "/school-grade-calculator"]:
                 with self.subTest(path=path):
                     response = client.get(path)
 
@@ -4431,7 +4239,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         self.assertIsNotNone(quick_links)
         self.assertEqual(3, quick_links.group(0).count("<a "))
         self.assertIn('href="/birth-year-age-table"', quick_links.group(0))
-        self.assertIn('href="/school-entry-year-table"', quick_links.group(0))
+        self.assertIn('href="/school-grade-calculator"', quick_links.group(0))
         self.assertIn('href="/birth-year-zodiac-table"', quick_links.group(0))
         self.assertNotIn('href="/baby-months"', quick_links.group(0))
 
@@ -4471,7 +4279,6 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
             "/birthday-dday-calculator": ("생일 D-day 계산기", "2월 29일", "계산 기준"),
             "/birth-year-age-table": ("출생연도별 나이표", "1992", "예시"),
             "/school-grade-calculator": ("학년 계산기", "2019", "계산 기준"),
-            "/school-entry-year-table": ("입학년도", "2019", "계산 기준"),
             "/baby-months": ("아이 개월수 계산기", "2025", "월령"),
         }
 
@@ -4528,13 +4335,11 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
             "/age",
             "/birth-year-age-table",
             "/school-grade-calculator",
-            "/school-entry-year-table",
             "/age-gap-calculator",
             "/100-day-calculator",
             "/baby-months-table",
             "/annual-age-calculator",
             "/age-comparison-table",
-            "/grade-age-table",
             "/pet-age-table",
             "/pet-months-table",
             "/grade-birth-year-table",
@@ -4869,13 +4674,13 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         self.assertIn("https://agecalc.cloud/references", body)
         self.assertIn("https://agecalc.cloud/birth-year-age-table", body)
         self.assertIn("https://agecalc.cloud/school-grade-calculator", body)
-        self.assertIn("https://agecalc.cloud/school-entry-year-table", body)
+        self.assertNotIn("https://agecalc.cloud/school-entry-year-table", body)
         self.assertIn("https://agecalc.cloud/age-gap-calculator", body)
         self.assertIn("https://agecalc.cloud/100-day-calculator", body)
         self.assertIn("https://agecalc.cloud/baby-months-table", body)
         self.assertIn("https://agecalc.cloud/annual-age-calculator", body)
         self.assertIn("https://agecalc.cloud/age-comparison-table", body)
-        self.assertIn("https://agecalc.cloud/grade-age-table", body)
+        self.assertNotIn("https://agecalc.cloud/grade-age-table", body)
         self.assertIn("https://agecalc.cloud/pet-age-table", body)
         self.assertIn("https://agecalc.cloud/korean-age-guide", body)
         self.assertIn("https://agecalc.cloud/pet-months-table", body)
@@ -5011,32 +4816,33 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         self.assertNotIn("window.innerWidth > 980", navigation)
 
     def test_desktop_header_exposes_the_full_category_menu_panel(self):
-        css = Path("static/css/style.css").read_text(encoding="utf-8")
+        css = Path("static/css/editorial-luxury.css").read_text(encoding="utf-8")
         navigation = Path("static/js/navigation.js").read_text(encoding="utf-8")
 
         self.assertRegex(
             css,
             re.compile(
                 r"@media\s*\(min-width:\s*901px\)\s*\{.*?"
-                r"\.menu-toggle\s*\{[^}]*display:\s*inline-flex;.*?"
-                r"\.mobile-nav-panel\s*\{[^}]*top:\s*var\(--desktop-header-height\);",
+                r"\.desktop-menu-toggle\s*\{[^}]*display:\s*inline-flex;.*?"
+                r"\.desktop-nav-panel\s*\{[^}]*top:\s*var\(--desktop-header-height\);",
                 re.DOTALL,
             ),
         )
         self.assertNotIn("window.innerWidth > 900", navigation)
+        self.assertIn("[data-desktop-nav-toggle]", navigation)
+        self.assertIn("[data-desktop-nav-panel]", navigation)
 
     def test_desktop_full_menu_uses_a_right_aligned_vertical_drawer(self):
-        css = Path("static/css/style.css").read_text(encoding="utf-8")
+        css = Path("static/css/editorial-luxury.css").read_text(encoding="utf-8")
 
         self.assertRegex(
             css,
             re.compile(
                 r"@media\s*\(min-width:\s*901px\)\s*\{.*?"
-                r"\.mobile-nav-panel\s*\{[^}]*top:\s*var\(--desktop-header-height\);[^}]*right:\s*0;[^}]*bottom:\s*0;[^}]*"
-                r"height:\s*calc\(100vh\s*-\s*var\(--desktop-header-height\)\);[^}]*"
-                r"width:\s*min\(460px,\s*92vw\);[^}]*transform:\s*translateX\(100%\);.*?"
-                r"\.mobile-nav-panel\.is-open\s*\{[^}]*transform:\s*translateX\(0\);.*?"
-                r"\.mobile-hub-groups\s*\{[^}]*grid-template-columns:\s*1fr;",
+                r"\.desktop-nav-panel\s*\{[^}]*top:\s*var\(--desktop-header-height\);[^}]*right:\s*0;[^}]*bottom:\s*0;[^}]*"
+                r"width:\s*min\(460px,\s*100vw\);[^}]*transform:\s*translateX\(100%\);.*?"
+                r"\.desktop-nav-panel\.is-open\s*\{[^}]*transform:\s*translateX\(0\);.*?"
+                r"\.desktop-nav-groups\s*\{[^}]*display:\s*grid;",
                 re.DOTALL,
             ),
         )

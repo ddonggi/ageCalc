@@ -10,6 +10,7 @@
     const numbers = new Intl.NumberFormat(config.locale);
     const plurals = new Intl.PluralRules(config.locale);
     const dates = new Intl.DateTimeFormat(config.locale, {year: 'numeric', month: 'long', day: 'numeric', calendar: 'gregory', timeZone: 'UTC'});
+    const datesWithWeekday = new Intl.DateTimeFormat(config.locale, {year: 'numeric', month: 'long', day: 'numeric', weekday: 'long', calendar: 'gregory', timeZone: 'UTC'});
     const errorElement = document.getElementById('calculator-error');
     const result = document.getElementById('global-result');
     const values = document.getElementById('result-values');
@@ -24,6 +25,10 @@
         return dates.format(new Date(`${value}T00:00:00Z`));
     }
 
+    function formatDateWithWeekday(value) {
+        return datesWithWeekday.format(new Date(`${value}T00:00:00Z`));
+    }
+
     function readDate(name, withYear = true) {
         const group = form.querySelector(`[data-date="${name}"]`);
         const get = part => group.querySelector(`[data-part="${part}"]`).value.trim();
@@ -35,6 +40,7 @@
     function row(label, value) {
         const wrapper = document.createElement('div');
         wrapper.className = 'global-result-row';
+        wrapper.dataset.resultKey = label;
         const term = document.createElement('dt');
         const detail = document.createElement('dd');
         term.textContent = ui[label];
@@ -91,7 +97,19 @@
         try {
             const today = rules.today();
             let reference = today;
-            if (config.kind === 'days_between_dates') {
+            if (config.kind === 'date_add_subtract') {
+                const start = readDate('start').iso;
+                const operation = form.querySelector('[name="operation"]:checked')?.value;
+                const amountValue = document.getElementById('shift-amount').value.trim();
+                if (!amountValue) throw new Error('required');
+                const amount = Number(amountValue);
+                const selectedUnit = document.getElementById('shift-unit').value;
+                const answer = rules.dateShift(start, operation, amount, selectedUnit);
+                row('result_date', formatDateWithWeekday(answer.date));
+                row('start_date', formatDate(start));
+                row('calendar_days_moved', unit(Math.abs(answer.days), 'day'));
+                note.textContent = ['month', 'year'].includes(selectedUnit) ? ui.month_end_note : ui.fixed_days_note;
+            } else if (config.kind === 'days_between_dates') {
                 const start = readDate('start').iso;
                 const end = readDate('end').iso;
                 const inclusive = document.getElementById('include-end').checked;
@@ -141,7 +159,7 @@
             } else if (config.kind === 'age_gap_calculator') {
                 row('year_gap', unit(rules.yearGap(document.getElementById('year_a').value, document.getElementById('year_b').value, today), 'year'));
             }
-            if (config.kind !== 'days_between_dates') row('reference_label', formatDate(reference));
+            if (!['days_between_dates', 'date_add_subtract'].includes(config.kind)) row('reference_label', formatDate(reference));
             result.hidden = false;
             result.focus({preventScroll: true});
             result.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'nearest'});
