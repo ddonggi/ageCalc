@@ -43,7 +43,8 @@ Thumbs.db
 *.backup
 
 # Runtime data
-data/
+data/*
+!data/regional_holidays.json
 _data/*
 !_data/README.md
 static/generated/

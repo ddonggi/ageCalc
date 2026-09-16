@@ -188,7 +188,7 @@ class ContentQualityAuditTests(unittest.TestCase):
     def test_operational_audit_allows_warnings_on_46_public_pages(self):
         report = audit_local_pages()
 
-        self.assertEqual(46, len(report.results))
+        self.assertEqual(51, len(report.results))
         self.assertEqual(0, report.error_count)
         self.assertGreater(report.warning_count, 0)
         self.assertTrue(report.ok)

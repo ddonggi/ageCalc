@@ -93,6 +93,14 @@ class LocalizedPageTests(unittest.TestCase):
                 xml = self.client.get(url.replace('https://agecalc.cloud', '')).get_data(as_text=True)
                 urls.extend(re.findall(r'<loc>(.*?)</loc>', xml))
         expected = {f'https://agecalc.cloud/{prefix}/{slug}' for prefix in list(LANGUAGES.values())[1:] for slug in PATHS.values()}
+        expected.update({
+            'https://agecalc.cloud/ja/business-days-calculator',
+            'https://agecalc.cloud/pt-br/business-days-calculator',
+            'https://agecalc.cloud/ja/school-year-calculator',
+            'https://agecalc.cloud/en/date-of-birth-calculator',
+            'https://agecalc.cloud/pt-br/date-of-birth-calculator',
+            'https://agecalc.cloud/ja/japanese-era-converter',
+        })
         localized = {url for url in urls if any(f'/{prefix}/' in url for prefix in list(LANGUAGES.values())[1:])}
         self.assertEqual(expected, localized)
         self.assertEqual(REVIEW_URLS, set(urls))

@@ -7,6 +7,11 @@ from content.locale_config import ALL_LOCALES
 
 # These are functional equivalents; Korean paths remain the established paths.
 LOCALIZED_PAGE_SETTINGS = {
+    'lunar_birthday': {'slug': 'lunar-birthday-calculator', 'template': 'partials/regional-calculator.html', 'register_ko': True, 'lastmod': '2026-09-15'},
+    'business_days': {'slug': 'business-days-calculator', 'template': 'partials/regional-calculator.html', 'lastmod': '2026-09-15'},
+    'school_year': {'slug': 'school-year-calculator', 'template': 'partials/regional-calculator.html', 'lastmod': '2026-09-15'},
+    'birth_date_range': {'slug': 'date-of-birth-calculator', 'template': 'partials/regional-calculator.html', 'lastmod': '2026-09-15'},
+    'japanese_era': {'slug': 'japanese-era-converter', 'template': 'partials/regional-calculator.html', 'lastmod': '2026-09-15'},
     'date_add_subtract': {'slug': 'date-add-subtract-calculator', 'template': 'partials/global-calculator.html', 'register_ko': True, 'lastmod': '2026-09-10'},
     'days_between_dates': {'slug': 'days-between-dates', 'template': 'partials/global-calculator.html', 'register_ko': True, 'lastmod': '2026-09-10'},
     'age': {'slug': 'age-calculator', 'template': 'age.html'},
@@ -301,7 +306,7 @@ STATIC_PAGE_REGISTRY = (
         "생일 D-day 계산기",
         "다음 생일까지 남은 날짜 계산",
         priority="core",
-        related_endpoints=("hundred_day_calculator", "baby_months"),
+        related_endpoints=("hundred_day_calculator", "baby_months", "lunar_birthday"),
         lastmod="2026-08-13",
     ),
     _page(
@@ -387,6 +392,36 @@ STATIC_PAGE_REGISTRY = (
         priority="core",
         related_endpoints=("days_between_dates", "d_day", "hundred_day_calculator"),
         lastmod="2026-09-10",
+    ),
+    _page(
+        "lunar_birthday", "/lunar-birthday-calculator", "anniversary",
+        "음력 생일 계산기", "올해와 앞으로의 음력 생일을 양력 날짜로 계산",
+        priority="core", related_endpoints=("birthday_dday_calculator", "age", "d_day"),
+        lastmod="2026-09-15", locales=("ko",), culture="korean",
+    ),
+    _page(
+        "business_days", "/ja/business-days-calculator", "anniversary",
+        "営業日・dias úteis 계산기", "국가 공휴일과 주말을 제외한 영업일 계산",
+        priority="core", related_endpoints=("days_between_dates", "date_add_subtract", "d_day"),
+        lastmod="2026-09-15", locales=("ja", "pt-BR"), culture="regional",
+    ),
+    _page(
+        "school_year", "/ja/school-year-calculator", "education",
+        "入学・卒業年度計算", "生年月日から入学年と卒業年を計算",
+        priority="core", related_endpoints=("age", "business_days", "japanese_era"),
+        lastmod="2026-09-15", locales=("ja",), culture="japanese",
+    ),
+    _page(
+        "birth_date_range", "/en/date-of-birth-calculator", "age",
+        "Date of birth range calculator", "기준일의 완료 나이로 가능한 출생일 범위 계산",
+        priority="core", related_endpoints=("age", "days_between_dates", "age_gap_calculator"),
+        lastmod="2026-09-15", locales=("en", "pt-BR"), culture="regional",
+    ),
+    _page(
+        "japanese_era", "/ja/japanese-era-converter", "anniversary",
+        "和暦・西暦変換", "明治以降の和暦と西暦の日付を相互変換",
+        priority="core", related_endpoints=("school_year", "age", "date_add_subtract"),
+        lastmod="2026-09-15", locales=("ja",), culture="japanese",
     ),
     _page(
         "d_day",
@@ -661,4 +696,8 @@ def indexable_pages_for_sitemap(
     return hub_pages + static_pages
 
 
-PUBLIC_SITEMAP_ENDPOINTS = tuple(page["endpoint"] for page in STATIC_PAGE_REGISTRY if page["indexable"])
+PUBLIC_SITEMAP_ENDPOINTS = tuple(
+    page["endpoint"]
+    for page in STATIC_PAGE_REGISTRY
+    if page["indexable"] and "ko" in page.get("supported_locales", ("ko",))
+)

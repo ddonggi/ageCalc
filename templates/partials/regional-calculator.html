@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="{{ locale_code }}">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{{ copy.title }}</title>
+    <meta name="description" content="{{ copy.description }}" />
+    <link rel="canonical" href="{{ page_canonical_url }}" />
+    {% include 'partials/hreflang.html' %}
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AgeCalc" />
+    <meta property="og:title" content="{{ copy.title }}" />
+    <meta property="og:description" content="{{ copy.description }}" />
+    <meta property="og:url" content="{{ page_canonical_url }}" />
+    <meta property="og:image" content="{{ site_base_url }}/static/images/og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.ico" />
+    {% if locale_code == 'ko' %}
+    <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
+    {% endif %}
+    <link rel="stylesheet" href="{{ versioned_static('css/i18n.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/regional-calculator.css') }}" />
+    {% for schema in global_schema %}<script type="application/ld+json" nonce="{{ csp_nonce }}">{{ schema | tojson }}</script>{% endfor %}
+    {% include 'partials/adsense.html' %}
+    <script src="{{ versioned_static('js/cookie-consent.js') }}" defer></script>
+    <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
+</head>
+<body class="global-page regional-page">
+<div class="container">
+    {% if locale_code == 'ko' %}
+    {% include 'partials/header.html' %}
+    {% else %}
+    <header class="global-header">
+        <div><a class="brand" href="{{ global_home }}">AgeCalc</a><p class="brand-note">{{ ui.tagline }}</p></div>
+        {% include 'partials/language-switcher.html' %}
+    </header>
+    <nav class="global-tools" aria-label="{{ ui.tools }}">
+        {% for tool in global_nav %}<a href="{{ tool.url }}"{% if tool.url == request.path %} aria-current="page"{% endif %}>{{ tool.label }}</a>{% endfor %}
+    </nav>
+    {% endif %}
+    <main>
+        {% if locale_code != 'ko' %}
+        <nav class="breadcrumbs" aria-label="{{ ui.tools }}">
+            {% for item in global_breadcrumbs %}{% if not loop.last %}<a href="{{ item.url }}">{{ item.label }}</a> / {% else %}<span aria-current="page">{{ item.label }}</span>{% endif %}{% endfor %}
+        </nav>
+        {% endif %}
+        <section class="global-hero regional-hero">
+            <p class="regional-kicker">AgeCalc · {{ locale_config.name }}</p>
+            <h1>{{ copy.h1 }}</h1>
+            <p>{{ copy.intro }}</p>
+        </section>
+
+        <div class="global-workspace regional-workspace">
+            <section class="global-panel regional-form-panel">
+                <h2>{{ copy.form_title }}</h2>
+                <form method="post" action="{{ request.path }}" autocomplete="off" data-clarity-mask="true">
+                    {% if page_key == 'lunar_birthday' %}
+                    <div class="regional-field-grid compact">
+                        <label>{{ copy.fields.month }}<select name="month" required>{% for number in range(1, 13) %}<option value="{{ number }}"{% if form_values.get('month', '1') == number|string %} selected{% endif %}>{{ number }}</option>{% endfor %}</select></label>
+                        <label>{{ copy.fields.day }}<select name="day" required>{% for number in range(1, 31) %}<option value="{{ number }}"{% if form_values.get('day', '1') == number|string %} selected{% endif %}>{{ number }}</option>{% endfor %}</select></label>
+                    </div>
+                    <label class="global-checkbox"><input type="checkbox" name="leap" value="1"{% if form_values.get('leap') == '1' %} checked{% endif %} />{{ copy.fields.leap }}</label>
+                    <label>{{ copy.fields.reference }}<input type="date" name="reference" value="{{ form_values.get('reference', today_iso) }}" required /></label>
+                    {% elif page_key == 'business_days' %}
+                    <fieldset><legend>{{ copy.fields.mode }}</legend><div class="global-options">
+                        {% for value in ('count', 'add', 'subtract') %}<label><input type="radio" name="mode" value="{{ value }}"{% if form_values.get('mode', 'count') == value %} checked{% endif %} />{{ copy.fields[value] }}</label>{% endfor %}
+                    </div></fieldset>
+                    <div class="regional-field-grid">
+                        <label>{{ copy.fields.start }}<input type="date" name="start" value="{{ form_values.get('start', '') }}" min="2025-01-01" max="2027-12-31" required /></label>
+                        <label>{{ copy.fields.end }}<input type="date" name="end" value="{{ form_values.get('end', '') }}" min="2025-01-01" max="2027-12-31" /></label>
+                        <label>{{ copy.fields.amount }}<input type="number" name="amount" value="{{ form_values.get('amount', '1') }}" min="0" step="1" /></label>
+                    </div>
+                    <label class="global-checkbox"><input type="checkbox" name="include_end" value="1"{% if form_values.get('include_end') == '1' %} checked{% endif %} />{{ copy.fields.include_end }}</label>
+                    <label>{{ copy.fields.excluded }}<textarea name="excluded" rows="4" placeholder="2026-12-31">{{ form_values.get('excluded', '') }}</textarea></label>
+                    {% elif page_key == 'school_year' %}
+                    <label>{{ copy.fields.birth }}<input type="date" name="birth" value="{{ form_values.get('birth', '') }}" required /></label>
+                    <div class="regional-field-grid">
+                        <label>{{ copy.fields.gap }}<select name="gap">{% for number in range(0, 11) %}<option value="{{ number }}"{% if form_values.get('gap', '0') == number|string %} selected{% endif %}>{{ number }}</option>{% endfor %}</select></label>
+                        <label>{{ copy.fields.course }}<select name="course">{% for number in (2, 4, 6) %}<option value="{{ number }}"{% if form_values.get('course', '4') == number|string %} selected{% endif %}>{{ number }}年</option>{% endfor %}</select></label>
+                    </div>
+                    {% elif page_key == 'birth_date_range' %}
+                    <div class="regional-field-grid">
+                        <label>{{ copy.fields.reference }}<input type="date" name="reference" value="{{ form_values.get('reference', today_iso) }}" required /></label>
+                        <label>{{ copy.fields.age }}<input type="number" name="age" value="{{ form_values.get('age', '') }}" min="0" max="150" step="1" required /></label>
+                    </div>
+                    {% elif page_key == 'japanese_era' %}
+                    <fieldset><legend>{{ copy.fields.mode }}</legend><div class="global-options">
+                        {% for value in ('to_era', 'from_era') %}<label><input type="radio" name="mode" value="{{ value }}"{% if form_values.get('mode', 'to_era') == value %} checked{% endif %} />{{ copy.fields[value] }}</label>{% endfor %}
+                    </div></fieldset>
+                    <label>{{ copy.fields.date }}<input type="date" name="date" value="{{ form_values.get('date', '') }}" min="1873-01-01" /></label>
+                    <div class="regional-field-grid era-grid">
+                        <label>{{ copy.fields.era }}<select name="era">{% for value, label in (('meiji','明治'),('taisho','大正'),('showa','昭和'),('heisei','平成'),('reiwa','令和')) %}<option value="{{ value }}"{% if form_values.get('era', 'reiwa') == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+                        <label>{{ copy.fields.era_year }}<input type="number" name="era_year" value="{{ form_values.get('era_year', '1') }}" min="1" step="1" /></label>
+                        <label>{{ copy.fields.month }}<input type="number" name="month" value="{{ form_values.get('month', '5') }}" min="1" max="12" step="1" /></label>
+                        <label>{{ copy.fields.day }}<input type="number" name="day" value="{{ form_values.get('day', '1') }}" min="1" max="31" step="1" /></label>
+                    </div>
+                    {% endif %}
+                    {% if calculator_error %}<p class="global-error" role="alert">{{ calculator_error }}</p>{% endif %}
+                    <div class="global-actions"><button type="submit">{{ copy.submit }}</button></div>
+                </form>
+                <p class="small regional-privacy">{{ copy.privacy_note }}</p>
+            </section>
+
+            {% if result %}
+            <section class="global-panel regional-result" aria-live="polite" data-clarity-mask="true">
+                <p class="regional-kicker">{{ ui.result }}</p>
+                <dl>
+                    {% for label, value in result.rows %}<div><dt>{{ copy.labels[label] }}</dt><dd>{{ value }}</dd></div>{% endfor %}
+                </dl>
+                {% if result.table %}
+                <div class="regional-table-wrap"><table><caption>{{ copy.h1 }}</caption><thead><tr><th scope="col">{{ copy.labels.lunar_year }}</th><th scope="col">{{ copy.labels.solar_date }}</th><th scope="col">{{ copy.labels.status }}</th></tr></thead><tbody>
+                    {% for row in result.table %}<tr><td>{{ row[0] }}</td><td>{{ row[1] or '—' }}</td><td>{{ row[2] }}</td></tr>{% endfor %}
+                </tbody></table></div>
+                {% endif %}
+                <p class="small">{{ copy.notes[result.note] }}</p>
+            </section>
+            {% endif %}
+        </div>
+
+        <div class="global-copy regional-copy">
+            {% for section in copy.sections %}<section{% if loop.first %} class="direct-answer"{% endif %}><h2>{{ section.heading }}</h2>{% for paragraph in section.paragraphs %}<p>{{ paragraph }}</p>{% endfor %}</section>{% endfor %}
+            <section><h2>{{ ui.faq }}</h2>{% for faq in copy.faq %}<details><summary>{{ faq.question }}</summary><p>{{ faq.answer }}</p></details>{% endfor %}</section>
+            <aside class="regional-source"{% if page_key != 'birth_date_range' %} data-official-source="true"{% endif %}><strong>{{ copy.source_label }}</strong><a href="{{ copy.source_url }}" rel="noopener noreferrer">{{ copy.source_url }}</a></aside>
+            <aside class="editorial-meta">
+                <h2>{{ copy.source_label }}</h2>
+                <p>{{ copy.notes.values() | first }}</p>
+                <p><time datetime="2026-09-15">2026-09-15</time> · AgeCalc</p>
+            </aside>
+        </div>
+        <nav class="related-paths" aria-label="{{ ui.related }}"><h2>{{ ui.related }}</h2><div class="global-tools">{% for tool in global_nav if tool.url != request.path %}<a href="{{ tool.url }}">{{ tool.label }}</a>{% endfor %}</div></nav>
+    </main>
+    <footer class="global-footer">
+        <p>{{ ui.footer }}</p>
+        <nav>{% for endpoint in ('about', 'contact', 'privacy', 'terms') %}<a href="{{ url_for(endpoint) }}">{{ ui[endpoint] }}{% if locale_code != 'ko' %} ({{ ui.korean_only }}){% endif %}</a>{% endfor %}</nav>
+        <p class="small">© 2026 AgeCalc. {{ ui.copyright }}</p>
+    </footer>
+</div>
+<div class="cookie-banner" id="cookie-banner" role="region" aria-label="{{ ui.privacy }}"><p>{{ ui.cookie_notice }} <a href="{{ url_for('privacy') }}">{{ ui.privacy }}</a></p><div class="global-actions"><button id="accept-cookies" type="button">{{ ui.accept }}</button><button id="reject-cookies" class="secondary" type="button">{{ ui.reject }}</button></div></div>
+</body>
+</html>

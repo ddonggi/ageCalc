@@ -4,10 +4,14 @@ import json
 from pathlib import Path
 import re
 
-from flask import g, redirect, render_template
+from datetime import date
+
+from flask import g, make_response, redirect, render_template, request
 
 from content.locale_config import LOCALE_CONFIG, LOCALE_FEATURES
 from content.page_registry import PUBLIC_PAGE_REGISTRY
+from content.regional_pages import REGIONAL_COPY, regional_copy
+from models.regional_calculators import calculate as calculate_regional
 
 TRANSLATION_ROOT = Path(__file__).resolve().parent.parent / 'translations'
 PAGE_BY_KEY = {page['key']: page for page in PUBLIC_PAGE_REGISTRY}
@@ -22,6 +26,12 @@ def catalog(locale):
 
 def supported_locales(page):
     return tuple(page.get('supported_locales', ('ko',)))
+
+
+def page_copy(page_key, locale):
+    if (page_key, locale) in REGIONAL_COPY:
+        return regional_copy(page_key, locale)
+    return catalog(locale)['pages'][page_key]
 
 
 def localized_url(page_key, locale):
@@ -79,9 +89,10 @@ def i18n_context(page, base_url):
 def localized_sitemap_entries(pages):
     """Expand only entries that the existing sitemap policy already allows."""
     for page in pages:
-        yield page
         for locale in supported_locales(page):
-            if locale != 'ko':
+            if locale == 'ko':
+                yield page
+            else:
                 yield {**page, 'path': localized_url(page['key'], locale),
                        'lastmod': (page.get('localization') or {}).get('lastmod', '2026-09-09')}
 
@@ -126,12 +137,45 @@ def validate_translations():
                 raise ValueError(f'Duplicate locale URL: {path}')
             paths.add(path)
             if locale != 'ko' or (page.get('localization') or {}).get('register_ko'):
-                if page['key'] not in catalog(locale)['pages']:
+                if page['key'] not in catalog(locale)['pages'] and (page['key'], locale) not in REGIONAL_COPY:
                     raise ValueError(f'Missing page translation: {locale}/{page["key"]}')
                 # Compare only real language equivalents; a culture-specific page
                 # need not exist in English or in every other foreign catalog.
-                reference_locale = next((code for code in supported_locales(page) if code != 'ko'), locale)
-                validate_section(catalog(locale)['pages'][page['key']], catalog(reference_locale)['pages'][page['key']], locale)
+                reference_locale = next(
+                    code for code in supported_locales(page)
+                    if (page['key'], code) in REGIONAL_COPY or page['key'] in catalog(code)['pages']
+                )
+                validate_section(page_copy(page['key'], locale), page_copy(page['key'], reference_locale), locale)
+
+
+def _regional_display(page_key, locale, result):
+    def format_date(value):
+        try:
+            parsed = date.fromisoformat(value)
+        except (TypeError, ValueError):
+            return value
+        if page_key == 'school_year':
+            return f'{parsed.year}年{parsed.month}月'
+        if locale == 'ko':
+            human = f'{parsed.year}년 {parsed.month}월 {parsed.day}일'
+        elif locale == 'ja':
+            human = f'{parsed.year}年{parsed.month}月{parsed.day}日'
+        elif locale == 'pt-BR':
+            human = parsed.strftime('%d/%m/%Y')
+        else:
+            month = ('January', 'February', 'March', 'April', 'May', 'June',
+                     'July', 'August', 'September', 'October', 'November', 'December')[parsed.month - 1]
+            human = f'{month} {parsed.day}, {parsed.year}'
+        return f'{human} ({value})'
+
+    rows = []
+    for key, value in result.get('rows', []):
+        rows.append((key, page_copy(page_key, locale)['labels'].get(value, format_date(value))))
+    table = []
+    for row in result.get('table', []):
+        table.append((row[0], format_date(row[1]) if row[1] else '',
+                      page_copy(page_key, locale)['labels'].get(row[2], row[2])))
+    return {**result, 'rows': rows, 'table': table}
 
 
 def register_localized_routes(app, base_url):
@@ -143,11 +187,18 @@ def register_localized_routes(app, base_url):
         g.localized_page = page
         g.page_canonical_url = base_url + localized_url(page_key, locale)
         resources = catalog(locale)
-        copy = resources['pages'][page_key]
+        copy = page_copy(page_key, locale)
         ui = {**resources['common'], **copy.get('ui', {})}
-        nav = [{'url': localized_url(p['key'], locale),
-                'label': resources['pages'].get(p['key'], {}).get('h1', p['title'])}
-               for p in PUBLIC_PAGE_REGISTRY if locale in supported_locales(p) and p.get('localization')]
+        nav = []
+        for candidate in PUBLIC_PAGE_REGISTRY:
+            if locale not in supported_locales(candidate) or not candidate.get('localization'):
+                continue
+            translated = (
+                (candidate['key'], locale) in REGIONAL_COPY
+                or candidate['key'] in resources['pages']
+            )
+            label = page_copy(candidate['key'], locale)['h1'] if translated else candidate['title']
+            nav.append({'url': localized_url(candidate['key'], locale), 'label': label})
         home_key = 'age' if locale in supported_locales(PAGE_BY_KEY['age']) else page_key
         breadcrumb_items = [
             {'label': f"AgeCalc ({resources['common']['korean_only']})", 'url': base_url + '/'},
@@ -160,7 +211,7 @@ def register_localized_routes(app, base_url):
              'itemListElement': [{'@type': 'ListItem', 'position': index, 'name': item['label'], 'item': item['url']}
                                 for index, item in enumerate(breadcrumb_items, 1)]},
         ]
-        if page_key == 'age':
+        if page_key == 'age' or (page_key, locale) in REGIONAL_COPY:
             schema += [
                 {'@context': 'https://schema.org', '@type': 'SoftwareApplication', 'name': copy['h1'],
                  'description': copy['description'], 'url': g.page_canonical_url, 'inLanguage': locale,
@@ -172,12 +223,30 @@ def register_localized_routes(app, base_url):
             ]
         if locale == 'ko':
             schema = [item for item in schema if item['@type'] != 'BreadcrumbList']
-        return render_template(page['localization']['template'], copy=copy, ui=ui,
-                               global_nav=nav, global_schema=schema, page_key=page_key,
-                               global_breadcrumbs=breadcrumb_items,
-                               global_home=localized_url(home_key, locale),
-                               calculator_config={'kind': page_key, 'locale': LOCALE_CONFIG[locale]['intl'],
-                                                  'ui': ui})
+        result = None
+        error = None
+        status = 200
+        form_values = request.form.to_dict(flat=True) if request.method == 'POST' else {}
+        if request.method == 'POST' and (page_key, locale) in REGIONAL_COPY:
+            try:
+                result = _regional_display(page_key, locale, calculate_regional(page_key, form_values, locale))
+            except ValueError as exc:
+                error_key = str(exc)
+                error = copy['errors'].get(error_key, copy['errors']['invalid_parameters'])
+                status = 400
+        response = make_response(render_template(
+            page['localization']['template'], copy=copy, ui=ui,
+            global_nav=nav, global_schema=schema, page_key=page_key,
+            global_breadcrumbs=breadcrumb_items,
+            global_home=localized_url(home_key, locale),
+            calculator_config={'kind': page_key, 'locale': LOCALE_CONFIG[locale]['intl'], 'ui': ui},
+            result=result, calculator_error=error, form_values=form_values,
+            today_iso=date.today().isoformat(),
+        ), status)
+        if request.method == 'POST':
+            response.headers['Cache-Control'] = 'no-store'
+            response.headers['X-Robots-Tag'] = 'noindex, follow'
+        return response
 
     def normalize_localized(page_key, locale):
         # A language link always points at the public document, never a result.
@@ -190,5 +259,6 @@ def register_localized_routes(app, base_url):
             path = localized_url(page['key'], locale)
             defaults = {'page_key': page['key'], 'locale': locale}
             endpoint = page['endpoint'] if locale == 'ko' else f'i18n_{locale}_{page["key"]}'
-            app.add_url_rule(path, endpoint=endpoint, view_func=render_localized, defaults=defaults)
+            methods = ('GET', 'POST') if (page['key'], locale) in REGIONAL_COPY else ('GET',)
+            app.add_url_rule(path, endpoint=endpoint, view_func=render_localized, defaults=defaults, methods=methods)
             app.add_url_rule(path + '/', endpoint=f'i18n_slash_{locale}_{page["key"]}', view_func=normalize_localized, defaults=defaults)
