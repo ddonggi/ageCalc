@@ -1,5 +1,7 @@
 # Hub Content Enrichment Implementation Plan
 
+> **현행 상태 (2026-09-17):** 허브 사용 가이드와 교육·가족 카테고리 편집 안내는 구현 완료됐다. 아래 미체크 박스는 당시 실행 절차를 보존한 기록이다.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add useful, original guidance to the eight life hubs and the education-family blog category so they clear the internal thin-content check without changing calculator behavior.

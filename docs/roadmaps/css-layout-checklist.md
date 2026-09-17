@@ -12,7 +12,7 @@
 
 ## Global Constraints
 
-- 기존 warm paper 디자인 토큰과 IBM Plex 타이포그래피를 유지한다.
+- 현재 `editorial-luxury.css`의 warm paper 색상과 Cormorant Garamond·Pretendard 타이포그래피를 유지한다.
 - 데스크톱 기준은 `min-width: 901px`, 모바일·태블릿 기준은 `max-width: 900px`로 통일한다.
 - 360px 화면에서 가로 스크롤이 생기지 않아야 한다.
 - 키보드 포커스와 모바일 메뉴 열기·닫기 동작을 유지한다.
@@ -128,7 +128,7 @@ Expected: 전체 테스트 PASS, whitespace 오류 없음.
 - [ ] 360px·768px·1024px·1440px 회귀 화면을 기록하는 시각 테스트 환경을 마련한다.
 - [ ] 공통 폼의 입력·오류·도움말 간격을 하나의 CSS 컴포넌트 규칙으로 정리한다.
 - [ ] 결과 카드의 숫자 크기와 긴 한국어 줄바꿈을 모바일 기준으로 통일한다.
-- [ ] `prefers-reduced-motion`에서 장식 애니메이션과 전환을 축소한다.
+- [x] `prefers-reduced-motion`에서 장식 애니메이션과 전환을 축소한다. (`editorial-luxury.css` 적용 완료)
 - [ ] 프린트 화면에서 fixed 헤더와 광고·쿠키 UI를 숨기는 인쇄 스타일을 추가한다.
 
 ## Definition of Done

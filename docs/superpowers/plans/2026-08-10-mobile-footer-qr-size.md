@@ -1,5 +1,7 @@
 # Mobile Footer QR Size Implementation Plan
 
+> **현행 상태 (2026-09-17):** 모바일 footer QR 크기 제한은 구현 완료됐다. 아래 체크박스는 당시 검증 절차를 보존한 기록이다.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 모바일 푸터의 후원 QR 외곽 너비를 104px로 제한해 전체 폭으로 확대되지 않게 한다.

@@ -1,5 +1,7 @@
 # Days between dates implementation
 
+> **Current status (2026-09-17):** This release has since been integrated and deployed. The scope and verification counts below preserve the pre-deployment implementation snapshot; current registry and sitemap tests are authoritative.
+
 ## Scope
 
 Add `/days-between-dates` and five foreign prefixed equivalents. Preserve existing age, birthday and D-day routes. D-day compares today with a target; this tool compares two chosen calendar dates.
@@ -17,6 +19,6 @@ Inputs remain browser-only and are not sent to analytics, storage or URLs. Analy
 - Pure JavaScript calendar/date-range contracts passed, including leap years, DST boundaries, inclusive counting and invalid/reversed dates.
 - Existing 30 localized calculator browser flows passed, including JS-off navigation, privacy and responsive checks.
 - New calculator browser coverage spans all six locales: inclusive/exclusive totals, swap, same day, invalid dates, leap day, reset, private inputs, 320/1280px overflow and JS-off navigation.
-- Registry-driven review sitemap now contains 80 URLs. The production count is expected to increase by six after a separate deployment; production has not been changed by this feature work.
+- At this implementation snapshot, the registry-driven review sitemap contained 80 URLs and production had not yet received the six new documents.
 
 Development review: `http://127.0.0.1:8000/days-between-dates`, with `/en/`, `/ja/`, `/es/`, `/pt-br/` and `/zh-cn/` equivalents.

@@ -1,6 +1,6 @@
 # AgeCalc
 
-Flask 기반 나이 계산기, 생활 기준표, 미니게임, RSS 블로그 자동화 웹 애플리케이션입니다.
+Flask 기반 나이·날짜 계산기, 생활 기준표, 다국어 도구와 RSS 블로그 자동화 웹 애플리케이션입니다.
 
 ## 서비스 링크
 - Production: [https://agecalc.cloud](https://agecalc.cloud)
@@ -16,11 +16,12 @@ Flask 기반 나이 계산기, 생활 기준표, 미니게임, RSS 블로그 자
 
 ## 현재 주요 기능
 - 만나이 계산: 양력/음력 생일, 기준일, 다음 생일까지 남은 기간
-- 생활형 나이 표: 출생년도별 나이표, 학년 계산, 입학 연도, 나이 차이, 100일, 생일 D-Day
+- 생활형 나이 표: 출생년도별 나이표, 통합 학년·입학 연도 계산, 나이 차이, 100일, 생일 D-Day
 - 아이/가족 계산: 아이 개월 수, 부모·자녀 나이 관계
 - 반려동물 계산: 강아지/고양이 나이, 반려동물 개월 수
+- 다국어 날짜 계산: 6개 언어의 나이·기념일·날짜 차이·날짜 더하기/빼기 계산기
+- 지역별 계산: 한국 음력 생일, 일본·브라질 영업일, 일본 학년·연호, 영문·포르투갈어 생년월일 범위 계산
 - 기준/안내 페이지: 운영 원칙, 계산 기준, 문의, 개인정보처리방침, 이용약관, FAQ
-- 미니게임: 숫자 맞추기, 스네이크, 틱택토, 가위바위보, 님, 퐁, 행맨, 메모리 매치, 커넥트4, 라이츠아웃, 지뢰찾기, 사이먼, 2048, 블랙잭, 브레이크아웃, 하노이, 피그, 오목, 리버시, 도트 앤 박스, 만칼라, 마스터마인드, 전쟁, 배틀십, 체커, 15퍼즐, 페그 솔리테어, 야추
 - 블로그 자동화: RSS 수집, OpenAI 재창작, 커버 이미지 생성, 초안 검수, 수동 공개
 
 ## 전체 흐름
@@ -29,7 +30,7 @@ flowchart LR
     User[사용자] --> Nginx[Nginx]
     Nginx --> Gunicorn[Gunicorn]
     Gunicorn --> Flask[Flask app.py]
-    Flask --> Pages[계산기/안내/미니게임]
+    Flask --> Pages[계산기/안내]
     Flask --> Blog[블로그 공개/초안/검토]
     Flask --> MySQL[(MySQL)]
     Timer[systemd timer] --> Scheduler[RSS scheduler]
@@ -44,13 +45,13 @@ flowchart LR
 - `/age`: 만나이 계산기
 - `/birth-year-age-table`: 출생년도별 나이표
 - `/school-grade-calculator`: 학년 계산기
-- `/school-entry-year-table`: 초등학교 입학 연도표
+- `/school-entry-year-table`: 통합 학년 계산기로 이동하는 영구 리디렉션
 - `/age-gap-calculator`: 나이 차이 계산기
 - `/100-day-calculator`: 100일 계산기
 - `/baby-months-table`: 아이 개월 수 표
 - `/annual-age-calculator`: 연도별 나이 계산기
 - `/age-comparison-table`: 나이 비교표
-- `/grade-age-table`: 학년별 나이표
+- `/grade-age-table`: 학년별 출생년도표로 이동하는 영구 리디렉션
 - `/pet-age-table`: 반려동물 나이표
 - `/korean-age-guide`: 한국나이 기준 안내
 - `/pet-months-table`: 반려동물 개월 수 표
@@ -59,6 +60,8 @@ flowchart LR
 - `/college-entry-year-calculator`: 대학 입학 연도 계산기
 - `/birthday-dday-calculator`: 생일 D-Day 계산기
 - `/dog`, `/cat`, `/baby-months`, `/d-day`, `/parent-child`
+- `/days-between-dates`, `/date-add-subtract-calculator`, `/lunar-birthday-calculator`
+- `/en`, `/ja`, `/es`, `/pt-br`, `/zh-cn` 접두사의 지원 계산기와 지역별 전용 계산기
 - `/about`, `/contact`, `/references`, `/privacy`, `/terms`, `/guide`, `/faq`
 - `/sitemap.xml`, `/health`
 
@@ -71,9 +74,9 @@ flowchart LR
 - `/blog/review/<id>`: 토큰 기반 검토 상세
 - `/blog/review/<id>/approve`: 토큰 기반 공개 승인
 
-### 미니게임
-- `/minigames` 및 `/minigames/<game>` 형태의 게임 페이지
-- 미니게임은 현재 애드센스 승인 안정성을 위해 sitemap에서 제외되고 `noindex` 대상으로 관리됩니다.
+### 종료된 미니게임
+- 이전 `/minigames/` 경로는 현재 공개되지 않으며 404를 반환합니다.
+- 공개 탐색과 sitemap에도 미니게임 링크를 포함하지 않습니다.
 
 ## 기술 스택
 - Backend: Flask, Gunicorn
@@ -184,9 +187,9 @@ python scripts/rewrite_blog_posts.py --status all --all --attempts 2 --apply --p
 ## 운영 메모
 - 앱과 스케줄러는 `/srv/apps/agecalc/.env.rss`를 공유합니다.
 - 민감 정보는 저장소에 커밋하지 않고 `.env.rss` 또는 systemd 환경 파일에서 관리합니다.
-- AdSense 재심사 동안 `ADSENSE_REVIEW_MODE=true`, `COUPANG_PARTNERS_ENABLED=false`, `BLOG_PUBLIC_INDEXING_ENABLED=false`를 유지합니다.
-- 승인 모드에서는 쿠팡 설정값과 관계없이 모든 제휴 노출이 차단되고, 블로그와 8개 라이프 허브가 sitemap에서 제외됩니다.
-- 승인 모드 sitemap은 핵심 계산기·정적 가이드·신뢰 페이지 46개로 고정됩니다.
+- 현재 승인 검토 구성을 유지할 때는 `ADSENSE_REVIEW_MODE=true`, `COUPANG_PARTNERS_ENABLED=false`, `BLOG_PUBLIC_INDEXING_ENABLED=false`를 사용합니다.
+- 승인 모드에서는 쿠팡 설정값과 관계없이 모든 제휴 노출이 차단되고, 블로그와 registry의 라이프 허브가 sitemap에서 제외됩니다.
+- 승인 모드 sitemap은 registry의 indexable 핵심 계산기·다국어/지역별 계산기·정적 가이드·신뢰 페이지에서 동적으로 생성됩니다. 정확한 URL 수는 `tests/i18n_expected.py`와 sitemap 테스트가 관리합니다.
 - `COUPANG_PARTNERS_ENABLED=true`는 승인 모드가 해제된 경우에만 쿠팡 파트너스 배너와 고지 문구를 노출합니다.
 - `agecalc-rss.timer`는 현재 production 기준 매일 `09:00`, `12:00`, `19:00` KST에 실행되며 실행당 초안 1개 생성을 시도합니다.
 - 앱 코드 변경 후 production 반영은 `ubuntu` 계정에서 `sudo systemctl restart agecalc.service`를 실행합니다.
