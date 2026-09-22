@@ -1,6 +1,29 @@
 {% if google_site_verification %}
 <meta name="google-site-verification" content="{{ google_site_verification }}">
 {% endif %}
+<script id="consent-defaults" nonce="{{ csp_nonce }}">
+(() => {
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+    const state = value => ({
+        ad_storage: value,
+        analytics_storage: value,
+        ad_user_data: value,
+        ad_personalization: value
+    });
+    window.gtag('consent', 'default', state('denied'));
+    if (document.cookie.split('; ').includes('cookieConsent=accepted')) {
+        window.gtag('consent', 'update', state('granted'));
+    }
+    // Keep consent independent of analytics loading and cached banner scripts.
+    document.addEventListener('click', event => {
+        const button = event.target.closest('#accept-cookies, #reject-cookies');
+        if (button) {
+            window.gtag('consent', 'update', state(button.id === 'accept-cookies' ? 'granted' : 'denied'));
+        }
+    });
+})();
+</script>
 {% if adsense_enabled and adsense_client_id %}
 <meta name="google-adsense-account" content="{{ adsense_client_id }}">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ adsense_client_id }}" crossorigin="anonymous"></script>

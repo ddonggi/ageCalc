@@ -44,7 +44,7 @@
     <meta name="referrer" content="no-referrer" />
     <script nonce="{{ csp_nonce }}">window.history.replaceState({}, document.title, window.location.pathname);</script>
     {% else %}
-    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% endif %}
     {% if article_schema %}
@@ -365,7 +365,7 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ versioned_static('js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
 </body>

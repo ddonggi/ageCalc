@@ -17,7 +17,7 @@
     <link rel="icon" href="/favicon.ico">
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
-    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% set adsense_enabled = adsense_enabled and category_indexable %}
     {% set coupang_partners_enabled = coupang_partners_enabled and category_indexable %}
@@ -115,7 +115,7 @@
         </main>
         {% include 'partials/footer.html' %}
     </div>
-    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ versioned_static('js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
 </body>
 </html>
