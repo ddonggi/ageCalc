@@ -34,7 +34,7 @@
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/home.css') }}" />
-    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 </head>
 
@@ -144,7 +144,7 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ versioned_static('js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <script src="{{ versioned_static('js/home-age-calculator.js') }}" defer></script>
 

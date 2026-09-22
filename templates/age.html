@@ -98,10 +98,10 @@
         referrerpolicy="no-referrer"></script>
     <script src="{{ versioned_static('js/date-rules.js') }}" defer></script>
     <script src="{{ versioned_static('js/age-calculator.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/cookie-consent.js') }}" defer></script>
+    <script src="{{ versioned_static('js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <!-- Google tag (gtag.js) -->
-    <script src="{{ url_for('static', filename='js/analytics.js') }}" defer></script>
+    <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
 
     {% include 'partials/adsense.html' %}
 

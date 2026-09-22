@@ -34,6 +34,21 @@ class StaticAssetVersioningTests(unittest.TestCase):
                 app_module.versioned_static("css/missing.css"),
             )
 
+    def test_tracking_scripts_use_content_hashes_on_public_pages(self):
+        client = app_module.app.test_client()
+        expected = {
+            name: hashlib.sha256((app_module.PROJECT_ROOT / "static/js" / name).read_bytes()).hexdigest()[:12]
+            for name in ("analytics.js", "cookie-consent.js")
+        }
+        for path in ("/", "/age", "/about", "/blog", "/en/age-calculator", "/ja/age-calculator"):
+            with self.subTest(path=path):
+                response = client.get(path)
+                self.assertEqual(200, response.status_code)
+                html = response.get_data(as_text=True)
+                for name, digest in expected.items():
+                    self.assertIn(f"/static/js/{name}?v={digest}", html)
+                    self.assertNotIn(f'/static/js/{name}"', html)
+
     def test_static_asset_version_rejects_parent_path(self):
         self.assertIsNone(app_module._static_asset_version("../app.py"))
 
