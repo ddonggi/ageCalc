@@ -81,11 +81,12 @@
                 <div class="editorial-story-list">
                     {% for post in posts %}
                     {% set article = article_by_slug.get(post.slug) %}
-                    <article class="editorial-story-card{% if article and article.thumbnail %} has-media{% endif %}">
+                    {% set thumbnail = article.thumbnail if article else post.cover_image_url %}
+                    <article class="editorial-story-card{% if thumbnail %} has-media{% endif %}">
                         <a class="editorial-story-link" href="{{ url_for('blog_detail', slug=post.slug) }}">
-                            {% if article and article.thumbnail %}
+                            {% if thumbnail %}
                             <span class="editorial-story-media">
-                                <img class="blog-thumb" src="{{ article.thumbnail }}" alt="{{ article.thumbnail_alt }}" width="1200" height="630" loading="lazy">
+                                <img class="blog-thumb" src="{{ thumbnail }}" alt="{{ article.thumbnail_alt if article else post.title }}" width="1200" height="630" loading="lazy">
                             </span>
                             {% endif %}
                             <span class="editorial-story-copy">

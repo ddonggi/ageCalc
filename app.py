@@ -168,7 +168,7 @@ def _parse_adsense_review_mode(value: str | None) -> bool:
 
 ADSENSE_REVIEW_MODE = _parse_adsense_review_mode(os.getenv("ADSENSE_REVIEW_MODE", "true"))
 BLOG_INDEX_MIN_POSTS = int(os.getenv("BLOG_INDEX_MIN_POSTS", "3").strip() or "3")
-BLOG_CATEGORY_INDEX_MIN_POSTS = 3
+BLOG_CATEGORY_INDEX_MIN_POSTS = 1
 BLOG_PUBLIC_INDEXING_ENABLED = (os.getenv("BLOG_PUBLIC_INDEXING_ENABLED", "false") or "false").strip().lower() in {
     "1",
     "true",
@@ -621,21 +621,14 @@ def _cached_published_blog_count() -> int:
 
 
 def _published_eligible_blog_posts(db_session) -> list[GeneratedPost]:
-    public_slugs = _eligible_public_blog_slugs()
-    if not public_slugs:
-        return []
+    # Publication is an editorial decision; read-time audits must not hide published URLs.
     posts = (
         db_session.query(GeneratedPost)
-        .filter(GeneratedPost.status == "published", GeneratedPost.slug.in_(public_slugs))
+        .filter(GeneratedPost.status == "published")
         .order_by(GeneratedPost.published_at.desc(), GeneratedPost.id.desc())
         .all()
     )
-    public_slug_set = set(public_slugs)
-    return [
-        post
-        for post in posts
-        if post.slug in public_slug_set and audit_post(post, require_cover_image=True).keep
-    ]
+    return [post for post in posts if post.status == "published"]
 
 
 def _is_blog_public_indexable(published_count: int | None = None) -> bool:
@@ -654,7 +647,15 @@ def _absolute_article_thumbnail(article: dict[str, object]) -> str:
     return f"{SITE_BASE_URL}{thumbnail}" if thumbnail.startswith("/") else thumbnail
 
 
-def _blog_article_schema(post, article: dict[str, object]) -> dict[str, object]:
+def _blog_article_schema(post, article: dict[str, object] | None) -> dict[str, object]:
+    if article is None:
+        article = {
+            "thumbnail": post.cover_image_url or "/static/images/og-image.png",
+            "schema_type": "BlogPosting", "h1": post.title,
+            "meta_description": post.excerpt or "", "author": SITE_AUTHOR_NAME,
+            "canonical_url": _absolute_url_for("blog_detail", slug=post.slug),
+            "category_label": "블로그", "tags": [],
+        }
     image_url = _absolute_article_thumbnail(article)
     schema: dict[str, object] = {
         "@context": "https://schema.org",
@@ -1551,7 +1552,7 @@ def sitemap_group(group):
             category_posts = [
                 post
                 for post in posts
-                if BLOG_ARTICLE_BLUEPRINTS[post.slug]["category"] == category_slug
+                if BLOG_ARTICLE_BLUEPRINTS.get(post.slug, {}).get("category") == category_slug
             ]
             if len(category_posts) < BLOG_CATEGORY_INDEX_MIN_POSTS:
                 continue
@@ -1592,7 +1593,18 @@ def public_rss():
 
     items = []
     for post in posts:
-        article = BLOG_ARTICLE_BLUEPRINTS[post.slug]
+        article = BLOG_ARTICLE_BLUEPRINTS.get(post.slug)
+        if article is None:
+            items.append({
+                "title": post.title,
+                "url": _absolute_url_for("blog_detail", slug=post.slug),
+                "description": post.excerpt or "",
+                "content_html": _escape_rss_cdata(post.content_html),
+                "published_at": _rss_date(post.published_at or post.created_at),
+                "updated_at": _rss_iso_date(post.updated_at or post.published_at or post.created_at),
+                "category": "블로그", "author": SITE_AUTHOR_NAME,
+            })
+            continue
         items.append(
             {
                 "title": article["title"],
@@ -2728,9 +2740,6 @@ def blog_detail(slug):
     is_public_article = (
         post is not None
         and post.status == "published"
-        and bool(article)
-        and _article_is_publicly_eligible(article)
-        and audit_post(post, require_cover_image=True).keep
     )
     if not is_public_article:
         if hasattr(session, "close"):
@@ -2786,7 +2795,7 @@ def blog_detail(slug):
             blog_indexable=blog_indexable,
             structured_article=article,
             structured_image_url=_absolute_article_thumbnail(article) if article else None,
-            article_schema=_blog_article_schema(post, article) if article and blog_indexable else None,
+            article_schema=_blog_article_schema(post, article) if blog_indexable else None,
             breadcrumbs=breadcrumbs,
             breadcrumb_schema=breadcrumb_schema,
             eligible_related_slugs=eligible_related_slugs,
