@@ -84,7 +84,7 @@ class BlogDiscoveryTests(unittest.TestCase):
 
         self.assertEqual(404, response.status_code)
 
-    def test_category_with_fewer_than_three_posts_is_noindex(self):
+    def test_category_with_published_posts_is_indexable(self):
         posts = [make_post("2026-man-age-guide", 1), make_post("man-age-vs-korean-age", 2)]
         with mock.patch.object(app_module, "ADSENSE_REVIEW_MODE", False), mock.patch.object(
             app_module, "BLOG_PUBLIC_INDEXING_ENABLED", True
@@ -95,10 +95,10 @@ class BlogDiscoveryTests(unittest.TestCase):
 
         html = response.get_data(as_text=True)
         self.assertEqual(200, response.status_code)
-        self.assertIn('<meta name="robots" content="noindex,follow"', html)
+        self.assertNotIn('<meta name="robots" content="noindex,follow"', html)
         self.assertIn('<link rel="canonical" href="https://agecalc.cloud/blog/category/age"', html)
-        self.assertNotIn("pagead/js/adsbygoogle.js", html)
-        self.assertNotIn("google-adsense-account", html)
+        self.assertIn("pagead/js/adsbygoogle.js", html)
+        self.assertIn("google-adsense-account", html)
 
     def test_category_with_three_posts_can_be_indexed(self):
         posts = [
@@ -161,7 +161,7 @@ class BlogDiscoveryTests(unittest.TestCase):
         self.assertIn("기준일", html)
         self.assertIn("재검수기한", html)
 
-    def test_public_detail_rejects_stale_db_snapshot(self):
+    def test_published_detail_survives_stale_db_snapshot(self):
         post = make_post("national-pension-receiving-age")
         post.title = "STALE DB TITLE"
         post.excerpt = "STALE DB EXCERPT"
@@ -173,7 +173,8 @@ class BlogDiscoveryTests(unittest.TestCase):
         ):
             response = app.test_client().get("/blog/national-pension-receiving-age")
 
-        self.assertEqual(404, response.status_code)
+        self.assertEqual(200, response.status_code)
+        self.assertNotIn("STALE DB TITLE", response.get_data(as_text=True))
 
 
 if __name__ == "__main__":

@@ -82,7 +82,7 @@ class BlogFeedTests(unittest.TestCase):
 
         self.assertEqual("앞]]]]><![CDATA[>뒤", escaped)
 
-    def test_rss_contains_only_registered_current_published_posts(self):
+    def test_rss_contains_curated_and_restored_published_posts(self):
         current = post_for("national-pension-receiving-age", 1)
         legacy = post_for("legacy-general-post", 2)
         with mock.patch.object(app_module, "ADSENSE_REVIEW_MODE", False), mock.patch.object(
@@ -96,14 +96,14 @@ class BlogFeedTests(unittest.TestCase):
         self.assertEqual("application/rss+xml", response.mimetype)
         root = ET.fromstring(response.data)
         items = root.findall("./channel/item")
-        self.assertEqual(1, len(items))
+        self.assertEqual(2, len(items))
         self.assertEqual(
             "https://agecalc.cloud/blog/national-pension-receiving-age",
             items[0].findtext("link"),
         )
         self.assertIn("정상 노령연금 개시연령은 출생연도에 따라 만 61~65세입니다", response.get_data(as_text=True))
-        self.assertNotIn("전체 본문", response.get_data(as_text=True))
-        self.assertNotIn("legacy-general-post", response.get_data(as_text=True))
+        self.assertIn("전체 본문", response.get_data(as_text=True))
+        self.assertIn("legacy-general-post", response.get_data(as_text=True))
         namespaces = {"dc": "http://purl.org/dc/elements/1.1/"}
         self.assertEqual("AgeCalc 편집팀", items[0].findtext("dc:creator", namespaces=namespaces))
         self.assertEqual("2026-07-01T02:00:00+00:00", items[0].findtext("dc:date", namespaces=namespaces))
@@ -154,7 +154,7 @@ class BlogFeedTests(unittest.TestCase):
         self.assertEqual(200, response.status_code)
         self.assertIn("https://agecalc.cloud/blog/category/education-family", xml)
         self.assertIn("https://agecalc.cloud/blog/2026-school-entry-birth-year", xml)
-        self.assertNotIn("legacy-general-post", xml)
+        self.assertIn("legacy-general-post", xml)
 
     def test_blog_pages_advertise_rss_only_when_public_indexing_is_active(self):
         post = post_for("2026-man-age-guide", 1)

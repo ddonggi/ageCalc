@@ -3685,7 +3685,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
             self.assertIn('<meta name="robots" content="noindex,nofollow" />', detail_html)
             self.assertNotIn("google-adsense-account", detail_html)
 
-    def test_blog_list_hides_legacy_published_posts_from_public_index(self):
+    def test_blog_list_includes_legacy_published_posts_in_public_index(self):
         from content.blog.rendering import render_article_content_html
         class FakeQuery:
             def __init__(self, posts):
@@ -3754,9 +3754,9 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         self.assertEqual(response.status_code, 200)
         html = response.get_data(as_text=True)
         self.assertIn('href="/blog/2026-man-age-guide"', html)
-        self.assertNotIn('href="/blog/legacy-general-post"', html)
+        self.assertIn('href="/blog/legacy-general-post"', html)
 
-    def test_blog_detail_returns_404_for_unregistered_published_post(self):
+    def test_blog_detail_serves_unregistered_published_post(self):
         class FakeQuery:
             def __init__(self, post):
                 self.post = post
@@ -3796,9 +3796,9 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         ):
             response = app.test_client().get("/blog/legacy-general-post")
 
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
 
-    def test_guides_sitemap_excludes_legacy_published_blog_posts(self):
+    def test_guides_sitemap_includes_legacy_published_blog_posts(self):
         from content.blog.rendering import render_article_content_html
         class FakeQuery:
             def __init__(self, posts):
@@ -3859,7 +3859,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         self.assertEqual(response.status_code, 200)
         xml = response.get_data(as_text=True)
         self.assertIn("https://agecalc.cloud/blog/2026-man-age-guide", xml)
-        self.assertNotIn("https://agecalc.cloud/blog/legacy-general-post", xml)
+        self.assertIn("https://agecalc.cloud/blog/legacy-general-post", xml)
 
     def test_blog_review_approval_blocks_posts_that_fail_adsense_audit(self):
         class FakeQuery:
@@ -4165,7 +4165,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
             published_at=datetime(2026, 7, 4, 12, 0),
             created_at=datetime(2026, 7, 4, 12, 0),
             updated_at=datetime(2026, 7, 4, 12, 0),
-            status="published",
+            status="needs_review",
             sources=[],
         )
 

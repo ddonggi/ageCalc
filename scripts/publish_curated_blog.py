@@ -260,10 +260,14 @@ def apply_release(
     }
 
 
-def restore_backup(session, backup_path: Path) -> dict[str, int]:
+def restore_backup(session, backup_path: Path, *, published_only: bool = False) -> dict[str, int]:
     payload = verify_backup(backup_path)
     post_rows = payload["generated_posts"]
     source_rows = payload["post_sources"]
+    if published_only:
+        post_rows = [row for row in post_rows if row["status"] == "published"]
+        selected_ids = {int(row["id"]) for row in post_rows}
+        source_rows = [row for row in source_rows if int(row["generated_post_id"]) in selected_ids]
     post_slugs = [str(row["slug"]) for row in post_rows]
 
     try:
@@ -338,6 +342,7 @@ def _build_parser() -> argparse.ArgumentParser:
     action = parser.add_mutually_exclusive_group()
     action.add_argument("--apply", action="store_true", help="Back up, delete unregistered rows, and publish curated posts.")
     action.add_argument("--restore", type=Path, help="Restore deleted rows from a verified JSON backup.")
+    parser.add_argument("--published-only", action="store_true", help="Restore only posts published at backup time and their sources.")
     parser.add_argument("--backup-dir", type=Path, default=DEFAULT_BACKUP_DIR)
     parser.add_argument("--expected-delete-posts", type=int)
     parser.add_argument("--expected-delete-post-sources", type=int)
@@ -355,7 +360,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         if args.restore:
             if not args.confirm:
                 raise ReleaseError("restore requires --confirm")
-            report = restore_backup(session, args.restore)
+            report = restore_backup(session, args.restore, published_only=args.published_only)
         else:
             report = plan_release(session)
             if args.apply:
