@@ -8,6 +8,7 @@ Flask 기반 나이·날짜 계산기, 생활 기준표, 다국어 도구와 RSS
 - Sitemap: [https://agecalc.cloud/sitemap.xml](https://agecalc.cloud/sitemap.xml)
 
 ## 문서 안내
+- 팀 운영 및 Codex 시작 프롬프트: [docs/TEAM_OPERATIONS.md](docs/TEAM_OPERATIONS.md)
 - 배포/운영: [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
 - 블로그 DB 스키마: [BLOG_POSTS_SCHEMA.md](BLOG_POSTS_SCHEMA.md)
 - 아키텍처/흐름도: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
@@ -185,6 +186,19 @@ python scripts/rewrite_blog_posts.py --status all --all --attempts 2 --apply --p
 ```
 
 ## 운영 메모
+### 팀 운영 규칙
+
+- 총괄운영자는 요구사항, Phase, 담당 범위, 완료 조건을 정하고 필요한 팀만 실행합니다. 소규모 작업은 한 담당자가 처리할 수 있습니다.
+- 팀 구성: 리서치, SEO 분석, 디자인, frontend, backend, QA, infra/DevOps, 콘텐츠·마케팅. 역할 문서는 `agents/`에 보관하고 총괄운영자가 담당자에게 읽도록 전달합니다. 파일 저장 자체가 에이전트를 실행하지는 않습니다.
+- 프로젝트 공통 지침은 루트 `AGENTS.md`에 두고 역할 문서와 연결합니다. README의 규칙은 각 작업방에도 명시적으로 전달합니다.
+- 담당자는 완료 시 결론 3줄과 다음 단계 1줄로 한 번 보고합니다. 막힘, 사실 판단, 사용자 확인이 필요한 경우에는 즉시 알립니다. 총괄운영자는 완료 대기 기능을 사용하고 반복적인 진행 조회·독촉을 하지 않습니다.
+- Phase가 끝나면 총괄운영자는 결과와 검증 근거를 요약하고 사용자에게 다음 단계 진행 여부를 묻습니다. 사용자의 명시적 진행 답변 전에는 다음 Phase를 시작하지 않습니다.
+- 개발은 실제 경로와 브랜치를 확인한 `pre-release` 작업 트리에서 수행합니다. 경로 이름만으로 브랜치를 추정하지 않습니다. 동시 개발 시 담당 파일을 나누거나 작업별 브랜치·작업 트리를 사용하고 총괄운영자가 통합합니다.
+- QA는 계산 경계값, 기존 기능, 모바일·접근성, 광고 간섭, SEO, 개인정보 수집을 변경 범위에 맞게 검증합니다. 콘텐츠는 출처·최신 기준·독창성을 별도로 검수합니다.
+- 개발 완료 → QA 및 통합 검증 → 사용자 승인 → `main` 병합·push → 운영 폴더에서 `git pull --ff-only` → 필요한 의존성·마이그레이션·서비스 재시작 → 상태 확인 순서로 진행합니다. 배포는 지정된 infra/DevOps 담당자 한 명이 수행합니다.
+- 개발 환경의 DB, 포트, 환경변수는 운영 환경과 분리합니다. 운영 폴더에서 직접 개발하지 않고 비밀값을 보고서나 Git에 포함하지 않습니다.
+- 결과물은 프로젝트 `outputs/<작업명>/<phase>/`에 저장하고, 계획·역할·검증 기록은 `docs/`와 `agents/`에서 관리합니다. 사실과 추정을 구분하고 확인하지 못한 내용은 `확인 필요`로 표시합니다.
+
 - 앱과 스케줄러는 `/srv/apps/agecalc/.env.rss`를 공유합니다.
 - 민감 정보는 저장소에 커밋하지 않고 `.env.rss` 또는 systemd 환경 파일에서 관리합니다.
 - 현재 승인 검토 구성을 유지할 때는 `ADSENSE_REVIEW_MODE=true`, `COUPANG_PARTNERS_ENABLED=false`, `BLOG_PUBLIC_INDEXING_ENABLED=false`를 사용합니다.
