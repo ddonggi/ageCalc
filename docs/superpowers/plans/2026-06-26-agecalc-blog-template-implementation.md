@@ -1,5 +1,7 @@
 # AgeCalc Blog Template Implementation Plan
 
+> **현행 상태 (2026-09-17):** 구조화 글 registry, 공개 글 seed·해석, 블로그 상세 템플릿과 검수 계약은 구현 완료됐다. 아래 체크박스는 구현 당시 절차를 보존한 기록이며 현재 미완료 TODO 목록이 아니다.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Rebuild the public blog article experience around a structured, AdSense-safer editorial template and publish the first flagship post at `/blog/2026-man-age-guide`.

@@ -1,5 +1,7 @@
 # AgeCalc Editorial Luxury Redesign Implementation Plan
 
+> **Current status (2026-09-17):** The editorial theme, shared layouts, calculator surfaces, blog/guide layouts and regression contracts were implemented in the subsequent redesign commits. The unchecked boxes below preserve the original TDD sequence and are not the current project backlog. The minigame preservation assumptions were superseded by the later decision to retire those routes.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Redesign every public AgeCalc surface with the approved Editorial Luxury visual system while preserving calculator behavior, URLs, SEO metadata, and archived minigame routes.

@@ -90,6 +90,15 @@ REMOVED_MINIGAME_PATHS = (
 
 
 class PublicPageTests(unittest.TestCase):
+    def test_home_page_exposes_naver_site_verification(self):
+        html = app.test_client().get("/").get_data(as_text=True)
+
+        self.assertIn(
+            '<meta name="naver-site-verification" '
+            'content="2c9ad0c903ffdf79a53d4fa573c983641577ac34" />',
+            html,
+        )
+
     def test_removed_minigames_are_absent_from_every_sitemap(self):
         locations = _sitemap_leaf_locations(app.test_client())
         self.assertFalse(any("/minigames" in location for location in locations))

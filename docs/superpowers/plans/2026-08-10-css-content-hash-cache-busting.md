@@ -1,5 +1,7 @@
 # CSS Content Hash Cache Busting Implementation Plan
 
+> **현행 상태 (2026-09-17):** 콘텐츠 해시 기반 정적 CSS URL 생성과 템플릿 전환은 구현 완료됐다. 아래 체크박스는 당시 TDD 절차 기록이며 현재 TODO가 아니다.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 모든 로컬 CSS URL에 파일 내용 기반 SHA-256 버전을 자동으로 붙여 배포 직후 최신 스타일이 사용자에게 전달되게 한다.

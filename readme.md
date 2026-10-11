@@ -1,6 +1,6 @@
 # AgeCalc
 
-Flask 기반 나이 계산기, 생활 기준표, 미니게임, RSS 블로그 자동화 웹 애플리케이션입니다.
+Flask 기반 나이·날짜 계산기, 생활 기준표, 다국어 도구와 RSS 블로그 자동화 웹 애플리케이션입니다.
 
 ## 서비스 링크
 - Production: [https://agecalc.cloud](https://agecalc.cloud)
@@ -8,6 +8,7 @@ Flask 기반 나이 계산기, 생활 기준표, 미니게임, RSS 블로그 자
 - Sitemap: [https://agecalc.cloud/sitemap.xml](https://agecalc.cloud/sitemap.xml)
 
 ## 문서 안내
+- 팀 운영 및 Codex 시작 프롬프트: [docs/TEAM_OPERATIONS.md](docs/TEAM_OPERATIONS.md)
 - 배포/운영: [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
 - 블로그 DB 스키마: [BLOG_POSTS_SCHEMA.md](BLOG_POSTS_SCHEMA.md)
 - 아키텍처/흐름도: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
@@ -16,11 +17,12 @@ Flask 기반 나이 계산기, 생활 기준표, 미니게임, RSS 블로그 자
 
 ## 현재 주요 기능
 - 만나이 계산: 양력/음력 생일, 기준일, 다음 생일까지 남은 기간
-- 생활형 나이 표: 출생년도별 나이표, 학년 계산, 입학 연도, 나이 차이, 100일, 생일 D-Day
+- 생활형 나이 표: 출생년도별 나이표, 통합 학년·입학 연도 계산, 나이 차이, 100일, 생일 D-Day
 - 아이/가족 계산: 아이 개월 수, 부모·자녀 나이 관계
 - 반려동물 계산: 강아지/고양이 나이, 반려동물 개월 수
+- 다국어 날짜 계산: 6개 언어의 나이·기념일·날짜 차이·날짜 더하기/빼기 계산기
+- 지역별 계산: 한국 음력 생일, 일본·브라질 영업일, 일본 학년·연호, 영문·포르투갈어 생년월일 범위 계산
 - 기준/안내 페이지: 운영 원칙, 계산 기준, 문의, 개인정보처리방침, 이용약관, FAQ
-- 미니게임: 숫자 맞추기, 스네이크, 틱택토, 가위바위보, 님, 퐁, 행맨, 메모리 매치, 커넥트4, 라이츠아웃, 지뢰찾기, 사이먼, 2048, 블랙잭, 브레이크아웃, 하노이, 피그, 오목, 리버시, 도트 앤 박스, 만칼라, 마스터마인드, 전쟁, 배틀십, 체커, 15퍼즐, 페그 솔리테어, 야추
 - 블로그 자동화: RSS 수집, OpenAI 재창작, 커버 이미지 생성, 초안 검수, 수동 공개
 
 ## 전체 흐름
@@ -29,7 +31,7 @@ flowchart LR
     User[사용자] --> Nginx[Nginx]
     Nginx --> Gunicorn[Gunicorn]
     Gunicorn --> Flask[Flask app.py]
-    Flask --> Pages[계산기/안내/미니게임]
+    Flask --> Pages[계산기/안내]
     Flask --> Blog[블로그 공개/초안/검토]
     Flask --> MySQL[(MySQL)]
     Timer[systemd timer] --> Scheduler[RSS scheduler]
@@ -44,13 +46,13 @@ flowchart LR
 - `/age`: 만나이 계산기
 - `/birth-year-age-table`: 출생년도별 나이표
 - `/school-grade-calculator`: 학년 계산기
-- `/school-entry-year-table`: 초등학교 입학 연도표
+- `/school-entry-year-table`: 통합 학년 계산기로 이동하는 영구 리디렉션
 - `/age-gap-calculator`: 나이 차이 계산기
 - `/100-day-calculator`: 100일 계산기
 - `/baby-months-table`: 아이 개월 수 표
 - `/annual-age-calculator`: 연도별 나이 계산기
 - `/age-comparison-table`: 나이 비교표
-- `/grade-age-table`: 학년별 나이표
+- `/grade-age-table`: 학년별 출생년도표로 이동하는 영구 리디렉션
 - `/pet-age-table`: 반려동물 나이표
 - `/korean-age-guide`: 한국나이 기준 안내
 - `/pet-months-table`: 반려동물 개월 수 표
@@ -59,6 +61,8 @@ flowchart LR
 - `/college-entry-year-calculator`: 대학 입학 연도 계산기
 - `/birthday-dday-calculator`: 생일 D-Day 계산기
 - `/dog`, `/cat`, `/baby-months`, `/d-day`, `/parent-child`
+- `/days-between-dates`, `/date-add-subtract-calculator`, `/lunar-birthday-calculator`
+- `/en`, `/ja`, `/es`, `/pt-br`, `/zh-cn` 접두사의 지원 계산기와 지역별 전용 계산기
 - `/about`, `/contact`, `/references`, `/privacy`, `/terms`, `/guide`, `/faq`
 - `/sitemap.xml`, `/health`
 
@@ -71,9 +75,9 @@ flowchart LR
 - `/blog/review/<id>`: 토큰 기반 검토 상세
 - `/blog/review/<id>/approve`: 토큰 기반 공개 승인
 
-### 미니게임
-- `/minigames` 및 `/minigames/<game>` 형태의 게임 페이지
-- 미니게임은 현재 애드센스 승인 안정성을 위해 sitemap에서 제외되고 `noindex` 대상으로 관리됩니다.
+### 종료된 미니게임
+- 이전 `/minigames/` 경로는 현재 공개되지 않으며 404를 반환합니다.
+- 공개 탐색과 sitemap에도 미니게임 링크를 포함하지 않습니다.
 
 ## 기술 스택
 - Backend: Flask, Gunicorn
@@ -182,11 +186,24 @@ python scripts/rewrite_blog_posts.py --status all --all --attempts 2 --apply --p
 ```
 
 ## 운영 메모
+### 팀 운영 규칙
+
+- 총괄운영자는 요구사항, Phase, 담당 범위, 완료 조건을 정하고 필요한 팀만 실행합니다. 소규모 작업은 한 담당자가 처리할 수 있습니다.
+- 팀 구성: 리서치, SEO 분석, 디자인, frontend, backend, QA, infra/DevOps, 콘텐츠·마케팅. 역할 문서는 `agents/`에 보관하고 총괄운영자가 담당자에게 읽도록 전달합니다. 파일 저장 자체가 에이전트를 실행하지는 않습니다.
+- 프로젝트 공통 지침은 루트 `AGENTS.md`에 두고 역할 문서와 연결합니다. README의 규칙은 각 작업방에도 명시적으로 전달합니다.
+- 담당자는 완료 시 결론 3줄과 다음 단계 1줄로 한 번 보고합니다. 막힘, 사실 판단, 사용자 확인이 필요한 경우에는 즉시 알립니다. 총괄운영자는 완료 대기 기능을 사용하고 반복적인 진행 조회·독촉을 하지 않습니다.
+- Phase가 끝나면 총괄운영자는 결과와 검증 근거를 요약하고 사용자에게 다음 단계 진행 여부를 묻습니다. 사용자의 명시적 진행 답변 전에는 다음 Phase를 시작하지 않습니다.
+- 개발은 실제 경로와 브랜치를 확인한 `pre-release` 작업 트리에서 수행합니다. 경로 이름만으로 브랜치를 추정하지 않습니다. 동시 개발 시 담당 파일을 나누거나 작업별 브랜치·작업 트리를 사용하고 총괄운영자가 통합합니다.
+- QA는 계산 경계값, 기존 기능, 모바일·접근성, 광고 간섭, SEO, 개인정보 수집을 변경 범위에 맞게 검증합니다. 콘텐츠는 출처·최신 기준·독창성을 별도로 검수합니다.
+- 개발 완료 → QA 및 통합 검증 → 사용자 승인 → `main` 병합·push → 운영 폴더에서 `git pull --ff-only` → 필요한 의존성·마이그레이션·서비스 재시작 → 상태 확인 순서로 진행합니다. 배포는 지정된 infra/DevOps 담당자 한 명이 수행합니다.
+- 개발 환경의 DB, 포트, 환경변수는 운영 환경과 분리합니다. 운영 폴더에서 직접 개발하지 않고 비밀값을 보고서나 Git에 포함하지 않습니다.
+- 결과물은 프로젝트 `outputs/<작업명>/<phase>/`에 저장하고, 계획·역할·검증 기록은 `docs/`와 `agents/`에서 관리합니다. 사실과 추정을 구분하고 확인하지 못한 내용은 `확인 필요`로 표시합니다.
+
 - 앱과 스케줄러는 `/srv/apps/agecalc/.env.rss`를 공유합니다.
 - 민감 정보는 저장소에 커밋하지 않고 `.env.rss` 또는 systemd 환경 파일에서 관리합니다.
-- AdSense 재심사 동안 `ADSENSE_REVIEW_MODE=true`, `COUPANG_PARTNERS_ENABLED=false`, `BLOG_PUBLIC_INDEXING_ENABLED=false`를 유지합니다.
-- 승인 모드에서는 쿠팡 설정값과 관계없이 모든 제휴 노출이 차단되고, 블로그와 8개 라이프 허브가 sitemap에서 제외됩니다.
-- 승인 모드 sitemap은 핵심 계산기·정적 가이드·신뢰 페이지 46개로 고정됩니다.
+- 현재 승인 검토 구성을 유지할 때는 `ADSENSE_REVIEW_MODE=true`, `COUPANG_PARTNERS_ENABLED=false`, `BLOG_PUBLIC_INDEXING_ENABLED=false`를 사용합니다.
+- 승인 모드에서는 쿠팡 설정값과 관계없이 모든 제휴 노출이 차단되고, 블로그와 registry의 라이프 허브가 sitemap에서 제외됩니다.
+- 승인 모드 sitemap은 registry의 indexable 핵심 계산기·다국어/지역별 계산기·정적 가이드·신뢰 페이지에서 동적으로 생성됩니다. 정확한 URL 수는 `tests/i18n_expected.py`와 sitemap 테스트가 관리합니다.
 - `COUPANG_PARTNERS_ENABLED=true`는 승인 모드가 해제된 경우에만 쿠팡 파트너스 배너와 고지 문구를 노출합니다.
 - `agecalc-rss.timer`는 현재 production 기준 매일 `09:00`, `12:00`, `19:00` KST에 실행되며 실행당 초안 1개 생성을 시도합니다.
 - 앱 코드 변경 후 production 반영은 `ubuntu` 계정에서 `sudo systemctl restart agecalc.service`를 실행합니다.

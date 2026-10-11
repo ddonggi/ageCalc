@@ -1,5 +1,7 @@
 # Regional Calculators Implementation Plan
 
+> **Current status (2026-09-17):** All tasks below were completed and the work was later merged and deployed in `bb5db60`. The no-deployment/no-merge constraints record the original implementation session; they are not the current release state.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox syntax for tracking.
 
 **Goal:** Ship five calculator features as seven locale-scoped pages without deployment.

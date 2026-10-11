@@ -89,7 +89,9 @@
 - Consumes: verified `develop/pre-release` commit.
 - Produces: matching `main`, remote branches, restarted `agecalc.service`, and verified production URLs.
 
-- [ ] Review the exact staged file list and commit.
-- [ ] Fetch remote state and fast-forward or merge `develop/pre-release` into `main` without discarding unrelated files.
-- [ ] Push the updated branches according to the existing remote topology.
-- [ ] Restart `agecalc.service` and verify active status, health, six localized pages, canonical/hreflang, and sitemap entries.
+- [x] Review the exact staged file list and commit.
+- [x] Fetch remote state and fast-forward or merge `develop/pre-release` into `main` without discarding unrelated files.
+- [x] Push the updated branches according to the existing remote topology.
+- [x] Restart `agecalc.service` and verify active status, health, localized pages, canonical/hreflang, and sitemap entries.
+
+Completion record (rechecked 2026-09-17): local `main`, `origin/main`, `develop/pre-release` and `origin/pre-release` point to `bb5db60`; `agecalc.service` is active; production `/health` returns `{"ok":true}` and the deployed regional calculator routes respond with their expected canonical documents.

@@ -1,6 +1,6 @@
 # AgeCalc Architecture
 
-AgeCalc는 Flask 단일 앱을 중심으로 계산기, 안내 페이지, 미니게임, 블로그를 제공하고, 별도 systemd timer가 RSS 기반 블로그 초안을 생성합니다.
+AgeCalc는 Flask 단일 앱을 중심으로 한국어·다국어 계산기, 안내 페이지와 블로그를 제공하고, 별도 systemd timer가 RSS 기반 블로그 초안을 생성합니다.
 
 ## Runtime
 ```mermaid
@@ -56,6 +56,7 @@ sequenceDiagram
 
 ## Public Indexing Rules
 - 계산기/안내 페이지는 sitemap에 포함됩니다.
-- 미니게임은 애드센스 승인 안정성을 위해 sitemap에서 제외되고 noindex 대상으로 관리됩니다.
-- 블로그 목록과 상세는 공개 글이 `BLOG_INDEX_MIN_POSTS` 기본값 3개 이상일 때 sitemap에 포함됩니다.
+- 종료된 미니게임 경로는 공개 탐색과 sitemap에서 제거되었고 404를 반환합니다.
+- 블로그 목록과 상세는 `BLOG_PUBLIC_INDEXING_ENABLED=true`, `ADSENSE_REVIEW_MODE=false`, 공개 글이 `BLOG_INDEX_MIN_POSTS` 이상이라는 조건을 모두 충족할 때 sitemap에 포함됩니다.
+- 다국어·지역별 계산기는 registry의 locale allowlist에 등록된 실제 문서만 sitemap과 hreflang에 포함됩니다.
 - `draft`와 `needs_review`는 public route에서 접근되지 않습니다.

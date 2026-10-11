@@ -1,5 +1,7 @@
 # AgeCalc Life Platform Implementation Plan
 
+> **현행 상태 (2026-09-17):** 이 문서는 전체 플랫폼 확장 구상을 보존한 장기 계획 기록이다. 레지스트리, 8개 허브, 허브 중심 탐색, 편집 메타데이터, 분할 sitemap 등 여러 기반 작업은 이후 커밋에서 구현됐다. 아래의 미체크 항목 전체를 현재 TODO로 해석하지 말고, 실제 후속 작업은 `2026-08-23-agecalc-expansion-checklist.md`와 최신 운영 문서를 기준으로 선정한다.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 현재 AgeCalc를 AdSense 승인 가능성이 높은 나이 기반 라이프 플랫폼으로 전환하고, 3개월 안에 기존 콘텐츠 품질 개선·8개 허브·15개 고수요 기능·최소 AI 기능을 안전하게 출시한다.

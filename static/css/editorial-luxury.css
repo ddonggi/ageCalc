@@ -1539,6 +1539,14 @@ body .scroll-top-btn {
     font-size: 1.55rem;
   }
 
+  /* Keep mobile article covers in flow at their intrinsic image ratio. */
+  .blog-page .editorial-article > .blog-hero {
+    height: auto;
+    max-height: none;
+    aspect-ratio: auto;
+    object-fit: contain;
+  }
+
   .editorial-prose,
   .editorial-article .editorial-prose,
   .editorial-prose > section,
