@@ -3734,7 +3734,7 @@ input.error {
     }
 
     .breadcrumbs {
-        width: calc(100vw - 28px);
+        width: 100%;
         margin-top: 10px;
         overflow-x: auto;
         white-space: nowrap;
