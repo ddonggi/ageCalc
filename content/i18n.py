@@ -110,9 +110,41 @@ def _leaf_strings(value, path=''):
         raise ValueError(f'Invalid translation at {path}')
 
 
+def _validate_editorial_sections(sections, locale):
+    """Static prose has a repeated schema, not a translated array index contract."""
+    def invalid(path):
+        raise ValueError(f'Invalid translation: {locale}.sections{path}')
+
+    def validate_text(value, path):
+        # Templates render this prose directly; interpolation is not supported.
+        if not isinstance(value, str) or not value.strip() or re.search(r'\{\w+\}', value):
+            invalid(path)
+
+    if not isinstance(sections, list) or not sections:
+        invalid('')
+    for index, section in enumerate(sections):
+        path = f'[{index}]'
+        if not isinstance(section, dict) or section.keys() != {'heading', 'paragraphs'}:
+            invalid(path)
+        validate_text(section['heading'], f'{path}.heading')
+        paragraphs = section['paragraphs']
+        if not isinstance(paragraphs, list) or not paragraphs:
+            invalid(f'{path}.paragraphs')
+        for paragraph_index, paragraph in enumerate(paragraphs):
+            validate_text(paragraph, f'{path}.paragraphs[{paragraph_index}]')
+
+
 def validate_translations():
     """Fail publication on incomplete catalogs, placeholders or URL collisions."""
     def validate_section(actual_section, reference_section, locale):
+        if ('sections' in actual_section) != ('sections' in reference_section):
+            raise ValueError(f'Translation keys differ: {locale}')
+        if 'sections' in actual_section:
+            _validate_editorial_sections(actual_section['sections'], locale)
+            # Keep the strict translation contract for UI keys, FAQ and all
+            # other fields; only editorial section/paragraph counts may vary.
+            actual_section = {key: value for key, value in actual_section.items() if key != 'sections'}
+            reference_section = {key: value for key, value in reference_section.items() if key != 'sections'}
         baseline = dict(_leaf_strings(reference_section))
         actual = dict(_leaf_strings(actual_section))
         if actual.keys() != baseline.keys():

@@ -168,7 +168,7 @@ STATIC_PAGE_REGISTRY = (
         "몇년생 몇살인지 출생연도별 만나이와 연나이 확인",
         priority="core",
         related_endpoints=("age", "annual_age_calculator", "birth_year_zodiac_table"),
-        lastmod="2026-08-13",
+        lastmod="2026-10-15",
     ),
     _page(
         "school_grade_calculator",
@@ -178,7 +178,7 @@ STATIC_PAGE_REGISTRY = (
         "출생연도 기준 현재 학년과 초·중·고 입학 시점 확인",
         priority="core",
         related_endpoints=("grade_birth_year_table", "college_entry_year_calculator"),
-        lastmod="2026-08-13",
+        lastmod="2026-10-15",
     ),
     _page(
         "school_entry_year_table",
@@ -279,7 +279,7 @@ STATIC_PAGE_REGISTRY = (
         "학년별 나이 계산기",
         "학년별 일반 출생연도와 연나이·만나이 범위 확인",
         related_endpoints=("school_grade_calculator", "college_entry_year_calculator"),
-        lastmod="2026-08-13",
+        lastmod="2026-10-15",
     ),
     _page(
         "birth_year_zodiac_table",
@@ -297,7 +297,7 @@ STATIC_PAGE_REGISTRY = (
         "학번 계산기",
         "대학 학번 기준 출생연도와 현재 나이 확인",
         related_endpoints=("school_grade_calculator", "grade_birth_year_table", "parent_child"),
-        lastmod="2026-08-13",
+        lastmod="2026-10-15",
     ),
     _page(
         "birthday_dday_calculator",

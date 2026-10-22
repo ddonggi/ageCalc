@@ -40,7 +40,7 @@ class BlogContentContractTests(unittest.TestCase):
         from content.blog_articles import BLOG_ARTICLE_BLUEPRINTS
         from content.blog.schema import validate_article_registry
 
-        validate_article_registry(BLOG_ARTICLE_BLUEPRINTS, today=date(2026, 7, 22))
+        validate_article_registry(BLOG_ARTICLE_BLUEPRINTS, today=date.today())
 
     def test_contract_requires_editorial_metadata(self):
         from content.blog.schema import ContentContractError, validate_article_registry
@@ -208,7 +208,7 @@ class BlogContentContractTests(unittest.TestCase):
                 self.assertGreater(date.fromisoformat(article["expires_at"]), today)
                 self.assertEqual("AgeCalc 편집책임자", article["review_owner"])
 
-    def test_all_twelve_articles_record_the_current_full_editorial_review(self):
+    def test_all_twelve_articles_record_their_latest_editorial_review(self):
         from content.blog_articles import BLOG_ARTICLE_BLUEPRINTS
 
         self.assertEqual(12, len(BLOG_ARTICLE_BLUEPRINTS))
@@ -220,12 +220,18 @@ class BlogContentContractTests(unittest.TestCase):
             "https://www.moe.go.kr/",
             "https://www.nhis.or.kr/",
         }
+        renewed_slugs = {
+            "age-65-benefits-2026",
+            "national-pension-receiving-age",
+            "2026-national-health-checkup-eligibility",
+        }
         for slug, article in BLOG_ARTICLE_BLUEPRINTS.items():
             with self.subTest(slug=slug):
-                self.assertEqual("2026-07-22", article["reviewed_at"])
+                expected_review = "2026-10-22" if slug in renewed_slugs else "2026-07-22"
+                self.assertEqual(expected_review, article["reviewed_at"])
                 self.assertTrue(article["source_urls"])
                 for source in article["source_urls"]:
-                    self.assertEqual("2026-07-22", source["checked_at"])
+                    self.assertEqual(expected_review, source["checked_at"])
                     self.assertNotIn(source["url"], generic_homepages)
 
     def test_contract_uses_stable_canonical_and_local_thumbnail(self):

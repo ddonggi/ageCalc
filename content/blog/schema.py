@@ -37,10 +37,12 @@ OFFICIAL_SOURCE_HOSTS = {
     "www.aaha.org",
     "www.bokjiro.go.kr",
     "www.gov.kr",
+    "www.korea.kr",
     "www.law.go.kr",
     "www.moe.go.kr",
     "www.nhis.or.kr",
     "www.nps.or.kr",
+    "www.yw.go.kr",
 }
 
 REQUIRED_ARTICLE_FIELDS = (

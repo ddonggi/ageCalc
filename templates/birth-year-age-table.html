@@ -51,6 +51,7 @@
                 <div class="hero-actions">
                     <a class="btn btn-primary" href="#birth-year-search">연도 바로 찾기</a>
                     <a class="btn btn-secondary" href="{{ url_for('age') }}">만나이 계산기 열기</a>
+                    <a class="btn btn-secondary" href="#preview-2027">2027년 기준 보기</a>
                 </div>
             </div>
             <div class="hero-metrics" aria-label="표시 정보">
@@ -85,6 +86,7 @@
             </p>
             {% endif %}
         </section>
+
 
         <section class="section-shell">
             <div class="section-heading">
@@ -179,6 +181,23 @@
                 </article>
                 {% endfor %}
             </div>
+        </section>
+
+        <section class="section-shell" id="preview-2027" aria-labelledby="preview-2027-heading">
+            <h2 id="preview-2027-heading">2027년 기준 출생연도별 나이 비교</h2>
+            <p>현재 표는 {{ current_year }}년 기준입니다. 아래는 같은 출생연도의 2027년 연나이와 생일 전후 만나이 범위를 비교합니다. 연나이는 1월 1일에 바뀌고, 만나이는 각자의 생일에 바뀝니다.</p>
+            <div class="data-table-wrap">
+                <table class="data-table">
+                    <caption>현재 연나이와 2027년 나이표 — 생일 전 → 생일 이후</caption>
+                    <thead><tr><th scope="col">출생연도</th><th scope="col">{{ current_year }}년 연나이</th><th scope="col">2027년 연나이</th><th scope="col">2027년 만나이 범위</th></tr></thead>
+                    <tbody>{% for row in preview_rows %}
+                        <tr{% if row.is_selected %} class="is-selected"{% endif %}><th scope="row">{{ row.label }}</th><td>{{ row.current_annual_age }}</td><td>{{ row.annual_age }}</td><td>{{ row.man_age_range }}</td></tr>
+                    {% endfor %}</tbody>
+                </table>
+            </div>
+            <p>2027년 출생자는 출생 후 만 0세입니다. 생년월일과 기준일이 정해지면 <a href="{{ url_for('age') }}">만나이 계산기</a>로 정확한 나이를 확인하세요.</p>
+            <h3>2027년이 되면 학년도도 바로 바뀌나요?</h3>
+            <p>달력연도와 학년도는 다릅니다. <a href="{{ url_for('grade_birth_year_table') }}#preview-2027">2027학년도 학년별 출생연도</a>는 3월부터의 일반 진급 기준입니다.</p>
         </section>
 
         <section class="section-shell">

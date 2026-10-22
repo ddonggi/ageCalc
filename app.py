@@ -1894,12 +1894,22 @@ def birth_year_age_table():
         "man_birth_years": (current_year - 21, current_year - 20),
     }
 
+    preview_rows = [
+        {
+            **_build_birth_year_snapshot(row["year"], 2027),
+            "current_annual_age": row["annual_age"],
+            "is_selected": row["is_selected"],
+        }
+        for row in rows if row["year"] <= 2027
+    ]
+
     return render_template(
         'birth-year-age-table.html',
         current_year=current_year,
         selected_year=selected_year,
         selected_row=selected_row,
         birth_year_rows=rows,
+        preview_rows=preview_rows,
         year_options=range(max_year, min_year - 1, -1),
         examples=examples,
         featured_age_lookup=featured_age_lookup,
@@ -1937,12 +1947,24 @@ def school_grade_calculator():
     example_years = [year for year in (2019, 2016, 2013, 2010) if 1900 <= year <= current_year]
     examples = [_build_school_grade_snapshot(year, school_year) for year in example_years]
 
+    preview_years = {2020, 2014, 2011}
+    if selected_year is not None:
+        preview_years.add(selected_year)
+    preview_rows = [
+        {
+            **_build_school_grade_snapshot(year, 2027),
+            "present_grade": _build_school_grade_snapshot(year, school_year)["current_grade"],
+        }
+        for year in sorted(preview_years, reverse=True)
+    ]
+
     return render_template(
         'school-grade-calculator.html',
         school_year=school_year,
         selected_year=selected_year,
         selected_row=selected_row,
         school_grade_rows=rows,
+        preview_rows=preview_rows,
         year_options=range(max_year, min_year - 1, -1),
         examples=examples,
         canonical_url=f"{SITE_BASE_URL}/school-grade-calculator",
@@ -2311,8 +2333,15 @@ def grade_birth_year_table():
         "학년별 일반 출생연도와 연나이·만나이 범위, 빠른년생·입학유예 예외를 확인하세요."
     )
 
+    preview_rows = [
+        _build_grade_birth_year_snapshot(stage_key, grade_number, 2027, 2027)
+        for stage_key, max_grade in valid_stage_grades.items()
+        for grade_number in range(1, max_grade + 1)
+    ]
+
     return render_template(
         'grade-birth-year-table.html',
+        preview_rows=preview_rows,
         school_year=school_year,
         selected_stage=stage,
         selected_grade=grade,
@@ -2424,6 +2453,8 @@ def college_entry_year_calculator():
 
     return render_template(
         'college-entry-year-calculator.html',
+        preview_cohort=_build_college_entry_snapshot(2027, current_year),
+        preview_entry=_build_college_entry_snapshot(2027, 2027),
         current_year=current_year,
         selected_year=selected_year,
         selected_row=selected_row,
