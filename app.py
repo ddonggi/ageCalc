@@ -1027,17 +1027,41 @@ def _build_hundred_day_snapshot(start_date, today=None) -> dict[str, object]:
     if today is None:
         today = _current_local_date()
 
-    hundredth_date = start_date + timedelta(days=99)
-    diff = (hundredth_date - today).days
-
-    if diff > 0:
-        status_label = f"D-{diff}"
+    milestones = []
+    for label, rule, offset in (
+        ("100일째", "시작일 포함 · 99일 더하기", 99),
+        ("첫돌(1주년)", "다음 해 같은 월일 · 2월 29일은 3월 1일", None),
+        ("1000일째", "시작일 포함 · 999일 더하기", 999),
+    ):
+        try:
+            if offset is not None:
+                milestone_date = start_date + timedelta(days=offset)
+            elif start_date.month == 2 and start_date.day == 29:
+                milestone_date = start_date.replace(year=start_date.year + 1, month=3, day=1)
+            else:
+                milestone_date = start_date.replace(year=start_date.year + 1)
+        except (OverflowError, ValueError):
+            milestone_date = None
+        diff = (milestone_date - today).days if milestone_date else None
+        milestones.append({
+            "label": label, "rule": rule, "date": milestone_date,
+            "date_label": _format_calendar_date(milestone_date) if milestone_date else "지원 날짜 범위 밖",
+            "available": milestone_date is not None,
+            "status_label": ("D-Day" if diff == 0 else f"D-{diff}" if diff > 0 else f"D+{abs(diff)}") if diff is not None else "지원 날짜 범위 밖",
+            "status_kind": ("today" if diff == 0 else "future" if diff > 0 else "past") if diff is not None else "unavailable",
+        })
+    hundredth = milestones[0]
+    milestones.sort(key=lambda item: (item["date"] is None, item["date"]))
+    next_milestone = next((item for item in milestones if item["date"] is not None and item["date"] >= today), None)
+    diff = (hundredth["date"] - today).days if hundredth["available"] else None
+    status_label = hundredth["status_label"]
+    if diff is None:
+        status_note = "100일째가 지원 날짜 범위를 벗어납니다. 다른 기념일 결과를 확인해 주세요."
+    elif diff > 0:
         status_note = f"100일째까지 {diff}일 남았습니다."
     elif diff < 0:
-        status_label = f"D+{abs(diff)}"
         status_note = f"100일째가 지난 지 {abs(diff)}일 되었습니다."
     else:
-        status_label = "D-Day"
         status_note = "바로 오늘이 100일째입니다."
 
     elapsed = (today - start_date).days + 1
@@ -1048,7 +1072,10 @@ def _build_hundred_day_snapshot(start_date, today=None) -> dict[str, object]:
 
     return {
         "start_date": _format_calendar_date(start_date),
-        "hundredth_date": _format_calendar_date(hundredth_date),
+        "hundredth_date": hundredth["date_label"],
+        "milestones": milestones,
+        "next_milestone": next_milestone,
+        "all_milestones_past": all(item["date"] is not None and item["date"] < today for item in milestones),
         "status_label": status_label,
         "status_note": status_note,
         "elapsed_label": elapsed_label,

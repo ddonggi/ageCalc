@@ -86,7 +86,7 @@
         <section class="section-shell">
             <div class="section-heading">
                 <h2 id="hundred-day-search">시작일 입력</h2>
-                <p class="section-intro">시작일 8자리를 입력하면 100일째 날짜와 오늘 기준 상태가 바로 나옵니다.</p>
+                <p class="section-intro">시작일 8자리를 입력하면 백일·첫돌(1주년)·1000일째 날짜와 오늘 기준 상태를 함께 확인할 수 있습니다.</p>
             </div>
             <form class="age-form" id="hundred-day-form" action="{{ url_for('hundred_day_calculator') }}#hundred-day-result" method="get" data-clarity-mask="true">
                 <div class="form-group">
@@ -116,6 +116,32 @@
                     <div class="summary-card"><strong>현재 기준 경과</strong><span>{{ selected_snapshot.elapsed_label }}</span></div>
                 </div>
                 <p class="small">{{ selected_snapshot.status_note }}</p>
+                <h3 id="anniversary-heading">백일·첫돌·천일 함께 보기</h3>
+                {% if selected_snapshot.next_milestone %}
+                <p><strong>다음 기념일:</strong> {{ selected_snapshot.next_milestone.label }} · {{ selected_snapshot.next_milestone.date_label }} · {{ selected_snapshot.next_milestone.status_label }}</p>
+                {% elif selected_snapshot.all_milestones_past %}
+                <p>표에 표시된 기념일이 모두 지났습니다.</p>
+                {% else %}
+                <p>지원 날짜 범위 안에서 다음 기념일을 계산할 수 없습니다.</p>
+                {% endif %}
+                <p class="small" id="anniversary-scroll-help">좁은 화면에서는 표를 좌우로 움직여 확인하세요. 키보드로 표에 초점을 맞춘 뒤 방향키로 이동할 수 있습니다.</p>
+                <div class="data-table-wrap" role="region" tabindex="0" aria-labelledby="anniversary-heading" aria-describedby="anniversary-scroll-help">
+                    <table class="data-table">
+                        <caption>선택한 시작일의 기념일과 오늘 기준 상태</caption>
+                        <thead><tr><th scope="col">기념일</th><th scope="col">날짜</th><th scope="col">계산 기준</th><th scope="col">오늘 기준 상태</th></tr></thead>
+                        <tbody>
+                            {% for milestone in selected_snapshot.milestones %}
+                            <tr>
+                                <th scope="row">{{ milestone.label }}</th>
+                                <td>{{ milestone.date_label }}</td>
+                                <td>{{ milestone.rule }}</td>
+                                <td>{{ milestone.status_label }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p class="small">첫돌(1주년)은 365일을 더하는 대신 다음 해 같은 월일로 계산합니다. 2월 29일 시작은 이 도구에서 다음 해 3월 1일을 기념일로 안내합니다. 법적 날짜 기준을 뜻하지 않습니다. 계산 결과가 지원 날짜 범위를 넘으면 해당 행에 ‘지원 날짜 범위 밖’으로 표시합니다.</p>
                 {% endif %}
             </article>
         </section>
@@ -146,7 +172,7 @@
                 <ul>
                     <li>시작일을 1일째로 계산하므로 100일째 날짜는 시작일에 99일을 더해 구합니다.</li>
                     <li>오늘 기준 상태는 100일째 날짜와 오늘 날짜를 비교해 D-Day 형식으로 보여줍니다.</li>
-                    <li>기념일 계산기와 달리 이 페이지는 100일 기준 확인에만 집중한 안내 페이지입니다.</li>
+                    <li>백일과 함께 1000일째(시작일 +999일), 첫돌(다음 해 같은 월일)을 확인합니다. 2월 29일의 첫돌은 다음 해 3월 1일로 안내합니다.</li>
                 </ul>
             </article>
             <article class="section-card">
