@@ -48,6 +48,7 @@
 
 html {
     scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--desktop-header-height) + 16px);
 }
 
 body {
@@ -174,6 +175,7 @@ button {
 
 .site-header {
     display: grid;
+    line-height: normal;
     grid-template-columns: minmax(190px, 1fr) auto auto;
     position: relative;
     z-index: 80;
@@ -3745,6 +3747,14 @@ input.error {
         flex-wrap: nowrap;
     }
 
+    .breadcrumbs li:last-child {
+        padding-inline-end: 6px;
+    }
+
+    .breadcrumbs a:focus-visible {
+        outline-offset: -2px;
+    }
+
     .brand-word {
         font-size: 1.8rem;
     }
@@ -4166,6 +4176,10 @@ input.error {
 }
 
 @media (max-width: 900px) {
+    html {
+        scroll-padding-top: calc(var(--mobile-header-height) + 16px);
+    }
+
     body {
         padding-top: var(--mobile-header-height);
     }
