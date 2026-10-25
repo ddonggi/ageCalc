@@ -1,0 +1,6 @@
+.time-duration-page { --site-font: "Pretendard", -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif; }
+.time-duration-page #time-result-title { scroll-margin-top: 180px; scroll-margin-bottom: 24px; }
+.time-duration-page #time-result-title:focus { outline: 2px solid #32634c; outline-offset: 4px; }
+.time-duration-page #time-inputs input { scroll-margin-top: 180px; scroll-margin-bottom: 24px; }
+.time-duration-page #time-inputs input[type=time] { max-width: 100%; }
+.time-duration-page #time-inputs input[aria-invalid=true] { border-color: #a02929; }

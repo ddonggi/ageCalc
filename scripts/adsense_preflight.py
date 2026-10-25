@@ -22,6 +22,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from content.page_registry import PRIVACY_NO_THIRD_PARTY_PATHS
+
 FORBIDDEN_SITEMAP_PREFIXES = ("/minigames", "/blog/drafts", "/blog/review")
 AFFILIATE_HTML_MARKERS = (
     "link.coupang.com",
@@ -152,7 +154,12 @@ def _validate_public_page(path: str, response, html: str, adsense_client_id: str
 
     adsense_account = f'<meta name="google-adsense-account" content="{adsense_client_id}">'
     adsense_script = f"pagead/js/adsbygoogle.js?client={adsense_client_id}"
-    if adsense_account not in html or adsense_script not in html:
+    if path in PRIVACY_NO_THIRD_PARTY_PATHS:
+        # An explicit input-privacy policy, not a general exemption for missing ads.
+        scripts = re.findall(r"<script\b[^>]*>.*?</script>", html, re.I | re.S)
+        if any(re.search(r"(?:src\s*=\s*['\"](?:https?:)?//|analytics\.js|clarity-init\.js|googlesyndication|googletagmanager|google-analytics|clarity\.ms)", script, re.I) for script in scripts):
+            report.add_issue("privacy_page_third_party_script", path, "입력 비공개 페이지에 외부 수집 스크립트가 있습니다.")
+    elif adsense_account not in html or adsense_script not in html:
         report.add_issue("adsense_code_missing", path, "공개 페이지에 애드센스 승인 코드가 없습니다.")
 
     if not re.search(r"<title>.+?</title>", html, re.S):

@@ -121,6 +121,24 @@ def editorial_metadata_for(page: dict[str, object] | None) -> dict[str, object] 
     if not page:
         return None
 
+    if page["key"] == "time_duration_calculator":
+        # Technical references checked in B2 Phase 1; no labor-law review is claimed.
+        return {
+            "author": EDITORIAL_AUTHOR,
+            "reviewer": EDITORIAL_REVIEWER,
+            "review_method": "자체 계산 명세·기술 문서 대조",
+            "policy_review_cadence": "계산 명세·입력 형식 변경 시 재검수",
+            "reviewed_at": "2026-10-25",
+            "modified_at": str(page["lastmod"]),
+            "official_source_required": False,
+            "sources": (
+                {"institution": "MDN Web Docs", "title": "time 입력의 값 형식과 분 단위 간격", "url": "https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/time", "checked_at": "2026-10-25", "official": False},
+                {"institution": "MDN Web Docs", "title": "Date와 시간대·일광절약시간 설명", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date", "checked_at": "2026-10-25", "official": False},
+            ),
+            "disclaimer": "벽시계 시각의 차이를 계산하는 제품 규칙이며, 법정 근로시간·급여 또는 시간대 이동의 실제 경과시간을 판정하지 않습니다.",
+            "related_search_term_slots": {},
+        }
+
     official_source_required = str(page["key"]) in OFFICIAL_SOURCE_REQUIRED_KEYS
     source_hub = str(page["hub"])
     if page["key"] in {"references", "faq"}:

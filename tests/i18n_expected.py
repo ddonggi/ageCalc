@@ -23,6 +23,7 @@ KOREAN_REVIEW_PATHS = frozenset('''
 /birthday-dday-calculator
 /d-day
 /days-between-dates
+/time-duration-calculator
 /date-add-subtract-calculator
 /lunar-birthday-calculator
 /pet-age-table

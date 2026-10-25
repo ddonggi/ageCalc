@@ -23,6 +23,9 @@ LOCALIZED_PAGE_SETTINGS = {
 }
 
 
+# No third-party collection scripts on input-private browser-only tools.
+PRIVACY_NO_THIRD_PARTY_PATHS = frozenset({"/time-duration-calculator"})
+
 CONTENT_ACTIONS = frozenset({"keep", "strengthen", "merge", "noindex"})
 PUBLIC_RELEASE_BATCHES = frozenset({"existing", "foundation"})
 REQUIRED_PAGE_FIELDS = frozenset(
@@ -374,13 +377,23 @@ STATIC_PAGE_REGISTRY = (
         lastmod="2026-08-15",
     ),
     _page(
+        "time_duration_calculator",
+        "/time-duration-calculator",
+        "anniversary",
+        "시간 차이·하루 근무시간 계산기",
+        "시작·종료 시각과 당일·익일 및 휴게 분으로 하루 순시간 계산",
+        related_endpoints=("days_between_dates", "date_add_subtract"),
+        lastmod="2026-10-25",
+        locales=("ko",),
+    ),
+    _page(
         "days_between_dates",
         "/days-between-dates",
         "anniversary",
         "두 날짜 사이 일수 계산기",
         "시작일과 종료일 사이의 일수 및 주 수 계산",
         priority="core",
-        related_endpoints=("d_day", "hundred_day_calculator", "birthday_dday_calculator"),
+        related_endpoints=("d_day", "hundred_day_calculator", "birthday_dday_calculator", "time_duration_calculator"),
         lastmod="2026-09-10",
     ),
     _page(
@@ -390,7 +403,7 @@ STATIC_PAGE_REGISTRY = (
         "날짜 더하기·빼기 계산기",
         "시작 날짜에 일·주·개월·연수를 더하거나 빼서 도착 날짜와 요일, 실제로 이동한 달력 일수 확인",
         priority="core",
-        related_endpoints=("days_between_dates", "d_day", "hundred_day_calculator"),
+        related_endpoints=("days_between_dates", "d_day", "hundred_day_calculator", "time_duration_calculator"),
         lastmod="2026-09-10",
     ),
     _page(

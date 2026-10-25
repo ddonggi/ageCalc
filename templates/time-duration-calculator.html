@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>시간 차이·하루 근무시간 계산기 | AgeCalc</title>
+    <meta name="description" content="시작·종료 시각과 당일·익일, 휴게시간을 입력해 하루의 전체 시간과 순시간을 분 단위로 계산합니다. 0시간·24시간과 자정을 넘는 구간의 기준도 확인하세요.">
+    <link rel="canonical" href="{{ page_canonical_url }}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="시간 차이·하루 근무시간 계산기 | AgeCalc">
+    <meta property="og:description" content="당일·익일과 휴게시간을 반영해 최대 24시간의 시각 차이를 계산합니다.">
+    <meta property="og:url" content="{{ page_canonical_url }}">
+    <meta property="og:image" content="{{ site_base_url }}/static/images/og-image.png">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}">
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}">
+    <link rel="stylesheet" href="{{ versioned_static('css/i18n.css') }}">
+    <link rel="stylesheet" href="{{ versioned_static('css/time-duration-calculator.css') }}">
+    {% for schema in global_schema | default([]) %}<script type="application/ld+json" nonce="{{ csp_nonce }}">{{ schema | tojson }}</script>{% endfor %}
+    <script src="{{ versioned_static('js/time-calculations.js') }}" defer></script>
+    <script src="{{ versioned_static('js/time-duration-calculator.js') }}" defer></script>
+</head>
+<body class="global-page time-duration-page" data-disable-clarity="true" data-disable-analytics="true">
+<div class="container">
+    {% include 'partials/header.html' %}
+    <main>
+        <section class="global-hero">
+            <h1>시간 차이·하루 근무시간 계산기</h1>
+            <p>시작한 시각부터 끝난 시각까지 몇 시간인지 확인하고, 직접 입력한 휴게시간을 빼서 순시간을 계산하세요. 하루에 해당하는 최대 24시간 구간을 다룹니다.</p>
+        </section>
+        <div class="global-workspace">
+            <section class="global-panel" aria-labelledby="time-form-title">
+                <h2 id="time-form-title">시각과 휴게시간 입력</h2>
+                <noscript><p class="small">자동 계산을 사용할 수 없습니다. 아래 수동 계산 방법과 예시를 참고하세요. 입력은 서버로 전송되지 않습니다.</p></noscript>
+                <p id="time-unavailable" class="small">자동 계산에는 JavaScript가 필요합니다. 지원하지 않는 환경에서는 아래 계산 방법과 예시를 참고하세요. 입력은 전송되지 않습니다.</p>
+                <form id="time-duration-form" autocomplete="off" novalidate data-clarity-mask="true">
+                    <fieldset id="time-inputs" disabled>
+                        <legend>계산할 구간</legend>
+                        <label for="start-time">시작 시각<input id="start-time" type="time" step="60" autocomplete="off" aria-describedby="time-format-help time-error" required></label>
+                        <label for="end-time">종료 시각<input id="end-time" type="time" step="60" autocomplete="off" aria-describedby="time-format-help time-day-help time-error" required></label>
+                        <p id="time-format-help" class="small">00:00~23:59, 분 단위로 입력합니다. 화면의 오전·오후 표시는 기기의 설정에 따라 달라질 수 있습니다.</p>
+                        <label class="global-checkbox" for="next-day"><input id="next-day" type="checkbox" aria-describedby="time-day-help time-error">종료 시각은 다음 날</label>
+                        <p id="time-day-help" class="small">기본은 같은 날입니다. 자정을 넘었다면 다음 날을 선택하세요. 종료 시각이 더 이르더라도 자동으로 다음 날로 바꾸지 않습니다.</p>
+                        <label for="break-minutes">휴게시간 (분)<input id="break-minutes" type="text" inputmode="numeric" value="0" maxlength="4" autocomplete="off" aria-describedby="time-break-help time-error" required></label>
+                        <p id="time-break-help" class="small">0~1440 사이 정수 분을 직접 입력하세요. 실제 전체 시간보다 길게 입력할 수 없으며 법정 휴게시간을 자동으로 넣지 않습니다.</p>
+                        <p id="time-error" class="global-error" role="alert"></p>
+                        <div class="global-actions"><button id="calculate-time" type="button">시간 계산하기</button><button id="reset-time" type="button" class="secondary">초기화</button></div>
+                    </fieldset>
+                </form>
+                <p class="small">입력과 결과는 이 화면에서만 사용합니다. URL 전송·저장·공유·분석 수집 기능이 없으며 새로고침하면 입력이 초기화됩니다.</p>
+            </section>
+            <section id="time-result" class="global-panel" data-clarity-mask="true" aria-labelledby="time-result-title" hidden>
+                <h2 id="time-result-title" tabindex="-1">시간 계산 결과</h2>
+                <dl id="time-result-values"></dl>
+                <p id="time-result-note">벽시계에 표시된 시각의 차이입니다. 휴게시간을 뺀 값은 참고용 순시간이며 법정 근로시간·급여 판정이 아닙니다.</p>
+                <p class="small">날짜·시간대·일광절약시간(DST) 변경에 따른 실제 경과시간은 반영하지 않습니다.</p>
+            </section>
+        </div>
+        <div class="global-copy">
+            <section class="direct-answer"><h2>같은 날과 다음 날은 어떻게 선택하나요?</h2>
+                <p>09:00부터 18:00까지는 같은 날 기준으로 전체 9시간입니다. 휴게 60분을 빼면 순시간은 8시간 0분, 480분이며 소수시간은 8.00시간입니다. 점심이나 쉬는 시간을 제외하려면 실제 제외할 분을 합해 직접 입력하세요.</p>
+                <p>22:00부터 다음 날 06:00까지는 ‘종료 시각은 다음 날’을 선택합니다. 전체 8시간에서 휴게 60분을 빼면 순시간은 7시간 0분입니다. 같은 날로 두면 종료가 시작보다 이르므로 오류를 안내합니다. 익일 여부를 추측하지 않는 이유는 입력 실수와 야간 구간을 구별하기 위해서입니다.</p>
+            </section>
+            <section><h2>동일 시각의 0시간과 24시간</h2>
+                <p>시작과 종료가 모두 09:00이라면 같은 날은 0시간, 다음 날은 24시간입니다. 휴게도 전체와 같게 입력하면 순시간은 0이 됩니다. 0시간은 유효한 결과이지만, 전체가 0분일 때 휴게를 1분 이상 넣으면 오류입니다.</p>
+                <p>최대 구간은 24시간입니다. 09:00부터 다음 날 09:01까지는 24시간 1분이므로 계산하지 않습니다. 여러 날의 기간은 아래 날짜 차이 도구에서 날짜 기준으로 확인하고, 서로 다른 시간대의 실제 경과시간이나 주간 합계는 별도로 확인해야 합니다.</p>
+            </section>
+            <section><h2>계산식과 분 단위 반올림</h2>
+                <p>각 시각을 ‘시 × 60 + 분’으로 바꿉니다. 전체 분은 종료 분에서 시작 분을 빼고 다음 날일 때만 1440분을 더한 값입니다. 순 분은 전체 분에서 휴게 분을 뺍니다. 예를 들어 23:59부터 다음 날 00:00까지는 1분입니다.</p>
+                <p>결과의 시간·분 표시는 정수 분을 그대로 사용합니다. 순 소수시간만 순 분을 60으로 나누어 소수 둘째 자리까지 반올림합니다. 1분은 0.02시간, 59분은 0.98시간, 61분은 1.02시간입니다. 15분·30분 단위 올림이나 절사는 하지 않으며 반올림한 표시값을 다시 계산에 사용하지 않습니다.</p>
+            </section>
+            <section><h2>오류와 사용 범위를 확인하세요</h2>
+                <p>시각을 비워 두거나 휴게시간에 빈값·음수·소수·지수 표기를 입력하면 계산할 수 없습니다. 휴게시간이 전체보다 길면 값을 확인하세요. 24:00 대신 다음 날 00:00을 사용하되 전체 구간이 24시간 이내인지 함께 확인해야 합니다.</p>
+                <p>이 도구는 달력 날짜나 현재 시각을 읽지 않습니다. 01:30부터 03:30까지의 차이는 기기 시간대와 관계없이 120분으로 계산합니다. DST 전환이나 이동에 따라 실제 지난 시간이 달라질 수 있으므로 항공·교대 일정의 실제 경과시간을 판정하는 용도로는 사용하지 마세요.</p>
+                <p>근무시간이라는 표현은 하루 구간을 정리하는 편의를 뜻합니다. 법정 휴게·야간 가산·연장근로·시급·급여 및 적법성은 계산하지 않습니다. 해당 판단에는 적용 규정과 개별 조건을 확인해야 합니다.</p>
+            </section>
+        </div>
+        <nav class="related-paths" aria-label="관련 날짜 계산기"><h2>관련 날짜 계산기</h2><div class="global-tools"><a href="/days-between-dates">날짜 차이 계산기</a><a href="/date-add-subtract-calculator">날짜 더하기·빼기 계산기</a></div></nav>
+    </main>
+    {% include 'partials/footer.html' %}
+</div>
+</body>
+</html>

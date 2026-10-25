@@ -26,6 +26,7 @@ from content.guide_pages import (
 from content.hub_pages import HUB_PAGE_BY_KEY, HUB_PAGE_BY_SLUG, HUB_PAGES
 from content.page_registry import (
     PUBLIC_PAGE_REGISTRY,
+    PRIVACY_NO_THIRD_PARTY_PATHS,
     PUBLIC_SITEMAP_ENDPOINTS,
     SITEMAP_GROUPS,
     contextual_links_for,
@@ -708,6 +709,8 @@ def _coupang_partners_is_enabled() -> bool:
 
 
 def _adsense_is_enabled_for_path(path: str, *, blog_public_indexable: bool | None = None) -> bool:
+    if path in PRIVACY_NO_THIRD_PARTY_PATHS:
+        return False
     excluded_prefixes = ("/blog/drafts", "/blog/review")
     if any(path == prefix or path.startswith(f"{prefix}/") for prefix in excluded_prefixes):
         return False
@@ -1863,6 +1866,15 @@ def age():
     if requested_birth_date:
         response.headers['Cache-Control'] = 'no-store'
     return response
+
+@app.route('/time-duration-calculator')
+def time_duration_calculator():
+    # Query strings are never interpreted as calculator input.
+    if request.query_string:
+        _mark_result_query_noindex()
+        g.private_result_query = True
+    return render_template('time-duration-calculator.html', navigation_language_links=())
+
 
 @app.route('/privacy')
 def privacy():

@@ -141,6 +141,9 @@
                     <p id="result-note"></p>
                 </section>
             </div>
+            {% if locale_code == 'ko' and page_key in ('days_between_dates', 'date_add_subtract') %}
+            <nav class="global-tools" aria-label="관련 시간 계산기"><a href="{{ url_for('time_duration_calculator') }}">시각·휴게시간으로 하루 시간 차이 계산</a></nav>
+            {% endif %}
             <div class="global-copy">
                 {% for section in copy.sections if not section.get('feature') or features.get(section.feature, false) %}
                 <section{% if (page_key == 'days_between_dates' and loop.index == 2) or (page_key == 'date_add_subtract' and loop.index == 1) %} class="direct-answer"{% endif %}><h2>{{ section.heading }}</h2>{% for paragraph in section.paragraphs %}<p>{{ paragraph }}</p>{% endfor %}</section>

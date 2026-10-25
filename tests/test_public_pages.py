@@ -2661,6 +2661,8 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 self.assertNotIn(path, hrefs)
 
     def test_public_sitemap_pages_render_adsense_approval_code(self):
+        from content.page_registry import PRIVACY_NO_THIRD_PARTY_PATHS
+
         client = app.test_client()
 
         with app.test_request_context("/"):
@@ -2671,6 +2673,12 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 response = client.get(path)
                 self.assertEqual(response.status_code, 200)
                 html = response.get_data(as_text=True)
+                if path in PRIVACY_NO_THIRD_PARTY_PATHS:
+                    self.assertNotIn("pagead/js/adsbygoogle.js", html)
+                    self.assertNotIn("tracking-config", html)
+                    self.assertNotIn("clarity-init.js", html)
+                    self.assertNotIn("www.googletagmanager.com/gtag/js", html)
+                    continue
                 self.assertIn(
                     '<meta name="google-adsense-account" content="ca-pub-7818333740838556">',
                     html,
