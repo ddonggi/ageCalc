@@ -9,6 +9,7 @@
     const rules = window.AgeCalcGlobalRules;
     const numbers = new Intl.NumberFormat(config.locale);
     const plurals = new Intl.PluralRules(config.locale);
+    const percentages = new Intl.NumberFormat(config.locale, {style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2});
     const dates = new Intl.DateTimeFormat(config.locale, {year: 'numeric', month: 'long', day: 'numeric', calendar: 'gregory', timeZone: 'UTC'});
     const datesWithWeekday = new Intl.DateTimeFormat(config.locale, {year: 'numeric', month: 'long', day: 'numeric', weekday: 'long', calendar: 'gregory', timeZone: 'UTC'});
     const errorElement = document.getElementById('calculator-error');
@@ -108,7 +109,14 @@
                 row('result_date', formatDateWithWeekday(answer.date));
                 row('start_date', formatDate(start));
                 row('calendar_days_moved', unit(Math.abs(answer.days), 'day'));
-                note.textContent = ['month', 'year'].includes(selectedUnit) ? ui.month_end_note : ui.fixed_days_note;
+                const calendar = rules.calendarInfo(answer.date);
+                row('iso_week_label', `ISO ${String(calendar.isoYear).padStart(4, '0')}-W${String(calendar.isoWeek).padStart(2, '0')}`);
+                row('elapsed_days_label', ui.elapsed_days_value.replace('{days}', numbers.format(calendar.elapsedDays)).replace('{total}', numbers.format(calendar.yearDays)));
+                row('year_progress_label', percentages.format(calendar.yearProgress));
+                note.textContent = [
+                    ['month', 'year'].includes(selectedUnit) ? ui.month_end_note : ui.fixed_days_note,
+                    ui.calendar_info_note
+                ].join(' ');
             } else if (config.kind === 'days_between_dates') {
                 const start = readDate('start').iso;
                 const end = readDate('end').iso;

@@ -62,3 +62,226 @@ assert.throws(() => calc.dateShift('9999-12-31', 'add', 1, 'day'), /date_range/)
 assert.throws(() => calc.dateShift('9999-12-31', 'add', 1, 'month'), /date_range/);
 assert.throws(() => calc.dateShift('9999-12-31', 'add', 1, 'year'), /date_range/);
 console.log('Date shift contracts passed');
+
+// Independent datetime.isocalendar expectations captured during B3 Phase 1.
+const calendarCases = [
+  {
+    "date": "0001-01-01",
+    "weekday": 1,
+    "iso_year": 1,
+    "iso_week": 1,
+    "day_of_year": 1,
+    "elapsed_days": 0,
+    "year_days": 365,
+    "progress_percent": "0.00"
+  },
+  {
+    "date": "0099-12-31",
+    "weekday": 4,
+    "iso_year": 99,
+    "iso_week": 53,
+    "day_of_year": 365,
+    "elapsed_days": 364,
+    "year_days": 365,
+    "progress_percent": "99.73"
+  },
+  {
+    "date": "0100-01-01",
+    "weekday": 5,
+    "iso_year": 99,
+    "iso_week": 53,
+    "day_of_year": 1,
+    "elapsed_days": 0,
+    "year_days": 365,
+    "progress_percent": "0.00"
+  },
+  {
+    "date": "1900-02-28",
+    "weekday": 3,
+    "iso_year": 1900,
+    "iso_week": 9,
+    "day_of_year": 59,
+    "elapsed_days": 58,
+    "year_days": 365,
+    "progress_percent": "15.89"
+  },
+  {
+    "date": "1900-03-01",
+    "weekday": 4,
+    "iso_year": 1900,
+    "iso_week": 9,
+    "day_of_year": 60,
+    "elapsed_days": 59,
+    "year_days": 365,
+    "progress_percent": "16.16"
+  },
+  {
+    "date": "2000-02-29",
+    "weekday": 2,
+    "iso_year": 2000,
+    "iso_week": 9,
+    "day_of_year": 60,
+    "elapsed_days": 59,
+    "year_days": 366,
+    "progress_percent": "16.12"
+  },
+  {
+    "date": "2015-12-31",
+    "weekday": 4,
+    "iso_year": 2015,
+    "iso_week": 53,
+    "day_of_year": 365,
+    "elapsed_days": 364,
+    "year_days": 365,
+    "progress_percent": "99.73"
+  },
+  {
+    "date": "2016-01-01",
+    "weekday": 5,
+    "iso_year": 2015,
+    "iso_week": 53,
+    "day_of_year": 1,
+    "elapsed_days": 0,
+    "year_days": 366,
+    "progress_percent": "0.00"
+  },
+  {
+    "date": "2016-01-04",
+    "weekday": 1,
+    "iso_year": 2016,
+    "iso_week": 1,
+    "day_of_year": 4,
+    "elapsed_days": 3,
+    "year_days": 366,
+    "progress_percent": "0.82"
+  },
+  {
+    "date": "2020-12-31",
+    "weekday": 4,
+    "iso_year": 2020,
+    "iso_week": 53,
+    "day_of_year": 366,
+    "elapsed_days": 365,
+    "year_days": 366,
+    "progress_percent": "99.73"
+  },
+  {
+    "date": "2021-01-01",
+    "weekday": 5,
+    "iso_year": 2020,
+    "iso_week": 53,
+    "day_of_year": 1,
+    "elapsed_days": 0,
+    "year_days": 365,
+    "progress_percent": "0.00"
+  },
+  {
+    "date": "2021-01-04",
+    "weekday": 1,
+    "iso_year": 2021,
+    "iso_week": 1,
+    "day_of_year": 4,
+    "elapsed_days": 3,
+    "year_days": 365,
+    "progress_percent": "0.82"
+  },
+  {
+    "date": "2024-01-01",
+    "weekday": 1,
+    "iso_year": 2024,
+    "iso_week": 1,
+    "day_of_year": 1,
+    "elapsed_days": 0,
+    "year_days": 366,
+    "progress_percent": "0.00"
+  },
+  {
+    "date": "2024-02-29",
+    "weekday": 4,
+    "iso_year": 2024,
+    "iso_week": 9,
+    "day_of_year": 60,
+    "elapsed_days": 59,
+    "year_days": 366,
+    "progress_percent": "16.12"
+  },
+  {
+    "date": "2024-12-30",
+    "weekday": 1,
+    "iso_year": 2025,
+    "iso_week": 1,
+    "day_of_year": 365,
+    "elapsed_days": 364,
+    "year_days": 366,
+    "progress_percent": "99.45"
+  },
+  {
+    "date": "2024-12-31",
+    "weekday": 2,
+    "iso_year": 2025,
+    "iso_week": 1,
+    "day_of_year": 366,
+    "elapsed_days": 365,
+    "year_days": 366,
+    "progress_percent": "99.73"
+  },
+  {
+    "date": "2025-01-01",
+    "weekday": 3,
+    "iso_year": 2025,
+    "iso_week": 1,
+    "day_of_year": 1,
+    "elapsed_days": 0,
+    "year_days": 365,
+    "progress_percent": "0.00"
+  },
+  {
+    "date": "2025-12-31",
+    "weekday": 3,
+    "iso_year": 2026,
+    "iso_week": 1,
+    "day_of_year": 365,
+    "elapsed_days": 364,
+    "year_days": 365,
+    "progress_percent": "99.73"
+  },
+  {
+    "date": "9999-12-31",
+    "weekday": 5,
+    "iso_year": 9999,
+    "iso_week": 52,
+    "day_of_year": 365,
+    "elapsed_days": 364,
+    "year_days": 365,
+    "progress_percent": "99.73"
+  }
+];
+for (const example of calendarCases) {
+    const actual = calc.calendarInfo(example.date);
+    assert.deepEqual(actual, {
+        isoYear: example.iso_year, isoWeek: example.iso_week,
+        elapsedDays: example.elapsed_days, yearDays: example.year_days,
+        yearProgress: example.elapsed_days / example.year_days
+    }, example.date);
+    assert.equal((actual.yearProgress * 100).toFixed(2), example.progress_percent);
+}
+for (const invalid of ['0000-01-01', '10000-01-01', '1900-02-29', '2025-02-29', '', null]) {
+    assert.throws(() => calc.calendarInfo(invalid), /invalid_date/);
+}
+// Every public year: Jan 4 is always ISO week 1, and Dec 28 always its final ISO week.
+for (let year = 1; year <= 9999; year += 1) {
+    const prefix = String(year).padStart(4, '0');
+    const jan4 = calc.calendarInfo(`${prefix}-01-04`);
+    assert.equal(jan4.isoYear, year);
+    assert.equal(jan4.isoWeek, 1);
+    assert.equal(jan4.elapsedDays, 3);
+    const dec28 = calc.calendarInfo(`${prefix}-12-28`);
+    assert.equal(dec28.isoYear, year);
+    assert.ok([52, 53].includes(dec28.isoWeek));
+    assert.equal(calc.calendarInfo(`${prefix}-01-01`).yearProgress, 0);
+    const last = calc.calendarInfo(`${prefix}-12-31`);
+    assert.equal(last.elapsedDays, last.yearDays - 1);
+    assert.ok(last.yearProgress < 1);
+}
+assert.deepEqual(calc.dateShift('2024-12-30', 'add', 1, 'day'), {date: '2024-12-31', days: 1});
+console.log('Calendar info contracts passed: 19 independent fixtures and every public year');

@@ -94,13 +94,19 @@
         "operation": "Operation", "add": "Add", "subtract": "Subtract", "amount": "Amount", "unit": "Unit",
         "unit_day": "Days", "unit_week": "Weeks", "unit_month": "Months", "unit_year": "Years",
         "result_date": "Calculated date", "calendar_days_moved": "Calendar days moved",
+        "iso_week_label": "ISO week",
+        "elapsed_days_label": "Days elapsed in year",
+        "year_progress_label": "Year progress",
+        "elapsed_days_value": "{days} / {total} days",
+        "calendar_info_note": "ISO weeks start on Monday, and the ISO week-year may differ from the calendar year near New Year. Elapsed days and year progress use the calendar year of the calculated date, up to the start of that date, excluding the date itself.",
         "month_end_note": "If the same day does not exist in the target month, the calculation uses that month's last day.",
         "fixed_days_note": "Days move by one calendar day each; weeks move by seven calendar days each.",
         "invalid_operation": "Choose Add or Subtract.", "invalid_amount": "Enter a whole number of zero or more.", "invalid_unit": "Choose a valid time unit."
       },
       "sections": [
         {"heading": "How month ends and leap years are handled", "paragraphs": ["Days and weeks move by fixed numbers of calendar days. Months and years preserve the original day when possible; otherwise, the result is the last day of the target month. For example, 31 January 2025 plus one month is 28 February 2025, and 29 February 2024 plus one year is 28 February 2025."]},
-        {"heading": "The 100th day is not 100 days after", "paragraphs": ["This calculator treats the start date as day zero. Adding 100 days moves forward by 100 days. If the start date is day one, as with a baby's 100th day or a couple's 100-day milestone, add 99 days or use the 100th Day Calculator."]}
+        {"heading": "The 100th day is not 100 days after", "paragraphs": ["This calculator treats the start date as day zero. Adding 100 days moves forward by 100 days. If the start date is day one, as with a baby's 100th day or a couple's 100-day milestone, add 99 days or use the 100th Day Calculator."]},
+        {"heading": "ISO week and year progress", "paragraphs": ["ISO weeks start on Monday, and week 1 contains 4 January. The ISO week-year can differ from the calendar year. For example, 31 December 2024 is in ISO week 2025-W01.", "Elapsed days count from 1 January of the calculated date’s calendar year up to, but not including, that date. On 31 December 2024, 365 of 366 days have elapsed: 99.73%. With the date itself excluded, 1 January is 0.00%. This is not a live measure of time passing."]}
       ],
       "faq": [
         {"question": "Can I calculate a date in the past?", "answer": "Yes. Choose Subtract to find a date before the start date."},

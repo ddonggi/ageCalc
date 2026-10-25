@@ -77,6 +77,18 @@
         return {date: shiftedIso, days: daysBetween(start, shiftedIso)};
     }
 
+    function calendarInfo(value) {
+        const target = date(value);
+        const year = target.getUTCFullYear();
+        const yearDays = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 366 : 365;
+        const elapsedDays = (target - utc(year, 0, 1)) / DAY;
+        // Each ISO week belongs to the calendar year containing its Thursday.
+        const thursday = utc(year, target.getUTCMonth(), target.getUTCDate() + 4 - (target.getUTCDay() || 7));
+        const isoYear = thursday.getUTCFullYear();
+        const isoWeek = Math.floor((thursday - utc(isoYear, 0, 1)) / DAY / 7) + 1;
+        return {isoYear, isoWeek, elapsedDays, yearDays, yearProgress: elapsedDays / yearDays};
+    }
+
     function monthlyAnchor(birth, months) {
         const first = utc(birth.getUTCFullYear(), birth.getUTCMonth() + months, 1);
         const lastDay = utc(first.getUTCFullYear(), first.getUTCMonth() + 1, 0).getUTCDate();
@@ -157,5 +169,5 @@
         return Math.abs(values[0] - values[1]);
     }
 
-    return {isoParts, today, daysBetween, dateRange, dateShift, completedMonths, duration, birthday, age, baby, hundred, yearGap};
+    return {isoParts, today, daysBetween, dateRange, dateShift, calendarInfo, completedMonths, duration, birthday, age, baby, hundred, yearGap};
 }));

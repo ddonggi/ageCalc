@@ -12,7 +12,7 @@ LOCALIZED_PAGE_SETTINGS = {
     'school_year': {'slug': 'school-year-calculator', 'template': 'partials/regional-calculator.html', 'lastmod': '2026-09-15'},
     'birth_date_range': {'slug': 'date-of-birth-calculator', 'template': 'partials/regional-calculator.html', 'lastmod': '2026-09-15'},
     'japanese_era': {'slug': 'japanese-era-converter', 'template': 'partials/regional-calculator.html', 'lastmod': '2026-09-15'},
-    'date_add_subtract': {'slug': 'date-add-subtract-calculator', 'template': 'partials/global-calculator.html', 'register_ko': True, 'lastmod': '2026-09-10'},
+    'date_add_subtract': {'slug': 'date-add-subtract-calculator', 'template': 'partials/global-calculator.html', 'register_ko': True, 'lastmod': '2026-10-25'},
     'days_between_dates': {'slug': 'days-between-dates', 'template': 'partials/global-calculator.html', 'register_ko': True, 'lastmod': '2026-09-10'},
     'age': {'slug': 'age-calculator', 'template': 'age.html'},
     'birthday_dday_calculator': {'slug': 'birthday-dday-calculator', 'template': 'birthday-dday-calculator.html'},

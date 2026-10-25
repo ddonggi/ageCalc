@@ -62,10 +62,16 @@
     },
     "date_add_subtract": {
       "title": "日期加减计算器 — 计算若干天后的日期 | AgeCalc", "h1": "日期加减计算器", "description": "在起始日期上加减天、周、月或年，查看结果日期、星期以及实际相隔的日历天数。", "intro": "选择起始日期、加或减、数值和单位，即可查找过去或未来的日期。结果还会显示星期和实际移动的日历天数。", "form_title": "在日期上加上或减去一段时间",
-      "ui": {"operation": "运算", "add": "加", "subtract": "减", "amount": "数量", "unit": "单位", "unit_day": "天", "unit_week": "周", "unit_month": "个月", "unit_year": "年", "result_date": "计算后的日期", "calendar_days_moved": "移动的日历天数", "month_end_note": "如果目标月份没有相同日期，则使用该月最后一天。", "fixed_days_note": "每一天移动一个日历日，每一周移动七个日历日。", "invalid_operation": "请选择加或减。", "invalid_amount": "请输入大于或等于零的整数。", "invalid_unit": "请选择有效的时间单位。"},
+      "ui": {"operation": "运算", "add": "加", "subtract": "减", "amount": "数量", "unit": "单位", "unit_day": "天", "unit_week": "周", "unit_month": "个月", "unit_year": "年", "result_date": "计算后的日期", "calendar_days_moved": "移动的日历天数", "iso_week_label": "ISO周数",
+        "elapsed_days_label": "年内已过天数",
+        "year_progress_label": "年度进度",
+        "elapsed_days_value": "{days} / {total}天",
+        "calendar_info_note": "ISO周从星期一开始，年末年初的周所属年份可能与公历年份不同。年内已过天数和年度进度按计算结果日期所属的公历年计算，以该日开始时为准，不包含当天。",
+        "month_end_note": "如果目标月份没有相同日期，则使用该月最后一天。", "fixed_days_note": "每一天移动一个日历日，每一周移动七个日历日。", "invalid_operation": "请选择加或减。", "invalid_amount": "请输入大于或等于零的整数。", "invalid_unit": "请选择有效的时间单位。"},
       "sections": [
         {"heading": "月末和闰年的处理方式", "paragraphs": ["天和周按固定的日历天数移动。月和年会尽量保留原来的日期；如果目标月份没有这一天，则使用该月最后一天。例如，2025年1月31日加一个月是2025年2月28日。"]},
-        {"heading": "第100天不等于100天后", "paragraphs": ["本计算器把起始日期视为第0天。如果把起始日期算作第1天，则第100天需要加99天，也可以使用第100天计算器。"]}
+        {"heading": "第100天不等于100天后", "paragraphs": ["本计算器把起始日期视为第0天。如果把起始日期算作第1天，则第100天需要加99天，也可以使用第100天计算器。"]},
+        {"heading": "ISO周数与年度进度", "paragraphs": ["ISO周从星期一开始，包含1月4日的周为第1周。ISO周所属年份可能与公历年份不同。例如，2024年12月31日属于ISO周2025-W01。", "年内已过天数从计算结果日期所属年份的1月1日算到前一天。2024年12月31日已过365天，全年共366天，年度进度为99.73%。由于不包含当天，1月1日为0.00%。这不是实时进度。"]}
       ],
       "faq": [
         {"question": "可以计算过去的日期吗？", "answer": "可以。选择“减”即可查找起始日期之前的日期。"},
