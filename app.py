@@ -24,6 +24,7 @@ from content.guide_pages import (
     NON_INDEXABLE_GUIDE_PATHS,
 )
 from content.hub_pages import HUB_PAGE_BY_KEY, HUB_PAGE_BY_SLUG, HUB_PAGES
+from content.tool_finder import TOOL_FINDER_GROUPS, build_tool_finder_items
 from content.page_registry import (
     PUBLIC_PAGE_REGISTRY,
     PRIVACY_NO_THIRD_PARTY_PATHS,
@@ -1721,7 +1722,12 @@ def _short_grade_label(stage, grade):
 @app.get('/')
 def index():
     """메인 페이지 - 나이 계산 도구 안내"""
-    return render_template('index.html', today=_current_local_date())
+    registered_paths = {rule.endpoint: rule.rule for rule in app.url_map.iter_rules() if not (rule.arguments - set(rule.defaults or {}))}
+    return render_template(
+        'index.html', today=_current_local_date(),
+        tool_finder_items=build_tool_finder_items(registered_paths=registered_paths),
+        tool_finder_groups=TOOL_FINDER_GROUPS,
+    )
 
 
 @app.get('/life-timeline')

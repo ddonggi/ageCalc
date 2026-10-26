@@ -119,6 +119,35 @@
             </nav>
         </section>
 
+        <section class="section-shell home-tool-finder" id="tool-finder" aria-labelledby="tool-finder-title" data-clarity-mask="true">
+            <div class="section-heading">
+                <h2 id="tool-finder-title">도구 찾기</h2>
+                <p class="section-intro">도구 이름이나 필요한 상황으로 계산기를 찾아보세요.</p>
+            </div>
+            <div class="tool-finder-controls" data-tool-controls hidden>
+                <label for="tool-finder-input">도구 이름 또는 상황</label>
+                <div class="tool-finder-input-row">
+                    <input id="tool-finder-input" type="text" maxlength="80" autocomplete="off" spellcheck="false" placeholder="예: 첫돌, 휴게시간, ISO 주차" aria-describedby="tool-finder-privacy">
+                    <button type="button" data-tool-reset>초기화</button>
+                </div>
+                <p id="tool-finder-privacy" class="tool-finder-note">생년월일이나 이름 같은 개인정보는 입력하지 마세요.</p>
+                <div class="tool-finder-filters" role="group" aria-label="상황별로 찾기">
+                    <button type="button" data-tool-group="all" aria-pressed="true">전체</button>
+                    {% for group in tool_finder_groups %}
+                    <button type="button" data-tool-group="{{ group.id }}" aria-pressed="false">{{ group.label }}</button>
+                    {% endfor %}
+                </div>
+                <p class="tool-finder-count" data-tool-count role="status" aria-live="polite" aria-atomic="true">도구 {{ tool_finder_items|length }}개</p>
+            </div>
+            <p data-tool-empty hidden>일치하는 도구가 없습니다. 다른 말로 찾아보세요.</p>
+            <ul class="tool-finder-list">
+                {% for item in tool_finder_items %}
+                <li data-tool-endpoint="{{ item.endpoint }}"><a href="{{ item.path }}"><strong>{{ item.title }}</strong>{% if item.summary %}<span>{{ item.summary }}</span>{% endif %}</a></li>
+                {% endfor %}
+            </ul>
+            <script id="tool-finder-data" type="application/json">{{ tool_finder_items|tojson }}</script>
+        </section>
+
         <section class="section-shell home-method-note direct-answer">
             <div class="section-heading">
                 <p class="eyebrow">How to use</p>
@@ -147,6 +176,7 @@
     <script src="{{ versioned_static('js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <script src="{{ versioned_static('js/home-age-calculator.js') }}" defer></script>
+    <script src="{{ versioned_static('js/tool-finder.js') }}" defer></script>
 
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
         ↑
