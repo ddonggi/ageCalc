@@ -423,7 +423,7 @@ def add_security_headers(response):
         response.headers["X-Robots-Tag"] = "noindex, follow"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
-    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault("Referrer-Policy", "no-referrer" if request.endpoint in {"hundred_day_calculator", "birthday_dday_calculator"} else "strict-origin-when-cross-origin")
     response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
     response.headers["X-XSS-Protection"] = "0"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
@@ -1133,6 +1133,7 @@ def _build_birthday_dday_snapshot(month: int, day: int, today=None) -> dict[str,
     return {
         "birthday_label": f"{month}월 {day}일",
         "next_birthday_date": _format_calendar_date(next_birthday),
+        "calendar_date": f"{next_birthday.year:04d}{next_birthday.month:02d}{next_birthday.day:02d}",
         "status_label": status_label,
         "status_note": status_note,
         "days_until_label": f"{days_until}일",
@@ -2109,8 +2110,8 @@ def hundred_day_calculator():
         ("프로젝트 회고 예시", today - timedelta(days=140)),
     ]
     examples = []
-    for title, start_date in example_inputs:
-        example = _build_hundred_day_snapshot(start_date, today)
+    for title, example_start_date in example_inputs:
+        example = _build_hundred_day_snapshot(example_start_date, today)
         example["title"] = title
         examples.append(example)
 

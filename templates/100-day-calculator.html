@@ -6,6 +6,8 @@
 
 <head>
     <meta charset="utf-8" />
+    {% if google_site_verification %}<meta name="google-site-verification" content="{{ google_site_verification }}">{% endif %}
+    {% if adsense_client_id %}<meta name="google-adsense-account" content="{{ adsense_client_id }}">{% endif %}
     <meta name="viewport" content="width=device-width,initial-scale=1" />
 
     <title>100일 계산기 | 시작일 포함 100일째·기념일 날짜 계산 | AgeCalc</title>
@@ -32,14 +34,14 @@
 
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
-    <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
     <script src="{{ versioned_static('js/date-rules.js') }}" defer></script>
+    <script src="{{ versioned_static('js/anniversary-calendar.js') }}" defer></script>
+    <script src="{{ versioned_static('js/anniversary-calendar-download.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/hundred-day-calculator.js') }}" defer></script>
-    {% include 'partials/adsense.html' %}
     {% include 'partials/hreflang.html' %}
 </head>
 
-<body class="calculator-flat-page">
+<body data-disable-analytics="true" data-disable-clarity="true" class="calculator-flat-page">
     <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
@@ -92,7 +94,7 @@
                 <div class="form-group">
                     <div class="date-inputs">
                         <label class="field-label" for="hundred-day-date">시작일</label>
-                        <input type="text" id="hundred-day-date" name="start_date" value="{% if start_date %}{{ start_date.strftime('%Y%m%d') }}{% endif %}" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off" aria-label="시작일 8자리" aria-describedby="hundred-day-error" data-clarity-mask="true" required>
+                        <input type="text" id="hundred-day-date" name="start_date" value="{% if start_date %}{{ '%04d%02d%02d'|format(start_date.year, start_date.month, start_date.day) }}{% endif %}" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off" aria-label="시작일 8자리" aria-describedby="hundred-day-error" data-clarity-mask="true" required>
                     </div>
                     <div class="hero-actions">
                         <button class="btn btn-primary" type="submit">계산하기</button>
@@ -104,7 +106,7 @@
         </section>
 
         <section class="section-shell section-card-grid" id="hundred-day-result" {% if not selected_snapshot %}hidden{% endif %} aria-live="polite" data-clarity-mask="true">
-            <article class="section-card birth-year-summary" id="hundred-day-result-content">
+            <article class="section-card birth-year-summary" id="hundred-day-result-content" {% if start_date %}data-calendar-input="{{ '%04d%02d%02d'|format(start_date.year, start_date.month, start_date.day) }}"{% endif %}>
                 {% if selected_snapshot %}
                 <p class="eyebrow">선택한 시작일</p>
                 <h2>{{ selected_snapshot.start_date }} 기준 100일 안내</h2>
@@ -133,7 +135,11 @@
                             {% for milestone in selected_snapshot.milestones %}
                             <tr>
                                 <th scope="row">{{ milestone.label }}</th>
-                                <td>{{ milestone.date_label }}</td>
+                                <td>{{ milestone.date_label }}
+                                    {% if milestone.available and milestone.date.year < 10000 and not (milestone.date.year == 9999 and milestone.date.month == 12 and milestone.date.day == 31) %}
+                                    <button type="button" class="btn btn-secondary" data-calendar-kind="{{ 'hundredth' if milestone.label == '100일째' else 'first-anniversary' if milestone.label == '첫돌(1주년)' else 'thousandth' }}" data-calendar-date="{{ '%04d%02d%02d'|format(milestone.date.year, milestone.date.month, milestone.date.day) }}" aria-label="{{ milestone.label }} {{ milestone.date_label }} 일정 파일 받기" disabled>일정 파일 받기</button>
+                                    {% else %}<span class="small">지원하는 날짜 범위를 벗어나 일정 파일을 만들 수 없습니다.</span>{% endif %}
+                                </td>
                                 <td>{{ milestone.rule }}</td>
                                 <td>{{ milestone.status_label }}</td>
                             </tr>
@@ -141,12 +147,14 @@
                         </tbody>
                     </table>
                 </div>
+                <p class="small">선택한 날짜를 ICS 파일로 저장해 캘린더에 추가할 수 있습니다. 파일을 가져오면 해당 캘린더 서비스에 날짜가 저장될 수 있습니다.</p>
+                <p class="small">같은 파일을 여러 번 가져오면 일정이 중복될 수 있습니다.</p>
+                <p class="small" id="calendar-download-status" role="status" aria-live="polite"></p>
+                <noscript><p class="small">일정 파일을 받으려면 JavaScript를 켜 주세요.</p></noscript>
                 <p class="small">첫돌(1주년)은 365일을 더하는 대신 다음 해 같은 월일로 계산합니다. 2월 29일 시작은 이 도구에서 다음 해 3월 1일을 기념일로 안내합니다. 법적 날짜 기준을 뜻하지 않습니다. 계산 결과가 지원 날짜 범위를 넘으면 해당 행에 ‘지원 날짜 범위 밖’으로 표시합니다.</p>
                 {% endif %}
             </article>
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
 
         <section class="section-shell">
             <div class="section-heading">
@@ -209,17 +217,6 @@
         {% include 'partials/footer.html' %}
     </div>
 
-    <div class="cookie-banner" id="cookie-banner">
-        <div class="cookie-content">
-            <p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 동의 여부는 아래에서 선택할 수 있으며, 거부해도 주요 기능은 그대로 이용할 수 있습니다.</p>
-            <div class="cookie-buttons">
-                <button id="accept-cookies" class="btn btn-primary">동의</button>
-                <button id="reject-cookies" class="btn btn-secondary">거부</button>
-            </div>
-        </div>
-    </div>
-
-    <script src="{{ versioned_static('js/cookie-consent.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/scroll-top.js') }}" defer></script>
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">↑</button>
 </body>

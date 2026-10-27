@@ -2461,8 +2461,14 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                         for marker in ("info-coupang-promotions", "home-coupang-rail-left")
                         if marker in html
                     ]
-                    self.assertTrue(promotion_positions)
-                    self.assertLess(form_position, min(promotion_positions))
+                    from content.page_registry import PRIVACY_NO_THIRD_PARTY_PATHS
+                    if path in PRIVACY_NO_THIRD_PARTY_PATHS:
+                        self.assertEqual([], promotion_positions)
+                        self.assertNotIn("ads-partners.coupang.com", html)
+                        self.assertNotIn("link.coupang.com", html)
+                    else:
+                        self.assertTrue(promotion_positions)
+                        self.assertLess(form_position, min(promotion_positions))
 
     def test_calculator_pages_put_heading_and_form_before_explanatory_sections(self):
         client = app.test_client()
@@ -4379,6 +4385,11 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
 
                     self.assertEqual(response.status_code, 200)
                     html = response.get_data(as_text=True)
+                    from content.page_registry import PRIVACY_NO_THIRD_PARTY_PATHS
+                    if path in PRIVACY_NO_THIRD_PARTY_PATHS:
+                        for marker in ('home-coupang-rail', 'home-coupang-banner', 'coupang-mobile-banner', 'ads-partners.coupang.com', 'link.coupang.com'):
+                            self.assertNotIn(marker, html)
+                        continue
                     self.assertEqual(2, html.count('class="home-coupang-rail'))
                     self.assertEqual(10, html.count('class="home-coupang-banner"'))
                     self.assertIn("coupang-side-rail-left", html)

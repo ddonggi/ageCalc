@@ -17,7 +17,6 @@ function buildBirthdayResultHTML({ birthdayLabel, nextDate, statusLabel, days, s
                 <a href="/d-day">다른 기념일 계산</a>
                 <a href="/life-timeline">생애 타임라인 보기</a>
             </div>
-            <p class="small">저장에 동의한 생년월일이 있으면 다음 계산기에서 자동으로 불러옵니다.</p>
         </div>`;
 }
 
