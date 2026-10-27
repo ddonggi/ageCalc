@@ -33,6 +33,7 @@ CURATION = (
     ('date_add_subtract', 'anniversary', ('날짜 더하기', '날짜 빼기', 'ISO 주차', '연간 진행률')),
     ('time_duration_calculator', 'anniversary', ('휴게시간', '익일', '근무시간')),
     ('lunar_birthday', 'anniversary', ('음력 생일',)),
+    ('weekly_work_hours_calculator', 'anniversary', ('주간 근무시간', '주간 시간', '근무표')),
 )
 
 

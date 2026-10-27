@@ -1,0 +1,38 @@
+.weekly-work-hours-page { --site-font: "Pretendard", -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif; }
+.weekly-work-hours-page main { min-width: 0; }
+.weekly-work-hours-page .global-panel { margin-bottom: 24px; min-width: 0; }
+.weekly-work-hours-page #weekly-inputs { min-width: 0; }
+.weekly-days { display: grid; gap: 16px; }
+.weekly-day { min-width: 0; padding: 12px 16px 16px; border: 1px solid #d6ded7; border-radius: 8px; }
+.weekly-day legend { padding: 0 8px; font-weight: 700; }
+.weekly-fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; align-items: end; }
+.weekly-fields label { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.weekly-fields input { box-sizing: border-box; min-width: 0; width: 100%; max-width: 100%; min-height: 44px; }
+.weekly-fields label.weekly-checkbox { flex-direction: row; align-items: center; min-height: 44px; }
+.weekly-fields .weekly-checkbox input { width: 20px; min-height: 20px; flex: 0 0 20px; }
+.weekly-fields input[aria-invalid=true] { border-color: #a02929; }
+.weekly-work-hours-page button { min-height: 44px; }
+.weekly-work-hours-page button:disabled { opacity: .55; cursor: not-allowed; }
+.weekly-work-hours-page input, .weekly-work-hours-page button, #weekly-result-title { scroll-margin-top: 180px; scroll-margin-bottom: 24px; }
+#weekly-result-title:focus { outline: 2px solid #32634c; outline-offset: 4px; }
+.weekly-export { margin: 20px 0 36px; flex-wrap: wrap; }
+.weekly-table-wrap { overflow-x: auto; }
+.weekly-table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+.weekly-table th, .weekly-table td { border: 1px solid #c9d0ca; padding: 9px; text-align: left; white-space: nowrap; }
+.weekly-table tfoot { font-weight: 700; }
+#weekly-print-report { display: none; }
+@media (max-width: 760px) { .weekly-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 375px) { .weekly-fields { grid-template-columns: minmax(0, 1fr); } .weekly-day { padding: 10px; } }
+@media print {
+    @page { size: A4 portrait; margin: 14mm; }
+    html, body.weekly-work-hours-page { margin: 0 !important; padding: 0 !important; background: white !important; color: black !important; }
+    body.weekly-work-hours-page > * { display: none !important; }
+    body.weekly-work-hours-page > #weekly-print-report { display: block !important; color: black; font-family: var(--site-font); font-size: 10pt; }
+    #weekly-print-report h2 { font-size: 16pt; margin: 0 0 12pt; }
+    #weekly-print-report p { color: black !important; font-size: 10pt; line-height: 1.6; }
+    #weekly-print-report .weekly-table { width: 100%; table-layout: fixed; font-size: 8pt; }
+    #weekly-print-report th, #weekly-print-report td { color: black !important; border: 1px solid black; padding: 5pt 2pt; white-space: normal; overflow-wrap: anywhere; }
+    #weekly-print-report tr { break-inside: avoid; page-break-inside: avoid; }
+    #weekly-print-report thead { display: table-header-group; }
+    #weekly-print-report tfoot { display: table-row-group; }
+}

@@ -4,7 +4,7 @@ from copy import deepcopy
 from content import tool_finder
 from content.page_registry import STATIC_PAGE_REGISTRY
 
-EXPECTED_CURATED_TOOLS = (('age', '/age', 'age', 0, ('만나이', '만 나이')), ('annual_age_calculator', '/annual-age-calculator', 'age', 1, ('연도별 나이',)), ('age_gap_calculator', '/age-gap-calculator', 'age', 2, ('나이 차이',)), ('age_comparison_table', '/age-comparison-table', 'age', 3, ('나이 비교',)), ('birth_year_age_table', '/birth-year-age-table', 'age', 4, ('출생연도',)), ('birth_year_zodiac_table', '/birth-year-zodiac-table', 'age', 5, ('띠',)), ('baby_months', '/baby-months', 'age', 6, ('아기 월령',)), ('baby_months_table', '/baby-months-table', 'age', 7, ('개월 수',)), ('parent_child', '/parent-child', 'age', 8, ('부모 자녀',)), ('school_grade_calculator', '/school-grade-calculator', 'school', 9, ('학년',)), ('college_entry_year_calculator', '/college-entry-year-calculator', 'school', 10, ('대학 학번',)), ('grade_birth_year_table', '/grade-birth-year-table', 'school', 11, ('학년별 출생연도',)), ('d_day', '/d-day', 'anniversary', 12, ('디데이',)), ('birthday_dday_calculator', '/birthday-dday-calculator', 'anniversary', 13, ('생일',)), ('hundred_day_calculator', '/100-day-calculator', 'anniversary', 14, ('백일', '100일', '첫돌', '천일', '1000일')), ('dog', '/dog', 'pets', 15, ('강아지',)), ('cat', '/cat', 'pets', 16, ('고양이',)), ('pet_age_table', '/pet-age-table', 'pets', 17, ('반려동물',)), ('pet_months_table', '/pet-months-table', 'pets', 18, ('반려동물',)), ('days_between_dates', '/days-between-dates', 'anniversary', 19, ('날짜 차이', '기간')), ('date_add_subtract', '/date-add-subtract-calculator', 'anniversary', 20, ('날짜 더하기', '날짜 빼기', 'ISO 주차', '연간 진행률')), ('time_duration_calculator', '/time-duration-calculator', 'anniversary', 21, ('휴게시간', '익일', '근무시간')), ('lunar_birthday', '/lunar-birthday-calculator', 'anniversary', 22, ('음력 생일',)))
+EXPECTED_CURATED_TOOLS = (('age', '/age', 'age', 0, ('만나이', '만 나이')), ('annual_age_calculator', '/annual-age-calculator', 'age', 1, ('연도별 나이',)), ('age_gap_calculator', '/age-gap-calculator', 'age', 2, ('나이 차이',)), ('age_comparison_table', '/age-comparison-table', 'age', 3, ('나이 비교',)), ('birth_year_age_table', '/birth-year-age-table', 'age', 4, ('출생연도',)), ('birth_year_zodiac_table', '/birth-year-zodiac-table', 'age', 5, ('띠',)), ('baby_months', '/baby-months', 'age', 6, ('아기 월령',)), ('baby_months_table', '/baby-months-table', 'age', 7, ('개월 수',)), ('parent_child', '/parent-child', 'age', 8, ('부모 자녀',)), ('school_grade_calculator', '/school-grade-calculator', 'school', 9, ('학년',)), ('college_entry_year_calculator', '/college-entry-year-calculator', 'school', 10, ('대학 학번',)), ('grade_birth_year_table', '/grade-birth-year-table', 'school', 11, ('학년별 출생연도',)), ('d_day', '/d-day', 'anniversary', 12, ('디데이',)), ('birthday_dday_calculator', '/birthday-dday-calculator', 'anniversary', 13, ('생일',)), ('hundred_day_calculator', '/100-day-calculator', 'anniversary', 14, ('백일', '100일', '첫돌', '천일', '1000일')), ('dog', '/dog', 'pets', 15, ('강아지',)), ('cat', '/cat', 'pets', 16, ('고양이',)), ('pet_age_table', '/pet-age-table', 'pets', 17, ('반려동물',)), ('pet_months_table', '/pet-months-table', 'pets', 18, ('반려동물',)), ('days_between_dates', '/days-between-dates', 'anniversary', 19, ('날짜 차이', '기간')), ('date_add_subtract', '/date-add-subtract-calculator', 'anniversary', 20, ('날짜 더하기', '날짜 빼기', 'ISO 주차', '연간 진행률')), ('time_duration_calculator', '/time-duration-calculator', 'anniversary', 21, ('휴게시간', '익일', '근무시간')), ('lunar_birthday', '/lunar-birthday-calculator', 'anniversary', 22, ('음력 생일',)), ('weekly_work_hours_calculator', '/weekly-work-hours-calculator', 'anniversary', 23, ('주간 근무시간', '주간 시간', '근무표')))
 
 class ToolFinderTests(unittest.TestCase):
     def test_reviewed_full_curation_fixture(self):
@@ -12,8 +12,8 @@ class ToolFinderTests(unittest.TestCase):
 
     def test_reviewed_current_candidates(self):
         items = tool_finder.build_tool_finder_items()
-        self.assertEqual(len(items), 23)
-        self.assertEqual(len({item['path'] for item in items}), 23)
+        self.assertEqual(len(items), 24)
+        self.assertEqual(len({item['path'] for item in items}), 24)
         self.assertTrue({'/100-day-calculator', '/time-duration-calculator', '/date-add-subtract-calculator', '/lunar-birthday-calculator'}.issubset({x['path'] for x in items}))
 
     def test_unpublished_nonindexable_and_foreign_only_excluded(self):
@@ -61,7 +61,7 @@ class ToolFinderHomeTests(unittest.TestCase):
             self.assertEqual(response.status_code, 200)
             html = response.get_data(as_text=True)
             elements = Elements(html).elements
-            self.assertEqual(len([a for t,a in elements if 'data-tool-endpoint' in a]), 23)
+            self.assertEqual(len([a for t,a in elements if 'data-tool-endpoint' in a]), 24)
             input_attrs = next(a for t,a in elements if a.get('id') == 'tool-finder-input')
             self.assertNotIn('name', input_attrs)
             self.assertTrue(any('hidden' in a for t,a in elements if 'data-tool-controls' in a))

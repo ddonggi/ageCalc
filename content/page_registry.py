@@ -24,7 +24,7 @@ LOCALIZED_PAGE_SETTINGS = {
 
 
 # No third-party collection scripts on input-private browser-only tools.
-PRIVACY_NO_THIRD_PARTY_PATHS = frozenset({"/time-duration-calculator"})
+PRIVACY_NO_THIRD_PARTY_PATHS = frozenset({"/time-duration-calculator", "/weekly-work-hours-calculator"})
 
 CONTENT_ACTIONS = frozenset({"keep", "strengthen", "merge", "noindex"})
 PUBLIC_RELEASE_BATCHES = frozenset({"existing", "foundation"})
@@ -384,6 +384,16 @@ STATIC_PAGE_REGISTRY = (
         "시작·종료 시각과 당일·익일 및 휴게 분으로 하루 순시간 계산",
         related_endpoints=("days_between_dates", "date_add_subtract"),
         lastmod="2026-10-25",
+        locales=("ko",),
+    ),
+    _page(
+        "weekly_work_hours_calculator",
+        "/weekly-work-hours-calculator",
+        "anniversary",
+        "주간 근무시간 계산기 · 합계·CSV·인쇄",
+        "요일별 시간 합계와 CSV 다운로드·인쇄",
+        related_endpoints=("time_duration_calculator", "days_between_dates"),
+        lastmod="2026-10-27",
         locales=("ko",),
     ),
     _page(

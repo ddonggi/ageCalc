@@ -1882,6 +1882,15 @@ def time_duration_calculator():
     return render_template('time-duration-calculator.html', navigation_language_links=())
 
 
+@app.route('/weekly-work-hours-calculator')
+def weekly_work_hours_calculator():
+    # Private browser-only inputs: query strings are never interpreted.
+    if request.query_string:
+        _mark_result_query_noindex()
+        g.private_result_query = True
+    return render_template('weekly-work-hours-calculator.html', navigation_language_links=())
+
+
 @app.route('/privacy')
 def privacy():
     """개인정보 처리 방침 페이지"""
