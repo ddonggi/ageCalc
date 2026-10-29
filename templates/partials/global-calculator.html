@@ -17,6 +17,8 @@
     </div>
 </fieldset>
 {%- endmacro %}
+{% set tenure_page = locale_code == 'ko' and page_key == 'days_between_dates' %}
+{% from 'partials/tenure-copy.html' import tenure_copy %}
 <!DOCTYPE html>
 <html lang="{{ locale_code }}">
 <head>
@@ -47,13 +49,22 @@
     {% for schema in global_schema %}
     <script type="application/ld+json" nonce="{{ csp_nonce }}">{{ schema | tojson }}</script>
     {% endfor %}
-    {% include 'partials/adsense.html' %}
+    {% if tenure_page %}
+    {% if google_site_verification %}<meta name="google-site-verification" content="{{ google_site_verification }}">{% endif %}
+    {% if adsense_client_id %}<meta name="google-adsense-account" content="{{ adsense_client_id }}">{% endif %}
+    {% else %}{% include 'partials/adsense.html' %}{% endif %}
     <script id="calculator-config" type="application/json" nonce="{{ csp_nonce }}">{{ calculator_config | tojson }}</script>
     <script src="{{ versioned_static('js/date-rules.js') }}" defer></script>
     <script src="{{ versioned_static('js/global-calculations.js') }}" defer></script>
+    {% if tenure_page %}
+    <script id="tenure-config" type="application/json" nonce="{{ csp_nonce }}">{{ tenure_copy | tojson }}</script>
+    <script src="{{ versioned_static('js/tenure-calculations.js') }}" defer></script>
+    {% endif %}
     <script src="{{ versioned_static('js/global-calculator.js') }}" defer></script>
+    {% if not tenure_page %}
     <script src="{{ versioned_static('js/cookie-consent.js') }}" defer></script>
     <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
+    {% endif %}
 </head>
 <body class="global-page">
     <div class="container">
@@ -103,6 +114,10 @@
                             <button type="button" id="swap-dates" class="secondary">{{ ui.swap_dates }}</button>
                             <label class="global-checkbox" for="include-end"><input id="include-end" type="checkbox" />{{ ui.include_end }}</label>
                             <p class="small">{{ ui.count_help }}</p>
+                            {% if tenure_page %}
+                            <label class="global-checkbox" for="tenure-mode"><input id="tenure-mode" type="checkbox" aria-describedby="tenure-help" />{{ tenure_copy.mode }}</label>
+                            <p class="small" id="tenure-help">{{ tenure_copy.mode_help }}</p>
+                            {% endif %}
                             {% elif page_key in ('age', 'baby_months') %}
                             {{ date_fields('birth', ui.birth_date) }}
                             {% elif page_key == 'birthday_dday_calculator' %}
@@ -139,10 +154,25 @@
                     <p id="result-event"></p>
                     <dl id="result-values"></dl>
                     <p id="result-note"></p>
+                    {% if tenure_page %}
+                    <section id="tenure-result" hidden aria-labelledby="tenure-heading">
+                        <h3 id="tenure-heading">{{ tenure_copy.heading }}</h3>
+                        <dl id="tenure-values"></dl>
+                        <p class="small">{{ tenure_copy.include_note }}</p>
+                        <p class="small">{{ tenure_copy.same_day_note }}</p>
+                    </section>
+                    {% endif %}
                 </section>
             </div>
             {% if locale_code == 'ko' and page_key in ('days_between_dates', 'date_add_subtract') %}
             <nav class="global-tools" aria-label="관련 시간 계산기"><a href="{{ url_for('time_duration_calculator') }}">시각·휴게시간으로 하루 시간 차이 계산</a></nav>
+            {% endif %}
+            {% if tenure_page %}
+            <section class="global-copy" aria-labelledby="tenure-rules-heading">
+                <h2 id="tenure-rules-heading">{{ tenure_copy.heading }}</h2>
+                <p>{{ tenure_copy.leap_note }}</p>
+                <p>{{ tenure_copy.limits_note }}</p>
+            </section>
             {% endif %}
             <div class="global-copy">
                 {% for section in copy.sections if not section.get('feature') or features.get(section.feature, false) %}
@@ -176,9 +206,11 @@
             <p class="small">© 2026 AgeCalc. {{ ui.copyright }}</p>
         </footer>
     </div>
+    {% if not tenure_page %}
     <div class="cookie-banner" id="cookie-banner" role="region" aria-label="{{ ui.privacy }}">
         <p>{{ ui.cookie_notice }} <a href="{{ url_for('privacy') }}">{{ ui.privacy }}{% if locale_code != 'ko' %} ({{ ui.korean_only }}){% endif %}</a></p>
         <div class="global-actions"><button id="accept-cookies" type="button">{{ ui.accept }}</button><button id="reject-cookies" class="secondary" type="button">{{ ui.reject }}</button></div>
     </div>
+    {% endif %}
 </body>
 </html>

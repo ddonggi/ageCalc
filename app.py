@@ -423,7 +423,7 @@ def add_security_headers(response):
         response.headers["X-Robots-Tag"] = "noindex, follow"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
-    response.headers.setdefault("Referrer-Policy", "no-referrer" if request.endpoint in {"hundred_day_calculator", "birthday_dday_calculator"} else "strict-origin-when-cross-origin")
+    response.headers.setdefault("Referrer-Policy", "no-referrer" if request.endpoint in {"hundred_day_calculator", "birthday_dday_calculator"} or request.path == "/days-between-dates" else "strict-origin-when-cross-origin")
     response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
     response.headers["X-XSS-Protection"] = "0"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"

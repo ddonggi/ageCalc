@@ -29,7 +29,7 @@ CURATION = (
     ('cat', 'pets', ('고양이',)),
     ('pet_age_table', 'pets', ('반려동물',)),
     ('pet_months_table', 'pets', ('반려동물',)),
-    ('days_between_dates', 'anniversary', ('날짜 차이', '기간')),
+    ('days_between_dates', 'anniversary', ('날짜 차이', '기간', '근속기간', '재직기간', '입사일')),
     ('date_add_subtract', 'anniversary', ('날짜 더하기', '날짜 빼기', 'ISO 주차', '연간 진행률')),
     ('time_duration_calculator', 'anniversary', ('휴게시간', '익일', '근무시간')),
     ('lunar_birthday', 'anniversary', ('음력 생일',)),

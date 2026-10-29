@@ -24,7 +24,7 @@ LOCALIZED_PAGE_SETTINGS = {
 
 
 # No third-party collection scripts on these input-sensitive calculator pages.
-PRIVACY_NO_THIRD_PARTY_PATHS = frozenset({"/time-duration-calculator", "/weekly-work-hours-calculator", "/100-day-calculator", "/birthday-dday-calculator"})
+PRIVACY_NO_THIRD_PARTY_PATHS = frozenset({"/time-duration-calculator", "/weekly-work-hours-calculator", "/100-day-calculator", "/birthday-dday-calculator", "/days-between-dates"})
 
 CONTENT_ACTIONS = frozenset({"keep", "strengthen", "merge", "noindex"})
 PUBLIC_RELEASE_BATCHES = frozenset({"existing", "foundation"})

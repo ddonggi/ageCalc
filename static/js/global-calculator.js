@@ -38,16 +38,45 @@
         return {iso: rules.isoParts(parts.year, parts.month, parts.day), ...parts};
     }
 
-    function row(label, value) {
+    function row(label, value, target = values, labelText = ui[label]) {
         const wrapper = document.createElement('div');
         wrapper.className = 'global-result-row';
         wrapper.dataset.resultKey = label;
         const term = document.createElement('dt');
         const detail = document.createElement('dd');
-        term.textContent = ui[label];
+        term.textContent = labelText;
         detail.textContent = value;
         wrapper.append(term, detail);
-        values.append(wrapper);
+        target.append(wrapper);
+    }
+
+    const tenureMode = document.getElementById('tenure-mode');
+    const tenureResult = document.getElementById('tenure-result');
+    const tenureValues = document.getElementById('tenure-values');
+    const tenureConfig = document.getElementById('tenure-config');
+    const tenureCopy = tenureConfig ? JSON.parse(tenureConfig.textContent) : null;
+    const originalLegends = tenureMode ? ['start', 'end'].map(name => form.querySelector(`[data-date="${name}"] legend`).textContent) : [];
+
+    function clearTenure() {
+        if (!tenureMode) return;
+        tenureResult.hidden = true;
+        tenureValues.replaceChildren();
+        ['start', 'end'].forEach((name, index) => {
+            form.querySelector(`[data-date="${name}"] legend`).textContent = tenureMode.checked ? tenureCopy[`${name}_role`] : originalLegends[index];
+        });
+    }
+
+    function showTenure(start, end) {
+        if (!tenureMode?.checked) return;
+        if (!window.AgeCalcTenureRules) throw new Error('invalid_date');
+        const answer = window.AgeCalcTenureRules.calculate(start, end);
+        const period = [unit(answer.years, 'year'), unit(answer.months, 'month'), unit(answer.days, 'day')].join(ui.duration_separator);
+        row('tenure_period', period, tenureValues, tenureCopy.period);
+        if (answer.nextAnniversary) {
+            row('tenure_anniversary', `${formatDate(answer.nextAnniversary.date)} (${numbers.format(answer.nextAnniversary.years)}${tenureCopy.anniversary_unit})`, tenureValues, tenureCopy.anniversary);
+            row('tenure_remaining', unit(answer.nextAnniversary.days, 'day'), tenureValues, tenureCopy.remaining);
+        } else row('tenure_anniversary', tenureCopy.out_of_range, tenureValues, tenureCopy.anniversary);
+        tenureResult.hidden = false;
     }
 
     function daysStatus(days) {
@@ -65,10 +94,12 @@
 
     form.addEventListener('change', () => {
         syncReference();
+        clearTenure();
         errorElement.textContent = '';
         result.hidden = true;
     });
     form.addEventListener('input', () => {
+        clearTenure();
         errorElement.textContent = '';
         result.hidden = true;
     });
@@ -76,7 +107,8 @@
         errorElement.textContent = '';
         result.hidden = true;
         values.replaceChildren();
-        window.setTimeout(syncReference, 0);
+        clearTenure();
+        window.setTimeout(() => { syncReference(); clearTenure(); }, 0);
     });
     document.getElementById('swap-dates')?.addEventListener('click', () => {
         for (const part of ['year', 'month', 'day']) {
@@ -84,11 +116,13 @@
             const end = document.getElementById(`end-${part}`);
             [start.value, end.value] = [end.value, start.value];
         }
+        clearTenure();
         errorElement.textContent = '';
         result.hidden = true;
     });
     form.addEventListener('submit', event => {
         event.preventDefault();
+        clearTenure();
         values.replaceChildren();
         note.textContent = '';
         result.hidden = true;
@@ -127,6 +161,7 @@
                 row('start_date', formatDate(start));
                 row('end_date', formatDate(end));
                 note.textContent = inclusive ? ui.inclusive_note : ui.exclusive_note;
+                showTenure(start, end);
             } else if (config.kind === 'age') {
                 const birth = readDate('birth').iso;
                 if (birth > today) throw new Error('future_birth');
