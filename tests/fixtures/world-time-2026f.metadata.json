@@ -1,0 +1,256 @@
+{
+  "generated": "2026-10-30 KST",
+  "sourceUrl": "https://data.iana.org/time-zones/releases/tzdata2026f.tar.gz",
+  "sourceVersion": "2026f",
+  "archiveSha256": "01b4a91cec5167ed48c11e8ab78f2048cead78ce94b0cafcad0ae8c5a3044d3d",
+  "sourceFileSha256": {
+    "version": "9f9a9e6bfd18cd6a0a4d65764931072577edcbb731981a068ef52bba6615b1de",
+    "asia": "02b69728085f6b0c999da70de2f1f9a2d8952b533a450d53bb41e03eb7d0e92e",
+    "europe": "fec11bf6c6bd0619a8777bbdaa2ecd184fde291cb4b97efa87d334c7145ba3c2",
+    "northamerica": "da7366f6e0862ed15cb787dd056dca3a255df2ec50d19ff0a9f54eeb1562083a",
+    "etcetera": "7281f095b42c13c4ae36b8bcba884e81dbb38127221fc1d9805c4dbf852487db"
+  },
+  "compiler": "zic (Ubuntu GLIBC 2.35-0ubuntu3.15) 2.35",
+  "compilerCommand": [
+    "/usr/sbin/zic",
+    "-d",
+    "TEMP/compiled",
+    "TEMP/asia",
+    "TEMP/europe",
+    "TEMP/northamerica",
+    "TEMP/etcetera"
+  ],
+  "compilerStderr": "",
+  "python": "3.10.12",
+  "oracle": "ZoneInfo.from_file explicitly reading freshly compiled official files; no system ZoneInfo lookup",
+  "zoneSource": {
+    "UTC": "Etc/UTC"
+  },
+  "zones": [
+    "UTC",
+    "Asia/Seoul",
+    "Asia/Tokyo",
+    "Asia/Shanghai",
+    "Asia/Kolkata",
+    "Europe/London",
+    "America/New_York"
+  ],
+  "compiledSha256": {
+    "UTC": "8b85846791ab2c8a5463c83a5be3c043e2570d7448434d41398969ed47e3e6f2",
+    "Asia/Seoul": "2c8f4bb15dd77090b497e2a841ff3323ecbbae4f9dbb9edead2f8dd8fb5d8bb4",
+    "Asia/Tokyo": "a02b9e66044dc5c35c5f76467627fdcba4aee1cc958606b85c777095cad82ceb",
+    "Asia/Shanghai": "64ffc2e43a94435a043c040d1d3af7e92d031adc78e7737af1861baa4eeef3e6",
+    "Asia/Kolkata": "e90c341036cb7203200e293cb3b513267e104a39a594f35e195254e6bc0a17cf",
+    "Europe/London": "c85495070dca42687df6a1c3ee780a27cbcb82f1844750ea6f642833a44d29b4",
+    "America/New_York": "e9ed07d7bee0c76a9d442d091ef1f01668fee7c4f26014c0a868b19fe6c18a95"
+  },
+  "inputCivilBounds": [
+    "2020-01-01",
+    "2030-12-31"
+  ],
+  "instantBounds": [
+    "2019-12-31T15:00:00Z",
+    "2030-12-31T23:59:00Z"
+  ],
+  "outputYearsMayInclude": [
+    2019,
+    2031
+  ],
+  "caseCount": 621,
+  "zoneResultCount": 4347,
+  "monthlySampling": "Each month 2020..2030, first day UTC 00:00 and 12:30",
+  "transitionSamplingMinutes": [
+    -61,
+    -60,
+    -1,
+    0,
+    1,
+    30,
+    60,
+    61
+  ],
+  "transitions": [
+    {
+      "zone": "Europe/London",
+      "instant": "2020-03-29T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2020-10-25T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2021-03-28T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2021-10-31T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2022-03-27T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2022-10-30T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2023-03-26T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2023-10-29T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2024-03-31T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2024-10-27T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2025-03-30T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2025-10-26T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2026-03-29T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2026-10-25T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2027-03-28T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2027-10-31T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2028-03-26T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2028-10-29T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2029-03-25T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2029-10-28T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2030-03-31T01:00:00Z"
+    },
+    {
+      "zone": "Europe/London",
+      "instant": "2030-10-27T01:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2020-03-08T07:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2020-11-01T06:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2021-03-14T07:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2021-11-07T06:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2022-03-13T07:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2022-11-06T06:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2023-03-12T07:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2023-11-05T06:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2024-03-10T07:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2024-11-03T06:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2025-03-09T07:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2025-11-02T06:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2026-03-08T07:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2026-11-01T06:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2027-03-14T07:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2027-11-07T06:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2028-03-12T07:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2028-11-05T06:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2029-03-11T07:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2029-11-04T06:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2030-03-10T07:00:00Z"
+    },
+    {
+      "zone": "America/New_York",
+      "instant": "2030-11-03T06:00:00Z"
+    }
+  ],
+  "fixtureSha256": "f8efd8e746db866311071372dee6ffeedc496c1a6ff4e64d55d7923b53ef291e",
+  "limitations": [
+    "Future civil time rules can change after 2026f.",
+    "Fixtures are official 2026f expectations, not evidence that browser tzdata is current.",
+    "No runtime application module or database imported."
+  ]
+}

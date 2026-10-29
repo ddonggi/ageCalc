@@ -1892,6 +1892,17 @@ def weekly_work_hours_calculator():
     return render_template('weekly-work-hours-calculator.html', navigation_language_links=())
 
 
+@app.route('/world-time-converter')
+def world_time_converter():
+    # No server-side parsing or restoration of private browser input.
+    if request.query_string:
+        _mark_result_query_noindex()
+        g.private_result_query = True
+    response = make_response(render_template('world-time-converter.html', navigation_language_links=()))
+    response.headers['Referrer-Policy'] = 'no-referrer'
+    return response
+
+
 @app.route('/privacy')
 def privacy():
     """개인정보 처리 방침 페이지"""

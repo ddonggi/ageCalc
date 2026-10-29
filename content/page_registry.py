@@ -24,7 +24,7 @@ LOCALIZED_PAGE_SETTINGS = {
 
 
 # No third-party collection scripts on these input-sensitive calculator pages.
-PRIVACY_NO_THIRD_PARTY_PATHS = frozenset({"/time-duration-calculator", "/weekly-work-hours-calculator", "/100-day-calculator", "/birthday-dday-calculator", "/days-between-dates"})
+PRIVACY_NO_THIRD_PARTY_PATHS = frozenset({"/world-time-converter", "/time-duration-calculator", "/weekly-work-hours-calculator", "/100-day-calculator", "/birthday-dday-calculator", "/days-between-dates"})
 
 CONTENT_ACTIONS = frozenset({"keep", "strengthen", "merge", "noindex"})
 PUBLIC_RELEASE_BATCHES = frozenset({"existing", "foundation"})
@@ -395,6 +395,13 @@ STATIC_PAGE_REGISTRY = (
         related_endpoints=("time_duration_calculator", "days_between_dates"),
         lastmod="2026-10-27",
         locales=("ko",),
+    ),
+    _page(
+        "world_time_converter", "/world-time-converter", "anniversary",
+        '세계 시간 변환기',
+        'UTC 또는 고정 UTC+09:00 기준으로 서울·도쿄·상하이·콜카타·런던·뉴욕의 날짜와 시각을 비교합니다. 2020~2030년 입력을 지원합니다.',
+        related_endpoints=("time_duration_calculator", "weekly_work_hours_calculator", "days_between_dates"),
+        lastmod="2026-10-30", locales=("ko",),
     ),
     _page(
         "days_between_dates",

@@ -25,6 +25,7 @@ KOREAN_REVIEW_PATHS = frozenset('''
 /days-between-dates
 /time-duration-calculator
 /weekly-work-hours-calculator
+/world-time-converter
 /date-add-subtract-calculator
 /lunar-birthday-calculator
 /pet-age-table

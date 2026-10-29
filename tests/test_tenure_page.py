@@ -30,7 +30,7 @@ class TenurePageTests(unittest.TestCase):
         self.assertNotIn('Cache-Control',r.headers)
         self.assertIn('rel="canonical" href="https://agecalc.cloud/days-between-dates"',r.get_data(as_text=True))
     def test_finder_aliases_reuse_existing_tool(self):
-        items=build_tool_finder_items(); self.assertEqual(24,len(items))
+        items=build_tool_finder_items(); self.assertEqual(25,len(items))
         item=next(i for i in items if i['endpoint']=='days_between_dates')
         self.assertEqual('/days-between-dates',item['path'])
         self.assertTrue({'날짜 차이','기간','근속기간','재직기간','입사일'} <= set(item['aliases']))

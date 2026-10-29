@@ -1,0 +1,16 @@
+.world-time-page main, .world-time-page .global-panel, #world-inputs { min-width: 0; }
+.world-time-page .global-panel { margin-bottom: 24px; }
+.world-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.world-fields label { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.world-fields input, .world-fields select { box-sizing: border-box; width: 100%; min-width: 0; max-width: 100%; min-height: 44px; }
+.world-time-page button { min-height: 44px; }
+.world-fields [aria-invalid=true] { border-color: #a02929; }
+.world-time-page input, .world-time-page select, .world-time-page button, #world-result-title { scroll-margin-top: 180px; scroll-margin-bottom: 24px; }
+#world-result-title:focus, .world-table-wrap:focus { outline: 2px solid #32634c; outline-offset: 4px; }
+.world-table-wrap { overflow-x: auto; max-width: 100%; }
+.world-table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+.world-table caption { text-align: left; margin-bottom: 12px; }
+.world-table th, .world-table td { border: 1px solid #c9d0ca; padding: 10px; text-align: left; white-space: nowrap; }
+.world-table th small { display: block; font-weight: normal; }
+.world-time-page .global-copy a { overflow-wrap: anywhere; }
+@media (max-width: 760px) { .world-fields { grid-template-columns: minmax(0, 1fr); } }
