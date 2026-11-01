@@ -155,6 +155,11 @@
                     <dl id="result-values"></dl>
                     <p id="result-note"></p>
                     {% if tenure_page %}
+                    <section id="weekday-result" hidden aria-labelledby="weekday-heading">
+                        <h3 id="weekday-heading">토·일 제외 일수</h3>
+                        <dl id="weekday-values" data-weekdays-label="토·일 제외 일수" data-weekend-days-label="제외한 토·일"></dl>
+                        <p class="small">공휴일은 제외하지 않습니다. 실제 근무일이나 법정 기한과는 다릅니다.</p>
+                    </section>
                     <section id="tenure-result" hidden aria-labelledby="tenure-heading">
                         <h3 id="tenure-heading">{{ tenure_copy.heading }}</h3>
                         <dl id="tenure-values"></dl>

@@ -285,3 +285,73 @@ for (let year = 1; year <= 9999; year += 1) {
 }
 assert.deepEqual(calc.dateShift('2024-12-30', 'add', 1, 'day'), {date: '2024-12-31', days: 1});
 console.log('Calendar info contracts passed: 19 independent fixtures and every public year');
+
+// Weekday-only interval: civil-date ordinal oracle, independent of JS Date.
+function ordinal(value) {
+    const [year, month, day] = value.split('-').map(Number);
+    const prior = year - 1;
+    const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+    const lengths = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    return prior * 365 + Math.floor(prior / 4) - Math.floor(prior / 100) + Math.floor(prior / 400)
+        + lengths.slice(0, month - 1).reduce((sum, count) => sum + count, 0) + day - 1;
+}
+function weekdayOracle(start, end, includeEnd = false) {
+    let weekdays = 0;
+    let weekendDays = 0;
+    for (let day = ordinal(start); day < ordinal(end) + Number(includeEnd); day += 1) {
+        if (day % 7 < 5) weekdays += 1;
+        else weekendDays += 1;
+    }
+    return {weekdays, weekendDays};
+}
+assert.equal(typeof calc.weekdayRange, 'function', 'weekdayRange must be exported');
+const weekdayExamples = [
+    ['2027-01-01', '2027-12-31', true, {weekdays: 261, weekendDays: 104}],
+    ['2027-05-01', '2027-05-03', true, {weekdays: 1, weekendDays: 2}],
+    ['2027-01-01', '2027-01-04', false, {weekdays: 1, weekendDays: 2}],
+    ['2027-01-01', '2027-01-04', true, {weekdays: 2, weekendDays: 2}],
+    ['2024-02-28', '2024-03-01', true, {weekdays: 3, weekendDays: 0}]
+];
+for (const [start, end, inclusive, expected] of weekdayExamples) {
+    assert.deepEqual(calc.weekdayRange(start, end, inclusive), expected);
+}
+// Every starting weekday and every remainder, with zero and multiple full weeks.
+for (let offset = 0; offset < 7; offset += 1) {
+    const start = calc.dateShift('2027-01-04', 'add', offset, 'day').date;
+    for (let length = 0; length <= 27; length += 1) {
+        const end = calc.dateShift(start, 'add', length, 'day').date;
+        for (const inclusive of [false, true]) {
+            const actual = calc.weekdayRange(start, end, inclusive);
+            assert.deepEqual(actual, weekdayOracle(start, end, inclusive));
+            assert.equal(actual.weekdays + actual.weekendDays, calc.dateRange(start, end, inclusive).days);
+        }
+    }
+}
+for (const [start, end] of [
+    ['0001-01-01', '0001-01-08'], ['0099-12-28', '0100-01-05'],
+    ['1900-02-26', '1900-03-03'], ['2000-02-26', '2000-03-03'],
+    ['9999-12-31', '9999-12-31'], ['0001-01-01', '9999-12-31']
+]) {
+    for (const inclusive of [false, true]) {
+        assert.deepEqual(calc.weekdayRange(start, end, inclusive), weekdayOracle(start, end, inclusive));
+    }
+}
+let weekdaySeed = 20261102;
+function nextWeekdayRandom() {
+    weekdaySeed = (Math.imul(weekdaySeed, 1664525) + 1013904223) >>> 0;
+    return weekdaySeed;
+}
+for (let sample = 0; sample < 400; sample += 1) {
+    const start = calc.dateShift('0001-01-01', 'add', nextWeekdayRandom() % 3640000, 'day').date;
+    const end = calc.dateShift(start, 'add', nextWeekdayRandom() % 3660, 'day').date;
+    const inclusive = Boolean(nextWeekdayRandom() % 2);
+    assert.deepEqual(calc.weekdayRange(start, end, inclusive), weekdayOracle(start, end, inclusive));
+}
+for (const invalid of ['', null, '0000-01-01', '10000-01-01', '1900-02-29', '2027-02-30']) {
+    assert.throws(() => calc.weekdayRange(invalid, '2027-03-01'), /invalid_date/);
+    assert.throws(() => calc.weekdayRange('0001-01-01', invalid), /invalid_date/);
+}
+assert.throws(() => calc.weekdayRange('2027-01-02', '2027-01-01'), /end_before_start/);
+// Existing dateRange return shape remains exact.
+assert.deepEqual(calc.dateRange('2027-01-01', '2027-01-04'), {days: 3, weeks: 0, remainingDays: 3});
+console.log('Weekday contracts passed: 392 weekday/remainder cases, 400 seeded intervals, extreme years and full range');

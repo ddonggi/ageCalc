@@ -50,6 +50,23 @@
         target.append(wrapper);
     }
 
+    const weekdayResult = config.kind === 'days_between_dates' ? document.getElementById('weekday-result') : null;
+    const weekdayValues = weekdayResult ? document.getElementById('weekday-values') : null;
+
+    function clearWeekdays() {
+        if (!weekdayResult) return;
+        weekdayResult.hidden = true;
+        weekdayValues.replaceChildren();
+    }
+
+    function showWeekdays(start, end, inclusive) {
+        if (!weekdayResult) return;
+        const answer = rules.weekdayRange(start, end, inclusive);
+        row('weekdays', unit(answer.weekdays, 'day'), weekdayValues, weekdayValues.dataset.weekdaysLabel);
+        row('weekend_days', unit(answer.weekendDays, 'day'), weekdayValues, weekdayValues.dataset.weekendDaysLabel);
+        weekdayResult.hidden = false;
+    }
+
     const tenureMode = document.getElementById('tenure-mode');
     const tenureResult = document.getElementById('tenure-result');
     const tenureValues = document.getElementById('tenure-values');
@@ -95,11 +112,13 @@
     form.addEventListener('change', () => {
         syncReference();
         clearTenure();
+        clearWeekdays();
         errorElement.textContent = '';
         result.hidden = true;
     });
     form.addEventListener('input', () => {
         clearTenure();
+        clearWeekdays();
         errorElement.textContent = '';
         result.hidden = true;
     });
@@ -108,6 +127,7 @@
         result.hidden = true;
         values.replaceChildren();
         clearTenure();
+        clearWeekdays();
         window.setTimeout(() => { syncReference(); clearTenure(); }, 0);
     });
     document.getElementById('swap-dates')?.addEventListener('click', () => {
@@ -117,12 +137,14 @@
             [start.value, end.value] = [end.value, start.value];
         }
         clearTenure();
+        clearWeekdays();
         errorElement.textContent = '';
         result.hidden = true;
     });
     form.addEventListener('submit', event => {
         event.preventDefault();
         clearTenure();
+        clearWeekdays();
         values.replaceChildren();
         note.textContent = '';
         result.hidden = true;
@@ -162,6 +184,7 @@
                 row('end_date', formatDate(end));
                 note.textContent = inclusive ? ui.inclusive_note : ui.exclusive_note;
                 showTenure(start, end);
+                showWeekdays(start, end, inclusive);
             } else if (config.kind === 'age') {
                 const birth = readDate('birth').iso;
                 if (birth > today) throw new Error('future_birth');
@@ -207,6 +230,7 @@
             result.focus({preventScroll: true});
             result.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'nearest'});
         } catch (error) {
+            clearWeekdays();
             errorElement.textContent = ui[error.message] || ui.invalid_date;
         }
     });

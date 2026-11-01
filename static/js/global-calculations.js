@@ -57,6 +57,18 @@
         return {days, weeks: Math.floor(days / 7), remainingDays: days % 7};
     }
 
+    function weekdayRange(start, end, includeEnd = false) {
+        const {days, weeks, remainingDays} = dateRange(start, end, includeEnd);
+        const firstWeekday = date(start).getUTCDay();
+        let weekdays = weeks * 5;
+        // Full weeks contribute five weekdays; only zero to six days remain.
+        for (let offset = 0; offset < remainingDays; offset += 1) {
+            const weekday = (firstWeekday + offset) % 7;
+            if (weekday !== 0 && weekday !== 6) weekdays += 1;
+        }
+        return {weekdays, weekendDays: days - weekdays};
+    }
+
     function dateShift(start, operation, amount, unit) {
         const origin = date(start);
         if (!['add', 'subtract'].includes(operation)) throw new Error('invalid_operation');
@@ -169,5 +181,5 @@
         return Math.abs(values[0] - values[1]);
     }
 
-    return {isoParts, today, daysBetween, dateRange, dateShift, calendarInfo, completedMonths, duration, birthday, age, baby, hundred, yearGap};
+    return {isoParts, today, daysBetween, dateRange, weekdayRange, dateShift, calendarInfo, completedMonths, duration, birthday, age, baby, hundred, yearGap};
 }));

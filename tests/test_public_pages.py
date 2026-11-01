@@ -91,6 +91,21 @@ REMOVED_MINIGAME_PATHS = (
 
 
 class PublicPageTests(unittest.TestCase):
+    def test_weekday_range_result_is_korean_only_and_initially_empty(self):
+        client = app.test_client()
+        html = client.get("/days-between-dates?start=2027-05-01&end=2027-05-03").get_data(as_text=True)
+        self.assertIn('<section id="weekday-result" hidden aria-labelledby="weekday-heading">', html)
+        self.assertRegex(html, r'<dl id="weekday-values"[^>]*></dl>')
+        self.assertIn("공휴일은 제외하지 않습니다. 실제 근무일이나 법정 기한과는 다릅니다.", html)
+        self.assertRegex(html, r'id="global-result"[^>]*aria-live="polite"[^>]*tabindex="-1"')
+        self.assertIn('id="include-end"', html)
+        self.assertIn('id="tenure-mode"', html)
+        for path in ("/en/days-between-dates", "/ja/days-between-dates", "/es/days-between-dates", "/pt-br/days-between-dates", "/date-add-subtract-calculator", "/d-day"):
+            with self.subTest(path=path):
+                response = client.get(path)
+                self.assertEqual(200, response.status_code)
+                self.assertNotIn('id="weekday-result"', response.get_data(as_text=True))
+
     def test_home_page_exposes_naver_site_verification(self):
         html = app.test_client().get("/").get_data(as_text=True)
 
