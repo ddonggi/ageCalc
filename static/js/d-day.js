@@ -13,6 +13,47 @@ class DDayCalculator {
         }
 
         this.bindEvents();
+        this.bindPresets();
+    }
+
+    bindPresets() {
+        this.presetButtons = Array.from(document.querySelectorAll('[data-dday-preset]'));
+        this.presetStatus = document.getElementById('dday-preset-status');
+        const allowedIds = new Set(['csat-academic-2027', 'csat-academic-2028']);
+        let rows;
+        try {
+            rows = JSON.parse(document.getElementById('dday-exam-presets')?.textContent || '[]');
+        } catch (_) {
+            rows = [];
+        }
+        if (!Array.isArray(rows)) rows = [];
+        const presets = new Map(rows.filter(row => row && allowedIds.has(row.id) && row.can_fill === true).map(row => [row.id, row]));
+        this.presetButtons.forEach(button => {
+            button.disabled = !presets.has(button.dataset.ddayPreset);
+            button.addEventListener('click', () => {
+                const preset = presets.get(button.dataset.ddayPreset);
+                if (button.disabled || !preset || preset.can_fill !== true) return;
+                this.clearPresetSelection();
+                this.labelInput.value = preset.label;
+                this.dateInput.value = preset.date_digits;
+                this.modeInputs.forEach(input => {input.checked = input.value === 'until';});
+                this.showError('');
+                this.clearResult();
+                button.setAttribute('aria-pressed', 'true');
+                if (this.presetStatus) this.presetStatus.textContent = this.presetStatus.dataset.filledMessage || '';
+                this.dateInput.focus();
+                this.dateInput.scrollIntoView({block: 'center', behavior: 'instant'});
+            });
+        });
+        [this.labelInput, this.dateInput, ...this.modeInputs].forEach(input => {
+            if (!input) return;
+            ['input', 'change'].forEach(type => input.addEventListener(type, () => this.clearPresetSelection()));
+        });
+    }
+
+    clearPresetSelection() {
+        this.presetButtons.forEach(button => button.setAttribute('aria-pressed', 'false'));
+        if (this.presetStatus) this.presetStatus.textContent = '';
     }
 
     bindEvents() {

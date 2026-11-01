@@ -18,6 +18,7 @@ from content.blog_articles import BLOG_ARTICLE_BLUEPRINTS, structured_blog_artic
 from content.blog.schema import BLOG_CATEGORIES, CATEGORY_PAGE_EDITORIAL_CONTENT
 from content.blog.rendering import render_article_content_html
 from content.editorial_metadata import editorial_metadata_for
+from content.exam_schedules import build_exam_presets
 from content.guide_pages import (
     GUIDE_PAGE_BY_SLUG,
     INDEXABLE_GUIDE_PAGES,
@@ -423,7 +424,7 @@ def add_security_headers(response):
         response.headers["X-Robots-Tag"] = "noindex, follow"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
-    response.headers.setdefault("Referrer-Policy", "no-referrer" if request.endpoint in {"hundred_day_calculator", "birthday_dday_calculator"} or request.path == "/days-between-dates" else "strict-origin-when-cross-origin")
+    response.headers.setdefault("Referrer-Policy", "no-referrer" if request.endpoint in {"hundred_day_calculator", "birthday_dday_calculator"} or request.path in {"/days-between-dates", "/d-day"} else "strict-origin-when-cross-origin")
     response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
     response.headers["X-XSS-Protection"] = "0"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
@@ -2689,7 +2690,8 @@ def d_day():
     if result:
         _mark_result_query_noindex()
         g.private_result_query = True
-    return render_template('d-day.html', dday_values=values, dday_result=result)
+    return render_template('d-day.html', dday_values=values, dday_result=result,
+                           dday_today=today.isoformat(), dday_exam_presets=build_exam_presets(today))
 
 @app.route('/parent-child')
 def parent_child():

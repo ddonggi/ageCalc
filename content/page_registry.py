@@ -24,7 +24,7 @@ LOCALIZED_PAGE_SETTINGS = {
 
 
 # No third-party collection scripts on these input-sensitive calculator pages.
-PRIVACY_NO_THIRD_PARTY_PATHS = frozenset({"/world-time-converter", "/time-duration-calculator", "/weekly-work-hours-calculator", "/100-day-calculator", "/birthday-dday-calculator", "/days-between-dates"})
+PRIVACY_NO_THIRD_PARTY_PATHS = frozenset({"/world-time-converter", "/time-duration-calculator", "/weekly-work-hours-calculator", "/100-day-calculator", "/birthday-dday-calculator", "/days-between-dates", "/d-day"})
 
 CONTENT_ACTIONS = frozenset({"keep", "strengthen", "merge", "noindex"})
 PUBLIC_RELEASE_BATCHES = frozenset({"existing", "foundation"})
@@ -461,7 +461,7 @@ STATIC_PAGE_REGISTRY = (
         "특정 날짜까지 남은 일수와 지난 일수 계산",
         priority="core",
         related_endpoints=("hundred_day_calculator", "birthday_dday_calculator", "baby_months"),
-        lastmod="2026-08-13",
+        lastmod="2026-10-31",
     ),
     _page(
         "parent_child",

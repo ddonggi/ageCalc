@@ -22,7 +22,7 @@ CURATION = (
     ('school_grade_calculator', 'school', ('학년',)),
     ('college_entry_year_calculator', 'school', ('대학 학번',)),
     ('grade_birth_year_table', 'school', ('학년별 출생연도',)),
-    ('d_day', 'anniversary', ('디데이',)),
+    ('d_day', 'anniversary', ('디데이', '수능', '시험일', '수능디데이', '수능100일')),
     ('birthday_dday_calculator', 'anniversary', ('생일',)),
     ('hundred_day_calculator', 'anniversary', ('백일', '100일', '첫돌', '천일', '1000일')),
     ('dog', 'pets', ('강아지',)),

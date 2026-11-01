@@ -1292,11 +1292,11 @@ assert.strictEqual(publisherRefreshes, 0);
 
         self.assertEqual(200, response.status_code)
         self.assertIn(
-            "<title>기념일 계산기 | D-day·남은 일수 계산 | AgeCalc</title>",
+            "<title>기념일 계산기 | D-day·수능 일정·남은 일수 | AgeCalc</title>",
             html,
         )
         self.assertIn(
-            "목표 날짜를 입력해 오늘 기준 D-day와 지난 날짜의 경과 일수를 계산합니다.",
+            "목표 날짜까지 남은 일수와 지난 일수를 계산합니다. 공식 수능 시험일과 D-100 날짜를 확인하고 학년도·실제 시행연도를 구분해 날짜를 채울 수 있습니다.",
             html,
         )
         self.assertIn("<h1>기념일 계산기</h1>", html)
@@ -4461,7 +4461,6 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
             "/pet-months-table": ("https://link.coupang.com/a/ffBtTssmtg", "banners/997607?trackingCode=AF6844979"),
             "/age": ("https://link.coupang.com/a/ffBvZNWzEi", "banners/1002561?trackingCode=AF6844979"),
             "/school-grade-calculator": ("https://link.coupang.com/a/ffBvZNWzEi", "banners/1002561?trackingCode=AF6844979"),
-            "/d-day": ("https://link.coupang.com/a/ffBvZNWzEi", "banners/1002561?trackingCode=AF6844979"),
         }
 
         with mock.patch.object(app_module, "ADSENSE_REVIEW_MODE", False), mock.patch.object(
@@ -4476,6 +4475,10 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                     self.assertIn('class="coupang-mobile-banner"', html)
                     self.assertIn(f'href="{href}"', html)
                     self.assertIn(banner_src, html)
+
+            dday_html = client.get("/d-day").get_data(as_text=True)
+            self.assertNotIn('class="coupang-mobile-banner"', dday_html)
+            self.assertNotIn("link.coupang.com", dday_html)
 
     def test_mobile_coupang_banner_css_is_mobile_sized(self):
         css = Path("static/css/style.css").read_text(encoding="utf-8")

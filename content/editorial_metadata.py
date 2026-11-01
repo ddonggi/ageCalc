@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from content.official_sources import SOURCE_CHECKED_AT, sources_for_hub
+from content.exam_schedules import EXAM_SCHEDULES
 
 
 EDITORIAL_AUTHOR = "AgeCalc 편집팀"
@@ -120,6 +121,23 @@ OFFICIAL_SOURCE_REQUIRED_KEYS = frozenset(
 def editorial_metadata_for(page: dict[str, object] | None) -> dict[str, object] | None:
     if not page:
         return None
+
+    if page["key"] == "d_day" and page["path"] == "/d-day":
+        return {
+            "author": EDITORIAL_AUTHOR,
+            "reviewer": EDITORIAL_REVIEWER,
+            "review_method": EDITORIAL_REVIEW_METHOD,
+            "policy_review_cadence": "화면의 다음 확인 예정일에 검수합니다. 공식 변경 공지가 있으면 다시 확인합니다.",
+            "reviewed_at": "2026-10-31",
+            "modified_at": str(page["lastmod"]),
+            "official_source_required": True,
+            "sources": tuple({
+                "institution": "교육부", "title": row["source_title"],
+                "url": row["source_url"], "checked_at": row["verified_on"], "official": True,
+            } for row in EXAM_SCHEDULES),
+            "disclaimer": INFORMATIONAL_DISCLAIMER,
+            "related_search_term_slots": {},
+        }
 
     if page["key"] == "time_duration_calculator":
         # Technical references checked in B2 Phase 1; no labor-law review is claimed.
