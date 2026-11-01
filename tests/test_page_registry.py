@@ -1,3 +1,5 @@
+from unittest.mock import patch
+from datetime import date
 import csv
 import re
 import unittest
@@ -19,10 +21,10 @@ from content.page_registry import (
 
 class PageRegistryTests(unittest.TestCase):
     def test_registry_covers_current_static_and_guide_pages(self):
-        self.assertEqual(41, len(STATIC_PAGE_REGISTRY))
+        self.assertEqual(42, len(STATIC_PAGE_REGISTRY))
         self.assertEqual(4, len(HUB_PAGE_REGISTRY))
         self.assertEqual(20, len(GUIDE_PAGE_REGISTRY))
-        self.assertEqual(65, len(PUBLIC_PAGE_REGISTRY))
+        self.assertEqual(66, len(PUBLIC_PAGE_REGISTRY))
 
         self.assertEqual(
             {"index", "age", "blog_list"},
@@ -119,6 +121,8 @@ class PageRegistryTests(unittest.TestCase):
                 self.assertNotIn(page["endpoint"], grouped_endpoints)
                 self.assertIn(page["hub"], {hub["hub"] for hub in HUB_PAGE_REGISTRY})
 
+    # This contract checks the reviewed, available snapshot; expiry has separate coverage.
+    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
     def test_registry_driven_sitemap_uses_review_mode_public_set(self):
         client = app.test_client()
         index_xml = client.get("/sitemap.xml").get_data(as_text=True)

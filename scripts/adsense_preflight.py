@@ -159,6 +159,12 @@ def _validate_public_page(path: str, response, html: str, adsense_client_id: str
         scripts = re.findall(r"<script\b[^>]*>.*?</script>", html, re.I | re.S)
         if any(re.search(r"(?:src\s*=\s*['\"](?:https?:)?//|analytics\.js|clarity-init\.js|googlesyndication|googletagmanager|google-analytics|clarity\.ms)", script, re.I) for script in scripts):
             report.add_issue("privacy_page_third_party_script", path, "입력 비공개 페이지에 외부 수집 스크립트가 있습니다.")
+    elif path == "/korean-holiday-calendar":
+        # This public reference excludes ads only; analytics and consent remain valid.
+        if 'google-adsense-account' in html or 'adsbygoogle.js' in html:
+            report.add_issue("excluded_page_adsense_present", path, "광고 제외 페이지에 AdSense 코드가 남아 있습니다.")
+        if not re.search(r'"adsense_client"\s*:\s*""', html):
+            report.add_issue("excluded_page_tracking_client_present", path, "광고 제외 페이지의 AdSense client가 비어 있지 않습니다.")
     elif adsense_account not in html or adsense_script not in html:
         report.add_issue("adsense_code_missing", path, "공개 페이지에 애드센스 승인 코드가 없습니다.")
 

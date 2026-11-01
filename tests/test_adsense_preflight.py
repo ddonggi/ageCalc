@@ -1,3 +1,5 @@
+from unittest.mock import patch
+from datetime import date
 import unittest
 import os
 import subprocess
@@ -13,12 +15,14 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 class AdsensePreflightTests(unittest.TestCase):
+    # This contract checks the reviewed, available snapshot; expiry has separate coverage.
+    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
     def test_operational_preflight_passes_with_nonblocking_content_warnings(self):
         report = run_local_preflight()
 
         self.assertTrue(report.ok, format_report(report))
-        self.assertEqual(96, report.sitemap_urls)
-        self.assertEqual(96, report.checked_pages)
+        self.assertEqual(97, report.sitemap_urls)
+        self.assertEqual(97, report.checked_pages)
         self.assertIn('age', PUBLIC_SITEMAP_ENDPOINTS)
         self.assertNotIn('school_entry_year_table', PUBLIC_SITEMAP_ENDPOINTS)
         self.assertNotIn('grade_age_table', PUBLIC_SITEMAP_ENDPOINTS)
@@ -54,10 +58,12 @@ class AdsensePreflightTests(unittest.TestCase):
         self.assertFalse(report.ok)
         self.assertIn("affiliate_material_present", format_report(report))
 
+    # This contract checks the reviewed, available snapshot; expiry has separate coverage.
+    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
     def test_operational_preflight_checks_only_sitemap_quality_pages(self):
         report = run_local_preflight()
 
-        self.assertEqual(96, report.sitemap_urls)
+        self.assertEqual(97, report.sitemap_urls)
         self.assertEqual(0, report.content_quality_failures)
         self.assertGreater(report.content_quality_warnings, 0)
         self.assertTrue(report.ok, format_report(report))
@@ -88,6 +94,25 @@ class AdsensePreflightTests(unittest.TestCase):
         output = format_report(report)
         self.assertIn("excluded_page_indexable", output)
         self.assertIn("excluded_page_adsense_present", output)
+
+    def test_holiday_ad_exclusion_is_checked_without_disabling_analytics(self):
+        response = type("Response", (), {"status_code": 200, "headers": {}})()
+        html = '<title>Holidays</title><meta name="description" content="' + 'x' * 35 + '"><h1>Holidays</h1><script src="/static/js/analytics.js"></script><script id="tracking-config">{"adsense_client":""}</script>'
+        clean = PreflightReport()
+        preflight_module._validate_public_page('/korean-holiday-calendar', response, html, 'ca-pub-test', clean)
+        self.assertTrue(clean.ok, format_report(clean))
+        for bad_html, expected in (
+            (html + '<script src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=other"></script>', 'excluded_page_adsense_present'),
+            (html.replace('"adsense_client":""', '"adsense_client":"other"'), 'excluded_page_tracking_client_present'),
+            (html.replace('<h1>Holidays</h1>', ''), 'h1_missing'),
+        ):
+            with self.subTest(expected=expected):
+                bad = PreflightReport()
+                preflight_module._validate_public_page('/korean-holiday-calendar', response, bad_html, 'ca-pub-test', bad)
+                self.assertIn(expected, format_report(bad))
+        ordinary = PreflightReport()
+        preflight_module._validate_public_page('/about', response, html, 'ca-pub-test', ordinary)
+        self.assertIn('adsense_code_missing', format_report(ordinary))
 
     def test_format_report_summarizes_clean_result(self):
         report = PreflightReport(checked_pages=3)

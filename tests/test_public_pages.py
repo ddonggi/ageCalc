@@ -1,3 +1,4 @@
+from unittest.mock import patch
 import json
 import re
 import subprocess
@@ -952,6 +953,8 @@ assert.strictEqual(publisherRefreshes, 0);
         for path in ("/age-tools/", "/education/", "/anniversary/", "/pets/"):
             self.assertIn(f'href="{path}"', home_html)
 
+    # This contract checks the reviewed, available snapshot; expiry has separate coverage.
+    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
     def test_adsense_review_mode_exposes_supported_sitemap_urls(self):
         client = app.test_client()
         root_xml = client.get("/sitemap.xml").get_data(as_text=True)
@@ -1961,6 +1964,8 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 self.assertIn('name="robots" content="noindex,follow"', html)
                 self.assertEqual(response.headers.get("X-Robots-Tag"), "noindex, follow")
 
+    # This contract checks the reviewed, available snapshot; expiry has separate coverage.
+    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
     def test_life_hubs_are_excluded_from_review_mode_sitemap(self):
         locations = _sitemap_leaf_locations(app.test_client())
         for hub in HUB_PAGES:
@@ -2685,6 +2690,16 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                     self.assertNotIn("clarity-init.js", html)
                     self.assertNotIn("www.googletagmanager.com/gtag/js", html)
                     continue
+                if path == "/korean-holiday-calendar":
+                    self.assertNotIn("pagead/js/adsbygoogle.js", html)
+                    self.assertNotIn('name="google-adsense-account"', html)
+                    self.assertRegex(html, r'"adsense_client"\s*:\s*""')
+                    self.assertIn("tracking-config", html)
+                    self.assertIn("analytics.js", html)
+                    self.assertIn("clarity-init.js", html)
+                    self.assertIn('id="consent-defaults"', html)
+                    self.assertIn("google-site-verification", html)
+                    continue
                 self.assertIn(
                     '<meta name="google-adsense-account" content="ca-pub-7818333740838556">',
                     html,
@@ -2697,6 +2712,8 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 self.assertIn("tracking-config", html)
                 self.assertNotIn("www.googletagmanager.com/gtag/js", html)
 
+    # This contract checks the reviewed, available snapshot; expiry has separate coverage.
+    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
     def test_public_sitemap_keeps_only_review_mode_urls(self):
         client = app.test_client()
         locations = _sitemap_leaf_locations(client)
@@ -4721,6 +4738,8 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         self.assertIn("https://agecalc.cloud/birthday-dday-calculator", body)
         self.assertNotIn("/minigames", body)
 
+    # This contract checks the reviewed, available snapshot; expiry has separate coverage.
+    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
     def test_sitemap_index_groups_public_pages(self):
         client = app.test_client()
         index_response = client.get("/sitemap.xml")

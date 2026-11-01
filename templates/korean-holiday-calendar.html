@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko" class="holiday-calendar-document">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ holiday_copy.meta_title }}</title>
+    <meta name="description" content="{{ holiday_copy.meta_description }}">
+    <link rel="canonical" href="{{ page_canonical_url }}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="AgeCalc">
+    <meta property="og:title" content="{{ holiday_copy.meta_title }}">
+    <meta property="og:description" content="{{ holiday_copy.meta_description }}">
+    <meta property="og:url" content="{{ page_canonical_url }}">
+    <meta property="og:image" content="{{ site_base_url }}/static/images/og-image.png">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}">
+    <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}">
+    <link rel="stylesheet" href="{{ versioned_static('css/korean-holiday-calendar.css') }}">
+    {% for schema in global_schema | default([]) %}<script type="application/ld+json" nonce="{{ csp_nonce }}">{{ schema | tojson }}</script>{% endfor %}
+    <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
+    <script src="{{ versioned_static('js/clarity-init.js') }}" defer></script>
+    {% include 'partials/adsense.html' %}
+</head>
+<body class="holiday-calendar-page">
+<div class="container">
+    {% include 'partials/header.html' %}
+    <main>
+        <section class="hero-band">
+            <div class="hero-copy">
+                <h1>{{ holiday_copy.title }}</h1>
+                <p class="page-intro">{{ holiday_copy.intro }}</p>
+                <p>{{ holiday_copy.year_scope }}</p>
+            </div>
+        </section>
+        {% if not holiday_calendar.available %}
+        <section class="section-shell holiday-state" aria-labelledby="holiday-state-title" data-holiday-state="{{ holiday_calendar.state }}">
+            <h2 id="holiday-state-title">{{ holiday_copy.unavailable_title }}</h2>
+            <p>{{ holiday_copy.unavailable_body }}</p>
+        </section>
+        {% endif %}
+        <section class="section-shell direct-answer" aria-labelledby="holiday-scope-title">
+            <h2 id="holiday-scope-title">{{ holiday_copy.scope_title }}</h2>
+            <p>{{ holiday_copy.scope_body }}</p>
+            {% if holiday_calendar.available %}<p data-holiday-state="{{ holiday_calendar.state }}">{{ holiday_copy.current_label }}</p>{% endif %}
+        </section>
+        {% if holiday_calendar.available %}
+        <section class="section-shell" aria-labelledby="holiday-summary-title">
+            <h2 id="holiday-summary-title">{{ holiday_copy.summary_title }}</h2>
+            <p>{{ holiday_copy.summary_body }}</p>
+            <dl class="holiday-summary">
+                {% for key in ['named', 'substitute', 'sundays', 'overlap', 'total'] %}
+                <dt>{{ holiday_copy.count_labels[key] }}</dt><dd data-holiday-count="{{ key }}">{{ holiday_calendar.counts[key] }}{{ holiday_copy.day_unit }}</dd>
+                {% endfor %}
+            </dl>
+            <p>{{ holiday_copy.overlap_note }}</p><p>{{ holiday_copy.summary_note }}</p>
+        </section>
+        <section class="section-shell" aria-labelledby="holiday-monthly-title">
+            <h2 id="holiday-monthly-title">{{ holiday_copy.monthly_title }}</h2>
+            <nav class="holiday-month-nav" aria-label="{{ holiday_copy.month_navigation }}">
+                {% for month in holiday_calendar.months %}<a href="#holiday-month-{{ month.month }}">{{ holiday_copy.month_labels[month.month - 1] }}</a>{% endfor %}
+            </nav>
+            {% for month in holiday_calendar.months %}
+            <section class="holiday-month" aria-labelledby="holiday-month-{{ month.month }}">
+                <h3 id="holiday-month-{{ month.month }}" tabindex="-1">{{ holiday_copy.month_labels[month.month - 1] }}</h3>
+                {% if month.holidays %}
+                <table class="holiday-table" data-holiday-month="{{ month.month }}">
+                    <caption>{{ holiday_calendar.metadata.year }} {{ holiday_copy.month_labels[month.month - 1] }} {{ holiday_copy.table_caption_suffix }}</caption>
+                    <colgroup><col class="holiday-date-column"><col><col class="holiday-type-column"></colgroup>
+                    <thead><tr><th scope="col">{{ holiday_copy.columns.date }} · {{ holiday_copy.columns.weekday }}</th><th scope="col">{{ holiday_copy.columns.name }}</th><th scope="col">{{ holiday_copy.columns.type }}</th></tr></thead>
+                    <tbody>{% for holiday in month.holidays %}
+                        <tr data-holiday-id="{{ holiday.id }}"><td><time datetime="{{ holiday.date }}">{{ holiday.date }}</time> ({{ holiday_copy.weekday_labels[holiday.weekday] }})</td><th scope="row">{{ holiday.label }}</th><td>{{ holiday_copy.type_labels[holiday.type] }}</td></tr>
+                    {% endfor %}</tbody>
+                </table>
+                {% else %}<p>{{ holiday_copy.empty_month }}</p>{% endif %}
+                <h4>{{ holiday_copy.sundays_title }}</h4>
+                <p class="holiday-sundays">{% for sunday in month.sundays %}<time datetime="{{ sunday }}" data-holiday-sunday>{{ sunday }}</time>{% if not loop.last %}, {% endif %}{% endfor %}</p>
+            </section>
+            {% endfor %}
+            <p>{{ holiday_copy.sundays_note }}</p>
+        </section>
+        <section class="section-shell" aria-labelledby="holiday-local-title">
+            <h2 id="holiday-local-title">{{ holiday_copy.local_title }}</h2><p>{{ holiday_copy.local_intro }}</p>
+            <table class="holiday-table" data-local-holidays>
+                <caption>{{ holiday_copy.local_title }}</caption>
+                <colgroup><col class="holiday-date-column"><col><col class="holiday-type-column"></colgroup>
+                <thead><tr><th scope="col">{{ holiday_copy.columns.date }} · {{ holiday_copy.columns.weekday }}</th><th scope="col">{{ holiday_copy.columns.name }}</th><th scope="col">{{ holiday_copy.local_scope_label }}</th></tr></thead>
+                <tbody>{% for holiday in holiday_calendar.local_holidays %}
+                    <tr data-local-holiday-id="{{ holiday.id }}"><td><time datetime="{{ holiday.date }}">{{ holiday.date }}</time> ({{ holiday_copy.weekday_labels[holiday.weekday] }})</td><th scope="row">{{ holiday.label }}<br><small>{{ holiday_copy.type_labels.local }}</small></th><td>{{ holiday.jurisdiction }}</td></tr>
+                {% endfor %}</tbody>
+            </table>
+        </section>
+        <section class="section-shell" aria-labelledby="holiday-saturday-title">
+            <h2 id="holiday-saturday-title">{{ holiday_copy.saturday_title }}</h2><p>{{ holiday_copy.saturday_body }}</p>
+            <h3>{{ holiday_copy.exception_title }}</h3><p>{{ holiday_copy.exception_body }}</p>
+        </section>
+        {% endif %}
+        <section class="section-shell" aria-labelledby="holiday-changes-title">
+            <h2 id="holiday-changes-title">{{ holiday_copy.changes_title }}</h2><p>{{ holiday_copy.changes_body }}</p>
+        </section>
+        <section class="section-shell" aria-labelledby="holiday-source-title">
+            <h2 id="holiday-source-title">{{ holiday_copy.source_title }}</h2><p>{{ holiday_copy.source_intro }}</p>
+            <p><a href="{{ holiday_calendar.metadata.source_url }}" target="_blank" rel="noreferrer noopener">{{ holiday_copy.source_link_label }}</a></p>
+            <p>{{ holiday_calendar.metadata.notice_number }}</p>
+            <dl class="holiday-metadata">
+                <dt>{{ holiday_copy.published_label }}</dt><dd><time datetime="{{ holiday_calendar.metadata.published_on }}">{{ holiday_calendar.metadata.published_on }}</time></dd>
+                <dt>{{ holiday_copy.verified_label }}</dt><dd><time datetime="{{ holiday_calendar.metadata.verified_on }}">{{ holiday_calendar.metadata.verified_on }}</time></dd>
+                <dt>{{ holiday_copy.next_review_label }}</dt><dd><time datetime="{{ holiday_calendar.metadata.next_review }}">{{ holiday_calendar.metadata.next_review }}</time></dd>
+                <dt>{{ holiday_copy.reviewer_label }}</dt><dd>{{ holiday_calendar.metadata.reviewer }}</dd>
+                <dt>{{ holiday_copy.maintenance_label }}</dt><dd>{{ holiday_calendar.metadata.maintenance_role }}</dd>
+                <dt>{{ holiday_copy.snapshot_label }}</dt><dd><time datetime="{{ holiday_calendar.today }}">{{ holiday_calendar.today }}</time></dd>
+            </dl>
+            <p>{{ holiday_copy.review_policy }}</p><p>{{ holiday_copy.snapshot_note }}</p>
+        </section>
+        {% if holiday_calendar.available %}
+        <section class="section-shell" aria-labelledby="holiday-faq-title">
+            <h2 id="holiday-faq-title">{{ holiday_copy.faq_title }}</h2>
+            {% for item in holiday_copy.faq %}<h3>{{ item.question }}</h3><p>{{ item.answer }}</p>{% endfor %}
+        </section>
+        {% endif %}
+        <nav class="section-shell" aria-labelledby="holiday-related-title">
+            <h2 id="holiday-related-title">{{ holiday_copy.related_title }}</h2>
+            {% set holiday_related_urls = ['/d-day', '/days-between-dates', '/world-time-converter'] %}
+            {% for item in holiday_copy.related %}<p><a href="{{ holiday_related_urls[loop.index0] }}">{{ item.label }}</a> — {{ item.description }}</p>{% endfor %}
+        </nav>
+    </main>
+    {% include 'partials/footer.html' %}
+</div>
+<div class="cookie-banner" id="cookie-banner">
+    <div class="cookie-content">
+        <p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 동의 여부는 아래에서 선택할 수 있으며, 거부해도 주요 기능은 그대로 이용할 수 있습니다.</p>
+        <div class="cookie-buttons"><button id="accept-cookies" class="btn btn-primary">동의</button><button id="reject-cookies" class="btn btn-secondary">거부</button></div>
+    </div>
+</div>
+<script src="{{ versioned_static('js/cookie-consent.js') }}" defer></script>
+</body>
+</html>
