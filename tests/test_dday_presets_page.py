@@ -24,7 +24,7 @@ class DDayPresetPageTests(unittest.TestCase):
         self.assertIn('/d-day', PRIVACY_NO_THIRD_PARTY_PATHS)
         self.assertNotIn('/en/d-day', PRIVACY_NO_THIRD_PARTY_PATHS)
         items = build_tool_finder_items()
-        self.assertEqual(len(items), 25)
+        self.assertEqual(len(items), 26)
         match = [x for x in items if x['endpoint'] == 'd_day']
         self.assertEqual(len(match), 1)
         self.assertEqual(match[0]['path'], '/d-day')

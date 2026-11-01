@@ -1,3 +1,5 @@
+from unittest.mock import patch
+from datetime import date
 import unittest
 import os
 import subprocess
@@ -13,12 +15,14 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 class AdsensePreflightTests(unittest.TestCase):
+    # This contract checks the reviewed, available snapshot; expiry has separate coverage.
+    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
     def test_operational_preflight_passes_with_nonblocking_content_warnings(self):
         report = run_local_preflight()
 
         self.assertTrue(report.ok, format_report(report))
-        self.assertEqual(96, report.sitemap_urls)
-        self.assertEqual(96, report.checked_pages)
+        self.assertEqual(97, report.sitemap_urls)
+        self.assertEqual(97, report.checked_pages)
         self.assertIn('age', PUBLIC_SITEMAP_ENDPOINTS)
         self.assertNotIn('school_entry_year_table', PUBLIC_SITEMAP_ENDPOINTS)
         self.assertNotIn('grade_age_table', PUBLIC_SITEMAP_ENDPOINTS)
@@ -54,10 +58,12 @@ class AdsensePreflightTests(unittest.TestCase):
         self.assertFalse(report.ok)
         self.assertIn("affiliate_material_present", format_report(report))
 
+    # This contract checks the reviewed, available snapshot; expiry has separate coverage.
+    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
     def test_operational_preflight_checks_only_sitemap_quality_pages(self):
         report = run_local_preflight()
 
-        self.assertEqual(96, report.sitemap_urls)
+        self.assertEqual(97, report.sitemap_urls)
         self.assertEqual(0, report.content_quality_failures)
         self.assertGreater(report.content_quality_warnings, 0)
         self.assertTrue(report.ok, format_report(report))

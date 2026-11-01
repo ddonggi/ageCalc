@@ -17,6 +17,7 @@ from controllers.age_controller import AgeController
 from content.blog_articles import BLOG_ARTICLE_BLUEPRINTS, structured_blog_article_for_slug
 from content.blog.schema import BLOG_CATEGORIES, CATEGORY_PAGE_EDITORIAL_CONTENT
 from content.blog.rendering import render_article_content_html
+from content.korean_holidays import build_holiday_calendar
 from content.editorial_metadata import editorial_metadata_for
 from content.exam_schedules import build_exam_presets
 from content.guide_pages import (
@@ -27,6 +28,7 @@ from content.guide_pages import (
 from content.hub_pages import HUB_PAGE_BY_KEY, HUB_PAGE_BY_SLUG, HUB_PAGES
 from content.tool_finder import TOOL_FINDER_GROUPS, build_tool_finder_items
 from content.page_registry import (
+    STATIC_PAGE_REGISTRY,
     PUBLIC_PAGE_REGISTRY,
     PRIVACY_NO_THIRD_PARTY_PATHS,
     PUBLIC_SITEMAP_ENDPOINTS,
@@ -398,7 +400,10 @@ def inject_csp_nonce():
         "current_page": current_page,
         "page_canonical_url": page_canonical_url,
         "site_base_url": SITE_BASE_URL,
-        "editorial_metadata": editorial_metadata_for(current_page),
+        "editorial_metadata": editorial_metadata_for(
+            current_page,
+            holiday_metadata=_holiday_calendar_for_request()["metadata"] if current_page and current_page["key"] == "korean_holiday_calendar" else None,
+        ),
         "related_paths": contextual_links_for(
             current_page,
             recommended_endpoints=tuple(getattr(g, "recommended_endpoints", ())),
@@ -1521,16 +1526,43 @@ def _build_baby_month_snapshot(months: int) -> dict[str, object]:
     }
 
 
+def _holiday_calendar_for_request(today=None):
+    """Use one service-date snapshot for holiday visibility in this response."""
+    if not hasattr(g, "korean_holiday_calendar"):
+        g.korean_holiday_calendar = build_holiday_calendar(today if today is not None else _current_local_date())
+    return g.korean_holiday_calendar
+
+
+def _holiday_sitemap_pages(pages):
+    available = _holiday_calendar_for_request()["available"]
+    return tuple(page for page in pages if page["endpoint"] != "korean_holiday_calendar" or available)
+
+
+@app.get("/korean-holiday-calendar")
+def korean_holiday_calendar():
+    if request.args:
+        return redirect(url_for("korean_holiday_calendar"))
+    from content.korean_holiday_copy import HOLIDAY_COPY
+    calendar = _holiday_calendar_for_request()
+    if not calendar["available"]:
+        _mark_result_query_noindex()
+    response = make_response(render_template(
+        "korean-holiday-calendar.html", holiday_calendar=calendar, holiday_copy=HOLIDAY_COPY,
+    ))
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
 @app.get("/sitemap.xml")
 def sitemap():
     sitemap_groups = tuple(
         group
         for group in SITEMAP_GROUPS
-        if indexable_pages_for_sitemap(
+        if _holiday_sitemap_pages(indexable_pages_for_sitemap(
             group,
             blog_public_indexable=False if ADSENSE_REVIEW_MODE else _is_blog_public_indexable(),
             include_hubs=not ADSENSE_REVIEW_MODE,
-        )
+        ))
     )
     entries = [
         _build_sitemap_index_entry(
@@ -1566,11 +1598,11 @@ def sitemap_group(group):
             f"{SITE_BASE_URL}{page['path']}",
             str(page["lastmod"]),
         )
-        for page in localized_sitemap_entries(indexable_pages_for_sitemap(
+        for page in localized_sitemap_entries(_holiday_sitemap_pages(indexable_pages_for_sitemap(
             group,
             blog_public_indexable=blog_public_indexable,
             include_hubs=not ADSENSE_REVIEW_MODE,
-        ))
+        )))
     ]
     if group == "guides" and blog_public_indexable:
         for post in posts:
@@ -1725,9 +1757,16 @@ def _short_grade_label(stage, grade):
 def index():
     """메인 페이지 - 나이 계산 도구 안내"""
     registered_paths = {rule.endpoint: rule.rule for rule in app.url_map.iter_rules() if not (rule.arguments - set(rule.defaults or {}))}
+    today = _current_local_date()
+    available = _holiday_calendar_for_request(today)["available"]
+    # Keep all curated endpoints present; only the new item's copied policy varies.
+    finder_pages = tuple(
+        {**page, "indexable": False} if page["endpoint"] == "korean_holiday_calendar" and not available else page
+        for page in STATIC_PAGE_REGISTRY
+    )
     return render_template(
-        'index.html', today=_current_local_date(),
-        tool_finder_items=build_tool_finder_items(registered_paths=registered_paths),
+        'index.html', today=today,
+        tool_finder_items=build_tool_finder_items(pages=finder_pages, registered_paths=registered_paths),
         tool_finder_groups=TOOL_FINDER_GROUPS,
     )
 
