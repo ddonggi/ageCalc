@@ -22,7 +22,6 @@ KOREAN_REVIEW_PATHS = frozenset('''
 /100-day-calculator
 /birthday-dday-calculator
 /d-day
-/korean-holiday-calendar
 /days-between-dates
 /time-duration-calculator
 /weekly-work-hours-calculator

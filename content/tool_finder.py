@@ -1,6 +1,5 @@
 """Curated Korean discovery, intersected with the registry's release policy."""
 from urllib.parse import urlsplit
-from content.korean_holiday_copy import HOLIDAY_COPY
 from content.page_registry import PUBLIC_RELEASE_BATCHES, STATIC_PAGE_REGISTRY
 
 TOOL_FINDER_GROUPS = (
@@ -36,7 +35,6 @@ CURATION = (
     ('lunar_birthday', 'anniversary', ('음력 생일',)),
     ('weekly_work_hours_calculator', 'anniversary', ('주간 근무시간', '주간 시간', '근무표')),
     ('world_time_converter', 'anniversary', ('세계시간', '시차', '회의시간', 'UTC')),
-    ('korean_holiday_calendar', 'anniversary', tuple(HOLIDAY_COPY['finder_aliases'])),
 )
 
 

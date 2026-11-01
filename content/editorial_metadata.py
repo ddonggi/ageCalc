@@ -1,6 +1,4 @@
 from __future__ import annotations
-from content.korean_holidays import SOURCE_INFO
-from content.korean_holiday_copy import HOLIDAY_COPY
 
 from content.official_sources import SOURCE_CHECKED_AT, sources_for_hub
 from content.exam_schedules import EXAM_SCHEDULES
@@ -120,28 +118,9 @@ OFFICIAL_SOURCE_REQUIRED_KEYS = frozenset(
 )
 
 
-def editorial_metadata_for(page: dict[str, object] | None, *, holiday_metadata=None) -> dict[str, object] | None:
+def editorial_metadata_for(page: dict[str, object] | None) -> dict[str, object] | None:
     if not page:
         return None
-
-    if page["key"] == "korean_holiday_calendar":
-        metadata = SOURCE_INFO if holiday_metadata is None else holiday_metadata
-        return {
-            "author": EDITORIAL_AUTHOR,
-            "reviewer": HOLIDAY_COPY["reviewer_name"],
-            "review_method": EDITORIAL_REVIEW_METHOD,
-            "policy_review_cadence": HOLIDAY_COPY["review_cadence"],
-            "reviewed_at": metadata["verified_on"],
-            "modified_at": str(page["lastmod"]),
-            "official_source_required": True,
-            "sources": ({
-                "institution": HOLIDAY_COPY["source_institution"],
-                "title": HOLIDAY_COPY["source_notice_title"],
-                "url": metadata["source_url"], "checked_at": metadata["verified_on"], "official": True,
-            },),
-            "disclaimer": HOLIDAY_COPY["editorial_disclaimer"],
-            "related_search_term_slots": {},
-        }
 
     if page["key"] == "d_day" and page["path"] == "/d-day":
         return {

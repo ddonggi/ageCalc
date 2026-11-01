@@ -1,4 +1,3 @@
-from datetime import date
 """Public localization contracts: preserve Korean URLs and expose real alternates."""
 import json
 import re
@@ -86,8 +85,6 @@ class LocalizedPageTests(unittest.TestCase):
         self.assertEqual(200, response.status_code)
         self.assertEqual('en', Markup(response.get_data(as_text=True)).attrs('html')[0]['lang'])
 
-    # This contract checks the reviewed, available snapshot; expiry has separate coverage.
-    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
     def test_sitemap_adds_only_supported_localized_urls(self):
         with patch('app.ADSENSE_REVIEW_MODE', True):
             root = self.client.get('/sitemap.xml').get_data(as_text=True)

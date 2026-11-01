@@ -1,5 +1,4 @@
 from __future__ import annotations
-from content.korean_holiday_copy import HOLIDAY_COPY
 
 from content.guide_pages import GUIDE_PAGES
 from content.hub_pages import HUB_PAGE_BY_KEY, HUB_PAGES
@@ -111,12 +110,6 @@ def _page(
 
 
 STATIC_PAGE_REGISTRY = (
-    _page(
-        "korean_holiday_calendar", "/korean-holiday-calendar", "anniversary",
-        HOLIDAY_COPY["registry_title"], HOLIDAY_COPY["search_intent"],
-        related_endpoints=("d_day", "days_between_dates", "world_time_converter"),
-        lastmod="2026-11-01", locales=("ko",),
-    ),
     _page(
         "index",
         "/",
