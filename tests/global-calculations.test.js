@@ -355,3 +355,44 @@ assert.throws(() => calc.weekdayRange('2027-01-02', '2027-01-01'), /end_before_s
 // Existing dateRange return shape remains exact.
 assert.deepEqual(calc.dateRange('2027-01-01', '2027-01-04'), {days: 3, weeks: 0, remainingDays: 3});
 console.log('Weekday contracts passed: 392 weekday/remainder cases, 400 seeded intervals, extreme years and full range');
+
+// B2: calendar facts are supplied by the separately validated server snapshot.
+const reviewedHolidays = [{"date": "2027-01-01", "label": "1월 1일", "type": "national"}, {"date": "2027-02-06", "label": "설날(연휴)", "type": "national"}, {"date": "2027-02-07", "label": "설날(연휴)", "type": "national"}, {"date": "2027-02-08", "label": "설날(연휴)", "type": "national"}, {"date": "2027-02-09", "label": "대체공휴일(설날)", "type": "substitute"}, {"date": "2027-03-01", "label": "3·1절", "type": "national"}, {"date": "2027-05-01", "label": "노동절", "type": "national"}, {"date": "2027-05-03", "label": "대체공휴일(노동절)", "type": "substitute"}, {"date": "2027-05-05", "label": "어린이날", "type": "national"}, {"date": "2027-05-13", "label": "부처님 오신 날", "type": "national"}, {"date": "2027-06-06", "label": "현충일", "type": "national"}, {"date": "2027-07-17", "label": "제헌절", "type": "national"}, {"date": "2027-07-19", "label": "대체공휴일(제헌절)", "type": "substitute"}, {"date": "2027-08-15", "label": "광복절", "type": "national"}, {"date": "2027-08-16", "label": "대체공휴일(광복절)", "type": "substitute"}, {"date": "2027-09-14", "label": "추석(연휴)", "type": "national"}, {"date": "2027-09-15", "label": "추석(연휴)", "type": "national"}, {"date": "2027-09-16", "label": "추석(연휴)", "type": "national"}, {"date": "2027-10-03", "label": "개천절", "type": "national"}, {"date": "2027-10-04", "label": "대체공휴일(개천절)", "type": "substitute"}, {"date": "2027-10-09", "label": "한글날", "type": "national"}, {"date": "2027-10-11", "label": "대체공휴일(한글날)", "type": "substitute"}, {"date": "2027-12-25", "label": "기독탄신일", "type": "national"}, {"date": "2027-12-27", "label": "대체공휴일(기독탄신일)", "type": "substitute"}];
+assert.deepEqual(calc.holidayRange2027('2027-01-01', '2027-12-31', true, reviewedHolidays), {
+    referenceDays:246, weekendDays:104, holidayDays:15,
+    excludedHolidays: reviewedHolidays.filter(h => ![0,6].includes(new Date(h.date+'T00:00:00Z').getUTCDay())).map(({date,label})=>({date,label}))
+});
+assert.deepEqual(calc.holidayRange2027('2027-05-01','2027-05-03',true,reviewedHolidays), {referenceDays:0,weekendDays:2,holidayDays:1,excludedHolidays:[{date:'2027-05-03',label:'대체공휴일(노동절)'}]});
+for (const [day,answer] of [['2027-05-11',1],['2027-06-06',0],['2027-06-07',1]]) {
+    assert.equal(calc.holidayRange2027(day,day,true,reviewedHolidays).referenceDays,answer);
+    assert.equal(calc.holidayRange2027(day,day,false,reviewedHolidays).referenceDays,0);
+}
+assert.throws(()=>calc.holidayRange2027('2026-12-31','2027-01-01',false,reviewedHolidays), /unsupported_year/);
+assert.throws(()=>calc.holidayRange2027('2027-12-31','2028-01-01',false,reviewedHolidays), /unsupported_year/);
+assert.throws(()=>calc.holidayRange2027('2027-02-02','2027-01-01',false,reviewedHolidays), /end_before_start/);
+assert.throws(()=>calc.holidayRange2027('2027-02-29','2027-03-01',false,reviewedHolidays), /invalid_date/);
+for(const bad of [null, [], [{date:'2027-01-01',label:'x',type:'local'}], [{date:'2026-01-01',label:'x',type:'national'}], [reviewedHolidays[0],reviewedHolidays[0]], [{date:'2027-02-30',label:'x',type:'national'}], [{date:'2027-01-01',label:'',type:'national'}]]) {
+    assert.throws(()=>calc.holidayRange2027('2027-01-01','2027-01-01',true,bad), /invalid_holidays/);
+}
+// Independent daily enumeration instead of the production week's quotient/remainder.
+const holidayDateSet = new Set(reviewedHolidays.map(h=>h.date));
+let randomSeed=20261102;
+for(let k=0;k<300;k++) {
+    randomSeed=(randomSeed*1664525+1013904223)>>>0;const a=randomSeed%365;
+    randomSeed=(randomSeed*1664525+1013904223)>>>0;const b=a+randomSeed%(365-a);
+    const start=new Date(Date.UTC(2027,0,1+a)).toISOString().slice(0,10), end=new Date(Date.UTC(2027,0,1+b)).toISOString().slice(0,10);
+    for(const include of [false,true]) {
+        let ref=0,weekend=0,holiday=0;
+        for(let n=a;n<b+(include?1:0);n++) {
+            const d=new Date(Date.UTC(2027,0,1+n)),iso=d.toISOString().slice(0,10);
+            if([0,6].includes(d.getUTCDay())) weekend++; else if(holidayDateSet.has(iso)) holiday++; else ref++;
+        }
+        const result=calc.holidayRange2027(start,end,include,reviewedHolidays);
+        assert.equal(result.referenceDays,ref);assert.equal(result.weekendDays,weekend);assert.equal(result.holidayDays,holiday);
+        assert.equal(ref+weekend+holiday,calc.dateRange(start,end,include).days);
+        assert.deepEqual(Object.keys(result).sort(),['excludedHolidays','holidayDays','referenceDays','weekendDays']);
+    }
+}
+const immutableFacts=JSON.stringify(reviewedHolidays);
+calc.holidayRange2027('2027-01-01','2027-12-31',true,reviewedHolidays);
+assert.equal(JSON.stringify(reviewedHolidays),immutableFacts);

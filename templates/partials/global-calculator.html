@@ -57,9 +57,11 @@
     <script src="{{ versioned_static('js/date-rules.js') }}" defer></script>
     <script src="{{ versioned_static('js/global-calculations.js') }}" defer></script>
     {% if tenure_page %}
+    <script id="holiday-copy" type="application/json" nonce="{{ csp_nonce }}">{"option": "2027년 전국 관공서 공휴일도 제외", "disclosure": "선택하면 날짜 입력 없이 공용 달력 자료만 조회합니다. 토·일과 전국 관공서 공휴일을 제외하며, 실제 근무일이나 법정 기한과는 다릅니다.", "heading": "공휴일 제외 참고 일수", "referenceDays": "참고 일수", "weekendDays": "제외한 토·일", "holidayDays": "추가로 제외한 평일 공휴일", "list": "평일 공휴일 목록", "verified": "자료 확인일", "nextReview": "다음 검수 기한", "source": "공식 출처", "calendar": "공휴일 달력 보기", "loading": "달력 자료를 확인하고 있습니다.", "unsupported": "시작일과 종료일이 모두 2027년인 경우에만 제공합니다.", "unavailable": "자료를 확인할 수 없어 공휴일 결과를 제공하지 않습니다. 기존 날짜 차이와 토·일 제외 결과는 그대로 이용할 수 있습니다.", "expired": "확인한 자료의 사용 시간이 끝났습니다. 다시 계산해 주세요.", "invalidated": "자료를 다시 확인해야 합니다. 다시 계산해 주세요.", "empty": "이 기간에 추가로 제외한 평일 공휴일은 없습니다.", "scope": "토·일과 겹치는 공휴일은 두 번 빼지 않습니다. 지역 공휴일과 개인 휴무일은 반영하지 않습니다."}</script>
     <script id="tenure-config" type="application/json" nonce="{{ csp_nonce }}">{{ tenure_copy | tojson }}</script>
     <script src="{{ versioned_static('js/tenure-calculations.js') }}" defer></script>
     {% endif %}
+    {% if tenure_page %}<script src="{{ versioned_static('js/holiday-count.js') }}" defer></script>{% endif %}
     <script src="{{ versioned_static('js/global-calculator.js') }}" defer></script>
     {% if not tenure_page %}
     <script src="{{ versioned_static('js/cookie-consent.js') }}" defer></script>
@@ -115,6 +117,8 @@
                             <label class="global-checkbox" for="include-end"><input id="include-end" type="checkbox" />{{ ui.include_end }}</label>
                             <p class="small">{{ ui.count_help }}</p>
                             {% if tenure_page %}
+                            <label class="global-checkbox" for="holiday-mode"><input id="holiday-mode" type="checkbox" aria-describedby="holiday-help" />2027년 전국 관공서 공휴일도 제외</label>
+                            <p class="small" id="holiday-help">선택하면 날짜 입력 없이 공용 달력 자료만 조회합니다. 토·일과 전국 관공서 공휴일을 제외하며, 실제 근무일이나 법정 기한과는 다릅니다.</p>
                             <label class="global-checkbox" for="tenure-mode"><input id="tenure-mode" type="checkbox" aria-describedby="tenure-help" />{{ tenure_copy.mode }}</label>
                             <p class="small" id="tenure-help">{{ tenure_copy.mode_help }}</p>
                             {% endif %}
@@ -159,6 +163,17 @@
                         <h3 id="weekday-heading">토·일 제외 일수</h3>
                         <dl id="weekday-values" data-weekdays-label="토·일 제외 일수" data-weekend-days-label="제외한 토·일"></dl>
                         <p class="small">공휴일은 제외하지 않습니다. 실제 근무일이나 법정 기한과는 다릅니다.</p>
+                    </section>
+                    <section id="holiday-result" hidden aria-labelledby="holiday-heading">
+                        <h3 id="holiday-heading">공휴일 제외 참고 일수</h3>
+                        <p id="holiday-status" role="status"></p>
+                        <div id="holiday-details" hidden>
+                            <dl id="holiday-values"></dl>
+                            <h4>평일 공휴일 목록</h4><p id="holiday-empty" hidden>이 기간에 추가로 제외한 평일 공휴일은 없습니다.</p><ul id="holiday-list"></ul>
+                            <p id="holiday-metadata" class="small"></p>
+                            <p class="small"><a id="holiday-source" target="_blank" rel="noopener noreferrer">공식 출처</a> · <a href="/korean-holiday-calendar">공휴일 달력 보기</a></p>
+                            <p class="small">토·일과 겹치는 공휴일은 두 번 빼지 않습니다. 지역 공휴일과 개인 휴무일은 반영하지 않습니다.</p>
+                        </div>
                     </section>
                     <section id="tenure-result" hidden aria-labelledby="tenure-heading">
                         <h3 id="tenure-heading">{{ tenure_copy.heading }}</h3>

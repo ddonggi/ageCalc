@@ -67,6 +67,46 @@
         weekdayResult.hidden = false;
     }
 
+    const holidayMode = document.getElementById('holiday-mode');
+    const holidayCopy = holidayMode ? JSON.parse(document.getElementById('holiday-copy').textContent) : null;
+    const holidayResult = document.getElementById('holiday-result');
+    function renderHolidays(state) {
+        const details = document.getElementById('holiday-details');
+        const list = document.getElementById('holiday-list');
+        const output = document.getElementById('holiday-values');
+        output.replaceChildren(); list.replaceChildren();
+        document.getElementById('holiday-metadata').textContent = '';
+        document.getElementById('holiday-source').removeAttribute('href');
+        details.hidden = true;
+        holidayResult.hidden = state.state === 'idle';
+        document.getElementById('holiday-status').textContent = holidayCopy[state.state] || '';
+        if (state.state !== 'ready') return;
+        for (const key of ['referenceDays','weekendDays','holidayDays']) row(key,unit(state.answer[key],'day'),output,holidayCopy[key]);
+        state.answer.excludedHolidays.forEach(item => {
+            const li = document.createElement('li');
+            li.textContent = `${item.date} · ${item.label}`;
+            list.append(li);
+        });
+        document.getElementById('holiday-empty').hidden = state.answer.excludedHolidays.length !== 0;
+        const meta = state.metadata;
+        document.getElementById('holiday-metadata').textContent = `${holidayCopy.verified}: ${meta.verified_on} · ${holidayCopy.nextReview}: ${meta.next_review} · ${meta.version}`;
+        document.getElementById('holiday-source').href = meta.source_url;
+        details.hidden = false;
+    }
+    const holidayController = holidayMode && window.AgeCalcHolidayCount ? window.AgeCalcHolidayCount.create({
+        fetch: window.fetch.bind(window), now: () => window.performance.now(), wall: () => Date.now(),
+        online: () => window.navigator.onLine !== false,
+        setTimeout: window.setTimeout.bind(window), clearTimeout: window.clearTimeout.bind(window),
+        setInterval: window.setInterval.bind(window), clearInterval: window.clearInterval.bind(window),
+        render: renderHolidays, calculate: rules.holidayRange2027
+    }) : null;
+    function clearHolidays(reason = 'idle') { holidayController?.invalidate(reason); }
+    if (holidayController) {
+        document.addEventListener('visibilitychange', () => clearHolidays(holidayMode.checked ? 'invalidated' : 'idle'));
+        for (const name of ['pagehide','pageshow','focus']) window.addEventListener(name, () => clearHolidays(holidayMode.checked ? 'invalidated' : 'idle'));
+        window.addEventListener('offline', () => clearHolidays(holidayMode.checked ? 'unavailable' : 'idle'));
+    }
+
     const tenureMode = document.getElementById('tenure-mode');
     const tenureResult = document.getElementById('tenure-result');
     const tenureValues = document.getElementById('tenure-values');
@@ -113,12 +153,14 @@
         syncReference();
         clearTenure();
         clearWeekdays();
+        clearHolidays();
         errorElement.textContent = '';
         result.hidden = true;
     });
     form.addEventListener('input', () => {
         clearTenure();
         clearWeekdays();
+        clearHolidays();
         errorElement.textContent = '';
         result.hidden = true;
     });
@@ -128,6 +170,7 @@
         values.replaceChildren();
         clearTenure();
         clearWeekdays();
+        clearHolidays();
         window.setTimeout(() => { syncReference(); clearTenure(); }, 0);
     });
     document.getElementById('swap-dates')?.addEventListener('click', () => {
@@ -138,6 +181,7 @@
         }
         clearTenure();
         clearWeekdays();
+        clearHolidays();
         errorElement.textContent = '';
         result.hidden = true;
     });
@@ -145,6 +189,7 @@
         event.preventDefault();
         clearTenure();
         clearWeekdays();
+        clearHolidays();
         values.replaceChildren();
         note.textContent = '';
         result.hidden = true;
@@ -185,6 +230,7 @@
                 note.textContent = inclusive ? ui.inclusive_note : ui.exclusive_note;
                 showTenure(start, end);
                 showWeekdays(start, end, inclusive);
+                holidayController?.submit(holidayMode.checked, start, end, inclusive);
             } else if (config.kind === 'age') {
                 const birth = readDate('birth').iso;
                 if (birth > today) throw new Error('future_birth');
@@ -231,6 +277,7 @@
             result.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'nearest'});
         } catch (error) {
             clearWeekdays();
+            clearHolidays();
             errorElement.textContent = ui[error.message] || ui.invalid_date;
         }
     });

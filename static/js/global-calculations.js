@@ -69,6 +69,33 @@
         return {weekdays, weekendDays: days - weekdays};
     }
 
+    function holidayRange2027(start, end, includeEnd = false, holidays) {
+        const {weekdays, weekendDays} = weekdayRange(start, end, includeEnd);
+        if (date(start).getUTCFullYear() !== 2027 || date(end).getUTCFullYear() !== 2027) {
+            throw new Error('unsupported_year');
+        }
+        if (!Array.isArray(holidays) || !holidays.length || holidays.length > 366) {
+            throw new Error('invalid_holidays');
+        }
+        const seen = new Set();
+        const excludedHolidays = [];
+        for (const row of holidays) {
+            let parsed;
+            try { parsed = date(row?.date); } catch (_) { throw new Error('invalid_holidays'); }
+            if (parsed.getUTCFullYear() !== 2027 || seen.has(row.date) ||
+                typeof row.label !== 'string' || !row.label.trim() || row.label.length > 200 ||
+                !['national', 'substitute'].includes(row.type)) throw new Error('invalid_holidays');
+            seen.add(row.date);
+            if (row.date >= start && (includeEnd ? row.date <= end : row.date < end) &&
+                parsed.getUTCDay() !== 0 && parsed.getUTCDay() !== 6) {
+                excludedHolidays.push({date: row.date, label: row.label});
+            }
+        }
+        excludedHolidays.sort((a, b) => a.date.localeCompare(b.date));
+        return {referenceDays: weekdays - excludedHolidays.length, weekendDays,
+            holidayDays: excludedHolidays.length, excludedHolidays};
+    }
+
     function dateShift(start, operation, amount, unit) {
         const origin = date(start);
         if (!['add', 'subtract'].includes(operation)) throw new Error('invalid_operation');
@@ -181,5 +208,5 @@
         return Math.abs(values[0] - values[1]);
     }
 
-    return {isoParts, today, daysBetween, dateRange, weekdayRange, dateShift, calendarInfo, completedMonths, duration, birthday, age, baby, hundred, yearGap};
+    return {isoParts, today, daysBetween, dateRange, weekdayRange, holidayRange2027, dateShift, calendarInfo, completedMonths, duration, birthday, age, baby, hundred, yearGap};
 }));

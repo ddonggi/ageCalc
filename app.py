@@ -1528,6 +1528,43 @@ def _build_baby_month_snapshot(months: int) -> dict[str, object]:
     }
 
 
+def _holiday_snapshot_now():
+    """Calendar API clock is explicitly Korean time, independent of blog settings."""
+    return datetime.now(ZoneInfo("Asia/Seoul"))
+
+
+@app.get("/api/calendar/korea/2027")
+def korean_holiday_snapshot_api():
+    """Anonymous, finite-lived national facts; calculation inputs stay in-browser."""
+    if request.query_string or request.get_data(cache=False):
+        response = jsonify({"error": "Unsupported request"})
+        response.status_code = 400
+    else:
+        now = _holiday_snapshot_now().astimezone(ZoneInfo("Asia/Seoul"))
+        calendar = build_holiday_calendar(now.date())
+        available = calendar["available"]
+        expires = now
+        if available:
+            midnight = datetime.combine(now.date() + timedelta(days=1), datetime.min.time(), tzinfo=now.tzinfo)
+            expires = min(now + timedelta(minutes=10), midnight)
+        metadata = calendar["metadata"]
+        response = jsonify({
+            "available": available, "state": calendar["state"], "year": 2027,
+            "holidays": [
+                {key: row[key] for key in ("date", "label", "type")}
+                for month in calendar["months"] for row in month["holidays"]
+                if row["scope"] == "national" and row["type"] in ("national", "substitute")
+            ] if available else [],
+            "metadata": {key: metadata[key] for key in ("version", "source_url", "verified_on", "next_review")},
+            "server_now": now.isoformat(), "expires_at": expires.isoformat(),
+            "lease_ms": int((expires - now).total_seconds() * 1000),
+        })
+    response.headers["Cache-Control"] = "no-store"
+    response.headers["X-Robots-Tag"] = "noindex, nofollow"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    return response
+
+
 def _holiday_calendar_for_request(today=None):
     """Use one service-date snapshot for holiday visibility in this response."""
     if not hasattr(g, "korean_holiday_calendar"):
