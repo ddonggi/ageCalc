@@ -2,6 +2,8 @@
 
 현재 블로그 자동화는 SQLAlchemy 모델 [models/blog_models.py](models/blog_models.py)를 기준으로 4개 테이블을 사용합니다.
 
+이 문서는 블로그 4개 테이블에 한정합니다. 같은 모델 파일에는 별도의 `PageFeedback` / `page_feedback`도 있으므로 전체 DB 테이블 목록으로 사용하지 않습니다. [문서 목차](docs/README.md)
+
 ## ERD
 ```mermaid
 erDiagram
@@ -121,7 +123,7 @@ RSS에서 수집한 원문 후보입니다.
 - `/blog/drafts`는 `draft`와 `needs_review`를 함께 보여주지만 비밀번호 세션이 필요합니다.
 - `draft` 공개 시 `scripts.adsense_blog_review.audit_post(..., require_cover_image=True)`를 통과해야 합니다.
 - 대표 이미지가 없거나, HTML 제외 본문이 2,500자 미만이거나, AgeCalc 내부 링크/출처가 없으면 공개되지 않습니다.
-- 공개 글이 `BLOG_INDEX_MIN_POSTS` 기본값 3개 미만이면 `/blog`와 sitemap의 블로그 노출이 제한됩니다.
+- 공개 색인에는 `BLOG_INDEX_MIN_POSTS` 외에 승인 모드 해제와 블로그 색인 활성화도 필요합니다. [공개 정책](docs/operations/runtime-policy.md)을 함께 확인합니다.
 
 ## SQLAlchemy 생성
 테이블은 앱 시작 또는 스크립트 실행 시 `db.init_db()` / `Base.metadata.create_all()` 경로로 생성됩니다. 수동 SQL을 관리하기보다 [models/blog_models.py](models/blog_models.py)를 기준으로 확인하세요.

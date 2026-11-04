@@ -346,8 +346,8 @@ This should be treated as a rendering contract at the route/template layer, even
 
 Recommended implementation path:
 
-1. extend the blog detail render context in [app.py](/srv/apps/agecalc/.worktrees/life-platform-checkpoint-1/app.py:1763)
-2. refactor [templates/blog-detail.html](/srv/apps/agecalc/.worktrees/life-platform-checkpoint-1/templates/blog-detail.html) to match the guide/calculator quality patterns
+1. extend the blog detail render context in [app.py](../../../app.py) (the original design referenced line 1763 in the life-platform-checkpoint-1 worktree; current line numbers may differ)
+2. refactor [templates/blog-detail.html](../../../templates/blog-detail.html) to match the guide/calculator quality patterns
 3. keep draft/review behavior intact
 4. make public blog article sections data-driven, not hard-coded
 

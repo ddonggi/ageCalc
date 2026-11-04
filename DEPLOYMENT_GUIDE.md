@@ -1,6 +1,10 @@
 # AgeCalc 배포 가이드
 
-AWS EC2 Ubuntu, Nginx, Gunicorn, MySQL, systemd 기준의 운영 문서입니다. 현재 production 구성은 `/srv/apps/agecalc` 경로와 `agecalc` 전용 계정을 기준으로 합니다.
+AWS EC2 Ubuntu, Nginx, Gunicorn, MySQL, systemd 기준의 설치·배포 예시입니다. 아래 경로·계정·서비스 설정은 실행 전에 실제 서버와 대조합니다. 이 문서 열람은 운영 변경 승인에 해당하지 않습니다.
+
+[문서 목차](docs/README.md) · [개발 환경](docs/DEVELOPMENT.md) · [공개 정책](docs/operations/runtime-policy.md)
+
+기능 개발은 확인된 pre-release에서 수행하고, 승인된 main 병합·push 후 운영에서 `git pull --ff-only`를 실행합니다. 필요한 마이그레이션·재시작·검증은 승인된 배포 계획에 따릅니다. 대상 커밋·실행 계정·DB 변경·백업·복구·중단 조건을 먼저 기록합니다.
 
 ## 1. 배포 구조
 ```mermaid
@@ -41,7 +45,7 @@ git clone <REPO_URL> agecalc
 sudo chown -R agecalc:agecalc /srv/apps/agecalc
 ```
 
-코드 수정과 앱 내부 스크립트 실행은 `agecalc` 계정에서 합니다.
+아래는 운영 계정·경로 예시입니다. 기능 수정은 운영 폴더가 아닌 확인된 개발 작업 트리에서 하며, 운영 스크립트 실행은 해당 작업 권한을 확인합니다.
 
 ```bash
 sudo -iu agecalc
@@ -120,7 +124,7 @@ chmod 600 .env.rss
 - `BLOG_BASE_URL`: 기본값 `https://agecalc.cloud`
 - `BLOG_REVIEW_TOKEN`: 토큰 기반 검토 링크
 - `BLOG_DRAFT_PASSWORD`: `/blog/drafts` 접근 비밀번호
-- `COUPANG_PARTNERS_ENABLED`: `true`이면 공개 블로그 글에 쿠팡 파트너스 배너와 고지 문구를 노출
+- `COUPANG_PARTNERS_ENABLED`: 승인 모드가 해제된 경우에만 제휴 노출 가능. [공개 정책](docs/operations/runtime-policy.md) 참조
 - `SMTP_*`: draft 생성 알림 메일
 - `FLASK_SECRET_KEY`: Flask 세션 서명 키
 
@@ -192,91 +196,14 @@ curl -I https://agecalc.cloud/health
 ```
 
 ### SSL 인증서 만료/갱신 대응
-HTTPS 접속 시 인증서 만료 오류가 보이면 먼저 현재 인증서 상태와 만료일을 확인합니다.
 
-```bash
-sudo certbot certificates
-openssl s_client -connect agecalc.cloud:443 -servername agecalc.cloud </dev/null 2>/dev/null | openssl x509 -noout -dates
-```
-
-`sudo: certbot: command not found`가 나오지만 `/etc/letsencrypt/live/agecalc.cloud/fullchain.pem` 파일이 존재한다면, 인증서 설정은 남아 있고 Certbot 실행 파일만 사라졌거나 PATH 연결이 끊긴 상태일 가능성이 큽니다. 먼저 설치 위치를 확인합니다.
-
-```bash
-command -v certbot
-ls -l /snap/bin/certbot /usr/bin/certbot /usr/local/bin/certbot
-snap list certbot
-dpkg -l | grep certbot
-```
-
-Snap Certbot이 남아 있으면 직접 실행하거나 `/usr/bin/certbot` 링크를 복구합니다.
-
-```bash
-sudo /snap/bin/certbot certificates
-sudo ln -sf /snap/bin/certbot /usr/bin/certbot
-sudo certbot certificates
-```
-
-Certbot이 완전히 제거된 상태라면 다시 설치합니다. 기존 `/etc/letsencrypt` 디렉터리는 삭제하지 않습니다.
-
-```bash
-sudo snap install core
-sudo snap refresh core
-sudo snap install --classic certbot
-sudo ln -sf /snap/bin/certbot /usr/bin/certbot
-sudo certbot certificates
-```
-
-`/usr/bin/certbot -> /snap/bin/certbot` 심볼릭 링크만 있고 `snap: command not found` 또는 `/snap/bin/certbot: No such file or directory`가 나오면, Snap이 제거되어 Certbot 링크가 깨진 상태입니다. 이 경우 Snap을 먼저 복구한 뒤 Certbot을 다시 설치합니다.
-
-```bash
-sudo apt update
-sudo apt install -y snapd
-sudo systemctl enable --now snapd.socket
-sudo snap install core
-sudo snap refresh core
-sudo snap install --classic certbot
-sudo ln -sf /snap/bin/certbot /usr/bin/certbot
-sudo certbot certificates
-```
-
-Certbot 자동 갱신이 정상 동작하는지 dry-run으로 점검합니다.
-
-```bash
-sudo certbot renew --dry-run
-```
-
-dry-run이 성공하면 실제 갱신을 실행하고 Nginx 설정을 검증한 뒤 reload합니다.
-
-```bash
-sudo certbot renew
-sudo nginx -t
-sudo systemctl reload nginx
-curl -I https://agecalc.cloud/health
-```
-
-갱신이 실패하거나 인증서가 누락된 경우에는 Nginx 플러그인으로 다시 발급합니다.
-
-```bash
-sudo certbot --nginx -d agecalc.cloud -d www.agecalc.cloud
-sudo nginx -t
-sudo systemctl reload nginx
-```
-
-자동 갱신 타이머도 함께 확인합니다. Snap으로 설치한 경우와 OS 패키지로 설치한 경우 서비스 이름이 다를 수 있습니다.
-
-```bash
-systemctl list-timers | grep -E 'certbot|snap.certbot'
-systemctl status snap.certbot.renew.timer
-systemctl status certbot.timer
-```
-
-`certbot.timer` 또는 `snap.certbot.renew.timer` 중 존재하는 타이머가 active 상태여야 합니다. 갱신 후에도 브라우저에서 만료 인증서가 계속 보이면 Nginx reload 여부, `/etc/letsencrypt/live/agecalc.cloud/fullchain.pem` 경로, CDN/프록시 캐시 사용 여부를 순서대로 확인합니다.
+인증서 확인·Certbot 복구·갱신·타이머 점검은 [TLS 인증서 운영 안내](docs/operations/tls-certificates.md)를 참고하세요.
 
 ## 9. RSS 블로그 스케줄러
 ### 현재 production 스케줄
-`agecalc-rss.timer`는 매일 `09:00`, `12:00`, `19:00` KST에 실행됩니다. `agecalc-rss.service`는 실행당 초안 1개 생성을 시도합니다.
+아래는 기존 운영 구성 예시입니다. 저장소 timer는 09:00·12:00·19:00을 정의하지만 타임존은 서버 설정에 따라 달라집니다. 설치된 timer/service의 시간대·활성화 상태·실행 인자를 확인하세요.
 
-현재 production 실행 명령:
+실행당 초안 1개를 생성하는 명령 예시:
 ```bash
 /srv/apps/agecalc/.micromamba/envs/agecalc/bin/python \
   /srv/apps/agecalc/scripts/rss_blog_scheduler.py run \
@@ -316,29 +243,15 @@ sudo journalctl -u agecalc-rss.service -n 200 --no-pager
 ```
 
 ## 10. 블로그 공개 기준
-OpenAI가 생성하더라도 아래 기준을 통과하지 못하면 `draft`가 아니라 `needs_review`로 남습니다.
 
-- HTML 제외 본문 최소 `2,500자`
-- 생성 목표 한글 기준 `2,700자 이상`
-- `h2`/`h3` 소제목 5개 이상
-- 실제 원문 URL 사용. Google News RSS 리디렉션 URL만 남으면 차단
-- AgeCalc 내부 계산기 링크 1개 이상
-- 대표 이미지 필요
-- 내부 자동 생성 문구, 짧은 요약문, 번역체/복제성 제목 차단
-
-초안 검토:
-```text
-https://agecalc.cloud/blog/drafts
-```
-
-공개 버튼은 `draft` 글에만 보입니다. `needs_review` 글은 재작성 또는 수동 보정 후 `draft`로 전환해야 합니다.
+본문 길이·소제목·출처·대표 이미지·상태 전환 기준은 [블로그 품질 및 공개 절차](docs/BLOG_WORKFLOW.md#current-quality-gates)에서 관리합니다. 초안 검토·공개 권한은 배포 권한과 별도로 확인합니다. 공개 후 검색 색인은 [공개 정책](docs/operations/runtime-policy.md)을 함께 따릅니다.
 
 ## 11. 배포 후 검증
 - `/health` 응답 `200`
 - `/sitemap.xml` 응답 정상
 - 핵심 계산기 페이지 정상
 - `/about`, `/contact`, `/references`, `/privacy`, `/terms` 접근 가능
-- `/blog`는 공개 글 3개 미만이면 `X-Robots-Tag: noindex, nofollow`
+- `/blog`는 공개 글 수뿐 아니라 승인 모드·블로그 색인 플래그를 함께 확인: [공개 정책](docs/operations/runtime-policy.md)
 - `/blog/<slug>`는 `published` 글만 접근 가능
 - `/blog/drafts`는 비밀번호 세션 필요
 - `/static/generated/blog-covers/` 이미지 파일 로드 가능
@@ -352,7 +265,7 @@ set +a
 /srv/apps/agecalc/.micromamba/envs/agecalc/bin/python scripts/adsense_preflight.py
 ```
 
-이 명령은 사이트맵 공개 URL, `noindex`, 애드센스 코드, `robots.txt`, `ads.txt`, 미니게임/비공개 블로그 경로 노출 여부를 점검합니다. 로컬에서 환경 파일을 불러오지 않고 실행하면 SQLite fallback 기준으로 확인합니다.
+이 명령은 로컬 Flask 라우트의 사이트맵·noindex·광고 코드·robots.txt·ads.txt 등을 점검하며 외부 운영 URL의 실응답을 검사하지 않습니다. 앱 import 전에 DB와 환경을 명시적으로 확인하세요. 위 운영 환경 source 예시는 승인된 운영 검증에만 사용하며 개발 환경에서는 [DB 격리 안내](docs/DEVELOPMENT.md)를 따릅니다.
 
 DB 테이블 확인:
 ```bash
@@ -364,6 +277,7 @@ mysql -u agecalc_user -p -h 127.0.0.1 -D agecalc -e "SHOW TABLES;"
 - `feed_items`
 - `generated_posts`
 - `post_sources`
+- `page_feedback` (블로그 외 페이지 피드백 모델)
 
 ## 12. 문제 해결
 - MySQL 접속 실패: `sudo systemctl status mysql`, `ss -lntp | grep 3306`, `DATABASE_URL` 확인

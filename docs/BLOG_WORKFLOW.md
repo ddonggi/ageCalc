@@ -24,6 +24,8 @@ flowchart TD
 
 원본 Mermaid 파일: [docs/diagrams/blog-workflow.mmd](diagrams/blog-workflow.mmd)
 
+도식의 시각은 기존 운영 예시입니다. 실제 실행 시간대와 활성화 여부는 설치된 timer/service에서 확인하며, [공개 정책](operations/runtime-policy.md)의 환경 구분을 따릅니다.
+
 ## Status
 | Status | Meaning | Public Access |
 | --- | --- | --- |
@@ -43,6 +45,15 @@ flowchart TD
 - 영어 원문은 한국어 설명형 글로 재창작되어야 하며 원문 제목을 그대로 쓰면 실패
 
 ## Manual Commands
+아래 운영 경로·계정·모델은 명령 예시입니다. 실행 전 대상 환경과 승인 범위를 확인합니다. 스크립트는 DB를 변경하거나 외부 API 비용을 발생시킬 수 있으며, `--publish-on-pass`·`--demote-failed-published`는 기존 공개 상태도 바꿉니다. 개발에서 운영 `.env.rss`를 복사하거나 source하지 않습니다. [개발 환경](DEVELOPMENT.md) · [배포 가이드](../DEPLOYMENT_GUIDE.md)
+
+RSS 소스 등록·조회:
+
+```bash
+python scripts/rss_blog_scheduler.py import-sources --file scripts/rss_sources.example.json
+python scripts/rss_blog_scheduler.py list-sources
+```
+
 초안 1개 생성:
 ```bash
 sudo -iu agecalc
