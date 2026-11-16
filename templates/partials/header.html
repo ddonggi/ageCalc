@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="{{ versioned_static('css/hallmark/site.css') }}">
 {% set current_endpoint = request.endpoint or '' %}
 {% set reading_progress_enabled = not (
     (current_endpoint == 'blog_detail' and ((draft_mode | default(false)) or (review_mode | default(false)) or not (blog_indexable | default(false))))

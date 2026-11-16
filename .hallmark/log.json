@@ -1,0 +1,27 @@
+[
+  {
+    "mode": "redesign",
+    "depth": "full",
+    "scope": "app",
+    "theme": "almanac",
+    "shape": "app screen",
+    "signature": "live age calculation sheet",
+    "nav": "existing categories",
+    "footer": "existing policy and support links",
+    "imagery": "none",
+    "photos": [],
+    "entry": "templates/index.html",
+    "sections": [
+      "calculator",
+      "tool finder",
+      "life hubs",
+      "reference",
+      "method"
+    ],
+    "prompt": "Redesign AgeCalc with Hallmark",
+    "verification": "297 tests passed; calculation, search reset and mobile overflow checked; rendered audit 0 FAIL before final header alignment fix",
+    "waived": [
+      "72: legacy auxiliary footer text; viewport overflow check passed"
+    ]
+  }
+]

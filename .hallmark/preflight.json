@@ -1,0 +1,21 @@
+{
+  "scanned": "2026-11-15",
+  "findings": {
+    "framework": "Flask/Jinja, app.py",
+    "fonts": "Local Pretendard, static/css/editorial-luxury.css:3",
+    "palette": "Legacy warm paper, static/css/style.css:1",
+    "scope": "Home app screen plus shared site chrome"
+  },
+  "preserve": [
+    "calculations",
+    "routes",
+    "forms",
+    "search",
+    "privacy and policy copy"
+  ],
+  "introduce": [
+    "Almanac tokens",
+    "working calculator sheet",
+    "search-first directory"
+  ]
+}
