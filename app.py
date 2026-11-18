@@ -429,7 +429,11 @@ def add_security_headers(response):
         response.headers["X-Robots-Tag"] = "noindex, follow"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
-    response.headers.setdefault("Referrer-Policy", "no-referrer" if request.endpoint in {"hundred_day_calculator", "birthday_dday_calculator"} or request.path in {"/days-between-dates", "/d-day"} else "strict-origin-when-cross-origin")
+    hide_referrer = (
+        request.endpoint in {"hundred_day_calculator", "birthday_dday_calculator", "parent_child"}
+        or request.path in {"/days-between-dates", "/d-day"}
+    )
+    response.headers.setdefault("Referrer-Policy", "no-referrer" if hide_referrer else "strict-origin-when-cross-origin")
     response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
     response.headers["X-XSS-Protection"] = "0"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
@@ -1861,6 +1865,7 @@ def life_hub(hub_slug):
 @app.route('/age', methods=['GET', 'POST'])
 def age():
     """만나이 계산 페이지 - 나이 계산 폼과 결과를 표시"""
+    today = _current_local_date()
     if request.method == 'POST':
         calendar_type = request.form.get('calendar_type', 'solar')
         if calendar_type != 'lunar':
@@ -1874,12 +1879,11 @@ def age():
         if not birth_date:
             return jsonify({'success': False, 'message': '생년월일을 입력해주세요.'}), 400
 
-        result = AgeController().calculate_age_from_string(birth_date, 'lunar')
+        result = AgeController().calculate_age_from_string(birth_date, 'lunar', reference_date=today)
         response = jsonify(result)
         response.headers['Cache-Control'] = 'no-store'
         return response
 
-    today = _current_local_date()
     requested_birth_date = request.args.get('birth_date', '').strip()
     calendar_type = request.args.get('calendar_type', 'solar').strip()
     calendar_type = calendar_type if calendar_type in {'solar', 'lunar'} else 'solar'
@@ -1895,7 +1899,7 @@ def age():
         else requested_birth_date
     )
     result = (
-        AgeController().calculate_age_from_string(birth_date_value, calendar_type)
+        AgeController().calculate_age_from_string(birth_date_value, calendar_type, reference_date=today)
         if requested_birth_date
         else None
     )

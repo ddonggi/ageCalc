@@ -15,6 +15,10 @@
     if (removedSensitiveValue) {
         window.history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
     }
+    // Keep the result URL reloadable while reporting only the calculator path.
+    if (document.body?.dataset.analyticsPathOnly === 'true') {
+        url.search = '';
+    }
     const cleanPageLocation = `${url.origin}${url.pathname}${url.search}`;
 
     const getCookie = (key) =>
@@ -62,13 +66,20 @@
         window.gtag = window.gtag || function gtag() {
             window.dataLayer.push(arguments);
         };
-        window.gtag('js', new Date());
+        // Consent may have changed in another tab while the loader was pending.
+        const accepted = getCookie('cookieConsent') === 'accepted';
+        const storage = accepted ? 'granted' : 'denied';
         window.gtag('consent', 'update', {
-            analytics_storage: 'granted',
-            ad_storage: 'granted',
-            ad_user_data: 'granted',
-            ad_personalization: 'granted',
+            analytics_storage: storage,
+            ad_storage: storage,
+            ad_user_data: storage,
+            ad_personalization: storage,
         });
+        if (!accepted) {
+            window.__agecalcTrackingInitialized = false;
+            return;
+        }
+        window.gtag('js', new Date());
         window.gtag('config', measurementId, {
             anonymize_ip: true,
             page_location: cleanPageLocation,

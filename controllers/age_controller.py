@@ -8,13 +8,14 @@ class AgeController:
         self.age_calculator = AgeCalculator()
         self.lunar_calendar = KoreanLunarCalendar()
     
-    def calculate_age_from_string(self, birth_date_string, calendar_type='solar'):
+    def calculate_age_from_string(self, birth_date_string, calendar_type='solar', *, reference_date=None):
         """
         생년월일 문자열로부터 나이를 계산
         
         Args:
             birth_date_string (str): YYYY-MM-DD 형식의 날짜 문자열
             calendar_type (str): 'solar' (양력) 또는 'lunar' (음력)
+            reference_date (date): 요청에 표시된 만나이 계산 기준일
             
         Returns:
             dict: 계산 결과를 담은 딕셔너리
@@ -55,7 +56,7 @@ class AgeController:
         
         # 나이 계산
         try:
-            age = self.age_calculator.calculate_age(birth_date)
+            age = self.age_calculator.calculate_age(birth_date, reference_date=reference_date)
         except ValueError:
             return {
                 'success': False,
