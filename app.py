@@ -1533,7 +1533,7 @@ def _build_baby_month_snapshot(months: int) -> dict[str, object]:
 
 
 def _holiday_snapshot_now():
-    """Calendar API clock is explicitly Korean time, independent of blog settings."""
+    """Use Korean time for holiday data, independent of blog settings."""
     return datetime.now(ZoneInfo("Asia/Seoul"))
 
 
@@ -1569,10 +1569,10 @@ def korean_holiday_snapshot_api():
     return response
 
 
-def _holiday_calendar_for_request(today=None):
+def _holiday_calendar_for_request():
     """Use one service-date snapshot for holiday visibility in this response."""
     if not hasattr(g, "korean_holiday_calendar"):
-        g.korean_holiday_calendar = build_holiday_calendar(today if today is not None else _current_local_date())
+        g.korean_holiday_calendar = build_holiday_calendar(_holiday_snapshot_now().date())
     return g.korean_holiday_calendar
 
 
@@ -1801,7 +1801,7 @@ def index():
     """메인 페이지 - 나이 계산 도구 안내"""
     registered_paths = {rule.endpoint: rule.rule for rule in app.url_map.iter_rules() if not (rule.arguments - set(rule.defaults or {}))}
     today = _current_local_date()
-    available = _holiday_calendar_for_request(today)["available"]
+    available = _holiday_calendar_for_request()["available"]
     # Keep all curated endpoints present; only the new item's copied policy varies.
     finder_pages = tuple(
         {**page, "indexable": False} if page["endpoint"] == "korean_holiday_calendar" and not available else page

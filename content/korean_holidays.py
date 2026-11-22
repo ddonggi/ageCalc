@@ -16,11 +16,11 @@ SOURCE_INFO = MappingProxyType({
     'published_on': '2026-06-29',
     'source_url': 'https://www.gwanbo.go.kr/ezpdf/customLayout.jsp?contentId=I0000000000000001782374733940000&tocId=I0000000000000001782199865342000&isTocOrder=N',
     'source_sha256': '10412c8632ab2e8e9937cbd3a8fa6ee184e08cbd9aa541dd4d44229cb11a67b3',
-    'verified_on': '2026-11-01',
-    'next_review': '2026-11-08',
+    'verified_on': '2026-11-22',
+    'next_review': '2026-11-29',
     'reviewer': 'Phase1 독립 QA(공식 원표 전 행 대조)',
     'maintenance_role': '9급 주무관',
-    'version': '2027.20261101.1',
+    'version': '2027.20261122.1',
     'active': True,
 })
 HOLIDAY_METADATA = MappingProxyType(dict(SOURCE_INFO))

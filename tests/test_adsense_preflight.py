@@ -1,6 +1,5 @@
-from unittest.mock import patch
-from datetime import date
 import unittest
+from tests.holiday_review_fixture import reviewed_calendar
 import os
 import subprocess
 import sys
@@ -16,7 +15,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 class AdsensePreflightTests(unittest.TestCase):
     # This contract checks the reviewed, available snapshot; expiry has separate coverage.
-    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
+    @reviewed_calendar()
     def test_operational_preflight_passes_with_nonblocking_content_warnings(self):
         report = run_local_preflight()
 
@@ -59,7 +58,7 @@ class AdsensePreflightTests(unittest.TestCase):
         self.assertIn("affiliate_material_present", format_report(report))
 
     # This contract checks the reviewed, available snapshot; expiry has separate coverage.
-    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
+    @reviewed_calendar()
     def test_operational_preflight_checks_only_sitemap_quality_pages(self):
         report = run_local_preflight()
 
