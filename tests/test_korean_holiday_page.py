@@ -1,10 +1,12 @@
 """B12 integration contracts: public state, discovery and canonical boundaries."""
-from datetime import date
+from datetime import date, datetime, time
 import json
 import re
 import unittest
+from tests.holiday_review_fixture import clock_at, reviewed_calendar
 from unittest.mock import patch
 from xml.etree import ElementTree
+from zoneinfo import ZoneInfo
 
 
 class KoreanHolidayPageTests(unittest.TestCase):
@@ -14,15 +16,19 @@ class KoreanHolidayPageTests(unittest.TestCase):
         cls.module = app
         cls.client = app.app.test_client()
 
+    def setUp(self):
+        self.enterContext(reviewed_calendar())
+
     def get_on(self, path, today=date(2026, 11, 1)):
-        with patch.object(self.module, '_current_local_date', return_value=today):
+        with clock_at(datetime.combine(today, time(12), ZoneInfo('Asia/Seoul'))):
             return self.client.get(path)
 
-    def sitemap_urls(self, today):
-        root = ElementTree.fromstring(self.get_on('/sitemap.xml', today).data)
+    def sitemap_urls(self, today=None):
+        get = self.client.get if today is None else lambda path: self.get_on(path, today)
+        root = ElementTree.fromstring(get('/sitemap.xml').data)
         urls = set()
         for loc in root.findall('{*}sitemap/{*}loc'):
-            child = ElementTree.fromstring(self.get_on(loc.text.removeprefix('https://agecalc.cloud'), today).data)
+            child = ElementTree.fromstring(get(loc.text.removeprefix('https://agecalc.cloud')).data)
             urls.update(node.text for node in child.findall('{*}url/{*}loc'))
         return urls
 
@@ -62,6 +68,28 @@ class KoreanHolidayPageTests(unittest.TestCase):
         stale_home = self.get_on('/', expired).get_data(as_text=True)
         self.assertIn('href="/korean-holiday-calendar"', current_home)
         self.assertNotIn('href="/korean-holiday-calendar"', stale_home)
+
+    def test_holiday_routes_share_seoul_midnight_across_blog_timezones(self):
+        from content import korean_holidays
+        meta = dict(korean_holidays.HOLIDAY_METADATA,
+                    verified_on="2026-11-22", next_review="2026-11-29")
+        calendar = "/korean-holiday-calendar"
+        instants = (("2026-11-29T14:59:59+00:00", True),
+                    ("2026-11-29T15:00:00+00:00", False))
+        with patch.object(korean_holidays, "HOLIDAY_METADATA", meta):
+            for zone in ("UTC", "Asia/Seoul"):
+                for stamp, available in instants:
+                    with (self.subTest(zone=zone, instant=stamp),
+                          patch.object(self.module, "BLOG_TIMEZONE", ZoneInfo(zone)),
+                          clock_at(datetime.fromisoformat(stamp))):
+                        api = self.client.get("/api/calendar/korea/2027").get_json()
+                        page = self.client.get(calendar)
+                        home = self.client.get("/").get_data(as_text=True)
+                        self.assertEqual(api["available"], available)
+                        self.assertEqual(api["lease_ms"], 1000 if available else 0)
+                        self.assertEqual("2027-05-03" in page.get_data(as_text=True), available)
+                        self.assertEqual('href="/korean-holiday-calendar"' in home, available)
+                        self.assertEqual("https://agecalc.cloud" + calendar in self.sitemap_urls(), available)
 
     def test_invalid_and_disabled_share_fail_closed_discovery(self):
         from content import korean_holidays
