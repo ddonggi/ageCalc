@@ -275,10 +275,18 @@
         function completed() {
             clearRun();
             if (!accepted()) { forget(); return; }
-            const links = new Map(cards().map((link, index) => [link, {
-                ...base, destination_tool: link.dataset.tool, card_rank: index + 1,
-                measurable: link.dataset.measurable === 'true',
-            }]));
+            // Baseline results can link to the same tool once per child. Both
+            // exposure and activation use that destination's first visible position.
+            const firstRank = new Map();
+            const links = new Map();
+            cards().forEach((link, index) => {
+                const tool = link.dataset.tool;
+                if (!firstRank.has(tool)) firstRank.set(tool, index + 1);
+                links.set(link, {
+                    ...base, destination_tool: tool, card_rank: firstRank.get(tool),
+                    measurable: link.dataset.measurable === 'true',
+                });
+            });
             run = {links, seen: new Set(), clicked: new Set()};
             send('calculator_completed', {
                 ...base, measurable: [...links.values()].some(item => item.measurable),

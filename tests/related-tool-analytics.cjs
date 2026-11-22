@@ -112,6 +112,59 @@ async function yearHandoff(browser, delayed, blocked = false) {
     } finally { release(); await context.close(); }
 }
 
+async function annualAgeResubmission(browser) {
+    const {page, context, events} = await fixture(browser);
+    try {
+        await page.goto(base + '/age');
+        await page.locator('[name=birth_date]').fill('19921002');
+        await navigate(page, page.locator('#age-form button[type=submit]'));
+        await navigate(page, page.locator('[data-related-tools] a[data-tool=annual_age_calculator]'));
+        assert.equal(events.filter(([name]) => name === 'related_calculator_completed').length, 0);
+        const input = page.locator('input[name=birth_year]');
+        const panel = page.locator('[data-related-tools]');
+        assert.equal(await input.inputValue(), '1992');
+        const documents = [];
+        page.on('request', request => { if (request.isNavigationRequest()) documents.push(request.url()); });
+        await page.locator(submitGrade).click();
+        await waitCount(events, 'related_calculator_completed', 1);
+        await waitCount(events, 'calculator_completed', 2);
+        await input.fill('1993');
+        await input.fill('1992');
+        assert.equal(await panel.isVisible(), false);
+        await page.locator(submitGrade).click();
+        await waitCount(events, 'calculator_completed', 3);
+        assert.ok(await panel.isVisible());
+        assert.equal(documents.length, 0);
+        await input.fill('1993');
+        await navigate(page, page.locator(submitGrade));
+        await waitCount(events, 'calculator_completed', 4);
+        assert.equal(documents.length, 1);
+        await page.reload();
+        assert.equal(events.filter(([name]) => name === 'calculator_completed').length, 4);
+        assert.equal(events.filter(([name]) => name === 'related_calculator_completed').length, 1);
+    } finally { await context.close(); }
+}
+
+async function familyDestinationRank(browser) {
+    const {page, context, events} = await fixture(browser);
+    try {
+        await page.setViewportSize({width: 390, height: 844});
+        await page.goto(base + '/parent-child?parent_role=mother&parent_birth=19800213&child_role=son&child_birth=20150831&child_role=daughter&child_birth=20191216');
+        await page.locator('#child-lines input').first().fill('20140831');
+        await navigate(page, page.locator(submitGrade));
+        const links = page.locator('[data-baseline-tools] a[data-tool=school_grade_calculator]');
+        assert.equal(await links.count(), 2);
+        await links.first().evaluate(el => el.scrollIntoView({block: 'center', behavior: 'instant'}));
+        await waitCount(events, 'related_tool_impression', 1);
+        await navigate(page, links.nth(1));
+        await waitCount(events, 'related_tool_click', 1);
+        const school = events.filter(([, p]) => p.destination_tool === 'school_grade_calculator');
+        assert.deepEqual(school.map(([name, p]) => [name, p.card_rank]),
+            [['related_tool_impression', 1], ['related_tool_click', 1]]);
+        assert.match(page.url(), /year=2019/);
+    } finally { await context.close(); }
+}
+
 async function consentAndExposure(browser) {
     const {page, context, events} = await fixture(browser, {unset: true});
     try {
@@ -263,11 +316,14 @@ async function realRequests(browser) {
     });
     try {
         if (layout === 'baseline') {
+            await familyDestinationRank(browser);
+            console.log('PASS baseline shared destination rank for two children');
             await yearHandoff(browser, false);
             console.log('PASS baseline links and downstream user submission');
             return;
         }
         for (const [label, check] of [
+            ['unchanged, restored and changed annual age submissions', () => annualAgeResubmission(browser)],
             ['GET handoff', () => yearHandoff(browser, false)],
             ['delayed loader', () => yearHandoff(browser, true)],
             ['blocked storage', () => yearHandoff(browser, false, true)],

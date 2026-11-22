@@ -34,5 +34,32 @@
         document.addEventListener('input', clear);
         document.addEventListener('change', clear);
         document.addEventListener('reset', clear);
+
+        // A GET of the current query with a result fragment stays in this
+        // document. There is no new server response to publish its completion.
+        window.addEventListener('submit', event => {
+            const form = event.target;
+            if (!event.isTrusted || event.defaultPrevented || !form.matches('form[data-calculator-form]')
+                || form.method !== 'get' || (form.target && form.target !== '_self')) return;
+            const button = event.submitter;
+            if (button?.matches('[formaction], [formmethod], [formtarget]')) return;
+            const action = new URL(form.action);
+            if (!action.hash || action.origin !== location.origin || action.pathname !== location.pathname) return;
+            action.search = new URLSearchParams(new FormData(form, button));
+            if (action.search !== location.search) return;
+
+            const result = document.getElementById(action.hash.slice(1));
+            if (!result?.getClientRects().length) {
+                // The calculator discarded the rendered result on edit. Let the
+                // browser request it again instead of jumping to a hidden anchor.
+                const originalAction = form.getAttribute('action');
+                form.action = action.pathname;
+                window.setTimeout(() => form.setAttribute('action', originalAction), 0);
+                return;
+            }
+            event.preventDefault();
+            location.hash = action.hash;
+            document.dispatchEvent(new Event('agecalc:result-completed'));
+        });
     }
 })();

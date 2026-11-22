@@ -95,7 +95,11 @@
       .filter(function (section, index, sections) { return section && sections.indexOf(section) === index; });
     var anchor = calculator;
     var selectedResult = document.querySelector(".birth-year-summary")?.closest("section");
-    if (selectedResult) anchor = selectedResult;
+    if (selectedResult) {
+      anchor = selectedResult;
+      var next = selectedResult.nextElementSibling;
+      if (next?.matches("[data-related-tools]:not([hidden])")) anchor = next;
+    }
     tableSections.forEach(function (section) { anchor.after(section); anchor = section; });
     anchor.after(directAnswer);
   }

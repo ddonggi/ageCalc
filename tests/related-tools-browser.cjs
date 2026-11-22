@@ -83,6 +83,29 @@ async function viewports(browser) {
 const eventCount = (page, name) => page.evaluate(eventName =>
     (window.dataLayer || []).filter(args => args[0] === 'event' && args[1] === eventName).length, name);
 
+async function tableResultOrder(browser) {
+    const context = await contextFor(browser);
+    try {
+        const page = await context.newPage();
+        await page.setViewportSize({ width: 390, height: 844 });
+        for (const path of ['/birth-year-age-table?year=2000', '/school-grade-calculator?year=2012']) {
+            await page.goto(base + path);
+            const panel = page.locator(nav);
+            assert.ok(await panel.isVisible());
+            const {adjacent, gap} = await panel.evaluate(el => {
+                const result = document.querySelector('.birth-year-summary').closest('section');
+                return {
+                    adjacent: result.nextElementSibling === el,
+                    gap: el.getBoundingClientRect().top - result.getBoundingClientRect().bottom,
+                };
+            });
+            assert.ok(adjacent, 'recommendations must immediately follow the rendered result on ' + path);
+            assert.ok(gap >= 0 && gap <= 64, 'unexpected result-to-card gap on ' + path + ': ' + gap);
+            assert.ok(await page.locator('table.data-table').count() > 0);
+        }
+    } finally { await context.close(); }
+}
+
 async function readableCards(browser) {
     const context = await contextFor(browser);
     await context.clearCookies();
@@ -179,6 +202,7 @@ async function funnel(browser) {
     try {
         await viewports(browser);
         if (!before) {
+            await tableResultOrder(browser);
             await readableCards(browser);
             await funnel(browser);
         }
