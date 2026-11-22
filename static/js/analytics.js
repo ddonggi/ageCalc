@@ -351,7 +351,7 @@
         window.addEventListener('submit', event => {
             outgoing = null;
             const form = event.target;
-            if (!accepted() || !event.isTrusted || event.defaultPrevented
+            if (!accepted() || !event.isTrusted || event.defaultPrevented || event.ageCalcModifiedSubmit
                 || !form.matches('form[data-calculator-form]')) return;
             const target = event.submitter?.getAttribute('formtarget') ?? form.target;
             if (target && target !== '_self') return;

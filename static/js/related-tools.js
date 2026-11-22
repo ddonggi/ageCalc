@@ -3,6 +3,22 @@
     const nav = document.querySelector('[data-related-tools]');
     if (!nav) return;
 
+    // SubmitEvent omits the click modifiers. Carry them through the button's
+    // native activation so focus, analytics and result reuse all defer to the browser.
+    document.addEventListener('click', click => {
+        if (!click.isTrusted || !(click.metaKey || click.ctrlKey || click.shiftKey || click.altKey)) return;
+        const button = click.target.closest('button, input');
+        const form = button?.form;
+        if (!form?.matches('form[data-calculator-form]') || !['submit', 'image'].includes(button.type)) return;
+
+        const mark = submit => {
+            if (submit.submitter === button && !click.defaultPrevented) submit.ageCalcModifiedSubmit = true;
+        };
+        form.addEventListener('submit', mark, {once: true});
+        // Invalid or cancelled clicks may finish without dispatching submit.
+        window.setTimeout(() => form.removeEventListener('submit', mark), 0);
+    }, true);
+
     if (nav.dataset.layout === 'baseline') {
         const config = nav.querySelector('[data-baseline-destinations]');
         const destinations = config ? JSON.parse(config.textContent) : {};
@@ -39,7 +55,7 @@
         // document. There is no new server response to publish its completion.
         window.addEventListener('submit', event => {
             const form = event.target;
-            if (!event.isTrusted || event.defaultPrevented || !form.matches('form[data-calculator-form]')
+            if (!event.isTrusted || event.defaultPrevented || event.ageCalcModifiedSubmit || !form.matches('form[data-calculator-form]')
                 || form.method !== 'get' || (form.target && form.target !== '_self')) return;
             const button = event.submitter;
             if (button?.matches('[formaction], [formmethod], [formtarget]')) return;

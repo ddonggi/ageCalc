@@ -125,9 +125,27 @@ async function annualAgeResubmission(browser) {
         assert.equal(await input.inputValue(), '1992');
         const documents = [];
         page.on('request', request => { if (request.isNavigationRequest()) documents.push(request.url()); });
+        const originalUrl = page.url();
+        const originalWindow = await browserWindowId(page);
+        for (const modifier of ['ControlOrMeta', 'Shift']) {
+            const [opened] = await Promise.all([
+                context.waitForEvent('page', {timeout: 6500}),
+                page.locator(submitGrade).click({modifiers: [modifier]}),
+            ]);
+            await opened.waitForURL(originalUrl + '#annual-age-result');
+            assert.ok(await opened.locator('#annual-age-result').isVisible());
+            assert.equal(await browserWindowId(opened) === originalWindow, modifier === 'ControlOrMeta',
+                modifier + ' must use the native tab or window');
+            assert.equal(page.url(), originalUrl);
+            assert.equal(documents.length, 0);
+            assert.equal(events.filter(([name]) => name === 'related_calculator_completed').length, 0);
+            await opened.close();
+            await page.bringToFront();
+        }
         await page.locator(submitGrade).click();
         await waitCount(events, 'related_calculator_completed', 1);
         await waitCount(events, 'calculator_completed', 2);
+        assert.equal(context.pages().length, 1);
         await input.fill('1993');
         await input.fill('1992');
         assert.equal(await panel.isVisible(), false);
@@ -143,6 +161,14 @@ async function annualAgeResubmission(browser) {
         assert.equal(events.filter(([name]) => name === 'calculator_completed').length, 4);
         assert.equal(events.filter(([name]) => name === 'related_calculator_completed').length, 1);
     } finally { await context.close(); }
+}
+
+async function browserWindowId(page) {
+    const session = await page.context().newCDPSession(page);
+    try {
+        const {windowId} = await session.send('Browser.getWindowForTarget');
+        return windowId;
+    } finally { await session.detach(); }
 }
 
 async function familyDestinationRank(browser) {
@@ -311,6 +337,8 @@ async function realRequests(browser) {
 
 (async () => {
     const browser = await chromium.launch({
+        // Native modifier-click dispositions need full Chromium, including in headless mode.
+        channel: 'chromium',
         executablePath: process.env.CHROMIUM_EXECUTABLE,
         args: ['--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1, EXCLUDE localhost', '--no-proxy-server'],
     });
@@ -323,7 +351,7 @@ async function realRequests(browser) {
             return;
         }
         for (const [label, check] of [
-            ['unchanged, restored and changed annual age submissions', () => annualAgeResubmission(browser)],
+            ['native tab/window and same-tab annual age submissions', () => annualAgeResubmission(browser)],
             ['GET handoff', () => yearHandoff(browser, false)],
             ['delayed loader', () => yearHandoff(browser, true)],
             ['blocked storage', () => yearHandoff(browser, false, true)],

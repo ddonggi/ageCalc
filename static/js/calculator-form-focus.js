@@ -119,6 +119,7 @@
   });
   document.addEventListener("keydown", submitOnEnter);
   document.addEventListener("submit", function (event) {
+    if (event.ageCalcModifiedSubmit) return;
     var form = event.target;
     if (form && form.matches(calculatorFormSelector)) scrollToCalculationResult(form);
   });
