@@ -67,6 +67,8 @@
     <script src="{{ versioned_static('js/cookie-consent.js') }}" defer></script>
     <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
     {% endif %}
+    <link rel="stylesheet" href="{{ versioned_static('css/related-tools.css') }}" />
+    <script src="{{ versioned_static('js/related-tools.js') }}" defer></script>
 </head>
 <body class="global-page">
     <div class="container">
@@ -95,7 +97,7 @@
                 <section class="global-panel">
                     <h2>{{ copy.form_title }}</h2>
                     <p id="calculator-unavailable" class="small">{{ ui.js_required }}</p>
-                    <form id="global-calculator" autocomplete="off" novalidate data-clarity-mask="true">
+                    <form id="global-calculator" autocomplete="off" novalidate data-clarity-mask="true" action="{{ request.path }}">
                         <fieldset id="calculator-inputs" disabled>
                             {% if page_key == 'date_add_subtract' %}
                             {{ date_fields('start', ui.start_date) }}
@@ -184,6 +186,7 @@
                     {% endif %}
                 </section>
             </div>
+            {% include 'partials/related-tools.html' %}
             {% if locale_code == 'ko' and page_key in ('days_between_dates', 'date_add_subtract') %}
             <nav class="global-tools" aria-label="관련 시간 계산기"><a href="{{ url_for('time_duration_calculator') }}">시각·휴게시간으로 하루 시간 차이 계산</a></nav>
             {% endif %}
@@ -215,8 +218,9 @@
                 <p>계산 기준 확인일: <time datetime="2026-10-25">2026년 10월 25일</time>. 결과가 예상과 다르면 입력한 날짜와 계산 단위를 확인한 뒤 <a href="{{ url_for('contact') }}">문의 페이지</a>로 알려주세요.</p>
             </aside>
             {% endif %}
+            {% set card_paths = related_tool_state().cards|map(attribute='path')|list %}
             <nav class="related-paths" aria-label="{{ ui.related }}"><h2>{{ ui.related }}</h2><div class="global-tools">
-                {% for tool in global_nav if tool.url != request.path %}<a href="{{ tool.url }}">{{ tool.label }}</a>{% endfor %}
+                {% for tool in global_nav if tool.url != request.path %}<a href="{{ tool.url }}"{% if tool.url in card_paths %} data-also-in-result{% endif %}>{{ tool.label }}</a>{% endfor %}
             </div></nav>
         </main>
         <footer class="global-footer">

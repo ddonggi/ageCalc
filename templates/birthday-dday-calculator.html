@@ -38,6 +38,8 @@
     <script src="{{ versioned_static('js/anniversary-calendar-download.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/birthday-dday.js') }}" defer></script>
     {% include 'partials/hreflang.html' %}
+    <link rel="stylesheet" href="{{ versioned_static('css/related-tools.css') }}" />
+    <script src="{{ versioned_static('js/related-tools.js') }}" defer></script>
 </head>
 
 <body data-disable-analytics="true" data-disable-clarity="true" class="editorial-calculator-page calculator-flat-page">
@@ -92,7 +94,7 @@
                     <h2 id="birthday-search">생일 선택</h2>
                     <p class="section-intro">생일 월일 4자리를 입력하면 다음 생일과 남은 일수를 바로 확인할 수 있습니다.</p>
                 </div>
-                <form class="age-form" id="birthday-dday-form" action="{{ url_for('birthday_dday_calculator') }}#birthday-dday-result" method="get" autocomplete="off" data-clarity-mask="true">
+                <form class="age-form" id="birthday-dday-form" action="{{ url_for('birthday_dday_calculator') }}#birthday-dday-result" method="get" autocomplete="off" data-clarity-mask="true" data-calculator-form>
                     <div class="form-group">
                         <div class="date-inputs">
                             <label class="field-label" for="birthday-dday-input">생일 월일</label>
@@ -139,7 +141,8 @@
                 <p class="small">같은 파일을 여러 번 가져오면 일정이 중복될 수 있습니다.</p>
                 <p class="small" id="calendar-download-status" role="status" aria-live="polite"></p>
                 <noscript><p class="small">일정 파일을 받으려면 JavaScript를 켜 주세요.</p></noscript>
-                    <div class="result-next">
+                    {% if related_layout == 'baseline' %}
+                    <div class="result-next" data-baseline-tools>
                         <h3>이어서 확인하기</h3>
                         <div class="result-next-links">
                             <a href="{{ url_for('age') }}">현재 만나이 확인</a>
@@ -148,8 +151,10 @@
                         </div>
                     </div>
                     {% endif %}
+                    {% endif %}
                 </article>
             </section>
+            {% include 'partials/related-tools.html' %}
         </div>
 
         <div class="editorial-supporting-content">
@@ -194,6 +199,7 @@
                     <a href="{{ url_for('d_day') }}">기념일 계산기</a>
                     <a href="{{ url_for('hundred_day_calculator') }}">100일 계산기</a>
                     <a href="{{ url_for('age') }}">만나이 계산기</a>
+                    {% if selected_snapshot and related_layout != 'baseline' %}<a href="{{ url_for('life_timeline') }}">생애 타임라인 보기</a>{% endif %}
                     <a href="{{ url_for('references') }}">계산 기준과 참고 자료</a>
                 </div>
             </article>

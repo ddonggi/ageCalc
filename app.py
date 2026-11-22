@@ -37,6 +37,7 @@ from content.page_registry import (
     find_page,
     indexable_pages_for_sitemap,
 )
+from content.related_tools import RELATED_TOOLS, baseline_destinations, related_tool_state
 from content.i18n import i18n_context, localized_sitemap_entries, register_localized_routes
 from db import SessionLocal, close_db_session, init_db
 from models.blog_models import GeneratedPost, PageFeedback
@@ -133,6 +134,7 @@ app.secret_key = _resolve_flask_secret_key(
     database_url=os.getenv("DATABASE_URL"),
 )
 app.config.update(
+    RELATED_TOOLS_LAYOUT=os.getenv("RELATED_TOOLS_LAYOUT", "cards"),
     PERMANENT_SESSION_LIFETIME=timedelta(hours=8),
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
@@ -331,6 +333,8 @@ def inject_csp_nonce():
     )
     blog_public_indexable = _is_blog_public_indexable(blog_public_count)
     current_page = getattr(g, 'localized_page', None) or find_page(request.endpoint, request.view_args)
+    related_source = current_page["key"] if current_page else request.endpoint
+    related_layout = "baseline" if app.config["RELATED_TOOLS_LAYOUT"] == "baseline" else "cards"
     page_canonical_url = getattr(g, "page_canonical_url", None)
     if page_canonical_url is None and current_page:
         page_canonical_url = f"{SITE_BASE_URL}{current_page['path']}"
@@ -377,6 +381,11 @@ def inject_csp_nonce():
         **i18n_context(current_page, SITE_BASE_URL),
         "csp_nonce": getattr(g, "csp_nonce", ""),
         "versioned_static": versioned_static,
+        "has_related_tools": related_source in RELATED_TOOLS,
+        "related_source": related_source,
+        "related_layout": related_layout,
+        "related_tool_state": related_tool_state,
+        "baseline_destinations": baseline_destinations,
         "csrf_token": _get_or_create_csrf_token,
         "author_name": SITE_AUTHOR_NAME,
         "contact_email": SITE_CONTACT_EMAIL,
@@ -1457,6 +1466,10 @@ def _build_birth_year_zodiac_snapshot(year: int, current_year: int) -> dict[str,
     return snapshot
 
 
+def _college_entry_years(current_year):
+    return range(max(1990, current_year - 20), current_year + 2)
+
+
 def _format_college_cohort_label(entry_year: int) -> str:
     return f"{entry_year % 100:02d}학번"
 
@@ -2494,6 +2507,7 @@ def grade_birth_year_table():
         school_year=school_year,
         selected_stage=stage,
         selected_grade=grade,
+        college_entry_years=_college_entry_years(current_year),
         selected_row=selected_row,
         grade_rows=rows,
         examples=examples,
@@ -2553,8 +2567,8 @@ def birth_year_zodiac_table():
 def college_entry_year_calculator():
     """대학 학번 나이 계산기 페이지"""
     current_year = _current_local_date().year
-    min_entry_year = max(1990, current_year - 20)
-    max_entry_year = current_year + 1
+    entry_years = _college_entry_years(current_year)
+    min_entry_year, max_entry_year = entry_years[0], entry_years[-1]
 
     selected_year, invalid_query = _validated_int_query("year", min_entry_year, max_entry_year)
     if invalid_query or (request.args and not _query_keys_are_exact("year")):
@@ -2800,7 +2814,10 @@ def parent_child():
         g.private_result_query = True
     form_parents = [{"role": item["role"], "birth": item["birth"].strftime("%Y%m%d") if item["birth"] else ""} for item in parents] or [{}]
     form_children = [{"role": item["role"], "birth": item["birth"].strftime("%Y%m%d") if item["birth"] else ""} for item in children] or [{}]
-    return render_template('parent-child.html', parent_results=results, parent_inputs=form_parents, child_inputs=form_children)
+    return render_template(
+        'parent-child.html', today=today, parent_results=results,
+        parent_inputs=form_parents, child_inputs=form_children,
+    )
 
 
 @app.post("/page-feedback")

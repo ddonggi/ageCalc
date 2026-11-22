@@ -55,6 +55,7 @@ class ParentChildCalculator {
                 return;
             }
             this.addParentLine();
+            document.dispatchEvent(new Event('agecalc:result-cleared'));
         });
         document.getElementById('add-child-line')?.addEventListener('click', () => {
             if (this.children.length >= this.maxChildren) {
@@ -62,6 +63,7 @@ class ParentChildCalculator {
                 return;
             }
             this.addChildLine();
+            document.dispatchEvent(new Event('agecalc:result-cleared'));
         });
 
         document.addEventListener('click', (e) => {
@@ -103,6 +105,7 @@ class ParentChildCalculator {
             this.children = this.children.filter(c => c.id !== id);
             this.renderLines('child');
         }
+        document.dispatchEvent(new Event('agecalc:result-cleared'));
         this.showError('');
     }
 
@@ -159,6 +162,7 @@ class ParentChildCalculator {
                 optionBtn.addEventListener('click', () => {
                     const value = optionBtn.dataset.value;
                     item.role = value;
+                    document.dispatchEvent(new Event('agecalc:result-cleared'));
                     button.textContent = roleOptions.find(opt => opt.value === value)?.label || defaultLabel;
                     button.setAttribute('aria-expanded', 'false');
                     dropdown.classList.remove('open');

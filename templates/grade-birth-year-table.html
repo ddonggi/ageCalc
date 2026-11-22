@@ -32,6 +32,8 @@
     <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
+    <link rel="stylesheet" href="{{ versioned_static('css/related-tools.css') }}" />
+    <script src="{{ versioned_static('js/related-tools.js') }}" defer></script>
 </head>
 
 <body class="calculator-flat-page">
@@ -80,7 +82,7 @@
                 <h2 id="grade-birth-search">학년 선택</h2>
                 <p class="section-intro">학교급과 학년을 고르면 해당 학년의 보통 출생연도가 바로 표시됩니다.</p>
             </div>
-            <form class="age-form birth-year-form" method="get" action="{{ url_for('grade_birth_year_table') }}">
+            <form class="age-form birth-year-form" method="get" action="{{ url_for('grade_birth_year_table') }}" data-calculator-form>
                 <div class="form-group">
                     <div class="date-inputs">
                         <select name="stage" aria-label="학교급 선택">
@@ -110,8 +112,7 @@
                 </div>
             </form>
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
+        {% if related_layout == 'baseline' %}{% include 'partials/result-promotions.html' %}{% endif %}
 
         {% if selected_row %}
         <section class="section-shell section-card-grid">
@@ -133,13 +134,18 @@
                         <span>{{ selected_row.man_age_range }}</span>
                     </div>
                 </div>
-                <div class="footer-links">
-                    <a href="{{ url_for('college_entry_year_calculator', year=selected_row.high_graduation_date[:4]|int) }}">대학 학번 흐름 확인</a>
+                {% if related_layout == 'baseline' %}
+                {% set entry_year = selected_row.high_graduation_date[:4]|int %}
+                <div class="footer-links" data-baseline-tools>
+                    <a href="{{ url_for('college_entry_year_calculator', year=entry_year if entry_year in college_entry_years else none) }}">대학 학번 흐름 확인</a>
                     <a href="{{ url_for('parent_child') }}">부모·자녀 나이 관계 보기</a>
                 </div>
+                {% endif %}
             </article>
         </section>
         {% endif %}
+        {% include 'partials/related-tools.html' %}
+        {% if related_layout != 'baseline' %}{% include 'partials/result-promotions.html' %}{% endif %}
 
         <section class="section-shell">
             <div class="section-heading">
@@ -219,7 +225,8 @@
                 <h2>연관 페이지</h2>
                 <div class="footer-links">
                     <a href="{{ url_for('school_grade_calculator') }}">출생연도로 현재 학년 확인</a>
-                    <a href="{{ url_for('college_entry_year_calculator') }}">학번과 나이 확인</a>
+                    <a href="{{ url_for('college_entry_year_calculator') }}">대학 학번 흐름 확인</a>
+                    {% if selected_row and related_layout != 'baseline' %}<a href="{{ url_for('parent_child') }}">부모·자녀 나이 관계 보기</a>{% endif %}
                     <a href="{{ url_for('references') }}">계산 기준과 참고 자료</a>
                 </div>
             </article>

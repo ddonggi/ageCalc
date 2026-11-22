@@ -1,4 +1,33 @@
 {
+  "related_tools": {
+    "heading": "接着算一算",
+    "cards": {
+      "age": [
+        "按出生日期计算周岁",
+        "输入出生日期和参考日期，查看截至当天的周岁年龄。"
+      ],
+      "age_gap_calculator": [
+        "比较两个人的出生年份",
+        "输入两人的出生年份，看看相差多少年。"
+      ],
+      "hundred_day_calculator": [
+        "查找第100天的日期",
+        "将开始当天算作第1天，查看第100天是哪一天。"
+      ],
+      "d_day": [
+        "计算纪念日倒计时",
+        "输入纪念日日期，查看还有多少天，或已经过了多少天。"
+      ],
+      "days_between_dates": [
+        "计算两个日期相隔的天数",
+        "选择开始和结束日期，查看这段时间有多少天，合几周零几天。"
+      ],
+      "date_add_subtract": [
+        "按天、周或月推算日期",
+        "选择起始日期，输入要往前或往后推算的时长，查看结果日期。"
+      ]
+    }
+  },
   "common": {
     "language_fallback_notice": "如果此页面不支持您选择的语言，将前往该语言的年龄计算器。",
     "language": "语言", "tagline": "清晰计算日常日期。", "tools": "计算工具", "calculate": "计算", "reset": "重置", "result": "计算结果", "year": "年", "month": "月", "day": "日", "choose_month": "选择月份", "birth_date": "出生日期", "reference_date": "计算年龄的日期", "today": "今天", "specific_date": "指定日期", "birthday": "生日", "start_date": "开始日期", "target_date": "事件日期", "event_name": "事件名称（可选）", "event_placeholder": "旅行、考试或纪念日", "until": "距离日期还有", "since": "距今已经", "year_a": "第一个出生年份", "year_b": "第二个出生年份", "date_help": "请选择月份，并输入日期和四位数年份。", "privacy_note": "您输入的日期仅保留在此浏览器中，不会发送到我们的服务器或被保存。", "js_required": "请启用 JavaScript 以使用计算器。即使不启用，您仍可阅读下方的说明和示例。", "faq": "常见问题", "related": "试试其他计算器", "how": "计算方式", "reference_label": "参考日期", "current_age": "周岁", "exact_age": "按年、月、日表示的年龄", "total_days": "出生至今的天数", "total_months": "足月月数", "next_birthday": "下一个生日", "days_until": "距离生日的天数", "birthday_today": "今天是您的生日！", "days_remaining": "剩余天数", "days_elapsed": "已过天数", "hundredth_date": "第100天", "year_gap": "出生年份之差", "years_months": "年和月", "same_day": "该日期就是今天。", "before_start": "开始日期尚未到来。", "invalid_date": "请输入真实日期，年份须为四位数。", "required": "请填写所有必填项。", "future_birth": "出生日期不能晚于今天。", "reference_before_birth": "参考日期必须等于或晚于出生日期。", "invalid_year": "请在可用范围内选择出生年份。", "date_range": "计算出的日期超出了支持的四位数年份范围。", "about": "关于", "privacy": "隐私", "terms": "条款", "contact": "联系我们", "korean_only": "仅提供韩语", "footer": "帮助理解年龄和日历日期的免费工具。", "copyright": "保留所有权利。", "cookie_notice": "我们使用 Cookie 进行分析和广告投放。您可以接受或拒绝非必要的跟踪。", "accept": "接受", "reject": "拒绝", "back_top": "返回顶部", "units": {"year": {"one": "{n}年", "other": "{n}年"}, "month": {"one": "{n}个月", "other": "{n}个月"}, "day": {"one": "{n}天", "other": "{n}天"}}, "duration_separator": " ", "months": ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]

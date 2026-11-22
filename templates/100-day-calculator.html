@@ -39,6 +39,8 @@
     <script src="{{ versioned_static('js/anniversary-calendar-download.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/hundred-day-calculator.js') }}" defer></script>
     {% include 'partials/hreflang.html' %}
+    <link rel="stylesheet" href="{{ versioned_static('css/related-tools.css') }}" />
+    <script src="{{ versioned_static('js/related-tools.js') }}" defer></script>
 </head>
 
 <body data-disable-analytics="true" data-disable-clarity="true" class="calculator-flat-page">
@@ -90,7 +92,7 @@
                 <h2 id="hundred-day-search">시작일 입력</h2>
                 <p class="section-intro">시작일 8자리를 입력하면 백일·첫돌(1주년)·1000일째 날짜와 오늘 기준 상태를 함께 확인할 수 있습니다.</p>
             </div>
-            <form class="age-form" id="hundred-day-form" action="{{ url_for('hundred_day_calculator') }}#hundred-day-result" method="get" data-clarity-mask="true">
+            <form class="age-form" id="hundred-day-form" action="{{ url_for('hundred_day_calculator') }}#hundred-day-result" method="get" data-clarity-mask="true" data-calculator-form>
                 <div class="form-group">
                     <div class="date-inputs">
                         <label class="field-label" for="hundred-day-date">시작일</label>
@@ -155,6 +157,7 @@
                 {% endif %}
             </article>
         </section>
+        {% include 'partials/related-tools.html' %}
 
         <section class="section-shell">
             <div class="section-heading">

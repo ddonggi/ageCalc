@@ -1,0 +1,96 @@
+.related-tools {
+    container-type: inline-size;
+    width: 100%;
+    min-width: 0;
+    margin-block: 24px;
+    color: var(--lux-text, #29231f);
+    text-align: start;
+}
+
+.related-tools[hidden] {
+    display: none;
+}
+
+.related-tools .related-tools-heading {
+    margin: 0 0 12px;
+    font: inherit;
+    font-weight: 700;
+    font-size: 1.125rem;
+}
+
+.related-tools-cards {
+    display: grid;
+    gap: 12px;
+}
+
+.related-tools .related-tool-card {
+    display: grid;
+    align-content: start;
+    gap: 6px;
+    min-height: 44px;
+    min-width: 0;
+    padding: 16px;
+    box-sizing: border-box;
+    border: 1px solid var(--lux-border-strong, #c6c0b7);
+    border-radius: 10px;
+    background: var(--lux-surface, white);
+    color: inherit;
+    text-decoration: none;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.related-tool-card strong {
+    font-weight: 600;
+}
+
+.related-tool-card:first-child strong {
+    color: var(--related-accent, #69462b);
+    font-weight: 750;
+}
+
+.related-tool-card span {
+    color: var(--lux-muted, #554e47);
+    font-size: .9375rem;
+}
+
+.related-tool-card:hover strong,
+.related-tool-card:focus-visible strong {
+    text-decoration: underline;
+    text-underline-offset: .15em;
+}
+
+.related-tool-card:focus-visible {
+    outline: 3px solid var(--related-accent, #69462b);
+    outline-offset: 3px;
+}
+
+@container (min-width: 560px) {
+    .related-tools-cards:has(> :nth-child(2)) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media print {
+    .related-tools {
+        display: none !important;
+    }
+}
+
+.global-page .related-tools {
+    --related-accent: #24553d;
+    --lux-surface: #fffdf9;
+    --lux-border-strong: #d2d8cb;
+}
+
+.related-tools:not([hidden]) ~ .related-paths [data-also-in-result] {
+    display: none;
+}
+
+/* Long consent translations at large text sizes still leave room to read the result. */
+body:has([data-related-tools][data-layout="cards"]) .cookie-banner.show {
+    box-sizing: border-box;
+    max-height: 42vh;
+    max-height: 42dvh;
+    overflow-y: auto;
+}

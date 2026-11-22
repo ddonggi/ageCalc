@@ -106,6 +106,8 @@
     {% include 'partials/adsense.html' %}
 
     {% include 'partials/hreflang.html' %}
+    <link rel="stylesheet" href="{{ versioned_static('css/related-tools.css') }}" />
+    <script src="{{ versioned_static('js/related-tools.js') }}" defer></script>
 </head>
 
 <body class="age-page editorial-calculator-page calculator-flat-page">
@@ -149,7 +151,7 @@
             </p>
         </section>
         <div class="editorial-calculator-shell">
-            <form class="age-form" id="age-form" action="{{ url_for('age') }}#result-container" method="get" autocomplete="off" data-clarity-mask="true">
+            <form class="age-form" id="age-form" action="{{ url_for('age') }}#result-container" method="get" autocomplete="off" data-clarity-mask="true" data-calculator-form>
                 <div class="form-group">
                     <h3>생년월일을 입력하세요 (8자리)</h3>
 
@@ -182,6 +184,7 @@
                 </div>
             </form>
 
+            {% set table_year = result_details.birth_year if result_details and [1900, today.year - 100]|max <= result_details.birth_year <= today.year else none %}
             <div class="result-container{% if result %} show{% endif %}" id="result-container" aria-live="polite" data-clarity-mask="true" tabindex="-1">
                 <h2>계산 결과</h2>
                 <div id="result-content">
@@ -214,15 +217,17 @@
                                     {% endfor %}
                                 </div>
                             </section>
-                            <nav class="age-result-next" aria-label="계산 결과 관련 도구">
+                            {% if related_layout == 'baseline' %}
+                            <nav class="age-result-next" aria-label="계산 결과 관련 도구" data-baseline-tools>
                                 <h4>이어서 확인하기</h4>
                                 <div class="age-result-links">
-                                    <a href="{{ url_for('birth_year_age_table', year=result_details.birth_year) }}"><strong>{{ result_details.birth_year }}년생 나이표</strong><span>연나이와 만나이 범위 보기</span></a>
-                                    <a href="{{ url_for('annual_age_calculator', birth_year=result_details.birth_year) }}"><strong>연나이 확인</strong><span>출생연도로 바로 계산</span></a>
-                                    <a href="{{ url_for('school_grade_calculator', year=result_details.birth_year) }}"><strong>학년 계산기</strong><span>현재 학년과 초·중·고 입학 시점 보기</span></a>
+                                    <a href="{{ url_for('birth_year_age_table', year=table_year) }}"><strong>{{ (table_year|string ~ '년생 나이표') if table_year else '출생연도별 나이표' }}</strong><span>연나이와 만나이 범위 보기</span></a>
+                                    <a href="{{ url_for('annual_age_calculator', birth_year=result_details.birth_year if 1900 <= result_details.birth_year <= today.year else none) }}"><strong>연나이 확인</strong><span>출생연도로 바로 계산</span></a>
+                                    <a href="{{ url_for('school_grade_calculator', year=table_year) }}"><strong>학년 계산기</strong><span>현재 학년과 초·중·고 입학 시점 보기</span></a>
                                     <a href="{{ url_for('birthday_dday_calculator') }}"><strong>생일 D-day</strong><span>생일까지 남은 날짜 계산</span></a>
                                 </div>
                             </nav>
+                            {% endif %}
                             <details class="share-section">
                                 <summary>결과 공유하기</summary>
                                 <div class="share-tools">
@@ -239,6 +244,7 @@
                     {% endif %}
                 </div>
             </div>
+            {% include 'partials/related-tools.html' %}
         </div>
         <div class="editorial-supporting-content">
         {% include 'partials/info_coupang_promotions.html' %}
@@ -382,7 +388,12 @@
                 </p>
                 <div class="footer-links editorial-link-row">
                     <a href="{{ url_for('birthday_dday_calculator') }}">다음 생일 확인</a>
+                    {% if result and result.success and related_layout != 'baseline' %}
+                    <a href="{{ url_for('birth_year_age_table', year=table_year) }}">{{ (table_year|string ~ '년생 나이표') if table_year else '출생연도별 나이표' }}</a>
+                    <a href="{{ url_for('school_grade_calculator', year=table_year) }}">학년과 입학 시점 보기</a>
+                    {% else %}
                     <a href="{{ url_for('birth_year_age_table') }}">출생연도표 보기</a>
+                    {% endif %}
                     <a href="{{ url_for('annual_age_calculator') }}">연나이 계산</a>
                 </div>
             </article>

@@ -1,4 +1,33 @@
 {
+  "related_tools": {
+    "heading": "Seguir calculando",
+    "cards": {
+      "age": [
+        "Calcular la edad exacta",
+        "Introduce la fecha de nacimiento para saber la edad en la fecha que elijas."
+      ],
+      "age_gap_calculator": [
+        "Comparar dos años de nacimiento",
+        "Introduce los dos años de nacimiento para saber cuántos años los separan."
+      ],
+      "hundred_day_calculator": [
+        "Encontrar el día número 100",
+        "Cuenta la fecha inicial como día uno para saber en qué fecha cae el día 100."
+      ],
+      "d_day": [
+        "Contar los días hasta un evento",
+        "Introduce la fecha del evento para saber cuántos días faltan o han pasado."
+      ],
+      "days_between_dates": [
+        "Contar los días entre dos fechas",
+        "Elige las fechas de inicio y fin para ver el intervalo en días y semanas."
+      ],
+      "date_add_subtract": [
+        "Sumar o restar tiempo a una fecha",
+        "Elige una fecha de inicio y un número de días, semanas o meses para obtener la nueva fecha."
+      ]
+    }
+  },
   "common": {
     "language_fallback_notice": "Si esta página no está disponible en el idioma elegido, se abrirá una calculadora de edad en ese idioma.",
     "language": "Idioma", "tagline": "Fechas cotidianas, calculadas con claridad.", "tools": "Calculadoras", "calculate": "Calcular", "reset": "Restablecer", "result": "Resultado", "year": "Año", "month": "Mes", "day": "Día", "choose_month": "Elige un mes", "birth_date": "Fecha de nacimiento", "reference_date": "Calcular la edad en", "today": "Hoy", "specific_date": "Una fecha específica", "birthday": "Cumpleaños", "start_date": "Fecha de inicio", "target_date": "Fecha del evento", "event_name": "Nombre del evento (opcional)", "event_placeholder": "Un viaje, examen o aniversario", "until": "Días que faltan", "since": "Días transcurridos", "year_a": "Primer año de nacimiento", "year_b": "Segundo año de nacimiento", "date_help": "Selecciona el mes e introduce el día y el año con cuatro cifras.", "privacy_note": "Tus fechas permanecen en este navegador. No se envían a nuestro servidor ni se guardan.", "js_required": "Activa JavaScript para usar la calculadora. Aun así, puedes leer las instrucciones y los ejemplos de abajo.", "faq": "Preguntas frecuentes", "related": "Prueba otra calculadora", "how": "Cómo funciona", "reference_label": "Fecha de referencia", "current_age": "Edad en años cumplidos", "exact_age": "Edad en años, meses y días", "total_days": "Días vividos", "total_months": "Meses cumplidos", "next_birthday": "Próximo cumpleaños", "days_until": "Días hasta el cumpleaños", "birthday_today": "¡Hoy es tu cumpleaños!", "days_remaining": "Días restantes", "days_elapsed": "Días transcurridos", "hundredth_date": "Día 100", "year_gap": "Diferencia entre años de nacimiento", "years_months": "Años y meses", "same_day": "Esa fecha es hoy.", "before_start": "La fecha de inicio aún no ha llegado.", "invalid_date": "Introduce una fecha real con un año de cuatro cifras.", "required": "Completa todos los campos obligatorios.", "future_birth": "La fecha de nacimiento no puede estar en el futuro.", "reference_before_birth": "La fecha de referencia debe ser igual o posterior a la fecha de nacimiento.", "invalid_year": "Elige un año de nacimiento dentro del intervalo disponible.", "date_range": "La fecha calculada está fuera del intervalo admitido de años con cuatro cifras.", "about": "Acerca de", "privacy": "Privacidad", "terms": "Términos", "contact": "Contacto", "korean_only": "en coreano", "footer": "Herramientas gratuitas para entender edades y fechas del calendario.", "copyright": "Todos los derechos reservados.", "cookie_notice": "Usamos cookies para análisis y publicidad. Puedes aceptar o rechazar el seguimiento opcional.", "accept": "Aceptar", "reject": "Rechazar", "back_top": "Volver arriba", "units": {"year": {"one": "{n} año", "other": "{n} años"}, "month": {"one": "{n} mes", "other": "{n} meses"}, "day": {"one": "{n} día", "other": "{n} días"}}, "duration_separator": " ", "months": ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]

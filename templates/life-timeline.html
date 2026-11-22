@@ -19,6 +19,8 @@
     <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
     <script src="{{ versioned_static('js/date-rules.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
+    <link rel="stylesheet" href="{{ versioned_static('css/related-tools.css') }}" />
+    <script src="{{ versioned_static('js/related-tools.js') }}" defer></script>
 </head>
 <body class="life-timeline-page calculator-flat-page">
     <div id="pixel-background"></div>
@@ -38,7 +40,7 @@
                 <p class="eyebrow">한 번만 입력하세요</p>
                 <h2>모든 결과는 {{ today.strftime('%Y년 %-m월 %-d일') }}을 같은 기준일로 계산합니다</h2>
             </div>
-            <form class="age-form life-timeline-form" id="life-timeline-form" action="{{ url_for('life_timeline') }}#life-timeline-result" method="get" data-today="{{ today.isoformat() }}" autocomplete="off" data-clarity-mask="true">
+            <form class="age-form life-timeline-form" id="life-timeline-form" action="{{ url_for('life_timeline') }}#life-timeline-result" method="get" data-today="{{ today.isoformat() }}" autocomplete="off" data-clarity-mask="true" data-calculator-form>
                 <label class="field-label" for="life-birth-date">생년월일 8자리</label>
                 <input type="text" id="life-birth-date" name="birth_date" value="{% if birth_date %}{{ birth_date.strftime('%Y%m%d') }}{% endif %}" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" required aria-describedby="life-timeline-error" />
                 <small class="error-msg" id="life-timeline-error" aria-live="polite"></small>
@@ -48,14 +50,15 @@
 
         <section class="life-timeline-result" id="life-timeline-result" aria-live="polite" aria-label="생애 타임라인 계산 결과" {% if not timeline %}hidden{% endif %}>
             {% if timeline %}
-            <div class="life-timeline-track">
+            <div class="life-timeline-track"{% if related_layout == 'baseline' %} data-baseline-tools{% endif %}>
                 <article class="life-moment is-now"><span class="life-moment-dot" aria-hidden="true"></span><p class="eyebrow">지금</p><h3>만 {{ timeline.full_age }}세</h3><p>출생연도 기준 연 나이는 {{ timeline.year_age }}세입니다.</p><a href="/age">만 나이 계산 기준 보기</a></article>
                 <article class="life-moment"><span class="life-moment-dot" aria-hidden="true"></span><p class="eyebrow">지나온 시간</p><h3>{{ '{:,}'.format(timeline.days_lived) }}일</h3><p>출생일부터 오늘까지의 순수한 날짜 차이입니다.</p></article>
-                <article class="life-moment is-next"><span class="life-moment-dot" aria-hidden="true"></span><p class="eyebrow">다음 생일 · {% if timeline.days_until_birthday == 0 %}오늘{% else %}D-{{ timeline.days_until_birthday }}{% endif %}</p><h3>{{ timeline.next_birthday.strftime('%Y년 %-m월 %-d일') }}</h3><p>{% if timeline.days_until_birthday == 0 %}오늘이 생일입니다.{% else %}다음 생일까지 {{ timeline.days_until_birthday }}일 남았습니다.{% endif %}</p><a href="/birthday-dday-calculator">생일 D-day 자세히 보기</a></article>
-                <article class="life-moment is-profile"><span class="life-moment-dot" aria-hidden="true"></span><p class="eyebrow">출생 프로필</p><h3>{{ timeline.zodiac }}띠 · {{ timeline.constellation }}</h3><p>띠는 출생연도 기준이며 음력 설·입춘 기준과 다를 수 있습니다.</p><a href="/birth-year-zodiac-table">출생연도별 띠표 보기</a></article>
+                <article class="life-moment is-next"><span class="life-moment-dot" aria-hidden="true"></span><p class="eyebrow">다음 생일 · {% if timeline.days_until_birthday == 0 %}오늘{% else %}D-{{ timeline.days_until_birthday }}{% endif %}</p><h3>{{ timeline.next_birthday.strftime('%Y년 %-m월 %-d일') }}</h3><p>{% if timeline.days_until_birthday == 0 %}오늘이 생일입니다.{% else %}다음 생일까지 {{ timeline.days_until_birthday }}일 남았습니다.{% endif %}</p>{% if related_layout == 'baseline' %}<a href="/birthday-dday-calculator">생일 D-day 자세히 보기</a>{% endif %}</article>
+                <article class="life-moment is-profile"><span class="life-moment-dot" aria-hidden="true"></span><p class="eyebrow">출생 프로필</p><h3>{{ timeline.zodiac }}띠 · {{ timeline.constellation }}</h3><p>띠는 출생연도 기준이며 음력 설·입춘 기준과 다를 수 있습니다.</p>{% if related_layout == 'baseline' %}<a href="/birth-year-zodiac-table">출생연도별 띠표 보기</a>{% endif %}</article>
             </div>
             {% endif %}
         </section>
+        {% include 'partials/related-tools.html' %}
 
         <section class="section-shell section-card-grid">
             <article class="section-card">

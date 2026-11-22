@@ -132,7 +132,7 @@
         const result = document.getElementById('life-timeline-result');
         const asOf = form.dataset.today;
 
-        result.addEventListener('click', (event) => {
+        function trackRelatedLink(event) {
             const link = event.target.closest('a[href]');
             const destination = link && RELATED_TOOL_DESTINATIONS[link.getAttribute('href')];
             if (destination) {
@@ -141,7 +141,9 @@
                     destination
                 });
             }
-        });
+        }
+        result.addEventListener('click', trackRelatedLink);
+        document.querySelector?.('[data-related-tools]')?.addEventListener('click', trackRelatedLink);
 
         input.addEventListener('input', () => {
             input.value = root.AgeCalcDateRules.formatDateDigits(input.value);

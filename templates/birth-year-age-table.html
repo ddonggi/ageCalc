@@ -33,6 +33,8 @@
     <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
+    <link rel="stylesheet" href="{{ versioned_static('css/related-tools.css') }}" />
+    <script src="{{ versioned_static('js/related-tools.js') }}" defer></script>
 </head>
 
 <body class="calculator-flat-page">
@@ -93,7 +95,7 @@
                 <h2 id="birth-year-search">출생년도 선택</h2>
                 <p class="section-intro">찾는 연도를 고르면 표에서 바로 강조해 보여드립니다.</p>
             </div>
-            <form class="age-form birth-year-form" method="get" action="{{ url_for('birth_year_age_table') }}">
+            <form class="age-form birth-year-form" method="get" action="{{ url_for('birth_year_age_table') }}" data-calculator-form>
                 <div class="form-group">
                     <div class="date-inputs">
                         <select name="year" aria-label="출생년도 선택">
@@ -112,8 +114,7 @@
                 </div>
             </form>
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
+        {% if related_layout == 'baseline' %}{% include 'partials/result-promotions.html' %}{% endif %}
 
         {% if selected_row %}
         <section class="section-shell section-card-grid" id="birth-year-selected-result">
@@ -139,7 +140,8 @@
                         <span>{{ selected_row.generation }}</span>
                     </div>
                 </div>
-                <div class="result-next">
+                {% if related_layout == 'baseline' %}
+                <div class="result-next" data-baseline-tools>
                     <h3>이어서 확인하기</h3>
                     <div class="result-next-links">
                         <a href="{{ url_for('annual_age_calculator', birth_year=selected_year) }}">연나이 자세히 보기</a>
@@ -148,6 +150,7 @@
                         <a href="{{ url_for('age') }}">정확한 만나이 계산</a>
                     </div>
                 </div>
+                {% endif %}
             </article>
             <article class="section-card birth-year-milestones">
                 <p class="eyebrow">생활 시점</p>
@@ -164,6 +167,8 @@
             </article>
         </section>
         {% endif %}
+        {% include 'partials/related-tools.html' %}
+        {% if related_layout != 'baseline' %}{% include 'partials/result-promotions.html' %}{% endif %}
 
         <section class="section-shell">
             <div class="section-heading">
@@ -250,6 +255,9 @@
                     생년월일을 입력하는 계산기가 더 적합합니다.
                 </p>
                 <div class="footer-links">
+                    {% if selected_row and related_layout != 'baseline' %}
+                    <a href="{{ url_for('birth_year_zodiac_table', year=selected_year) }}">같은 띠 연도 보기</a>
+                    {% endif %}
                     <a href="{{ url_for('age') }}">만나이 계산기</a>
                     <a href="{{ url_for('guide') }}">나이 계산 가이드</a>
                     <a href="{{ url_for('faq') }}">자주 묻는 질문</a>

@@ -23,6 +23,7 @@
     function clearState() {
         calculatedInput = null;
         error.textContent = '';
+        document.dispatchEvent(new Event('agecalc:result-cleared'));
         result.hidden = true;
         values.replaceChildren();
         Object.keys(fields).forEach(function (key) { fields[key].removeAttribute('aria-invalid'); });
@@ -58,6 +59,7 @@
         row('순 소수시간', calculation.decimalHours + '시간');
         calculatedInput = currentInput();
         result.hidden = false;
+        document.dispatchEvent(new Event('agecalc:result-completed'));
         focusInView(document.getElementById('time-result-title'));
     }
     function reset() {
