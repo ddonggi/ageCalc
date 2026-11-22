@@ -1572,7 +1572,10 @@ def korean_holiday_snapshot_api():
 def _holiday_calendar_for_request():
     """Use one service-date snapshot for holiday visibility in this response."""
     if not hasattr(g, "korean_holiday_calendar"):
-        g.korean_holiday_calendar = build_holiday_calendar(_holiday_snapshot_now().date())
+        g.korean_holiday_calendar = build_holiday_calendar(
+            _holiday_snapshot_now().date(),
+            include_overdue=request.endpoint == "korean_holiday_calendar",
+        )
     return g.korean_holiday_calendar
 
 
@@ -1587,7 +1590,7 @@ def korean_holiday_calendar():
         return redirect(url_for("korean_holiday_calendar"))
     from content.korean_holiday_copy import HOLIDAY_COPY
     calendar = _holiday_calendar_for_request()
-    if not calendar["available"]:
+    if calendar["state"] != "current":
         _mark_result_query_noindex()
     response = make_response(render_template(
         "korean-holiday-calendar.html", holiday_calendar=calendar, holiday_copy=HOLIDAY_COPY,

@@ -50,7 +50,7 @@ class KoreanHolidayPageTests(unittest.TestCase):
             self.assertTrue(response.headers['Location'].endswith('/korean-holiday-calendar'))
             self.assertNotIn('?', response.headers['Location'])
 
-    def test_deadline_inclusive_then_page_and_discovery_stop_together(self):
+    def test_overdue_calendar_remains_readable_with_existing_discovery_policy(self):
         good = date(2026, 11, 8); expired = date(2026, 11, 9)
         valid = self.get_on('/korean-holiday-calendar', good)
         stale = self.get_on('/korean-holiday-calendar', expired)
@@ -59,7 +59,23 @@ class KoreanHolidayPageTests(unittest.TestCase):
         self.assertNotIn('noindex', valid.headers.get('X-Robots-Tag', ''))
         self.assertEqual(stale.headers.get('X-Robots-Tag'), 'noindex, follow')
         self.assertEqual(stale.headers.get('Cache-Control'), 'no-store')
-        self.assertNotIn('2027-05-03', stale.get_data(as_text=True))
+        valid_html = valid.get_data(as_text=True)
+        self.assertNotIn('재검수가 필요합니다', valid_html)
+        for day in (expired, date(2027, 1, 1)):
+            with self.subTest(day=day):
+                html = self.get_on('/korean-holiday-calendar', day).get_data(as_text=True)
+                for pattern in (r'<tr data-holiday-id=.*?</tr>', r'<dd data-holiday-count=.*?</dd>',
+                                r'<time [^>]+data-holiday-sunday>.*?</time>', r'<tr data-local-holiday-id=.*?</tr>'):
+                    expected = re.findall(pattern, valid_html)
+                    self.assertTrue(expected)
+                    self.assertEqual(re.findall(pattern, html), expected)
+                self.assertIn('data-holiday-count="total">72일', html)
+                self.assertEqual(html.count('재검수가 필요합니다'), 1)
+                self.assertEqual(html.count('마지막 검수일'), 1)
+                notice = html[html.index('data-holiday-state="needs_review"'):html.index('data-holiday-count="named"')]
+                self.assertIn('재검수가 필요합니다', notice)
+                self.assertIn('<time datetime="2026-11-01">2026-11-01</time>', notice)
+                self.assertNotIn('확인한 자료 표시 중', html)
         self.assertIn('제2026-0078호', stale.get_data(as_text=True))
         valid_urls = self.sitemap_urls(good); stale_urls = self.sitemap_urls(expired)
         self.assertEqual(valid_urls - stale_urls, {'https://agecalc.cloud/korean-holiday-calendar'})
@@ -87,13 +103,16 @@ class KoreanHolidayPageTests(unittest.TestCase):
                         home = self.client.get("/").get_data(as_text=True)
                         self.assertEqual(api["available"], available)
                         self.assertEqual(api["lease_ms"], 1000 if available else 0)
-                        self.assertEqual("2027-05-03" in page.get_data(as_text=True), available)
+                        html = page.get_data(as_text=True)
+                        self.assertIn("2027-05-03", html)
+                        self.assertEqual(html.count("재검수가 필요합니다"), 0 if available else 1)
                         self.assertEqual('href="/korean-holiday-calendar"' in home, available)
                         self.assertEqual("https://agecalc.cloud" + calendar in self.sitemap_urls(), available)
 
     def test_invalid_and_disabled_share_fail_closed_discovery(self):
         from content import korean_holidays
-        for changes in ({'active': False}, {'next_review': 'bad'}):
+        for changes in ({'active': False}, {'next_review': 'bad'},
+                        {'verified_on': '2026-11-02', 'next_review': '2026-11-09'}):
             meta = dict(korean_holidays.HOLIDAY_METADATA); meta.update(changes)
             with patch.object(korean_holidays, 'HOLIDAY_METADATA', meta):
                 response = self.get_on('/korean-holiday-calendar')
@@ -112,6 +131,7 @@ class KoreanHolidayPageTests(unittest.TestCase):
         with patch.object(korean_holidays, 'HOLIDAY_METADATA', meta):
             response = self.get_on('/korean-holiday-calendar', date(2026,11,9))
             self.assertNotIn('noindex', response.headers.get('X-Robots-Tag', ''))
+            self.assertNotIn('재검수가 필요합니다', response.get_data(as_text=True))
             self.assertIn('2027-05-03', response.get_data(as_text=True))
             self.assertIn('href="/korean-holiday-calendar"', self.get_on('/', date(2026,11,9)).get_data(as_text=True))
         self.assertEqual(before, list(STATIC_PAGE_REGISTRY))

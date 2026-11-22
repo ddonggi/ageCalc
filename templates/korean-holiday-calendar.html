@@ -32,6 +32,7 @@
                 <p>{{ holiday_copy.year_scope }}</p>
             </div>
         </section>
+        {% set review_overdue = holiday_calendar.available and holiday_calendar.state == 'needs_review' %}
         {% if not holiday_calendar.available %}
         <section class="section-shell holiday-state" aria-labelledby="holiday-state-title" data-holiday-state="{{ holiday_calendar.state }}">
             <h2 id="holiday-state-title">{{ holiday_copy.unavailable_title }}</h2>
@@ -41,7 +42,14 @@
         <section class="section-shell direct-answer" aria-labelledby="holiday-scope-title">
             <h2 id="holiday-scope-title">{{ holiday_copy.scope_title }}</h2>
             <p>{{ holiday_copy.scope_body }}</p>
-            {% if holiday_calendar.available %}<p data-holiday-state="{{ holiday_calendar.state }}">{{ holiday_copy.current_label }}</p>{% endif %}
+            {% if review_overdue %}
+            <p class="holiday-state" data-holiday-state="needs_review">
+                {{ holiday_copy.overdue_notice }} {{ holiday_copy.verified_label }}
+                <time datetime="{{ holiday_calendar.metadata.verified_on }}">{{ holiday_calendar.metadata.verified_on }}</time>
+            </p>
+            {% elif holiday_calendar.available %}
+            <p data-holiday-state="current">{{ holiday_copy.current_label }}</p>
+            {% endif %}
         </section>
         {% if holiday_calendar.available %}
         <section class="section-shell" aria-labelledby="holiday-summary-title">
@@ -103,7 +111,9 @@
             <p>{{ holiday_calendar.metadata.notice_number }}</p>
             <dl class="holiday-metadata">
                 <dt>{{ holiday_copy.published_label }}</dt><dd><time datetime="{{ holiday_calendar.metadata.published_on }}">{{ holiday_calendar.metadata.published_on }}</time></dd>
+                {% if not review_overdue %}
                 <dt>{{ holiday_copy.verified_label }}</dt><dd><time datetime="{{ holiday_calendar.metadata.verified_on }}">{{ holiday_calendar.metadata.verified_on }}</time></dd>
+                {% endif %}
                 <dt>{{ holiday_copy.next_review_label }}</dt><dd><time datetime="{{ holiday_calendar.metadata.next_review }}">{{ holiday_calendar.metadata.next_review }}</time></dd>
                 <dt>{{ holiday_copy.reviewer_label }}</dt><dd>{{ holiday_calendar.metadata.reviewer }}</dd>
                 <dt>{{ holiday_copy.maintenance_label }}</dt><dd>{{ holiday_calendar.metadata.maintenance_role }}</dd>
