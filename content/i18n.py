@@ -9,7 +9,7 @@ from datetime import date
 from flask import g, make_response, redirect, render_template, request
 
 from content.locale_config import LOCALE_CONFIG, LOCALE_FEATURES
-from content.page_registry import PUBLIC_PAGE_REGISTRY
+from content.page_registry import PRIVACY_NO_THIRD_PARTY_PATHS, PUBLIC_PAGE_REGISTRY
 from content.regional_pages import REGIONAL_COPY, regional_copy
 from models.regional_calculators import calculate as calculate_regional
 
@@ -220,10 +220,14 @@ def register_localized_routes(app, base_url):
         page = PAGE_BY_KEY[page_key]
         g.locale_code = locale
         g.localized_page = page
-        g.page_canonical_url = base_url + localized_url(page_key, locale)
+        canonical_path = localized_url(page_key, locale)
+        g.page_canonical_url = base_url + canonical_path
+        private_input_page = canonical_path in PRIVACY_NO_THIRD_PARTY_PATHS
         resources = catalog(locale)
         copy = page_copy(page_key, locale)
         ui = {**resources['common'], **copy.get('ui', {})}
+        if locale == 'ko' and page_key == 'date_add_subtract':
+            ui.update(resources['weekday_shift_ui'])
         nav = []
         for candidate in PUBLIC_PAGE_REGISTRY:
             if locale not in supported_locales(candidate) or not candidate.get('localization'):
@@ -274,10 +278,13 @@ def register_localized_routes(app, base_url):
             global_nav=nav, global_schema=schema, page_key=page_key,
             global_breadcrumbs=breadcrumb_items,
             global_home=localized_url(home_key, locale),
+            private_input_page=private_input_page,
             calculator_config={'kind': page_key, 'locale': LOCALE_CONFIG[locale]['intl'], 'ui': ui},
             result=result, calculator_error=error, form_values=form_values,
             today_iso=date.today().isoformat(),
         ), status)
+        if private_input_page:
+            response.headers['Referrer-Policy'] = 'no-referrer'
         if request.method == 'POST':
             response.headers['Cache-Control'] = 'no-store'
             response.headers['X-Robots-Tag'] = 'noindex, follow'

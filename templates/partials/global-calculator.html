@@ -49,7 +49,7 @@
     {% for schema in global_schema %}
     <script type="application/ld+json" nonce="{{ csp_nonce }}">{{ schema | tojson }}</script>
     {% endfor %}
-    {% if tenure_page %}
+    {% if private_input_page %}
     {% if google_site_verification %}<meta name="google-site-verification" content="{{ google_site_verification }}">{% endif %}
     {% if adsense_client_id %}<meta name="google-adsense-account" content="{{ adsense_client_id }}">{% endif %}
     {% else %}{% include 'partials/adsense.html' %}{% endif %}
@@ -63,7 +63,7 @@
     {% endif %}
     {% if tenure_page %}<script src="{{ versioned_static('js/holiday-count.js') }}" defer></script>{% endif %}
     <script src="{{ versioned_static('js/global-calculator.js') }}" defer></script>
-    {% if not tenure_page %}
+    {% if not private_input_page %}
     <script src="{{ versioned_static('js/cookie-consent.js') }}" defer></script>
     <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
     {% endif %}
@@ -108,6 +108,7 @@
                             <label for="shift-amount">{{ ui.amount }}<input id="shift-amount" type="number" inputmode="numeric" min="0" step="1" required aria-describedby="calculator-error" /></label>
                             <label for="shift-unit">{{ ui.unit }}<select id="shift-unit" required aria-describedby="calculator-error">
                                 <option value="day">{{ ui.unit_day }}</option>
+                                {% if locale_code == 'ko' %}<option value="weekday">{{ ui.unit_weekday }}</option>{% endif %}
                                 <option value="week">{{ ui.unit_week }}</option>
                                 <option value="month">{{ ui.unit_month }}</option>
                                 <option value="year">{{ ui.unit_year }}</option>
@@ -230,7 +231,7 @@
             <p class="small">© 2026 AgeCalc. {{ ui.copyright }}</p>
         </footer>
     </div>
-    {% if not tenure_page %}
+    {% if not private_input_page %}
     <div class="cookie-banner" id="cookie-banner" role="region" aria-label="{{ ui.privacy }}">
         <p>{{ ui.cookie_notice }} <a href="{{ url_for('privacy') }}">{{ ui.privacy }}{% if locale_code != 'ko' %} ({{ ui.korean_only }}){% endif %}</a></p>
         <div class="global-actions"><button id="accept-cookies" type="button">{{ ui.accept }}</button><button id="reject-cookies" class="secondary" type="button">{{ ui.reject }}</button></div>
