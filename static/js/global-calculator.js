@@ -149,24 +149,29 @@
         wrapper.querySelector('fieldset').disabled = !specific;
     }
 
+    function clearResult() {
+        result.hidden = true;
+        document.dispatchEvent?.(new Event('agecalc:result-cleared'));
+    }
+
     form.addEventListener('change', () => {
         syncReference();
         clearTenure();
         clearWeekdays();
         clearHolidays();
         errorElement.textContent = '';
-        result.hidden = true;
+        clearResult();
     });
     form.addEventListener('input', () => {
         clearTenure();
         clearWeekdays();
         clearHolidays();
         errorElement.textContent = '';
-        result.hidden = true;
+        clearResult();
     });
     form.addEventListener('reset', () => {
         errorElement.textContent = '';
-        result.hidden = true;
+        clearResult();
         values.replaceChildren();
         clearTenure();
         clearWeekdays();
@@ -183,7 +188,7 @@
         clearWeekdays();
         clearHolidays();
         errorElement.textContent = '';
-        result.hidden = true;
+        clearResult();
     });
     form.addEventListener('submit', event => {
         event.preventDefault();
@@ -192,7 +197,7 @@
         clearHolidays();
         values.replaceChildren();
         note.textContent = '';
-        result.hidden = true;
+        clearResult();
         errorElement.textContent = '';
         document.getElementById('result-event').textContent = '';
         document.getElementById('result-title').textContent = ui.result;
@@ -273,6 +278,7 @@
             }
             if (!['days_between_dates', 'date_add_subtract'].includes(config.kind)) row('reference_label', formatDate(reference));
             result.hidden = false;
+            document.dispatchEvent?.(new Event('agecalc:result-completed'));
             result.focus({preventScroll: true});
             result.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'nearest'});
         } catch (error) {

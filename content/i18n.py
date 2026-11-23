@@ -154,11 +154,14 @@ def validate_translations():
             if (not blank_allowed and not value.strip()) or set(re.findall(r'\{\w+\}', value)) != set(re.findall(r'\{\w+\}', baseline[key])):
                 raise ValueError(f'Invalid translation: {locale}{key}')
 
+    from content.related_tools import validate_related_copy
+
     paths = set()
     for page in PUBLIC_PAGE_REGISTRY:
         if not set(supported_locales(page)).issubset(LOCALE_CONFIG):
             raise ValueError(f'Unsupported page locale: {page["key"]}')
     for locale in LOCALE_CONFIG:
+        validate_related_copy(locale, catalog(locale).get("related_tools"))
         if locale != 'ko' or catalog(locale)['pages']:
             validate_section(catalog(locale)['common'], catalog('en')['common'], locale)
         for page in PUBLIC_PAGE_REGISTRY:

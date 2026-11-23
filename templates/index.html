@@ -36,6 +36,8 @@
     <link rel="stylesheet" href="{{ versioned_static('css/home.css') }}" />
     <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
+    <link rel="stylesheet" href="{{ versioned_static('css/related-tools.css') }}" />
+    <script src="{{ versioned_static('js/related-tools.js') }}" defer></script>
 </head>
 
 <body class="home-page" data-disable-clarity="true">
@@ -53,7 +55,7 @@
             </div>
 
             <div class="editorial-panel-shell">
-                <form id="home-age-form" class="editorial-panel-core" data-clarity-mask="true" data-today="{{ today.isoformat() }}" novalidate>
+                <form id="home-age-form" class="editorial-panel-core" data-clarity-mask="true" action="{{ url_for('index') }}" data-today="{{ today.isoformat() }}" novalidate>
                     <div class="home-age-reference">
                         <p class="command-label">기준일</p>
                         <strong>{{ today.strftime("%Y.%m.%d") }}</strong>
@@ -65,11 +67,12 @@
 
                     <button class="btn btn-primary" type="submit">계산하기</button>
 
-                    <div class="editorial-result-grid" id="home-age-result" aria-live="polite" hidden>
+                    <div class="editorial-result-grid" id="home-age-result"{% if related_layout == 'baseline' %} data-baseline-tools{% endif %} aria-live="polite" hidden>
                         <div class="home-age-result-card home-age-result-card-primary">
                             <span>만나이</span>
                             <output id="home-age-value"></output>
                         </div>
+                        {% if related_layout == 'baseline' %}
                         <div class="home-age-result-card" id="home-grade-result">
                             <span>학년</span>
                             <a id="home-grade-link" data-calculator-url="{{ url_for('school_grade_calculator') }}" href="{{ url_for('school_grade_calculator') }}">학년 계산</a>
@@ -78,7 +81,9 @@
                             <span>생일 D-day</span>
                             <a href="{{ url_for('birthday_dday_calculator') }}">D-day 계산</a>
                         </div>
+                        {% endif %}
                     </div>
+                    {% include 'partials/related-tools.html' %}
                 </form>
             </div>
         </section>

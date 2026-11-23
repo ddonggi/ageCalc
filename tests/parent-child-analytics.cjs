@@ -78,7 +78,7 @@ async function checkConsent(browser, consent) {
         }
         assert.equal(clarityRequests, 0);
         if (consent === 'accepted') {
-            await page.locator('#parent-child-result-content a[href*="school-grade"]').first().click();
+            await page.locator('[data-related-tools]:visible a[data-tool="school_grade_calculator"], [data-baseline-tools] a[href*="school-grade"]').first().click();
             assert.equal(await page.evaluate(() => document.referrer), '');
             await page.goBack();
             await page.reload();
@@ -87,7 +87,8 @@ async function checkConsent(browser, consent) {
             await page.goto(publicUrl);
             await page.waitForFunction(() => window.dataLayer?.some(args => args[0] === 'config'));
             const location = await page.evaluate(() => window.dataLayer.find(args => args[0] === 'config')[2].page_location);
-            assert.equal(location, publicUrl);
+            assert.equal(location, base + '/college-entry-year-calculator');
+            assert.equal(page.url(), publicUrl);
         }
     } finally {
         await context.close();
@@ -95,7 +96,7 @@ async function checkConsent(browser, consent) {
 }
 
 (async () => {
-    const browser = await chromium.launch();
+    const browser = await chromium.launch({executablePath: process.env.CHROMIUM_EXECUTABLE});
     try {
         for (const consent of ['accepted', 'late', 'withdrawn', 'rejected', 'unset']) {
             await checkConsent(browser, consent);

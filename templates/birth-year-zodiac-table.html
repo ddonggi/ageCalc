@@ -31,6 +31,8 @@
     <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
+    <link rel="stylesheet" href="{{ versioned_static('css/related-tools.css') }}" />
+    <script src="{{ versioned_static('js/related-tools.js') }}" defer></script>
 </head>
 
 <body class="calculator-flat-page">
@@ -82,7 +84,7 @@
                 <h2 id="zodiac-search">출생연도 선택</h2>
                 <p class="section-intro">찾는 연도를 고르면 해당 띠와 같은 띠인 연도를 바로 보여줍니다.</p>
             </div>
-            <form class="age-form birth-year-form" method="get" action="{{ url_for('birth_year_zodiac_table') }}#birth-year-zodiac-result">
+            <form class="age-form birth-year-form" method="get" action="{{ url_for('birth_year_zodiac_table') }}#birth-year-zodiac-result" data-calculator-form>
                 <div class="form-group">
                     <div class="date-inputs">
                         <select name="year" aria-label="출생연도 선택">
@@ -101,8 +103,7 @@
                 </div>
             </form>
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
+        {% if related_layout == 'baseline' %}{% include 'partials/result-promotions.html' %}{% endif %}
 
         {% if selected_row %}
         <section class="section-shell section-card-grid" id="birth-year-zodiac-result" tabindex="-1">
@@ -127,6 +128,8 @@
             </article>
         </section>
         {% endif %}
+        {% include 'partials/related-tools.html' %}
+        {% if related_layout != 'baseline' %}{% include 'partials/result-promotions.html' %}{% endif %}
 
         <section class="section-shell">
             <div class="section-heading">

@@ -19,6 +19,8 @@
     {% for schema in global_schema | default([]) %}<script type="application/ld+json" nonce="{{ csp_nonce }}">{{ schema | tojson }}</script>{% endfor %}
     <script src="{{ versioned_static('js/time-calculations.js') }}" defer></script>
     <script src="{{ versioned_static('js/time-duration-calculator.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ versioned_static('css/related-tools.css') }}" />
+    <script src="{{ versioned_static('js/related-tools.js') }}" defer></script>
 </head>
 <body class="global-page time-duration-page" data-disable-clarity="true" data-disable-analytics="true">
 <div class="container">
@@ -56,6 +58,7 @@
                 <p class="small">날짜·시간대·일광절약시간(DST) 변경에 따른 실제 경과시간은 반영하지 않습니다.</p>
             </section>
         </div>
+        {% include 'partials/related-tools.html' %}
         <div class="global-copy">
             <section class="direct-answer"><h2>같은 날과 다음 날은 어떻게 선택하나요?</h2>
                 <p>09:00부터 18:00까지는 같은 날 기준으로 전체 9시간입니다. 휴게 60분을 빼면 순시간은 8시간 0분, 480분이며 소수시간은 8.00시간입니다. 점심이나 쉬는 시간을 제외하려면 실제 제외할 분을 합해 직접 입력하세요.</p>

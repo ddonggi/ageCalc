@@ -38,6 +38,8 @@
     <script src="{{ versioned_static('js/date-rules.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
 
+    <link rel="stylesheet" href="{{ versioned_static('css/related-tools.css') }}" />
+    <script src="{{ versioned_static('js/related-tools.js') }}" defer></script>
 </head>
 
 <body class="editorial-calculator-page calculator-flat-page">
@@ -62,7 +64,7 @@
         </section>
 
         <div class="editorial-calculator-shell">
-        <form class="age-form" id="pet-age-form" action="{{ url_for('dog') }}#pet-result-container" method="get" data-pet="dog" autocomplete="off" data-clarity-mask="true">
+        <form class="age-form" id="pet-age-form" action="{{ url_for('dog') }}#pet-result-container" method="get" data-pet="dog" autocomplete="off" data-clarity-mask="true" data-calculator-form>
             <div class="form-group">
                 <h3>강아지 나이를 입력하세요</h3>
                 <fieldset class="pet-mode-fieldset">
@@ -180,6 +182,7 @@
             <h2>계산 결과</h2>
             <div id="pet-result-content">{% if pet_result %}{% if pet_result.kind == 'adoption' %}<div class="result success"><p class="message">오늘까지 함께한 기간</p><div class="age-info"><p class="age"><span class="age-number">{{ pet_result.age_text }}</span></p></div><p class="small">데려온 날부터 오늘까지 완료된 달 수입니다. 실제 나이나 사람 나이 환산값은 아닙니다.</p></div>{% else %}<div class="result success"><p class="message">강아지 나이 {{ pet_result.age_text }} 기준 ({{ pet_result.size_label }})</p><div class="age-info"><p class="age">사람 나이 환산: <span class="age-number">{{ pet_result.human_age }}</span></p></div><p class="small">환산 나이는 건강 상태나 기대수명을 판정하지 않습니다.</p></div>{% endif %}{% endif %}</div>
         </div>
+        {% include 'partials/related-tools.html' %}
         </div>
         {% include 'partials/home_coupang_rails.html' %}
 
