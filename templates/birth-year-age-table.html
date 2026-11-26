@@ -189,14 +189,18 @@
         </section>
 
         <section class="section-shell" id="preview-2027" aria-labelledby="preview-2027-heading">
-            <h2 id="preview-2027-heading">2027년 기준 출생연도별 나이 비교</h2>
+            <h2 id="preview-2027-heading">2027년 기준 출생연도별 나이{% if current_year != 2027 %} 비교{% endif %}</h2>
+            {% if current_year == 2027 %}
+            <p>아래 표에는 2027년 연나이와 생일 전후 만나이가 나옵니다. 연나이는 1월 1일에, 만나이는 각자의 생일에 바뀝니다.</p>
+            {% else %}
             <p>현재 표는 {{ current_year }}년 기준입니다. 아래는 같은 출생연도의 2027년 연나이와 생일 전후 만나이 범위를 비교합니다. 연나이는 1월 1일에 바뀌고, 만나이는 각자의 생일에 바뀝니다.</p>
+            {% endif %}
             <div class="data-table-wrap">
                 <table class="data-table">
-                    <caption>현재 연나이와 2027년 나이표 — 생일 전 → 생일 이후</caption>
-                    <thead><tr><th scope="col">출생연도</th><th scope="col">{{ current_year }}년 연나이</th><th scope="col">2027년 연나이</th><th scope="col">2027년 만나이 범위</th></tr></thead>
+                    <caption>{% if current_year == 2027 %}2027년 연나이와 생일 전후 만나이{% else %}현재 연나이와 2027년 나이표 — 생일 전 → 생일 이후{% endif %}</caption>
+                    <thead><tr><th scope="col">출생연도</th>{% if current_year != 2027 %}<th scope="col">{{ current_year }}년 연나이</th>{% endif %}<th scope="col">2027년 연나이</th><th scope="col">2027년 만나이 범위</th></tr></thead>
                     <tbody>{% for row in preview_rows %}
-                        <tr{% if row.is_selected %} class="is-selected"{% endif %}><th scope="row">{{ row.label }}</th><td>{{ row.current_annual_age }}</td><td>{{ row.annual_age }}</td><td>{{ row.man_age_range }}</td></tr>
+                        <tr{% if row.is_selected %} class="is-selected"{% endif %}><th scope="row">{{ row.label }}</th>{% if current_year != 2027 %}<td>{{ row.current_annual_age }}</td>{% endif %}<td>{{ row.annual_age }}</td><td>{{ row.man_age_range }}</td></tr>
                     {% endfor %}</tbody>
                 </table>
             </div>

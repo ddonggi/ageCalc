@@ -2616,6 +2616,9 @@ def college_entry_year_calculator():
         seo_description = "26학번 몇년생, 26학번 나이, 22학번 나이, 09학번 몇살처럼 학번 기준 출생연도와 현재 나이를 확인하는 대학 학번 계산기입니다."
         og_title = "대학 학번 계산기 | AgeCalc"
         og_description = "26학번 몇년생, 26학번 나이, 22학번 나이처럼 학번 기준 출생연도와 현재 나이를 한 화면에서 정리했습니다."
+        if current_year >= 2027:
+            seo_description = "대학 입학연도로 보통 몇 년생인지 확인하세요. 현재 연나이와 생일 전후 만나이도 함께 나옵니다."
+            og_description = "학번을 고르면 일반적인 진학 기준에 따른 출생연도와 현재 나이가 나옵니다."
 
     return render_template(
         'college-entry-year-calculator.html',

@@ -23,11 +23,15 @@ class Preview2027Tests(unittest.TestCase):
         self.assertIsNotNone(section, '2027 comparison must be server rendered')
         return re.sub(r'\s+', ' ', re.sub('<[^>]+>', ' ', section.group(1)))
 
-    def test_birth_year_keeps_current_and_2027_ages_separate(self):
-        for today, current_age in ((date(2026, 12, 31), '16세'), (date(2027, 1, 1), '17세')):
+    def test_birth_year_compares_only_when_current_year_differs_from_2027(self):
+        for today, expected_ages in (
+            (date(2026, 12, 31), '16세 17세'),
+            (date(2027, 1, 1), '17세'),
+            (date(2028, 1, 1), '18세 17세'),
+        ):
             with self.subTest(today=today):
                 text = self.preview('/birth-year-age-table?year=2010', today)
-                self.assertIn(f'2010년생 {current_age} 17세 만 16~17세', text)
+                self.assertIn(f'2010년생 {expected_ages} 만 16~17세', text)
                 self.assertIn('2027년 기준', text)
 
     def test_school_preview_does_not_roll_current_school_year_in_january(self):
@@ -41,12 +45,34 @@ class Preview2027Tests(unittest.TestCase):
         for label, birth, age, full_age in (('초1', 2020, 7, '6~7'), ('초6', 2015, 12, '11~12'), ('중1', 2014, 13, '12~13'), ('중3', 2012, 15, '14~15'), ('고1', 2011, 16, '15~16'), ('고3', 2009, 18, '17~18')):
             self.assertIn(f'{label} {birth}년생 {age}세 만 {full_age}세', text)
 
-    def test_college_entry_and_current_ages_are_distinct(self):
-        for today, age, full_age in ((date(2026, 12, 31), 18, '17~18'), (date(2027, 1, 1), 19, '18~19')):
-            text = self.preview('/college-entry-year-calculator?year=2027', today)
-            self.assertIn('2008년생', text)
-            self.assertIn(f'{today.year}년 현재 연나이 {age}세 / 만 {full_age}세', text)
-            self.assertIn('2027년 입학연도 연나이 19세 / 만 18~19세', text)
+    def test_college_entry_compares_only_when_current_year_differs_from_2027(self):
+        for today, current_age in (
+            (date(2026, 12, 31), '연나이 18세 / 만 17~18세'),
+            (date(2027, 1, 1), None),
+            (date(2028, 1, 1), '연나이 20세 / 만 19~20세'),
+        ):
+            with self.subTest(today=today):
+                text = self.preview('/college-entry-year-calculator?year=2027', today)
+                self.assertIn('2008년생', text)
+                self.assertEqual(text.count('연나이 19세 / 만 18~19세'), 1)
+                if current_age:
+                    self.assertIn(f'{today.year}년 현재 {current_age}', text)
+
+    def test_college_base_descriptions_drop_fixed_cohorts_in_2027(self):
+        for today in (date(2026, 12, 31), date(2027, 1, 1), date(2028, 1, 1)):
+            with self.subTest(today=today):
+                response = self.get('/college-entry-year-calculator', today)
+                self.assertEqual(response.status_code, 200)
+                html = response.get_data(as_text=True)
+                for field in ('name="description"', 'property="og:description"'):
+                    match = re.search(rf'<meta {field} content="([^"]+)"', html)
+                    self.assertIsNotNone(match, field)
+                    description = match.group(1)
+                    self.assertRegex(description, r'출생연도|몇 ?년생')
+                    if today.year < 2027:
+                        self.assertIn('26학번', description)
+                    else:
+                        self.assertNotRegex(description, r'\d+학번')
 
     def test_query_meanings_and_indexing_are_preserved(self):
         for path in ('/birth-year-age-table?year=2027', '/school-grade-calculator?year=2027', '/grade-birth-year-table?year=2027', '/college-entry-year-calculator?year=bad', '/college-entry-year-calculator?year=2027&preview=1'):
