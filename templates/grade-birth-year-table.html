@@ -165,8 +165,8 @@
         </section>
 
         <section class="section-shell" id="preview-2027" aria-labelledby="preview-2027-heading">
-            <h2 id="preview-2027-heading">2027학년도 학년별 출생연도 미리보기</h2>
-            <p>현재 학년 조회는 {{ school_year }}학년도 기준입니다. 다음 표는 2027학년도(2027년 3월~2028년 2월) 일반 진급 기준이며, 나이는 2027년 달력연도 기준입니다.</p>
+            <h2 id="preview-2027-heading">{% if school_year < 2027 %}2027학년도 학년별 출생연도 미리보기{% elif school_year == 2027 %}2027학년도 학년별 출생연도 기준{% else %}2027학년도 학년별 출생연도 참고{% endif %}</h2>
+            <p>현재 학년 조회는 {{ school_year }}학년도 기준입니다. 아래 표는 2027학년도(2027년 3월~2028년 2월) 일반 진급 기준입니다. 나이는 2027년 달력연도를 기준으로 표시합니다.</p>
             <div class="data-table-wrap"><table class="data-table">
                 <caption>2027학년도 초1~고3 출생연도와 2027년 나이</caption>
                 <thead><tr><th scope="col">학년</th><th scope="col">일반 출생연도</th><th scope="col">2027년 연나이</th><th scope="col">2027년 만나이 범위</th></tr></thead>
