@@ -173,6 +173,11 @@ birth.value = '19921002';
 listeners.input();
 assert.equal(error.textContent, '');
 listeners.submit({preventDefault() { throw Error('Valid native GET was blocked'); }});
+form.elements.calendar_type.value = 'lunar';
+birth.value = '19900230';
+listeners.input();
+assert.equal(error.textContent, '');
+listeners.submit({preventDefault() { throw Error('Valid lunar date was blocked'); }});
 """
         completed = subprocess.run(
             ["node", "-e", program],
@@ -216,6 +221,13 @@ listeners.submit({preventDefault() { throw Error('Valid native GET was blocked')
             css,
             r"body\.calculator-flat-page \.container > \.breadcrumbs\s*\{\s*order:\s*0;",
         )
+
+    def test_age_discovery_reuses_1900_only_for_supported_destinations(self):
+        response = app.test_client().get('/age?birth_date=19000101')
+        tools = response.get_data(as_text=True).split('class="tool-grid"', 1)[1].split('</section>', 1)[0]
+        self.assertIn('href="/annual-age-calculator?birth_year=1900"', tools)
+        self.assertIn('href="/school-grade-calculator"', tools)
+        self.assertIn('href="/birth-year-age-table"', tools)
 
     def test_age_result_prioritizes_summary_and_safe_related_links(self):
         program = r"""

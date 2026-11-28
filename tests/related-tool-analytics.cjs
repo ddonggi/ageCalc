@@ -195,27 +195,33 @@ async function consentAndExposure(browser) {
     const {page, context, events} = await fixture(browser, {unset: true});
     try {
         await home(page);
+        assert.equal(events.length, 0);
         await page.locator('#accept-cookies').click();
         await page.waitForFunction(() => window.dataLayer.some(command => command[0] === 'config'));
         await page.locator(grade).scrollIntoViewIfNeeded();
         await page.waitForTimeout(1100);
-        assert.equal(events.length, 0);
+        assert.deepEqual(events.filter(([name]) => name !== 'reading_progress'), []);
         await page.setViewportSize({width: 1100, height: 360});
         await page.locator(homeSubmit).click();
         const showFraction = fraction => page.locator(grade).evaluate((link, amount) => {
             const rect = link.getBoundingClientRect();
             window.scrollBy({top: rect.top - innerHeight + rect.height * amount, behavior: 'instant'});
         }, fraction);
+        const schoolImpressions = () => events.filter(([name, params]) =>
+            name === 'related_tool_impression' && params.destination_tool === 'school_grade_calculator');
         await showFraction(0.4);
         await page.waitForTimeout(1100);
-        assert.equal(events.filter(([n]) => n === 'related_tool_impression').length, 0);
+        assert.equal(schoolImpressions().length, 0);
         await showFraction(0.7);
         await page.waitForTimeout(600);
         await showFraction(0.3);
         await page.waitForTimeout(100);
         await showFraction(0.7);
         await page.waitForTimeout(600);
-        assert.equal(events.filter(([n]) => n === 'related_tool_impression').length, 0);
+        assert.equal(schoolImpressions().length, 0);
+        await page.waitForTimeout(550);
+        assert.equal(schoolImpressions().length, 1);
+        await page.locator('[data-related-tools] [data-tool="birthday_dday_calculator"]').scrollIntoViewIfNeeded();
         await waitCount(events, 'related_tool_impression', 2);
         await page.locator(grade).scrollIntoViewIfNeeded();
         await page.waitForTimeout(1100);
