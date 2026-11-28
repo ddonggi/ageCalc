@@ -21,6 +21,7 @@ function node(tag, text) { var item = document.createElement(tag); if (text !== 
 function printInvalid() { printReport.replaceChildren(node('h2', copy.result_title), node('p', copy.invalid_print)); }
 function invalidate() {
     calculatedSnapshot = null;
+    document.dispatchEvent(new Event('agecalc:result-cleared'));
     result.hidden = true;
     download.disabled = true;
     printButton.disabled = true;
@@ -86,8 +87,11 @@ function calculate() {
     appendRow(document.getElementById('weekly-result-totals'), totalCells(value.totals));
     document.getElementById('weekly-boundary').hidden = !value.crossesWeekBoundary;
     calculatedSnapshot = snapshot(current);
-    result.hidden = false; download.disabled = false; printButton.disabled = false;
+    result.hidden = false;
+    download.disabled = false;
+    printButton.disabled = false;
     renderPrint(value);
+    document.dispatchEvent(new Event('agecalc:result-completed'));
     focus(document.getElementById('weekly-result-title'));
 }
 function latest() {

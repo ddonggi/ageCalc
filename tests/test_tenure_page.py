@@ -17,12 +17,26 @@ class TenurePageTests(unittest.TestCase):
         for marker in ['js/analytics.js', 'js/cookie-consent.js', 'id="cookie-banner"', 'id="consent-defaults"', 'id="tracking-config"', 'pagead2.googlesyndication.com', 'coupang.com']:
             self.assertNotIn(marker, text)
     def test_unrelated_pages_keep_existing_policy(self):
-        for path in ['/en/days-between-dates', '/ja/days-between-dates', '/es/days-between-dates', '/pt-br/days-between-dates', '/zh-cn/days-between-dates', '/date-add-subtract-calculator']:
+        for path in ['/en/days-between-dates', '/ja/days-between-dates', '/es/days-between-dates', '/pt-br/days-between-dates', '/zh-cn/days-between-dates', '/en/date-add-subtract-calculator']:
             r=self.client.get(path); text=r.get_data(as_text=True)
             self.assertNotIn('id="tenure-mode"',text)
             self.assertNotIn('js/tenure-calculations.js',text)
             self.assertIn('js/analytics.js',text)
             self.assertEqual('strict-origin-when-cross-origin',r.headers['Referrer-Policy'])
+    def test_korean_date_shift_uses_page_wide_input_protection(self):
+        path = '/date-add-subtract-calculator'
+        with patch('app.ADSENSE_CLIENT_ID', 'ca-pub-scoped-test'):
+            response = self.client.get(path)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual('no-referrer', response.headers['Referrer-Policy'])
+        html = response.get_data(as_text=True)
+        self.assertIn('<option value="weekday">평일(토·일 제외)</option>', html)
+        self.assertIn('<option value="day">일</option>', html)
+        for marker in ('tracking-config', 'adsbygoogle.js', 'js/analytics.js',
+                       'js/cookie-consent.js', 'id="cookie-banner"', 'id="holiday-copy"'):
+            self.assertNotIn(marker, html)
+        self.assertEqual(405, self.client.post(path).status_code)
+
     def test_query_policy_and_canonical_remain(self):
         r=self.client.get('/days-between-dates?start=2024-02-29&end=2025-02-28')
         self.assertEqual(200,r.status_code)

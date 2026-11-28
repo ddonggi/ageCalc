@@ -1,7 +1,6 @@
-from unittest.mock import patch
-from datetime import date
 """Public discovery policy: never turn registry metadata into unrestricted links."""
 import unittest
+from tests.holiday_review_fixture import reviewed_calendar
 from copy import deepcopy
 from content import tool_finder
 from content.page_registry import STATIC_PAGE_REGISTRY
@@ -51,7 +50,7 @@ class ToolFinderTests(unittest.TestCase):
 
 class ToolFinderHomeTests(unittest.TestCase):
     # This contract checks the reviewed, available snapshot; expiry has separate coverage.
-    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
+    @reviewed_calendar()
     def test_home_routes_and_ssr_discovery(self):
         from app import app
         from html.parser import HTMLParser

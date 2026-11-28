@@ -96,15 +96,37 @@
             holidayDays: excludedHolidays.length, excludedHolidays};
     }
 
+    function shiftWeekdays(origin, days) {
+        if (days === 0) return origin;
+        const direction = Math.sign(days);
+        let remaining = Math.abs(days);
+        const limit = date(direction > 0 ? '9999-12-31' : '0001-01-01');
+        if (remaining > Math.abs(limit - origin) / DAY) throw new Error('date_range');
+
+        // Each full week has five weekdays. Leave at least one to find the actual weekday,
+        // even if the origin (and the whole-week jump) falls on a weekend.
+        const weeks = Math.floor((remaining - 1) / 5);
+        let shifted = rules.addUtcDays(origin, direction * weeks * 7);
+        remaining -= weeks * 5;
+        while (remaining > 0) {
+            shifted = rules.addUtcDays(shifted, direction);
+            const weekday = shifted.getUTCDay();
+            if (weekday >= 1 && weekday <= 5) remaining -= 1;
+        }
+        return shifted;
+    }
+
     function dateShift(start, operation, amount, unit) {
         const origin = date(start);
         if (!['add', 'subtract'].includes(operation)) throw new Error('invalid_operation');
         if (typeof amount !== 'number' || !Number.isSafeInteger(amount) || amount < 0) throw new Error('invalid_amount');
         const count = amount;
-        if (!['day', 'week', 'month', 'year'].includes(unit)) throw new Error('invalid_unit');
+        if (!['day', 'week', 'month', 'year', 'weekday'].includes(unit)) throw new Error('invalid_unit');
         const signed = operation === 'subtract' ? -count : count;
         let shifted;
-        if (unit === 'day' || unit === 'week') {
+        if (unit === 'weekday') {
+            shifted = shiftWeekdays(origin, signed);
+        } else if (unit === 'day' || unit === 'week') {
             shifted = rules.addUtcDays(origin, signed * (unit === 'week' ? 7 : 1));
         } else {
             const months = signed * (unit === 'year' ? 12 : 1);

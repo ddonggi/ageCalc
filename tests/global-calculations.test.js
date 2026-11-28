@@ -63,6 +63,39 @@ assert.throws(() => calc.dateShift('9999-12-31', 'add', 1, 'month'), /date_range
 assert.throws(() => calc.dateShift('9999-12-31', 'add', 1, 'year'), /date_range/);
 console.log('Date shift contracts passed');
 
+const weekdayShiftCases = [
+    ['2027-01-01', 'add', 1, '2027-01-04', 3],
+    ['2027-01-04', 'subtract', 1, '2027-01-01', -3],
+    ['2027-01-02', 'add', 1, '2027-01-04', 2],
+    ['2027-01-02', 'subtract', 1, '2027-01-01', -1],
+    ['2027-01-03', 'add', 1, '2027-01-04', 1],
+    ['2027-01-03', 'subtract', 1, '2027-01-01', -2],
+    ['2027-01-02', 'add', 5, '2027-01-08', 6],
+    ['2027-01-03', 'subtract', 5, '2026-12-28', -6],
+    ['2027-01-07', 'add', 5, '2027-01-14', 7],
+    ['2027-01-07', 'subtract', 5, '2026-12-31', -7],
+    ['2027-01-03', 'add', 0, '2027-01-03', 0],
+    ['2027-01-02', 'subtract', 0, '2027-01-02', 0],
+    ['2024-02-28', 'add', 1, '2024-02-29', 1],
+    ['2026-12-31', 'add', 1, '2027-01-01', 1],
+    ['2027-05-01', 'add', 1, '2027-05-03', 2],
+    ['0001-01-01', 'add', 2608614, '9999-12-31', 3652058],
+    ['9999-12-31', 'subtract', 2608614, '0001-01-01', -3652058],
+];
+for (const [start, operation, amount, date, days] of weekdayShiftCases) {
+    assert.deepEqual(calc.dateShift(start, operation, amount, 'weekday'), {date, days});
+}
+for (const amount of ['', -1, 1.5, NaN, Infinity, 2 ** 53]) {
+    assert.throws(() => calc.dateShift('2027-01-01', 'add', amount, 'weekday'), /invalid_amount/);
+}
+assert.throws(() => calc.dateShift('2027-02-29', 'add', 0, 'weekday'), /invalid_date/);
+assert.throws(() => calc.dateShift('0001-01-01', 'subtract', 1, 'weekday'), /date_range/);
+assert.throws(() => calc.dateShift('9999-12-31', 'add', 1, 'weekday'), /date_range/);
+assert.throws(() => calc.dateShift('0001-01-01', 'add', 2608615, 'weekday'), /date_range/);
+assert.throws(() => calc.dateShift('2027-01-01', 'subtract', Number.MAX_SAFE_INTEGER, 'weekday'), /date_range/);
+console.log('Weekday shift contracts passed');
+
+
 // Independent datetime.isocalendar expectations captured during B3 Phase 1.
 const calendarCases = [
   {

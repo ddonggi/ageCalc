@@ -10,6 +10,7 @@ var body = document.getElementById('world-result-body');
 var error = document.getElementById('world-error');
 function node(tag, text) { var element = document.createElement(tag); element.textContent = String(text); return element; }
 function invalidate() {
+    document.dispatchEvent(new Event('agecalc:result-cleared'));
     result.hidden = true; body.replaceChildren(); error.textContent = '';
     document.getElementById('world-instant').textContent = '';
     document.getElementById('world-mismatch').hidden = true;
@@ -45,7 +46,9 @@ function calculate() {
     });
     document.getElementById('world-instant').textContent = copy.instant + ' ' + value.instant + ' · ' + copy.source + ' ' + offset(value.sourceOffsetMinutes);
     document.getElementById('world-mismatch').hidden = !value.seoulMismatch;
-    result.hidden = false; focus(document.getElementById('world-result-title'));
+    result.hidden = false;
+    document.dispatchEvent(new Event('agecalc:result-completed'));
+    focus(document.getElementById('world-result-title'));
 }
 function reset(moveFocus) { fields.date.value = ''; fields.time.value = ''; fields.source.value = '540'; invalidate(); if (moveFocus) focus(fields.date); }
 inputs.addEventListener('input', invalidate);

@@ -1,7 +1,8 @@
 import unittest
 import subprocess
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
+from unittest.mock import patch
 
 from app import app
 from models.date_rules import calculate_man_age, parse_iso_date
@@ -123,6 +124,52 @@ class BirthDatePrivacyTests(unittest.TestCase):
             self.assertIn(href, age_html)
         self.assertEqual(family_response.status_code, 302)
         self.assertEqual(family_response.headers["Location"], "/parent-child")
+
+    def test_age_result_uses_service_date_across_midnight(self):
+        # Model a UTC host just before its date changes. Seoul is already a day ahead.
+        class HostClock(datetime):
+            @classmethod
+            def now(cls):
+                return cls(2026, 12, 31, 16)
+
+        cases = (
+            (date(2026, 12, 31), '20000101', 26),
+            (date(2027, 1, 1), '20000101', 27),
+            (date(2027, 1, 1), '20270102', None),
+            (date(2027, 2, 28), '20000229', 26),
+            (date(2027, 3, 1), '20000229', 27),
+        )
+        for today, birth, expected_age in cases:
+            with (
+                self.subTest(today=today, expected_age=expected_age),
+                patch('app._current_local_date', return_value=today),
+                patch('models.age_calculator.datetime', HostClock),
+            ):
+                response = self.client.get('/age', query_string={'birth_date': birth})
+                html = response.get_data(as_text=True)
+                self.assertEqual(response.headers['Cache-Control'], 'no-store')
+                if expected_age is None:
+                    self.assertIn('미래의 생년월일', html)
+                else:
+                    self.assertIn(f'class="age-number">만 {expected_age}세</span>', html)
+                if today == date(2027, 1, 1) and expected_age == 27:
+                    self.assertIn('오늘이 생일입니다', html)
+
+    def test_converted_lunar_age_uses_same_date_for_get_and_post(self):
+        # Lunar 2000-01-01 is solar 2000-02-05.
+        for day, expected_age in ((4, 26), (5, 27)):
+            with (
+                self.subTest(day=day),
+                patch('app._current_local_date', return_value=date(2027, 2, day)),
+                patch('models.age_calculator.datetime', wraps=datetime) as host_clock,
+            ):
+                host_clock.now.return_value = datetime(2027, 2, 4, 16)
+                fields = {'calendar_type': 'lunar', 'birth_date': '2000-01-01'}
+                get = self.client.get('/age', query_string=fields)
+                post = self.client.post('/age', data=fields)
+                self.assertIn(f'class="age-number">만 {expected_age}세</span>', get.get_data(as_text=True))
+                self.assertEqual(post.get_json()['age'], expected_age)
+                self.assertEqual(post.headers['Cache-Control'], 'no-store')
 
     def test_age_result_page_keeps_its_query_string(self):
         script = r"""

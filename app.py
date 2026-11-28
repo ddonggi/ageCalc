@@ -37,6 +37,7 @@ from content.page_registry import (
     find_page,
     indexable_pages_for_sitemap,
 )
+from content.related_tools import RELATED_TOOLS, baseline_destinations, related_tool_state
 from content.i18n import i18n_context, localized_sitemap_entries, register_localized_routes
 from db import SessionLocal, close_db_session, init_db
 from models.blog_models import GeneratedPost, PageFeedback
@@ -133,6 +134,7 @@ app.secret_key = _resolve_flask_secret_key(
     database_url=os.getenv("DATABASE_URL"),
 )
 app.config.update(
+    RELATED_TOOLS_LAYOUT=os.getenv("RELATED_TOOLS_LAYOUT", "cards"),
     PERMANENT_SESSION_LIFETIME=timedelta(hours=8),
     SESSION_COOKIE_SECURE=True,
     SESSION_COOKIE_HTTPONLY=True,
@@ -331,6 +333,8 @@ def inject_csp_nonce():
     )
     blog_public_indexable = _is_blog_public_indexable(blog_public_count)
     current_page = getattr(g, 'localized_page', None) or find_page(request.endpoint, request.view_args)
+    related_source = current_page["key"] if current_page else request.endpoint
+    related_layout = "baseline" if app.config["RELATED_TOOLS_LAYOUT"] == "baseline" else "cards"
     page_canonical_url = getattr(g, "page_canonical_url", None)
     if page_canonical_url is None and current_page:
         page_canonical_url = f"{SITE_BASE_URL}{current_page['path']}"
@@ -377,6 +381,11 @@ def inject_csp_nonce():
         **i18n_context(current_page, SITE_BASE_URL),
         "csp_nonce": getattr(g, "csp_nonce", ""),
         "versioned_static": versioned_static,
+        "has_related_tools": related_source in RELATED_TOOLS,
+        "related_source": related_source,
+        "related_layout": related_layout,
+        "related_tool_state": related_tool_state,
+        "baseline_destinations": baseline_destinations,
         "csrf_token": _get_or_create_csrf_token,
         "author_name": SITE_AUTHOR_NAME,
         "contact_email": SITE_CONTACT_EMAIL,
@@ -429,7 +438,11 @@ def add_security_headers(response):
         response.headers["X-Robots-Tag"] = "noindex, follow"
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
-    response.headers.setdefault("Referrer-Policy", "no-referrer" if request.endpoint in {"hundred_day_calculator", "birthday_dday_calculator"} or request.path in {"/days-between-dates", "/d-day"} else "strict-origin-when-cross-origin")
+    hide_referrer = (
+        request.endpoint in {"hundred_day_calculator", "birthday_dday_calculator", "parent_child"}
+        or request.path in {"/days-between-dates", "/d-day"}
+    )
+    response.headers.setdefault("Referrer-Policy", "no-referrer" if hide_referrer else "strict-origin-when-cross-origin")
     response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
     response.headers["X-XSS-Protection"] = "0"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
@@ -1453,6 +1466,10 @@ def _build_birth_year_zodiac_snapshot(year: int, current_year: int) -> dict[str,
     return snapshot
 
 
+def _college_entry_years(current_year):
+    return range(max(1990, current_year - 20), current_year + 2)
+
+
 def _format_college_cohort_label(entry_year: int) -> str:
     return f"{entry_year % 100:02d}학번"
 
@@ -1529,7 +1546,7 @@ def _build_baby_month_snapshot(months: int) -> dict[str, object]:
 
 
 def _holiday_snapshot_now():
-    """Calendar API clock is explicitly Korean time, independent of blog settings."""
+    """Use Korean time for holiday data, independent of blog settings."""
     return datetime.now(ZoneInfo("Asia/Seoul"))
 
 
@@ -1565,10 +1582,13 @@ def korean_holiday_snapshot_api():
     return response
 
 
-def _holiday_calendar_for_request(today=None):
+def _holiday_calendar_for_request():
     """Use one service-date snapshot for holiday visibility in this response."""
     if not hasattr(g, "korean_holiday_calendar"):
-        g.korean_holiday_calendar = build_holiday_calendar(today if today is not None else _current_local_date())
+        g.korean_holiday_calendar = build_holiday_calendar(
+            _holiday_snapshot_now().date(),
+            include_overdue=request.endpoint == "korean_holiday_calendar",
+        )
     return g.korean_holiday_calendar
 
 
@@ -1583,7 +1603,7 @@ def korean_holiday_calendar():
         return redirect(url_for("korean_holiday_calendar"))
     from content.korean_holiday_copy import HOLIDAY_COPY
     calendar = _holiday_calendar_for_request()
-    if not calendar["available"]:
+    if calendar["state"] != "current":
         _mark_result_query_noindex()
     response = make_response(render_template(
         "korean-holiday-calendar.html", holiday_calendar=calendar, holiday_copy=HOLIDAY_COPY,
@@ -1797,7 +1817,7 @@ def index():
     """메인 페이지 - 나이 계산 도구 안내"""
     registered_paths = {rule.endpoint: rule.rule for rule in app.url_map.iter_rules() if not (rule.arguments - set(rule.defaults or {}))}
     today = _current_local_date()
-    available = _holiday_calendar_for_request(today)["available"]
+    available = _holiday_calendar_for_request()["available"]
     # Keep all curated endpoints present; only the new item's copied policy varies.
     finder_pages = tuple(
         {**page, "indexable": False} if page["endpoint"] == "korean_holiday_calendar" and not available else page
@@ -1861,6 +1881,7 @@ def life_hub(hub_slug):
 @app.route('/age', methods=['GET', 'POST'])
 def age():
     """만나이 계산 페이지 - 나이 계산 폼과 결과를 표시"""
+    today = _current_local_date()
     if request.method == 'POST':
         calendar_type = request.form.get('calendar_type', 'solar')
         if calendar_type != 'lunar':
@@ -1874,12 +1895,11 @@ def age():
         if not birth_date:
             return jsonify({'success': False, 'message': '생년월일을 입력해주세요.'}), 400
 
-        result = AgeController().calculate_age_from_string(birth_date, 'lunar')
+        result = AgeController().calculate_age_from_string(birth_date, 'lunar', reference_date=today)
         response = jsonify(result)
         response.headers['Cache-Control'] = 'no-store'
         return response
 
-    today = _current_local_date()
     requested_birth_date = request.args.get('birth_date', '').strip()
     calendar_type = request.args.get('calendar_type', 'solar').strip()
     calendar_type = calendar_type if calendar_type in {'solar', 'lunar'} else 'solar'
@@ -1895,7 +1915,7 @@ def age():
         else requested_birth_date
     )
     result = (
-        AgeController().calculate_age_from_string(birth_date_value, calendar_type)
+        AgeController().calculate_age_from_string(birth_date_value, calendar_type, reference_date=today)
         if requested_birth_date
         else None
     )
@@ -2490,6 +2510,7 @@ def grade_birth_year_table():
         school_year=school_year,
         selected_stage=stage,
         selected_grade=grade,
+        college_entry_years=_college_entry_years(current_year),
         selected_row=selected_row,
         grade_rows=rows,
         examples=examples,
@@ -2549,8 +2570,8 @@ def birth_year_zodiac_table():
 def college_entry_year_calculator():
     """대학 학번 나이 계산기 페이지"""
     current_year = _current_local_date().year
-    min_entry_year = max(1990, current_year - 20)
-    max_entry_year = current_year + 1
+    entry_years = _college_entry_years(current_year)
+    min_entry_year, max_entry_year = entry_years[0], entry_years[-1]
 
     selected_year, invalid_query = _validated_int_query("year", min_entry_year, max_entry_year)
     if invalid_query or (request.args and not _query_keys_are_exact("year")):
@@ -2595,6 +2616,9 @@ def college_entry_year_calculator():
         seo_description = "26학번 몇년생, 26학번 나이, 22학번 나이, 09학번 몇살처럼 학번 기준 출생연도와 현재 나이를 확인하는 대학 학번 계산기입니다."
         og_title = "대학 학번 계산기 | AgeCalc"
         og_description = "26학번 몇년생, 26학번 나이, 22학번 나이처럼 학번 기준 출생연도와 현재 나이를 한 화면에서 정리했습니다."
+        if current_year >= 2027:
+            seo_description = "대학 입학연도로 보통 몇 년생인지 확인하세요. 현재 연나이와 생일 전후 만나이도 함께 나옵니다."
+            og_description = "학번을 고르면 일반적인 진학 기준에 따른 출생연도와 현재 나이가 나옵니다."
 
     return render_template(
         'college-entry-year-calculator.html',
@@ -2796,7 +2820,10 @@ def parent_child():
         g.private_result_query = True
     form_parents = [{"role": item["role"], "birth": item["birth"].strftime("%Y%m%d") if item["birth"] else ""} for item in parents] or [{}]
     form_children = [{"role": item["role"], "birth": item["birth"].strftime("%Y%m%d") if item["birth"] else ""} for item in children] or [{}]
-    return render_template('parent-child.html', parent_results=results, parent_inputs=form_parents, child_inputs=form_children)
+    return render_template(
+        'parent-child.html', today=today, parent_results=results,
+        parent_inputs=form_parents, child_inputs=form_children,
+    )
 
 
 @app.post("/page-feedback")

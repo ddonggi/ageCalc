@@ -42,6 +42,8 @@
     {% include 'partials/adsense.html' %}
 
     {% include 'partials/hreflang.html' %}
+    <link rel="stylesheet" href="{{ versioned_static('css/related-tools.css') }}" />
+    <script src="{{ versioned_static('js/related-tools.js') }}" defer></script>
 </head>
 
 <body class="editorial-calculator-page calculator-flat-page">
@@ -69,7 +71,7 @@
         </section>
 
         <div class="editorial-calculator-shell">
-        <form class="age-form" id="baby-months-form" action="{{ url_for('baby_months') }}#baby-result-container" method="get" autocomplete="off" data-clarity-mask="true">
+        <form class="age-form" id="baby-months-form" action="{{ url_for('baby_months') }}#baby-result-container" method="get" autocomplete="off" data-clarity-mask="true" data-calculator-form>
             <div class="form-group">
                 <h3>출생일을 입력하세요 (8자리)</h3>
                 <div class="date-inputs">
@@ -85,6 +87,7 @@
             <h2>계산 결과</h2>
             <div id="baby-result-content">{% if baby_result %}<div class="result success"><p class="message">현재 개월 수</p><div class="age-info"><p class="age"><span class="age-number">{{ baby_result.months }}개월</span> <span class="small">({{ baby_result.total_days }}일)</span></p></div><p class="small">{{ baby_result.years }}년 {{ baby_result.remain }}개월</p><div class="result-section"><h4>결과 해석</h4><p>출생일에서 오늘까지 완료된 달 수를 계산한 값입니다.</p><p class="small">날짜 계산 결과이며 발달 평가나 의료 진단이 아닙니다.</p></div></div>{% endif %}</div>
         </div>
+        {% include 'partials/related-tools.html' %}
         </div>
         {% include 'partials/home_coupang_rails.html' %}
 

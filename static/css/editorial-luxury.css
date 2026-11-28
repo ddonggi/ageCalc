@@ -1863,7 +1863,8 @@ body.calculator-flat-page .container > .age-form {
 
 body.calculator-flat-page .container > .result-container,
 body.calculator-flat-page .container > .life-timeline-result,
-body.calculator-flat-page .container > .section-shell:has(.birth-year-summary) {
+body.calculator-flat-page .container > .section-shell:has(.birth-year-summary),
+body.calculator-flat-page .container > :is(.result-container, .life-timeline-result, .section-shell:has(.birth-year-summary)) + .related-tools {
   order: 3;
 }
 

@@ -1,7 +1,7 @@
 """Pure-data contract tests: no app, environment, network or DB imports."""
 import importlib.util
 import unittest
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from unittest.mock import patch
 
 
@@ -15,9 +15,10 @@ class HolidayCalendarTests(unittest.TestCase):
 
     def setUp(self):
         self.assertIsNotNone(self.spec, 'official holiday module is missing')
+        self.reviewed = date.fromisoformat(self.h.HOLIDAY_METADATA['verified_on'])
 
     def test_official_dates_counts_and_no_inferred_substitutes(self):
-        result = self.h.build_holiday_calendar(date(2026, 11, 1))
+        result = self.h.build_holiday_calendar(self.reviewed)
         self.assertEqual(result['counts'], dict(named=24, substitute=7, sundays=52, overlap=4, total=72))
         rows = [r for month in result['months'] for r in month['holidays']]
         self.assertEqual([r['date'] for r in rows], [
@@ -39,7 +40,7 @@ class HolidayCalendarTests(unittest.TestCase):
         self.assertEqual(result['local_holidays'][0]['weekday'], 5)
 
     def test_original_middle_dot_preserved_separately_from_display(self):
-        result = self.h.build_holiday_calendar(date(2026, 11, 1))
+        result = self.h.build_holiday_calendar(self.reviewed)
         national = [r for month in result['months'] for r in month['holidays']]
         march = next(r for r in national if r['date'] == '2027-03-01')
         self.assertEqual((march['original_label'], march['label']), ('3\u22191절', '3\u00b71절'))
@@ -49,9 +50,9 @@ class HolidayCalendarTests(unittest.TestCase):
             ('5\u221918민주화운동 기념일', '5\u00b718민주화운동 기념일')])
 
     def test_review_boundaries_and_wrapper_match(self):
-        for day, state in [(date(2026, 10, 31), 'needs_review'), (date(2026, 11, 1), 'current'),
-                           (date(2026, 11, 7), 'current'), (date(2026, 11, 8), 'current'),
-                           (date(2026, 11, 9), 'needs_review')]:
+        for offset, state in [(-1, 'needs_review'), (0, 'current'), (6, 'current'),
+                              (7, 'current'), (8, 'needs_review')]:
+            day = self.reviewed + timedelta(days=offset)
             with self.subTest(day=day):
                 result = self.h.build_holiday_calendar(day)
                 self.assertEqual(result['state'], state)
@@ -63,9 +64,13 @@ class HolidayCalendarTests(unittest.TestCase):
                     self.assertIsNone(result['counts'])
 
     def test_disabled_and_future_verification(self):
-        for changes, want in [({'active': False}, 'disabled'), ({'verified_on': '2026-11-02', 'next_review': '2026-11-09'}, 'needs_review')]:
+        future = {
+            'verified_on': (self.reviewed + timedelta(days=1)).isoformat(),
+            'next_review': (self.reviewed + timedelta(days=8)).isoformat(),
+        }
+        for changes, want in [({'active': False}, 'disabled'), (future, 'needs_review')]:
             with patch.object(self.h, 'HOLIDAY_METADATA', dict(self.h.HOLIDAY_METADATA, **changes)):
-                result = self.h.build_holiday_calendar(date(2026, 11, 1))
+                result = self.h.build_holiday_calendar(self.reviewed)
                 self.assertEqual(result['state'], want)
                 self.assertFalse(result['available'])
                 self.assertEqual(result['months'], [])
@@ -73,7 +78,7 @@ class HolidayCalendarTests(unittest.TestCase):
     def test_rejects_bad_metadata(self):
         cases = {'year': 2028, 'source_url': 'javascript:bad', 'source_sha256': 'f' * 64,
                  'notice_number': '', 'source_id': 'unknown', 'published_on': '2026-02-30',
-                 'verified_on': '2026-11-1', 'next_review': '2026-10-31', 'active': 1,
+                 'verified_on': '2026-11-1', 'next_review': self.reviewed.isoformat(), 'active': 1,
                  'reviewer': '', 'maintenance_role': '', 'version': ''}
         for field, value in cases.items():
             with self.subTest(field=field), self.assertRaises(ValueError):
@@ -103,7 +108,7 @@ class HolidayCalendarTests(unittest.TestCase):
 
     def test_invalid_metadata_fails_closed_and_uses_safe_source(self):
         with patch.object(self.h, 'HOLIDAY_METADATA', {'source_url': 'https://evil.invalid', 'reviewer': '<script>'}):
-            result = self.h.build_holiday_calendar(date(2026, 11, 1))
+            result = self.h.build_holiday_calendar(self.reviewed)
         self.assertEqual(result['state'], 'invalid')
         self.assertEqual(result['metadata']['source_url'], self.h.SOURCE_INFO['source_url'])
         self.assertNotIn('<script>', str(result))
@@ -113,18 +118,18 @@ class HolidayCalendarTests(unittest.TestCase):
 
     def test_invalid_record_fails_closed(self):
         with patch.object(self.h, 'NATIONAL_HOLIDAYS', ({'date': 'oops'},)):
-            self.assertFalse(self.h.holiday_calendar_available(date(2026, 11, 1)))
-            self.assertEqual(self.h.build_holiday_calendar(date(2026, 11, 1))['state'], 'invalid')
+            self.assertFalse(self.h.holiday_calendar_available(self.reviewed))
+            self.assertEqual(self.h.build_holiday_calendar(self.reviewed)['state'], 'invalid')
 
     def test_constants_immutable_and_output_mutation_cannot_change_facts(self):
         with self.assertRaises(TypeError): self.h.HOLIDAY_METADATA['active'] = False
         with self.assertRaises(TypeError): self.h.NATIONAL_HOLIDAYS[0]['date'] = '2027-01-02'
         with self.assertRaises(TypeError): self.h.LOCAL_HOLIDAYS[0]['jurisdiction'] = '전국'
-        result = self.h.build_holiday_calendar(date(2026, 11, 1))
+        result = self.h.build_holiday_calendar(self.reviewed)
         result['metadata']['active'] = False
         result['months'][0]['holidays'][0]['label'] = 'bad'
         result['local_holidays'].clear()
-        fresh = self.h.build_holiday_calendar(date(2026, 11, 1))
+        fresh = self.h.build_holiday_calendar(self.reviewed)
         self.assertTrue(fresh['available'])
         self.assertEqual(fresh['months'][0]['holidays'][0]['label'], '1월 1일')
         self.assertEqual(len(fresh['local_holidays']), 3)

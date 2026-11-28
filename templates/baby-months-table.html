@@ -32,6 +32,8 @@
     <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/clarity-init.js') }}" defer></script>
     {% include 'partials/adsense.html' %}
+    <link rel="stylesheet" href="{{ versioned_static('css/related-tools.css') }}" />
+    <script src="{{ versioned_static('js/related-tools.js') }}" defer></script>
 </head>
 
 <body class="calculator-flat-page">
@@ -84,7 +86,7 @@
                 <h2 id="baby-months-search">월령 선택</h2>
                 <p class="section-intro">찾고 싶은 월령을 선택하면 연·개월 표현과 함께 바로 강조해 보여드립니다.</p>
             </div>
-            <form class="age-form birth-year-form" method="get" action="{{ url_for('baby_months_table') }}">
+            <form class="age-form birth-year-form" method="get" action="{{ url_for('baby_months_table') }}" data-calculator-form>
                 <div class="form-group">
                     <div class="date-inputs">
                         <select name="months" aria-label="생후 개월 수 선택">
@@ -103,8 +105,7 @@
                 </div>
             </form>
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
+        {% if related_layout == 'baseline' %}{% include 'partials/result-promotions.html' %}{% endif %}
 
         {% if selected_row %}
         <section class="section-shell section-card-grid">
@@ -129,6 +130,8 @@
             </article>
         </section>
         {% endif %}
+        {% include 'partials/related-tools.html' %}
+        {% if related_layout != 'baseline' %}{% include 'partials/result-promotions.html' %}{% endif %}
 
         <section class="section-shell">
             <div class="section-heading">

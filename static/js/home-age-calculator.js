@@ -101,7 +101,16 @@
       return;
     }
 
+    function clearResult() {
+      result.hidden = true;
+      ageValue.textContent = "";
+      if (gradeLink) gradeLink.href = gradeLink.getAttribute("data-calculator-url");
+      document.dispatchEvent(new Event("agecalc:result-cleared"));
+    }
+
+    form.addEventListener("reset", clearResult);
     input.addEventListener("input", function () {
+      clearResult();
       input.value = input.value.replace(/\D/g, "").slice(0, 8);
     });
 
@@ -112,8 +121,7 @@
       if (!calculation.ok) {
         input.setAttribute("aria-invalid", "true");
         error.textContent = calculation.error;
-        result.hidden = true;
-        ageValue.textContent = "";
+        clearResult();
         return;
       }
 
@@ -123,9 +131,19 @@
       if (gradeLink) {
         var birthYear = normalizeBirthDate(input.value).slice(0, 4);
         var calculatorUrl = gradeLink.getAttribute("data-calculator-url");
-        gradeLink.href = calculatorUrl + "?year=" + birthYear;
+        var currentYear = Number(todayIso.slice(0, 4));
+        var supportedYear = Number(birthYear) >= Math.max(1900, currentYear - 100) && Number(birthYear) <= currentYear;
+        gradeLink.href = supportedYear ? calculatorUrl + "?year=" + birthYear : calculatorUrl;
+        var cards = gradeLink.closest("[data-related-cards]");
+        if (cards) {
+          // The Korean school year starts in March. Grade 12 ends in the following February.
+          var schoolYear = currentYear - (Number(todayIso.slice(5, 7)) < 3 ? 1 : 0);
+          if (schoolYear - Number(birthYear) <= 18) cards.prepend(gradeLink);
+          else cards.append(gradeLink);
+        }
       }
       result.hidden = false;
+      document.dispatchEvent(new Event("agecalc:result-completed"));
     });
   }
 

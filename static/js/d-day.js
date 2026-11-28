@@ -39,6 +39,7 @@ class DDayCalculator {
                 this.modeInputs.forEach(input => {input.checked = input.value === 'until';});
                 this.showError('');
                 this.clearResult();
+                document.dispatchEvent?.(new Event('agecalc:result-cleared'));
                 button.setAttribute('aria-pressed', 'true');
                 if (this.presetStatus) this.presetStatus.textContent = this.presetStatus.dataset.filledMessage || '';
                 this.dateInput.focus();

@@ -2,6 +2,7 @@
 from datetime import datetime, timezone, timedelta
 import os
 import unittest
+from tests.holiday_review_fixture import reviewed_calendar
 from unittest.mock import patch
 from zoneinfo import ZoneInfo
 
@@ -13,6 +14,9 @@ class HolidaySnapshotApiTests(unittest.TestCase):
         from content import korean_holidays
         cls.module, cls.holidays = app, korean_holidays
         cls.client = app.app.test_client()
+
+    def setUp(self):
+        self.enterContext(reviewed_calendar())
 
     def get_at(self, instant, path='/api/calendar/korea/2027', **kwargs):
         with patch.object(self.module, '_holiday_snapshot_now', return_value=instant):

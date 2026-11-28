@@ -6,18 +6,20 @@ class AgeCalculator:
     """만 나이 계산을 담당하는 Model 클래스"""
     
     @staticmethod
-    def calculate_age(birth_date):
+    def calculate_age(birth_date, *, reference_date=None):
         """
         생년월일을 받아서 만 나이를 계산
         
         Args:
             birth_date (datetime): 생년월일
+            reference_date (date): 생략하면 시스템의 오늘 날짜 사용
             
         Returns:
             int: 만 나이
         """
-        today = datetime.now().date()
-        return calculate_man_age(birth_date.date(), today)
+        if reference_date is None:
+            reference_date = datetime.now().date()
+        return calculate_man_age(birth_date.date(), reference_date)
     
     @staticmethod
     def parse_birth_date(date_string):

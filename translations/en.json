@@ -1,4 +1,37 @@
 {
+  "related_tools": {
+    "heading": "Calculate next",
+    "cards": {
+      "age": [
+        "Find the exact age",
+        "Enter a date of birth to find the age on a date you choose."
+      ],
+      "age_gap_calculator": [
+        "Compare two birth years",
+        "Enter both birth years to see how many years apart they are."
+      ],
+      "birth_date_range": [
+        "Find a possible date of birth",
+        "Use an age and a reference date to find the earliest and latest possible birthdays."
+      ],
+      "hundred_day_calculator": [
+        "Find the 100th day",
+        "Count the starting date as day one to find the date of day 100."
+      ],
+      "d_day": [
+        "Count down to an event",
+        "Enter an event date to see how many days remain or have passed."
+      ],
+      "days_between_dates": [
+        "Count days between two dates",
+        "Choose a start and end date to see the period in days and weeks."
+      ],
+      "date_add_subtract": [
+        "Add or subtract time from a date",
+        "Choose a starting date and a number of days, weeks or months to find the new date."
+      ]
+    }
+  },
   "common": {
     "language_fallback_notice": "If this page is unavailable in your chosen language, you will open an age calculator in that language.",
     "language": "Language", "tagline": "Everyday dates, clearly calculated.", "tools": "Calculators",

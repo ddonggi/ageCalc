@@ -1,0 +1,22 @@
+{% if has_related_tools %}
+{% set next_tools = related_tool_state() %}
+<nav class="related-tools" data-related-tools data-source="{{ related_source }}" data-locale="{{ locale_code }}"
+     data-layout="{{ related_layout }}" data-ssr-success="{{ 'true' if next_tools.success else 'false' }}"
+     data-result="{{ 'true' if next_tools.success else 'false' }}" aria-label="{{ next_tools.heading }}"
+     {% if related_layout == 'baseline' or not next_tools.success or not next_tools.cards %}hidden{% endif %}>
+    {% if related_layout == 'baseline' %}
+    <script type="application/json" nonce="{{ csp_nonce }}" data-baseline-destinations>{{ baseline_destinations(locale_code) | tojson }}</script>
+    {% else %}
+    <h2 class="related-tools-heading">{{ next_tools.heading }}</h2>
+    <div class="related-tools-cards" data-related-cards>
+        {% for card in next_tools.cards %}
+        <a class="related-tool-card" href="{{ card.href }}" referrerpolicy="no-referrer" data-tool="{{ card.key }}" data-calculator-url="{{ card.path }}"
+           data-measurable="{{ 'true' if card.measurable else 'false' }}"{% if related_source == 'index' and card.key == 'school_grade_calculator' %} id="home-grade-link"{% endif %}>
+            <strong{% if related_source == 'index' %} id="{{ 'home-grade-result' if card.key == 'school_grade_calculator' else 'home-birthday-result' }}"{% endif %}>{{ card.title }}</strong>
+            <span>{{ card.description }}</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+</nav>
+{% endif %}

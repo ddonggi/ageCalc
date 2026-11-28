@@ -149,24 +149,29 @@
         wrapper.querySelector('fieldset').disabled = !specific;
     }
 
+    function clearResult() {
+        result.hidden = true;
+        document.dispatchEvent?.(new Event('agecalc:result-cleared'));
+    }
+
     form.addEventListener('change', () => {
         syncReference();
         clearTenure();
         clearWeekdays();
         clearHolidays();
         errorElement.textContent = '';
-        result.hidden = true;
+        clearResult();
     });
     form.addEventListener('input', () => {
         clearTenure();
         clearWeekdays();
         clearHolidays();
         errorElement.textContent = '';
-        result.hidden = true;
+        clearResult();
     });
     form.addEventListener('reset', () => {
         errorElement.textContent = '';
-        result.hidden = true;
+        clearResult();
         values.replaceChildren();
         clearTenure();
         clearWeekdays();
@@ -183,7 +188,7 @@
         clearWeekdays();
         clearHolidays();
         errorElement.textContent = '';
-        result.hidden = true;
+        clearResult();
     });
     form.addEventListener('submit', event => {
         event.preventDefault();
@@ -192,7 +197,7 @@
         clearHolidays();
         values.replaceChildren();
         note.textContent = '';
-        result.hidden = true;
+        clearResult();
         errorElement.textContent = '';
         document.getElementById('result-event').textContent = '';
         document.getElementById('result-title').textContent = ui.result;
@@ -204,9 +209,12 @@
                 const operation = form.querySelector('[name="operation"]:checked')?.value;
                 const amountValue = document.getElementById('shift-amount').value.trim();
                 if (!amountValue) throw new Error('required');
-                const amount = Number(amountValue);
                 const selectedUnit = document.getElementById('shift-unit').value;
-                const answer = rules.dateShift(start, operation, amount, selectedUnit);
+                if (selectedUnit === 'weekday') {
+                    if (!ui.unit_weekday) throw new Error('invalid_unit');
+                    if (!/^[0-9]+$/.test(amountValue)) throw new Error('invalid_amount');
+                }
+                const answer = rules.dateShift(start, operation, Number(amountValue), selectedUnit);
                 row('result_date', formatDateWithWeekday(answer.date));
                 row('start_date', formatDate(start));
                 row('calendar_days_moved', unit(Math.abs(answer.days), 'day'));
@@ -214,10 +222,10 @@
                 row('iso_week_label', `ISO ${String(calendar.isoYear).padStart(4, '0')}-W${String(calendar.isoWeek).padStart(2, '0')}`);
                 row('elapsed_days_label', ui.elapsed_days_value.replace('{days}', numbers.format(calendar.elapsedDays)).replace('{total}', numbers.format(calendar.yearDays)));
                 row('year_progress_label', percentages.format(calendar.yearProgress));
-                note.textContent = [
-                    ['month', 'year'].includes(selectedUnit) ? ui.month_end_note : ui.fixed_days_note,
-                    ui.calendar_info_note
-                ].join(' ');
+                let shiftNote = ui.fixed_days_note;
+                if (selectedUnit === 'weekday') shiftNote = ui.weekday_shift_note;
+                if (['month', 'year'].includes(selectedUnit)) shiftNote = ui.month_end_note;
+                note.textContent = [shiftNote, ui.calendar_info_note].join(' ');
             } else if (config.kind === 'days_between_dates') {
                 const start = readDate('start').iso;
                 const end = readDate('end').iso;
@@ -273,6 +281,7 @@
             }
             if (!['days_between_dates', 'date_add_subtract'].includes(config.kind)) row('reference_label', formatDate(reference));
             result.hidden = false;
+            document.dispatchEvent?.(new Event('agecalc:result-completed'));
             result.focus({preventScroll: true});
             result.scrollIntoView({behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'nearest'});
         } catch (error) {

@@ -1,8 +1,8 @@
-from unittest.mock import patch
 import json
 import re
 import subprocess
 import unittest
+from tests.holiday_review_fixture import reviewed_calendar
 from datetime import date, datetime
 from html.parser import HTMLParser
 from types import SimpleNamespace
@@ -969,7 +969,7 @@ assert.strictEqual(publisherRefreshes, 0);
             self.assertIn(f'href="{path}"', home_html)
 
     # This contract checks the reviewed, available snapshot; expiry has separate coverage.
-    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
+    @reviewed_calendar()
     def test_adsense_review_mode_exposes_supported_sitemap_urls(self):
         client = app.test_client()
         root_xml = client.get("/sitemap.xml").get_data(as_text=True)
@@ -1131,8 +1131,10 @@ assert.strictEqual(publisherRefreshes, 0);
         self.assertIn("선택한 연도", html)
         self.assertIn("1990년생 나이 안내", html)
 
-    def test_birth_year_result_renders_school_life_milestones_and_safe_ctas(self):
-        with mock.patch.object(app_module, "_current_local_date", return_value=date(2026, 8, 24)):
+    def test_birth_year_baseline_renders_school_life_milestones_and_safe_ctas(self):
+        with mock.patch.object(app_module, "_current_local_date", return_value=date(2026, 8, 24)), mock.patch.dict(
+            app.config, RELATED_TOOLS_LAYOUT="baseline"
+        ):
             response = app.test_client().get("/birth-year-age-table?year=1992")
 
         self.assertEqual(200, response.status_code)
@@ -1165,6 +1167,29 @@ assert.strictEqual(publisherRefreshes, 0);
             self.assertIn(link, result_html)
         self.assertEqual(4, result_html.count("<a "))
         self.assertNotIn("birth_date=", result_html)
+
+    def test_related_cards_follow_birth_year_and_birthday_results(self):
+        cases = [
+            ("/birth-year-age-table?year=1992", "birth-year-selected-result", [
+                "/annual-age-calculator?birth_year=1992", "/school-grade-calculator?year=1992",
+            ], "/birth-year-zodiac-table?year=1992"),
+            ("/birthday-dday-calculator?month=10&day=2", "birthday-dday-result-content", [
+                "/d-day", "/age",
+            ], "/life-timeline"),
+        ]
+        with mock.patch.dict(app.config, RELATED_TOOLS_LAYOUT="cards"):
+            for url, result_id, expected_cards, other_link in cases:
+                with self.subTest(url=url):
+                    html = app.test_client().get(url).get_data(as_text=True)
+                    result_start = html.index(f'id="{result_id}"')
+                    result_end = html.index("</section>", result_start)
+                    nav_start = html.index("<nav ", html.index("</section>", result_start))
+                    nav_end = html.index("</nav>", nav_start)
+                    nav = html[nav_start:nav_end]
+                    self.assertIn("data-related-tools", nav)
+                    self.assertEqual(expected_cards, re.findall(r'<a [^>]*href="([^"]+)"', nav))
+                    self.assertNotIn('class="result-next"', html[result_start:result_end])
+                    self.assertIn(f'href="{other_link}"', html[nav_end:])
 
     def test_school_grade_calculator_page_is_public(self):
         client = app.test_client()
@@ -1805,10 +1830,11 @@ assert.strictEqual(publisherRefreshes, 0);
             if affiliate_marker in html:
                 self.assertLess(direct_answer, html.index(affiliate_marker))
 
-    def test_birthday_dday_ssr_and_csr_results_offer_the_same_next_steps(self):
-        server_html = app.test_client().get(
-            "/birthday-dday-calculator?month=10&day=2"
-        ).get_data(as_text=True)
+    def test_birthday_dday_baseline_preserves_existing_next_steps(self):
+        with mock.patch.dict(app.config, RELATED_TOOLS_LAYOUT="baseline"):
+            server_html = app.test_client().get(
+                "/birthday-dday-calculator?month=10&day=2"
+            ).get_data(as_text=True)
         expected_links = (
             'href="/age"',
             'href="/d-day"',
@@ -1980,7 +2006,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 self.assertEqual(response.headers.get("X-Robots-Tag"), "noindex, follow")
 
     # This contract checks the reviewed, available snapshot; expiry has separate coverage.
-    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
+    @reviewed_calendar()
     def test_life_hubs_are_excluded_from_review_mode_sitemap(self):
         locations = _sitemap_leaf_locations(app.test_client())
         for hub in HUB_PAGES:
@@ -2728,7 +2754,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 self.assertNotIn("www.googletagmanager.com/gtag/js", html)
 
     # This contract checks the reviewed, available snapshot; expiry has separate coverage.
-    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
+    @reviewed_calendar()
     def test_public_sitemap_keeps_only_review_mode_urls(self):
         client = app.test_client()
         locations = _sitemap_leaf_locations(client)
@@ -4754,7 +4780,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         self.assertNotIn("/minigames", body)
 
     # This contract checks the reviewed, available snapshot; expiry has separate coverage.
-    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
+    @reviewed_calendar()
     def test_sitemap_index_groups_public_pages(self):
         client = app.test_client()
         index_response = client.get("/sitemap.xml")

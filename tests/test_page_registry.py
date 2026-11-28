@@ -1,8 +1,7 @@
-from unittest.mock import patch
-from datetime import date
 import csv
 import re
 import unittest
+from tests.holiday_review_fixture import reviewed_calendar
 from pathlib import Path
 
 from app import app
@@ -122,7 +121,7 @@ class PageRegistryTests(unittest.TestCase):
                 self.assertIn(page["hub"], {hub["hub"] for hub in HUB_PAGE_REGISTRY})
 
     # This contract checks the reviewed, available snapshot; expiry has separate coverage.
-    @patch("app._current_local_date", new=lambda: date(2026, 11, 1))
+    @reviewed_calendar()
     def test_registry_driven_sitemap_uses_review_mode_public_set(self):
         client = app.test_client()
         index_xml = client.get("/sitemap.xml").get_data(as_text=True)

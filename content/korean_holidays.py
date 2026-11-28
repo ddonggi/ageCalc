@@ -16,11 +16,11 @@ SOURCE_INFO = MappingProxyType({
     'published_on': '2026-06-29',
     'source_url': 'https://www.gwanbo.go.kr/ezpdf/customLayout.jsp?contentId=I0000000000000001782374733940000&tocId=I0000000000000001782199865342000&isTocOrder=N',
     'source_sha256': '10412c8632ab2e8e9937cbd3a8fa6ee184e08cbd9aa541dd4d44229cb11a67b3',
-    'verified_on': '2026-11-01',
-    'next_review': '2026-11-08',
+    'verified_on': '2026-11-22',
+    'next_review': '2026-11-29',
     'reviewer': 'Phase1 독립 QA(공식 원표 전 행 대조)',
     'maintenance_role': '9급 주무관',
-    'version': '2027.20261101.1',
+    'version': '2027.20261122.1',
     'active': True,
 })
 HOLIDAY_METADATA = MappingProxyType(dict(SOURCE_INFO))
@@ -130,8 +130,8 @@ def validate_holiday_data(metadata, national, local):
                 raise ValueError('Incorrect local jurisdiction')
 
 
-def build_holiday_calendar(today):
-    """Build a detached display snapshot; unavailable data never escapes."""
+def build_holiday_calendar(today, *, include_overdue=False):
+    """Return validated dates. Only the read-only calendar displays overdue reviews."""
     if type(today) is not date:
         raise TypeError('today must be a datetime.date')
     result = {'metadata': dict(SOURCE_INFO), 'today': today.isoformat(),
@@ -145,7 +145,8 @@ def build_holiday_calendar(today):
     if not HOLIDAY_METADATA['active']:
         result['state'] = 'disabled'
         return result
-    if today < _iso_date(HOLIDAY_METADATA['verified_on']) or today > _iso_date(HOLIDAY_METADATA['next_review']):
+    overdue = today > _iso_date(HOLIDAY_METADATA['next_review'])
+    if today < _iso_date(HOLIDAY_METADATA['verified_on']) or (overdue and not include_overdue):
         result['state'] = 'needs_review'
         return result
     sundays = set()
@@ -156,7 +157,7 @@ def build_holiday_calendar(today):
         cursor += timedelta(days=1)
     named = {row['date'] for row in NATIONAL_HOLIDAYS}
     records = [dict(row, weekday=_iso_date(row['date']).weekday()) for row in NATIONAL_HOLIDAYS]
-    result.update(available=True, state='current', months=[{
+    result.update(available=True, state='needs_review' if overdue else 'current', months=[{
         'month': month,
         'holidays': sorted((row for row in records if _iso_date(row['date']).month == month), key=lambda row: row['date']),
         'sundays': sorted(day for day in sundays if _iso_date(day).month == month),
