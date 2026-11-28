@@ -1,0 +1,304 @@
+@font-face {
+  font-family: GaeguSketch;
+  src: url("../sketch/gaegu-title.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* The shared Korean shell uses the same paper, pencil and marker as the age worksheet. */
+html:root {
+  --color-paper: #fffcf3;
+  --color-paper-2: #fff1c5;
+  --color-paper-3: #f2e7d5;
+  --color-sheet: #fffefa;
+  --color-ink: #332e31;
+  --color-ink-2: #443e3b;
+  --color-muted: #615b54;
+  --color-rule: #cdc1ad;
+  --color-rule-2: #6c625a;
+  --color-accent: #ffe397;
+  --color-accent-2: #ffda76;
+  --color-accent-ink: #332e31;
+  --color-focus: #295c91;
+  --color-error: #9d3531;
+  --sketch-peach: #ffbd9d;
+  --sketch-sky: #e5eff1;
+  --sketch-hand: GaeguSketch, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --sketch-edge: 14px 19px 15px 12px / 17px 12px 20px 13px;
+  --font-body: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-display: var(--font-body);
+  --lux-sage: #76502a;
+  --lux-gold: #795021;
+  --home-accent: #78502e;
+}
+html body {
+  background-color: var(--color-paper);
+  background-image: radial-gradient(#b9a37e28 .7px, transparent 1px);
+  background-size: 5px 5px;
+  color: var(--color-ink);
+}
+html body .sprite { position: absolute; width: 0; height: 0; overflow: hidden; pointer-events: none; }
+html body .icon { display: inline-block; width: 25px; height: 25px; flex: none; vertical-align: middle; }
+html body .container > .site-header {
+  display: flex;
+  gap: clamp(14px, 3vw, 56px);
+  align-items: center;
+  min-height: 66px;
+  padding: 9px 0;
+  background: var(--color-paper);
+  border-bottom: 2px solid var(--color-ink);
+}
+html body .site-header .brand { display: inline-flex; align-items: center; gap: 5px; text-decoration: none; }
+html body .site-header .brand-word, html body .sketch-footer-brand {
+  display: inline-block;
+  color: var(--color-ink);
+  font: 700 38px/1 var(--sketch-hand);
+  letter-spacing: -.06em;
+  background: linear-gradient(177deg, transparent 72%, var(--color-accent) 73% 85%, transparent 86%);
+  text-decoration: none;
+}
+html body .site-header .sketch-brand-icon { width: 37px; height: 37px; transform: rotate(-7deg); }
+html body .header-actions { margin-inline-start: auto; gap: 8px; }
+html body .site-header :is(.desktop-menu-toggle, .menu-toggle, .language-switcher summary) {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 6px 12px;
+  border: 1.5px solid var(--color-ink);
+  border-radius: 14px 11px 14px 10px;
+  color: var(--color-ink);
+  background: var(--color-sheet);
+  white-space: nowrap;
+}
+html body .site-header .hub-nav-direct, html body .site-header .mega-nav-link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 10px;
+  color: var(--color-ink);
+  font-weight: 650;
+}
+html body .site-header .hub-nav-direct:is(.is-active,:hover), html body .site-header .mega-nav-link:is(.is-active,:hover) {
+  background: linear-gradient(178deg, transparent 19%, #ffebaf 20% 83%, transparent 85%);
+}
+html body :is(.mobile-nav-panel,.desktop-nav-panel) { color: var(--color-ink); background: var(--color-sheet); }
+html body .sketch-finder-link { display: flex; align-items: center; gap: 8px; margin: 8px 0 16px; min-height: 44px; font-weight: 650; }
+html body .section-heading h1, html body .hero-copy h1, html body .article-header h1, html body .global-hero h1 {
+  font: 700 clamp(34px, 4vw, 56px)/1.12 var(--sketch-hand);
+  letter-spacing: -.035em;
+  max-width: 30ch;
+  color: var(--color-ink);
+}
+html body .breadcrumbs { margin-block: 12px; }
+html body:not(.home-page) :is(.hero-band,.direct-answer,.editorial-prose-section,.section-shell) {
+  color: var(--color-ink);
+  box-shadow: none;
+}
+html body:not(.home-page) .section-shell:not(.section-card-grid) {
+  margin-block: clamp(18px, 3vw, 36px);
+}
+html body:not(.home-page) .hero-band, html body .editorial-prose-section, html body .editorial-index-hero {
+  background: transparent;
+}
+html body :is(.section-card,.metric-card,.hub-card,.related-path-group,.editorial-story,.article-card) {
+  color: var(--color-ink);
+  border-color: var(--color-rule);
+  background: var(--color-sheet);
+  box-shadow: none;
+}
+html body .related-paths, html body .footer {
+  border: 0;
+  border-top: 2px solid var(--color-ink);
+  background: transparent;
+  color: var(--color-ink);
+  box-shadow: none;
+}
+html body .related-path-group { border-radius: var(--sketch-edge); padding: 16px; }
+html body .footer :is(p, h4, strong, a) { color: var(--color-ink); }
+html body .footer .sketch-footer-brand { margin-bottom: 8px; font-size: 30px; }
+html body .cookie-banner { inset: auto; }
+html body #cookie-banner {
+  display: none;
+  position: relative;
+  inset: auto;
+  width: min(calc(100% - 32px), 1120px);
+  margin: 16px auto;
+  padding: 12px 16px;
+  background: var(--color-sheet);
+  border: 1px dashed var(--color-rule-2);
+  border-radius: var(--sketch-edge);
+  box-shadow: none;
+  color: var(--color-ink);
+  transform: none;
+}
+html body #cookie-banner.show { display: block; }
+html body #cookie-banner .cookie-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: none;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--color-ink);
+}
+html body #cookie-banner p { margin: 0; color: inherit; line-height: 1.5; font-size: .875rem; }
+html body #cookie-banner .cookie-buttons { display: flex; flex-direction: row; gap: 8px; }
+html body #cookie-banner .btn {
+  min-height: 44px;
+  min-width: 62px;
+  width: auto;
+  padding: .4rem .8rem;
+  border: 1px solid var(--color-rule-2);
+  border-radius: 8px;
+  background: var(--color-sheet);
+  color: var(--color-ink);
+}
+html body.calculator-flat-page > .container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+html body.calculator-flat-page .container > :is(.site-header,.breadcrumbs) { order: 0; }
+html body.calculator-flat-page .container > .related-paths { order: 11; }
+html body.calculator-flat-page .container > .editorial-metadata { order: 12; }
+html body.calculator-flat-page .container > .footer { order: 14; }
+html body.calculator-flat-page :is(.calculator-page-heading.hero-band .hero-copy > h1,.calculator-page-heading h1) {
+  color: var(--color-ink);
+  font: 700 clamp(34px, 4vw, 52px)/1.15 var(--sketch-hand);
+}
+html body.calculator-flat-page:not(.age-page) .calculator-page-heading .hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+  gap: 10px;
+}
+html body.calculator-flat-page:not(.age-page) .calculator-page-heading .hero-metrics .metric-card {
+  border: 0;
+  border-inline-start: 2px solid var(--color-rule);
+  border-radius: 0;
+  background: transparent;
+  padding: 8px 12px;
+}
+html body.calculator-flat-page:not(.age-page) :is(.age-form,.section-shell:has(> .age-form),.editorial-calculator-shell .age-form) {
+  padding: clamp(16px, 3vw, 30px);
+  border: 1.7px solid var(--color-ink);
+  border-radius: var(--sketch-edge);
+  background: var(--color-sheet);
+  box-shadow: 2px 3px 0 #e4dac6;
+}
+html body.calculator-flat-page:not(.age-page) .section-shell > .age-form { padding: 0; border: 0; border-radius: 0; box-shadow: none; }
+html body.calculator-flat-page:not(.age-page) .age-form :is(input:not([type="radio"]):not([type="checkbox"]), select, textarea) {
+  color: var(--color-ink);
+  border: 1.5px solid var(--color-rule-2);
+  border-radius: 8px 10px 7px 9px;
+  background: #fffefa;
+}
+html body.calculator-flat-page:not(.age-page) .age-form :is(button[type="submit"],.btn-primary) {
+  background: var(--color-accent);
+  color: var(--color-ink);
+  border: 1.5px solid var(--color-ink);
+  border-radius: 10px 8px 12px 9px;
+  box-shadow: 1px 2px 0 var(--color-ink);
+}
+html body.calculator-flat-page:not(.age-page) .age-form :is(button[type="submit"],.btn-primary):hover { background: var(--color-accent-2); }
+html body.calculator-flat-page:not(.age-page) :is(.result-container.show,.birth-year-summary) {
+  padding: clamp(16px, 2.6vw, 28px);
+  border: 1.7px solid var(--color-ink);
+  border-radius: var(--sketch-edge);
+  background: #fff8df;
+  box-shadow: 2px 3px 0 #e8dfcc;
+}
+html body.calculator-flat-page .result-container .result { background: transparent; color: var(--color-ink); }
+html body.life-hub-page .life-hub-link-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 14px;
+}
+html body.life-hub-page .life-hub-link-list a {
+  border: 1.5px solid var(--color-rule-2);
+  border-radius: var(--sketch-edge);
+  background: var(--color-sheet);
+  padding: 18px 20px;
+}
+html body.life-hub-page .life-hub-link-list a:hover { background: #fff4d3; }
+html body.life-hub-page .life-hub-link-list a strong { color: var(--color-ink); }
+html body.life-hub-page .life-hub-link-list a span { color: var(--color-muted); }
+html body :where(a,button,summary,input,select,label) { touch-action: manipulation; }
+html body :focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
+@media (max-width: 900px) {
+  html body .container > .site-header { min-height: 59px; gap: 8px; padding-block: 7px; }
+  html body .site-header .brand-word { font-size: 30px; }
+  html body .site-header .sketch-brand-icon { width: 30px; height: 30px; }
+  html body .site-header .menu-toggle { padding-inline: 10px; }
+}
+@media (max-width: 640px) {
+  html body #cookie-banner .cookie-content { flex-direction: column; align-items: flex-start; }
+}
+
+/* Time tools keep their native date fields, wide tables and print layouts. */
+@media screen {
+  html body:is(.weekly-work-hours-page,.time-duration-page,.world-time-page) .global-hero { padding-block: 24px 16px; }
+  html body:is(.weekly-work-hours-page,.time-duration-page,.world-time-page) .global-panel {
+    padding: clamp(16px, 3vw, 30px);
+    background: var(--color-sheet);
+    border: 1.5px solid var(--color-ink);
+    border-radius: var(--sketch-edge);
+    box-shadow: 2px 3px #e4dac6;
+  }
+  html body:is(.weekly-work-hours-page,.time-duration-page,.world-time-page) .global-panel[id$="-result"] { background: #fff8df; }
+  html body:is(.weekly-work-hours-page,.time-duration-page,.world-time-page) .global-actions button {
+    border: 1.5px solid var(--color-ink);
+    border-radius: 9px 11px 8px 10px;
+    min-height: 44px;
+    background: var(--color-sheet);
+    color: var(--color-ink);
+  }
+  html body:is(.weekly-work-hours-page,.time-duration-page,.world-time-page) .global-actions button:first-child { background: var(--color-accent); }
+  html body:is(.weekly-work-hours-page,.time-duration-page,.world-time-page) .global-panel :is(input:not([type=checkbox]):not([type=radio]),select) {
+    border: 1px solid var(--color-rule-2);
+    border-radius: 8px;
+    background: var(--color-sheet);
+  }
+  html body.weekly-work-hours-page .weekly-day { border: 0; border-top: 1px dashed var(--color-rule); border-radius: 0; padding-inline: 0; }
+  html body.weekly-work-hours-page .weekly-day legend { background: #fff4d3; }
+  html body:is(.weekly-work-hours-page,.world-time-page) table th { background: var(--sketch-sky); }
+  html body.holiday-calendar-page main .holiday-month {
+    padding: clamp(14px, 2.5vw, 28px);
+    border: 1.5px solid var(--color-rule-2);
+    border-radius: var(--sketch-edge);
+    background: var(--color-sheet);
+  }
+  html body.holiday-calendar-page .holiday-table th { background: var(--sketch-sky); }
+}
+
+html body.home-page { padding-top: 0; }
+html body:has(.site-header) { --accent-1: #78502e; --accent-2: #674124; }
+html body:not(.home-page):not(.calculator-flat-page) .hero-band:has(> .hero-copy:only-child) {
+  display: block;
+  padding: clamp(18px, 3vw, 34px) 0;
+  min-height: 0;
+}
+html body:not(.home-page):not(.calculator-flat-page) .hero-band > .hero-copy:only-child {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  max-width: 70ch;
+  padding-inline: 0;
+}
+html body:not(.home-page):not(.calculator-flat-page) .hero-band > .hero-copy > h1,
+html body.life-hub-page[class] .container .life-hub-tools h1 {
+  width: auto;
+  max-width: 100%;
+  margin: 0;
+  font: 700 clamp(35px,4vw,56px)/1.14 var(--sketch-hand);
+  letter-spacing: -.04em;
+}
+html body.life-hub-page .container .life-hub-tools .life-hub-link-list a {
+  background: var(--color-sheet);
+  border: 1.5px solid var(--color-rule-2);
+  border-radius: var(--sketch-edge);
+}
+
+#pet-age-form .pet-size-option { border-radius: var(--sketch-edge); }

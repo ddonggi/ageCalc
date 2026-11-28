@@ -237,7 +237,14 @@ def register_localized_routes(app, base_url):
                 or candidate['key'] in resources['pages']
             )
             label = page_copy(candidate['key'], locale)['h1'] if translated else candidate['title']
-            nav.append({'url': localized_url(candidate['key'], locale), 'label': label})
+            nav.append({'key': candidate['key'], 'url': localized_url(candidate['key'], locale), 'label': label})
+        available = {item['key']: item for item in nav}
+        # Reverse links also surface relevant localized tools when a domestic tool
+        # in the original recommendation list is unavailable in this language.
+        related_keys = dict.fromkeys((*page['related_endpoints'], *(
+            key for key in available if page_key in PAGE_BY_KEY[key]['related_endpoints']
+        )))
+        related_tools = [available[key] for key in related_keys if key in available and key != page_key][:3]
         home_key = 'age' if locale in supported_locales(PAGE_BY_KEY['age']) else page_key
         breadcrumb_items = [
             {'label': f"AgeCalc ({resources['common']['korean_only']})", 'url': base_url + '/'},
@@ -275,7 +282,7 @@ def register_localized_routes(app, base_url):
                 status = 400
         response = make_response(render_template(
             page['localization']['template'], copy=copy, ui=ui,
-            global_nav=nav, global_schema=schema, page_key=page_key,
+            global_nav=nav, related_tools=related_tools, global_schema=schema, page_key=page_key,
             global_breadcrumbs=breadcrumb_items,
             global_home=localized_url(home_key, locale),
             private_input_page=private_input_page,

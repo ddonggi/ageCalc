@@ -16,7 +16,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 class AdsensePreflightTests(unittest.TestCase):
     # This contract checks the reviewed, available snapshot; expiry has separate coverage.
     @reviewed_calendar()
-    def test_operational_preflight_passes_with_nonblocking_content_warnings(self):
+    def test_operational_preflight_passes_without_content_warnings(self):
         report = run_local_preflight()
 
         self.assertTrue(report.ok, format_report(report))
@@ -25,7 +25,7 @@ class AdsensePreflightTests(unittest.TestCase):
         self.assertIn('age', PUBLIC_SITEMAP_ENDPOINTS)
         self.assertNotIn('school_entry_year_table', PUBLIC_SITEMAP_ENDPOINTS)
         self.assertNotIn('grade_age_table', PUBLIC_SITEMAP_ENDPOINTS)
-        self.assertGreater(report.content_quality_warnings, 0)
+        self.assertEqual(report.content_quality_warnings, 0)
         self.assertIn("quality_warnings=", format_report(report))
 
     def test_local_preflight_still_passes_after_curated_blog_support(self):
@@ -64,7 +64,7 @@ class AdsensePreflightTests(unittest.TestCase):
 
         self.assertEqual(97, report.sitemap_urls)
         self.assertEqual(0, report.content_quality_failures)
-        self.assertGreater(report.content_quality_warnings, 0)
+        self.assertEqual(report.content_quality_warnings, 0)
         self.assertTrue(report.ok, format_report(report))
 
     def test_review_mode_validator_requires_rss_to_be_hidden(self):

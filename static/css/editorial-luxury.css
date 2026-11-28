@@ -458,7 +458,6 @@ body:not(.calculator-flat-page) .section-card,
 body:not(.calculator-flat-page) .age-right-item,
 body:not(.calculator-flat-page) .metric-card,
 body:not(.calculator-flat-page) .age-hub-result-card,
-body:not(.calculator-flat-page) .home-life-hub-card article,
 body:not(.calculator-flat-page) .home-quick-links a {
   border: 1px solid rgba(36, 29, 24, .12);
   border-radius: var(--lux-radius-core);
@@ -471,7 +470,6 @@ body:not(.calculator-flat-page) .home-quick-links a {
 body:not(.calculator-flat-page) .section-card:hover,
 body:not(.calculator-flat-page) .age-right-item:hover,
 body:not(.calculator-flat-page) .age-hub-result-card:hover,
-body:not(.calculator-flat-page) .home-life-hub-card:hover article,
 body:not(.calculator-flat-page) .home-quick-links a:hover {
   border-color: rgba(166, 139, 97, .42);
   background: var(--lux-surface);
@@ -1721,12 +1719,11 @@ body.home-page .home-life-hub-card:last-child {
 }
 
 body.home-page .home-life-hub-card article {
-  padding: clamp(1rem, 2.5vw, 1.25rem);
-  grid-template-rows: auto auto auto 1fr auto;
-  border: 1px solid rgba(166, 139, 97, .42) !important;
-  border-radius: var(--lux-radius-core) !important;
-  background: var(--lux-surface) !important;
-  box-shadow: 0 16px 36px rgba(36, 29, 24, .10) !important;
+  padding: 0;
+  grid-template-rows: auto 1fr auto;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 body.home-page .home-life-hub-card:hover,

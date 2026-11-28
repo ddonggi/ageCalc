@@ -17,11 +17,6 @@
   <meta property="og:url" content="https://agecalc.cloud/faq" />
   <meta property="og:image" content="{{ url_for('static', filename='images/og-image.png', _external=True) }}" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
-      rel="stylesheet">
   <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
   <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
 
@@ -61,7 +56,6 @@
 </head>
 
 <body>
-    <div id="pixel-background"></div>
   <div class="container">
     {% include 'partials/header.html' %}
     <header class="page-header">
@@ -171,7 +165,6 @@
   <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
     ↑
   </button>
-    <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
 </body>
 
 </html>

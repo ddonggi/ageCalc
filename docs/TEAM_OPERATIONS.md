@@ -14,7 +14,7 @@ AgeCalc 저장소의 readme.md 팀 운영 규칙과 현재 코드·배포 문서
 - agents/coordinator.md: 총괄운영자
 - agents/research.md: 검색 수요·경쟁·공식 기준 조사
 - agents/seo.md: 검색 의도, canonical, sitemap, robots, 구조화 데이터, 내부링크, 측정
-- agents/design.md: 기존 디자인 체계, 화면·상호작용·접근성 명세
+- agents/design.md: readme.md의 화면 디자인 지침을 기준으로 공통 헤더, 계산기 목록 아이콘, 카드·표와 반응형 상호작용 명세
 - agents/frontend.md: Jinja·HTML·CSS·JavaScript, 모바일·접근성·성능
 - agents/backend.md: Flask·계산식·서비스·DB·API·개인정보
 - agents/qa.md: 독립 검증, 경계값·회귀·브라우저·콘텐츠·SEO 점검

@@ -9,6 +9,7 @@ const gradePath = '/school-grade-calculator';
 
 function renderHome(today) {
     const input = new EventTarget();
+    input.focus = () => { input.focused = true; };
     input.setAttribute = input.removeAttribute = () => {};
     const form = new EventTarget();
     form.getAttribute = () => today;
@@ -47,6 +48,7 @@ function renderHome(today) {
             form.dispatchEvent(new Event('submit', {cancelable: true}));
             return completions.at(-1);
         },
+        input,
         completions
     };
 }
@@ -69,4 +71,5 @@ test('only supported school years are reused, and invalid edits clear the earlie
     assert.deepEqual(home.calculate('19251231'), ['birthday-first', gradePath, false]);
     home.calculate('20260230');
     assert.equal(home.completions.length, 2);
+    assert.equal(home.input.focused, true);
 });

@@ -76,6 +76,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
+  // Keep both modal drawers in the same viewport stacking context on every page.
+  document.body.append(overlay, panel);
+
   const hidePanel = () => {
     panel.hidden = true;
     overlay.hidden = true;
@@ -86,13 +89,15 @@ document.addEventListener("DOMContentLoaded", () => {
     overlay.hidden = false;
   };
 
+  let closeTimer;
   const closePanel = ({ returnFocus = true } = {}) => {
+    window.clearTimeout(closeTimer);
     panel.classList.remove("is-open");
     overlay.classList.remove("is-open");
     body.classList.remove("no-scroll");
     toggleButton.setAttribute("aria-expanded", "false");
 
-    window.setTimeout(() => {
+    closeTimer = window.setTimeout(() => {
       hidePanel();
       if (returnFocus) {
         toggleButton.focus();
@@ -102,6 +107,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const openPanel = () => {
     if (desktopMedia.matches) return;
+    window.clearTimeout(closeTimer);
     showPanel();
     window.requestAnimationFrame(() => {
       panel.classList.add("is-open");
@@ -132,8 +138,18 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !panel.hidden) {
-      closePanel();
+    if (panel.hidden || !panel.classList.contains("is-open")) return;
+    if (event.key === "Escape") closePanel();
+    if (event.key === "Tab") {
+      const items = panel.querySelectorAll("a[href], button:not([disabled])");
+      const first = items[0], last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     }
   });
 

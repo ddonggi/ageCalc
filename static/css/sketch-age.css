@@ -1,0 +1,27 @@
+/* Layout for the Korean age page's existing editorial and advertising slots. */
+.mast { position: relative; }
+.reading-progress { position: absolute; inset: auto 0 -2px; height: 3px; pointer-events: none; }
+.reading-progress-fill { display: block; height: 100%; background: var(--ink); transform: scaleX(0); transform-origin: left; }
+.support summary { display: flex; align-items: center; min-height: 44px; text-decoration: underline; }
+.support[open] img { display: block; }
+.info-coupang-promo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 12px; }
+.info-coupang-promo img, .coupang-mobile-banner img { display: block; max-width: 100%; height: auto; margin: auto; }
+.coupang-disclosure, .home-coupang-disclosure { color: var(--muted); font-size: .8125rem; }
+.coupang-mobile-banner, .home-coupang-rail { display: none; }
+@media (max-width: 760px) {
+  .coupang-mobile-banner { display: grid; justify-items: center; gap: 8px; }
+}
+@media (min-width: 1181px) {
+  .notes:has(.home-coupang-rail) {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 80ch) 160px;
+    justify-content: space-between;
+    column-gap: 24px;
+    max-width: none;
+  }
+  .notes:has(.home-coupang-rail) > * { grid-column: 2; min-width: 0; }
+  .notes > .home-coupang-rail { display: grid; align-content: start; justify-items: center; align-self: start; gap: 12px; grid-row: 1 / span 12; }
+  .notes:has(.home-coupang-rail) > .home-coupang-rail-left { grid-column: 1; }
+  .notes:has(.home-coupang-rail) > .home-coupang-rail-right { grid-column: 3; }
+  .home-coupang-rail img { display: block; width: 160px; height: 600px; }
+}

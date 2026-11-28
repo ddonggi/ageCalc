@@ -1,0 +1,52 @@
+{% from 'sketch-icons.html' import icon, tool_icon %}
+{% macro header() %}
+<link rel="stylesheet" href="{{ versioned_static('css/sketch-header.css') }}" />
+<header class="site-header agecalc-mast">
+    <div class="agecalc-mast-inner">
+        <a class="agecalc-wordmark" rel="home" href="{{ global_home }}">{{ icon('cal') }}<span>AgeCalc</span></a>
+        {% set short_labels = {'birthday_dday_calculator': ui.birthday, 'd_day': ui.until} %}
+        <nav class="mega-nav global-shortcuts" aria-label="{{ ui.tools }}">
+            {% for tool in global_nav if tool.key in ('age', 'birthday_dday_calculator', 'd_day') %}
+            <a href="{{ tool.url }}" title="{{ tool.label }}"{% if tool.url == request.path %} class="is-active" aria-current="page"{% endif %}>{{ short_labels.get(tool.key, tool.label) }}</a>
+            {% endfor %}
+        </nav>
+        <div class="agecalc-mast-actions">
+            {% include 'partials/language-switcher.html' %}
+            <details class="global-directory">
+                <summary class="agecalc-mast-control" aria-label="{{ ui.tools }}"><span class="global-directory-label">{{ ui.tools }}</span><span class="agecalc-menu-icon" aria-hidden="true"></span></summary>
+                <nav aria-label="{{ ui.tools }}">{% for tool in global_nav %}
+                    <a href="{{ tool.url }}"{% if tool.url == request.path %} aria-current="page"{% endif %}>{{ tool_icon(tool.key) }}{{ tool.label }}</a>
+                {% endfor %}</nav>
+            </details>
+        </div>
+    </div>
+</header>
+{% endmacro %}
+
+{% macro hero() %}
+<section class="global-hero">
+    <img width="98" height="88" src="{{ versioned_static('sketch/desk-calendar.svg') }}" alt="" />
+    <div><h1>{{ copy.h1 }}</h1><p>{{ copy.intro }}</p></div>
+</section>
+{% endmacro %}
+
+{% macro empty_result() %}
+<aside class="global-panel global-empty">
+    <h2>{{ ui.result }}</h2>
+    <div>
+        <img width="98" height="88" src="{{ versioned_static('sketch/desk-calendar.svg') }}" alt="" />
+        <p>{{ ui.result_hint }}</p>
+    </div>
+</aside>
+{% endmacro %}
+
+{% macro related() %}
+{% if related_tools %}
+<nav class="global-next" aria-label="{{ ui.related }}">
+    <h2>{{ ui.related }}</h2>
+    <ul>{% for tool in related_tools %}
+        <li><a href="{{ tool.url }}">{{ tool_icon(tool.key) }}<span>{{ tool.label }}</span><span aria-hidden="true">→</span></a></li>
+    {% endfor %}</ul>
+</nav>
+{% endif %}
+{% endmacro %}

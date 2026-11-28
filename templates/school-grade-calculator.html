@@ -24,10 +24,6 @@
         href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
     <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
@@ -38,7 +34,6 @@
 </head>
 
 <body class="editorial-calculator-page calculator-flat-page">
-    <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
@@ -168,7 +163,7 @@
         <section class="section-shell" id="preview-2027" aria-labelledby="preview-2027-heading">
             <h2 id="preview-2027-heading">{% if school_year < 2027 %}2027학년도 입학 미리보기{% elif school_year == 2027 %}2027학년도 입학 기준{% else %}2027학년도 입학 참고{% endif %}</h2>
             <p><strong>2020년생은 일반 취학 기준으로 2027학년도 초등학교 1학년입니다.</strong> {% if school_year == 2027 %}아래 표에서 일반 진학 기준의 2027학년도 학년을 확인하세요.{% else %}현재 학년은 {{ school_year }}학년도 기준입니다. 아래 표에서 현재 학년과 2027학년도 학년을 비교할 수 있습니다.{% endif %}</p>
-            <div class="data-table-wrap"><table class="data-table">
+            <div class="data-table-wrap" role="region" tabindex="0" aria-labelledby="preview-2027-heading"><table class="data-table">
                 <caption>{% if school_year == 2027 %}일반 진학 기준 2027학년도 학년{% else %}일반 진학 기준 현재 학년과 2027학년도 비교{% endif %}</caption>
                 <thead><tr><th scope="col">출생연도</th>{% if school_year != 2027 %}<th scope="col">{{ school_year }}학년도</th>{% endif %}<th scope="col">2027학년도</th></tr></thead>
                 <tbody>{% for row in preview_rows %}<tr><th scope="row">{{ row.label }}</th>{% if school_year != 2027 %}<td>{{ row.present_grade }}</td>{% endif %}<td>{{ row.current_grade }}</td></tr>{% endfor %}</tbody>
@@ -182,10 +177,10 @@
 
         <section class="section-shell">
             <div class="section-heading">
-                <h2>{{ school_year }}학년도 출생년도별 학년표</h2>
+                <h2 id="reference-table-title">{{ school_year }}학년도 출생년도별 학년표</h2>
                 <p class="section-intro">최근 출생년도를 기준으로 현재 학년과 입학 시점을 표로 정리했습니다.</p>
             </div>
-            <div class="data-table-wrap">
+            <div class="data-table-wrap" role="region" tabindex="0" aria-labelledby="reference-table-title">
                 <table class="data-table birth-year-table">
                     <thead>
                         <tr>

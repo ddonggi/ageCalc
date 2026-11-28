@@ -1,3 +1,4 @@
+{% from 'sketch-icons.html' import tool_icon %}
 <!DOCTYPE html>
 <html lang="ko">
 
@@ -33,10 +34,6 @@
     <link rel="apple-touch-icon" sizes="180x180"
         href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
     <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
@@ -77,7 +74,6 @@
 
 <body class="blog-page editorial-content-page">
     {% set article = structured_article %}
-    <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
         {% include 'partials/home_coupang_rails.html' %}
@@ -216,9 +212,9 @@
             <section class="section-shell editorial-prose-section">
                 <div class="section-heading">
                     <p class="eyebrow">비교</p>
-                    <h2>상황별 확인 기준</h2>
+                    <h2 id="reference-table-title">상황별 확인 기준</h2>
                 </div>
-                <div class="table-scroll">
+                <div class="table-scroll" role="region" tabindex="0" aria-labelledby="reference-table-title">
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -296,7 +292,7 @@
                     {% for tool in article.related_tools %}
                     <article class="section-card">
                         <p class="eyebrow">도구</p>
-                        <h3><a href="{{ tool.path }}">{{ tool.label }}</a></h3>
+                        <h3><a href="{{ tool.path }}">{{ tool_icon(tool.path) }}{{ tool.label }}</a></h3>
                         <p>{{ tool.summary }}</p>
                     </article>
                     {% endfor %}

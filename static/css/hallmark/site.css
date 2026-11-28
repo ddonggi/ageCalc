@@ -1,7 +1,3 @@
-/* Hallmark · shape: app screen · genre: editorial · theme: Almanac · redesign: full · nav: kept · signature: live date calculation sheet · states: empty, error, result · axes: mid/grotesk-sans/chromatic-magenta · posture: restrained · v2.0.0 */
-/* Hallmark · pre-emit critique: restrained controls and a searchable reference index; local Korean typography retained for legibility. */
-@import url('./tokens.css');
-@import url('./base.css');
 html body { background: var(--color-paper); color: var(--color-ink); padding: 0; }
 html body::before, html body::after, #pixel-background { display: none; }
 html body .container { width: 100%; max-width: var(--container); padding-inline: var(--gutter); display: block; }
@@ -32,7 +28,10 @@ html body .container > .site-header { grid-template-columns: minmax(0,1fr) auto;
 html body .site-header .brand-block { min-width: 0; }
 html body .site-header .brand-word { font-size: 24px; }
 html body .site-header .mega-nav { display: none; }
-html body .header-actions { gap: var(--space-2xs); }
+html body .header-actions { gap: var(--space-xs); }
 }
 html body .language-switcher:not([open]) > nav { display: none; }
 @media(max-width: 980px) { html body .language-switcher > nav { position: fixed; inset-inline-end: var(--space-md); top: 72px; width: 260px; max-width: calc(100% - 32px); background: var(--color-sheet); color: var(--color-ink); } }
+
+html body .language-switcher summary { border-radius: 2px; background: var(--color-sheet); border-color: var(--color-muted); color: var(--color-ink); }
+html body .language-switcher nav a:hover, html body .language-switcher nav a[aria-current] { background: var(--color-paper-2); }

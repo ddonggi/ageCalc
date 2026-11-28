@@ -1,0 +1,207 @@
+/* Shared surfaces for editorial examples, reference tables and follow-up links. */
+:root {
+  --collection-sheet: #fffefa;
+  --collection-ink: #332e31;
+  --collection-muted: #615b54;
+  --collection-outline: #736960;
+  --collection-rule: #d7cdbd;
+  --collection-blue: #e5eff1;
+  --collection-yellow: #fff1c5;
+  --collection-edge: 12px 15px 11px 14px / 14px 11px 15px 12px;
+  --collection-pad: clamp(.95rem, 1.7vw, 1.45rem);
+}
+
+@media screen {
+  /* A single result gets the full row, while shorter examples can share a row. */
+  html:root body :is(.section-card-grid, .hub-card-grid, .age-rights-grid, .related-path-groups) {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+    align-items: stretch;
+    gap: clamp(.75rem, 1.4vw, 1.1rem);
+    min-inline-size: 0;
+  }
+  html:root body .section-card-grid > .birth-year-summary { grid-column: 1 / -1; }
+  html:root body :is(
+    .section-card-grid > .section-card:not(.birth-year-summary),
+    .faq-list > .section-card,
+    .age-rights-grid .age-right-item,
+    .hub-card-grid .hub-card,
+    .life-hub-questions .question-item,
+    .related-path-groups > .related-path-group
+  ) {
+    min-inline-size: 0;
+    margin: 0;
+    padding: var(--collection-pad);
+    border: 1.5px solid var(--collection-outline);
+    border-radius: var(--collection-edge);
+    background: var(--collection-sheet);
+    color: var(--collection-ink);
+    box-shadow: none;
+    transform: none;
+    align-content: start;
+  }
+  html:root body .section-card-grid > .section-card:not(.birth-year-summary):hover {
+    border-color: var(--collection-outline);
+    background: var(--collection-sheet);
+    transform: none;
+  }
+  html:root body :is(.hub-card, .related-path-group, .section-card) :where(h2,h3,h4,p,li,dd) { max-inline-size: 100%; }
+  html:root body .age-rights-grid .age-header { color: var(--collection-ink); }
+  html:root body .related-path-group :is(h3,a) { color: var(--collection-ink); }
+  html:root body .related-path-group :is(p,li > span) { color: var(--collection-muted); }
+  html:root body .related-path-group li + li { border-block-start: 1px dashed var(--collection-rule); padding-block-start: .6rem; }
+  html:root body .related-path-group a { text-underline-offset: .18em; }
+
+  html:root body :is(.summary-grid, .age-result-summary) { gap: .7rem; min-inline-size: 0; }
+  html:root body :is(.summary-grid .summary-card, .age-result-summary .age-result-summary-item) {
+    min-inline-size: 0;
+    padding: .85rem 1rem;
+    border: 1px solid var(--collection-rule);
+    border-radius: 9px 11px 10px 8px;
+    color: var(--collection-ink);
+    background: var(--collection-sheet);
+    box-shadow: none;
+    font-variant-numeric: tabular-nums;
+  }
+  html:root body .section-card-grid > .section-card.birth-year-summary {
+    min-inline-size: 0;
+    border: 1.5px solid var(--collection-outline);
+    border-radius: var(--collection-edge);
+    padding: var(--collection-pad);
+    background: var(--collection-yellow);
+    color: var(--collection-ink);
+  }
+  html:root body .editorial-story-list {
+    display: grid;
+    gap: .85rem;
+    border: 0;
+  }
+  html:root body .editorial-story-list > .editorial-story-card {
+    min-inline-size: 0;
+    border: 1.5px solid var(--collection-outline);
+    border-radius: var(--collection-edge);
+    background: var(--collection-sheet);
+  }
+  html:root body .editorial-story-card .editorial-story-link { padding: var(--collection-pad); border-radius: inherit; transform: none; }
+  html:root body .editorial-story-card .editorial-story-link:is(:hover,:focus-visible) {
+    background: #fff6dc;
+    color: var(--collection-ink);
+  }
+  html:root body :is(.global-next li a, .tool-grid .tool, .life-hub-link-list a, .home-life-hub-grid .home-life-hub-card) {
+    border-color: var(--collection-outline);
+    border-radius: var(--collection-edge);
+  }
+
+  /* Exam date presets are small records; labels and dates share a baseline. */
+  [aria-labelledby="dday-presets-heading"] .section-card-grid { margin-block: 1.1rem; }
+  [aria-labelledby="dday-presets-heading"] .section-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: .7rem;
+  }
+  [aria-labelledby="dday-presets-heading"] .section-card :is(h3,p,dl,dt,dd) { margin: 0; }
+  [aria-labelledby="dday-presets-heading"] .section-card dl {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0 .75rem;
+    font-size: .9rem;
+  }
+  [aria-labelledby="dday-presets-heading"] .section-card :is(dt,dd) { padding-block: .4rem; border-block-end: 1px dashed var(--collection-rule); }
+  [aria-labelledby="dday-presets-heading"] .section-card dt { color: var(--collection-muted); }
+  [aria-labelledby="dday-presets-heading"] .section-card dd { text-align: end; font-weight: 650; font-variant-numeric: tabular-nums; }
+  html body [data-dday-preset] {
+    min-height: 44px;
+    align-self: flex-start;
+    margin-block-start: auto;
+    border: 1.5px solid var(--collection-outline);
+    border-radius: 9px 12px 8px 10px;
+    color: var(--collection-ink);
+    background: var(--collection-yellow);
+  }
+  html body [data-dday-preset]:disabled { background: #f1eee7; color: #655e54; opacity: 1; cursor: not-allowed; }
+  html body [data-dday-preset][aria-pressed="true"] { outline: 2px solid var(--collection-ink); outline-offset: 1px; }
+
+  /* Contain wide records locally; short comparison tables reflow without scrolling. */
+  html:root body :is(.data-table-wrap,.table-scroll,.weekly-table-wrap,.world-table-wrap,.regional-table-wrap) {
+    max-inline-size: 100%;
+    min-inline-size: 0;
+    overflow-x: auto;
+    padding: 0;
+    background: var(--collection-sheet);
+    border: 1.5px solid var(--collection-outline);
+    border-radius: 10px 12px 9px 11px;
+    box-shadow: none;
+  }
+  html:root body :is(.data-table,.holiday-table,.weekly-table,.world-table,.regional-table-wrap table,.notes table,.editorial-prose table,.blog-content table) {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    border: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--collection-sheet);
+    color: var(--collection-ink);
+    font-size: clamp(.875rem, 1vw, .97rem);
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums;
+  }
+  html:root body :is(.data-table,.holiday-table,.weekly-table,.world-table,.regional-table-wrap table,.notes table,.editorial-prose table,.blog-content table) :is(th,td) {
+    padding: .65rem .8rem;
+    border: 0;
+    border-block-end: 1px solid var(--collection-rule);
+    vertical-align: top;
+    text-align: start;
+    color: var(--collection-ink);
+  }
+  html:root body :is(.data-table,.holiday-table,.weekly-table,.world-table,.regional-table-wrap table,.notes table,.editorial-prose table,.blog-content table) thead th {
+    background: var(--collection-blue);
+    color: var(--collection-ink);
+    border-block-end: 1.5px solid var(--collection-outline);
+    font-weight: 700;
+  }
+  html:root body :is(.data-table,.holiday-table,.weekly-table,.world-table,.regional-table-wrap table,.notes table,.editorial-prose table,.blog-content table) caption {
+    color: var(--collection-ink);
+    background: var(--collection-sheet);
+    text-align: start;
+    padding: .65rem .8rem;
+    font-weight: 650;
+  }
+  html:root body .data-table tbody tr.is-selected > * { background-color: var(--collection-yellow); font-weight: 650; }
+  html:root body .data-table tbody tr.is-selected > :first-child { box-shadow: inset 3px 0 var(--collection-outline); }
+  html:root body :is(.weekly-table,.world-table) tfoot > tr > * { background: var(--collection-yellow); }
+  html:root body .data-table:has(thead tr > :nth-child(5)) { min-width: 37rem; }
+  html:root body :is(.notes,.editorial-prose) section > table:not(.data-table) {
+    border: 1.5px solid var(--collection-outline);
+    border-radius: 10px;
+    overflow: hidden;
+    table-layout: fixed;
+  }
+  @media (max-width: 640px) {
+    html:root body .editorial-story-card.has-media .editorial-story-link { grid-template-columns: minmax(0,1fr); gap: .8rem; }
+    html:root body .editorial-story-card.has-media .editorial-story-media { order: 0; }
+    html:root body :is(.notes,.editorial-prose) section > table:not(.data-table) :is(th,td) { padding: .5rem; overflow-wrap: anywhere; }
+  }
+}
+
+@media screen {
+  html:root body :is(.data-table-wrap,.table-scroll,.weekly-table-wrap,.world-table-wrap,.regional-table-wrap):focus-visible {
+    outline: 3px solid #295c91;
+    outline-offset: 2px;
+  }
+  html:root body :is(.data-table,.holiday-table,.weekly-table,.world-table) tbody tr:not(.is-selected) > th {
+    background: #f7f3e9;
+    font-weight: 650;
+  }
+}
+
+html body svg.tool-list-icon {
+  display: inline-block;
+  width: 1.35em;
+  height: 1.35em;
+  margin-inline-end: .4em;
+  vertical-align: -.29em;
+  flex: none;
+  color: var(--collection-ink);
+}
+.global-next a svg.tool-list-icon { margin-inline-end: 0; }

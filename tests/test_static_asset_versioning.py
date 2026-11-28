@@ -115,9 +115,9 @@ class StaticAssetVersioningTests(unittest.TestCase):
                 )
 
         expected_age_calculator = hashlib.sha256(
-            (app_module.PROJECT_ROOT / "static/js/age-calculator.js").read_bytes()
+            (app_module.PROJECT_ROOT / "static/js/sketch-age.js").read_bytes()
         ).hexdigest()[:12]
-        self.assertIn(f"/static/js/age-calculator.js?v={expected_age_calculator}", client.get("/age").get_data(as_text=True))
+        self.assertIn(f"/static/js/sketch-age.js?v={expected_age_calculator}", client.get("/age").get_data(as_text=True))
 
         expected_baby_months = hashlib.sha256(
             (app_module.PROJECT_ROOT / "static/js/baby-months.js").read_bytes()

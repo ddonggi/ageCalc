@@ -1,0 +1,181 @@
+        <section aria-labelledby="age-basis" style="margin-top:40px">
+            <h2 id="age-basis">계산 기준과 입력 규칙</h2>
+            <p>
+                이 계산기는 생년월일(연·월·일)만으로 만나이를 산출합니다. 시·분·초와 타임존은 반영하지 않으며,
+                날짜 단위로만 계산하므로 해외 체류 중에도 “현지 날짜 기준”으로 결과가 표시됩니다.
+            </p>
+            <p>
+                음력 생일을 선택하면 내부적으로 양력으로 변환한 뒤 동일한 규칙으로 만나이를 계산합니다.
+                윤년(2월 29일) 출생의 경우 윤년이 아닌 해에는 관행적으로 2월 28일 또는 3월 1일 기준으로
+                간주하는 사례가 있으므로, 실제 행정 판단이 필요하다면 관계 기관 안내를 확인하세요.
+            </p>
+            <ul>
+                <li>입력 형식: 8자리 생년월일(예: 19921002)</li>
+                <li>계산 기준: 생일이 지나야 +1, 생일 전이면 전년도 나이 유지</li>
+                <li>결과 용도: 일반 정보 제공(법적 효력 없음)</li>
+            </ul>
+        </section>
+
+        <section aria-labelledby="age-examples" style="margin-top:40px">
+            <h2 id="age-examples">예시로 보는 만나이</h2>
+            <p>
+                예를 들어 1992-10-02 출생이라면, 생일 전날까지는 전년도 나이가 유지되고,
+                생일이 지난 시점부터 만나이가 1살 증가합니다. 즉 “생일 기준으로 변하는 나이”가 만나이의 핵심입니다.
+            </p>
+            <div class="section-card-grid">
+                <article class="section-card" data-example-card>
+                    <p class="eyebrow">사례 1 · 생일 전</p>
+                    <h3>1992년 10월 2일생, 2026년 10월 1일</h3>
+                    <p>2026-1992에서 아직 지나지 않은 생일을 반영해 만 33세입니다.</p>
+                </article>
+                <article class="section-card" data-example-card>
+                    <p class="eyebrow">사례 2 · 생일 당일</p>
+                    <h3>1992년 10월 2일생, 2026년 10월 2일</h3>
+                    <p>생일 당일부터 한 살이 올라가므로 만 34세입니다.</p>
+                </article>
+                <article class="section-card" data-example-card>
+                    <p class="eyebrow">사례 3 · 올해 출생</p>
+                    <h3>2026년 1월 15일생, 2026년 6월 22일</h3>
+                    <p>첫 생일 전이므로 만 0세이며, 월령은 아이 개월 수 계산기로 별도 확인합니다.</p>
+                </article>
+            </div>
+            <p>
+                출생년도만으로 빠르게 보고 싶다면
+                여러 연도를 나란히 보려면 <a href="{{ url_for('birth_year_age_table') }}">출생년도별 나이표</a>를 이용하세요.
+            </p>
+            <p>
+                생일과 관계없이 올해 기준 연나이를 보고 싶다면
+                <a href="{{ url_for('annual_age_calculator') }}">연나이 계산기</a>에서 바로 계산하세요.
+            </p>
+            <p class="small">마지막 기준 확인일: {{ editorial_metadata.reviewed_at if editorial_metadata else '2026-06-22' }}</p>
+        </section>
+
+        <section class="section-shell section-card-grid" aria-label="연령별 제도 확인 안내">
+            <article class="section-card">
+                <p class="eyebrow">공식 기준 우선</p>
+                <h2>연령별 제도는 공식 기준을 확인하세요</h2>
+                <p>복지·주거·연금·자격 제도는 나이 외에도 소득, 거주지, 가입 기간과 시행 시점에 따라 달라집니다. 계산 결과만으로 신청 가능 여부를 판단하지 마세요.</p>
+                <div class="footer-links editorial-link-row">
+                    <a href="{{ url_for('references') }}">계산 기준과 공식 출처 확인</a>
+                    <a href="{{ url_for('about') }}">콘텐츠 검수 원칙 보기</a>
+                </div>
+            </article>
+        </section>
+
+        <section class="age-rights-section" aria-labelledby="age-rights-title">
+            <div class="section-heading">
+                <p class="eyebrow">Age-based reference</p>
+                <h2 id="age-rights-title">🧑 연령별 주요 권리·제도 (만나이 기준)</h2>
+            </div>
+            <div class="age-rights-grid">
+                <article class="age-right-item" data-age="14"><div class="age-header"><span class="age-number">14</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.kakaocorp.com/page/" target="_blank" rel="noopener noreferrer">카카오톡, SNS 등 대부분 온라인 서비스 가입 가능</a></li><li>형사 미성년자(만 14세 미만) → 형사처벌 불가, 만 14세부터는 형사책임 인정</li></ul></article>
+                <article class="age-right-item" data-age="15"><div class="age-header"><span class="age-number">15</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.moel.go.kr/" target="_blank" rel="noopener noreferrer">근로기준법상 취직 가능 연령 (부모 동의 필요)</a></li></ul></article>
+                <article class="age-right-item" data-age="17"><div class="age-header"><span class="age-number">17</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=13100000013" target="_blank" rel="noopener noreferrer">주민등록증 발급 가능</a></li></ul></article>
+                <article class="age-right-item" data-age="18"><div class="age-header"><span class="age-number">18</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.safedriving.or.kr/" target="_blank" rel="noopener noreferrer">자동차 운전면허 취득 가능 (2종 보통 기준)</a></li><li><a href="https://www.nec.go.kr/" target="_blank" rel="noopener noreferrer">선거권 부여 (국회의원, 대통령 선거 모두 가능)</a></li><li><a href="https://www.gov.kr/mw/AA020InfoCappView.do?CappBizCD=12700000050" target="_blank" rel="noopener noreferrer">혼인 가능 (민법 개정 후 남녀 모두 만 18세 이상부터)</a></li><li>일부 청년 정책(교통·문화 할인, 청소년 우대 등) 종료</li></ul></article>
+                <article class="age-right-item" data-age="19"><div class="age-header"><span class="age-number">19</span><span class="age-unit">세 이상</span></div><ul><li>술·담배 구매 가능 (청소년보호법)</li><li>성인 등급 콘텐츠 및 일부 성인 전용 시설 출입 가능</li></ul></article>
+                <article class="age-right-item" data-age="20"><div class="age-header"><span class="age-number">20</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.mma.go.kr/" target="_blank" rel="noopener noreferrer">군 입대 의무 본격 적용 (징병검사, 현역 입영 가능)</a></li><li><a href="https://www.kosaf.go.kr/ko/main.do" target="_blank" rel="noopener noreferrer">대학 등록금·청년 지원금 일부 제도 만 20세 이상 대상</a></li></ul></article>
+                <article class="age-right-item" data-age="24"><div class="age-header"><span class="age-number">24</span><span class="age-unit">세 이하</span></div><ul><li>일부 공공기관 청년 우대금리 통장 가입 가능</li></ul></article>
+                <article class="age-right-item" data-age="34"><div class="age-header"><span class="age-number">34</span><span class="age-unit">세 이하</span></div><ul><li><a href="https://www.molit.go.kr/" target="_blank" rel="noopener noreferrer">청년 월세 특별 지원 (국토부, 지자체)</a></li><li>청년 전세자금 대출 (버팀목 전세자금 등)</li><li>청년 주택 청약 우대 (신혼부부 특별공급 등은 만 39세 이하까지 확대되기도 함)</li></ul></article>
+                <article class="age-right-item" data-age="39"><div class="age-header"><span class="age-number">39</span><span class="age-unit">세 이하</span></div><ul><li>청년 주택/장기전세주택 입주 가능 연령</li><li><a href="https://www.semas.or.kr/" target="_blank" rel="noopener noreferrer">청년 창업 지원 (중소기업청, 창업지원금 등)</a></li><li>일부 지자체 청년 지원 정책 상한선</li></ul></article>
+                <article class="age-right-item" data-age="40"><div class="age-header"><span class="age-number">40</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.semas.or.kr/" target="_blank" rel="noopener noreferrer">중장년층 창업 지원 (중소기업청, 중장년 창업지원금)</a></li><li><a href="https://www.work.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 재취업 지원 (고용지원센터)</a></li></ul></article>
+                <article class="age-right-item" data-age="45"><div class="age-header"><span class="age-number">45</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.molit.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 전용 주택 청약 (일부 지자체)</a></li></ul></article>
+                <article class="age-right-item" data-age="50"><div class="age-header"><span class="age-number">50</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.work.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 전용 취업 지원 프로그램</a></li><li><a href="https://www.nhis.or.kr/" target="_blank" rel="noopener noreferrer">중장년층 건강검진 무료 (국가건강검진)</a></li></ul></article>
+                <article class="age-right-item" data-age="55"><div class="age-header"><span class="age-number">55</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.molit.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 전용 주택 분양 (일부 아파트)</a></li></ul></article>
+                <article class="age-right-item" data-age="60"><div class="age-header"><span class="age-number">60</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">중장년층 특별 지원 (일부 지자체)</a></li></ul></article>
+                <article class="age-right-item" data-age="61"><div class="age-header"><span class="age-number">61</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">노령연금 지급 시작 (1953-56년생)</a></li></ul></article>
+                <article class="age-right-item" data-age="62"><div class="age-header"><span class="age-number">62</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">노령연금 지급 시작 (1957-60년생)</a></li></ul></article>
+                <article class="age-right-item" data-age="63"><div class="age-header"><span class="age-number">63</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">노령연금 지급 시작 (1961-64년생)</a></li></ul></article>
+                <article class="age-right-item" data-age="64"><div class="age-header"><span class="age-number">64</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">노령연금 지급 시작 (1965-68년생)</a></li></ul></article>
+                <article class="age-right-item" data-age="65"><div class="age-header"><span class="age-number">65</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">노인복지법상 노인 혜택 시작</a></li><li><a href="https://www.work.go.kr/" target="_blank" rel="noopener noreferrer">노인교통카드 할인 (대중교통)</a></li><li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">노인 문화시설 할인 (박물관, 영화관 등)</a></li><li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">기초연금 수급 자격 (만 65세 이상)</a></li><li><a href="https://www.longtermcare.or.kr/" target="_blank" rel="noopener noreferrer">노인장기요양보험 수급 자격</a></li></ul></article>
+                <article class="age-right-item" data-age="70"><div class="age-header"><span class="age-number">70</span><span class="age-unit">세 이상</span></div><ul><li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">노인 우선 대기 및 할인 혜택 확대</a></li></ul></article>
+            </div>
+        </section>
+
+        <section aria-labelledby="how-works" style="margin-top:40px">
+            <h2 id="how-works">만나이 공식</h2>
+            <p>
+                만나이는 출생일을 기준으로 오늘 날짜와의 차이를 연·월·일 단위로 계산해 산출합니다.
+
+                생일이 지났을 때만 한 살이 증가하며, 생일 전에는 전년도 나이가 유지됩니다.
+                본 계산기는 양력 기준으로 동작하고, 시간대/서머타임에 따른 시·분 정보는 배제하여 날짜 단위만 사용합니다.
+                윤년과 말일(예: 2월 29일 출생)도 예외 없이 처리하며, 윤년이 아닌 해의 2월 29일은 통상 2월 28일 또는 3월 1일을 기준으로 간주하는 관행을 안내합니다.
+                결과는 일반 정보 제공을 목적으로 하며, 법적 판단이 필요한 경우 관계 기관의 최신 안내를 확인해야 합니다.
+                계산하면 생년월일이 결과 페이지 주소에 포함되어 서버로 전송됩니다. 공용 기기에서는 방문 기록에 유의하세요. 링크 복사는 입력값을 제외합니다.
+            </p>
+            <ul>
+                <li>기준일: 사용자가 페이지 접속 시점의 현지 날짜</li>
+                <li>윤년/말일 보정: 2월 29일 출생 등 특수 케이스 안내</li>
+                <li>서머타임/타임존: 날짜만 계산, 시·분은 사용하지 않음</li>
+            </ul>
+        </section>
+
+        <section class="section-shell section-card-grid" aria-label="만나이 예외와 다음 행동">
+            <article class="section-card">
+                <p class="eyebrow">예외</p>
+                <h2>2월 29일과 음력 생일</h2>
+                <p>
+                    2월 29일 출생자는 윤년이 아닌 해의 생일 취급 기준이 기관별 업무 규정에 따라 달라질 수 있습니다.
+                    음력 생일은 먼저 양력 날짜로 환산한 뒤 만나이 공식을 적용합니다. 제출·계약·신청에 사용하는 나이라면
+                    계산 결과만 보지 말고 해당 기관이 지정한 기준일과 생일 처리 방식을 확인해야 합니다.
+                </p>
+            </article>
+            <article class="section-card">
+                <p class="eyebrow">다음 행동</p>
+                <h2>계산한 뒤 함께 볼 내용</h2>
+                <p>
+                    정확한 만나이를 확인했다면 신청서의 기준일, 다음 생일까지 남은 기간, 학교나 가족의 주요 시점을 이어서 볼 수 있습니다.
+                    연도만 빠르게 비교하려면 출생년도별 나이표를, 생일과 무관한 연도 기준 숫자가 필요하면 연나이 계산기를 선택하세요.
+                </p>
+                <div class="footer-links editorial-link-row">
+                    <a href="{{ url_for('birthday_dday_calculator') }}">다음 생일 확인</a>
+                    <a href="{{ url_for('birth_year_age_table') }}">출생연도표 보기</a>
+                    <a href="{{ url_for('annual_age_calculator') }}">연나이 계산</a>
+                </div>
+            </article>
+        </section>
+
+        <section aria-labelledby="compare">
+            <h2 id="compare">한국식/국제식 나이 비교</h2>
+            <p>
+                대한민국은 2023년 6월부터 공적 영역에서 만나이로 통일되었습니다. 일상에서는 여전히
+                다양한 표현이 혼용되기도 하지만, 행정·법률 등 공식 절차에서는 만나이가 기준입니다.
+                아래 표는 용어별 정의와 예시를 간단히 정리한 것입니다.
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>종류</th>
+                        <th>정의</th>
+                        <th>예시(1992-10-02)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>만나이</td>
+                        <td>생일이 지나야 +1</td>
+                        <td>{{ today.isoformat() }} 기준 {{ example_man_age }}세</td>
+                    </tr>
+                    <tr>
+                        <td>연나이</td>
+                        <td>올해 − 출생연도</td>
+                        <td>{{ today.year }}년 기준 {{ example_annual_age }}세</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>
+                자세한 설명은 <a href="/guide">나이 계산 가이드</a>와 <a href="/faq">자주 묻는 질문</a>에서 확인하실 수 있습니다.
+            </p>
+        </section>
+
+        <section aria-labelledby="notice">
+            <h2 id="notice">고지 및 참고</h2>
+            <p>
+                본 서비스는 일반 정보 제공을 목적으로 하며, 행정·법률상 효력은 관계 법령 및 기관 안내를 확인하시기 바랍니다.
+                정책·제도는 지자체·기관별로 상이할 수 있습니다.
+            </p>
+            <ul>
+                <li><a href="https://www.gov.kr/" target="_blank" rel="noopener noreferrer">정부24</a></li>
+                <li><a href="https://www.mohw.go.kr/" target="_blank" rel="noopener noreferrer">보건복지부</a></li>
+                <li><a href="https://www.nps.or.kr/" target="_blank" rel="noopener noreferrer">국민연금공단</a></li>
+            </ul>
+        </section>

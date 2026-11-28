@@ -24,10 +24,6 @@
         href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
     <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
@@ -38,7 +34,6 @@
 </head>
 
 <body class="calculator-flat-page">
-    <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
@@ -195,7 +190,7 @@
             {% else %}
             <p>현재 표는 {{ current_year }}년 기준입니다. 아래는 같은 출생연도의 2027년 연나이와 생일 전후 만나이 범위를 비교합니다. 연나이는 1월 1일에 바뀌고, 만나이는 각자의 생일에 바뀝니다.</p>
             {% endif %}
-            <div class="data-table-wrap">
+            <div class="data-table-wrap" role="region" tabindex="0" aria-labelledby="preview-2027-heading">
                 <table class="data-table">
                     <caption>{% if current_year == 2027 %}2027년 연나이와 생일 전후 만나이{% else %}현재 연나이와 2027년 나이표 — 생일 전 → 생일 이후{% endif %}</caption>
                     <thead><tr><th scope="col">출생연도</th>{% if current_year != 2027 %}<th scope="col">{{ current_year }}년 연나이</th>{% endif %}<th scope="col">2027년 연나이</th><th scope="col">2027년 만나이 범위</th></tr></thead>
@@ -211,10 +206,10 @@
 
         <section class="section-shell">
             <div class="section-heading">
-                <h2>{{ current_year }}년 기준 출생년도표</h2>
+                <h2 id="birth-year-table-title">{{ current_year }}년 기준 출생년도표</h2>
                 <p class="section-intro">출생년도 전체를 한 표로 정리했습니다. 선택한 연도는 강조 표시됩니다.</p>
             </div>
-            <div class="data-table-wrap">
+            <div class="data-table-wrap" tabindex="0" role="region" aria-labelledby="birth-year-table-title">
                 <table class="data-table birth-year-table">
                     <thead>
                         <tr>

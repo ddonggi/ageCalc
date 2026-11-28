@@ -140,70 +140,39 @@ class PublicPageTests(unittest.TestCase):
     def test_age_page_submits_only_when_its_explicit_button_is_clicked(self):
         """Typing validates as eight digits; submit is left to the server-rendered result page."""
         html = app.test_client().get("/age").get_data(as_text=True)
-        self.assertIn('<button class="btn btn-primary" type="submit">계산하기</button>', html)
+        self.assertIn('<button class="calculate" type="submit">', html)
 
         program = r"""
-const assert = require('assert');
+const assert = require('node:assert/strict');
 const listeners = {};
-const resultContainer = {
-  classList: {
-    shown: false,
-    add(name) { if (name === 'show') this.shown = true; },
-    remove(name) { if (name === 'show') this.shown = false; }
-  }
-};
-const resultContent = { innerHTML: '' };
-const birthInput = {
-  value: '19921002',
-  classList: { add() {}, remove() {} },
-  addEventListener(name, callback) { listeners[`birth:${name}`] = callback; }
-};
+const error = {textContent: ''};
+const birth = {value: '', setAttribute() {}, focus() {}};
 const form = {
-  addEventListener(name, callback) { listeners[`form:${name}`] = callback; }
+    elements: {calendar_type: {value: 'solar'}},
+    dataset: {today: '2026-11-23'},
+    addEventListener(name, callback) { listeners[name] = callback; },
 };
-
-global.AgeCalcDateRules = {
-  formatDateDigits(value) { return value; },
-  parseBirthDateDigits() { return new Date(1992, 9, 2); },
-  formatIsoDate() { return '1992-10-02'; }
-};
+const elements = {'#age-form': form, '#birth-input': birth, '#birth-error': error};
 global.document = {
-  addEventListener() {},
-  getElementById(id) {
-    if (id === 'result-container') return resultContainer;
-    if (id === 'result-content') return resultContent;
-    return null;
-  },
-  querySelector(selector) {
-    if (selector === 'input[name="calendar_type"]:checked') return { value: 'solar' };
-    return null;
-  },
-  querySelectorAll() { return []; }
+    querySelector(selector) { return elements[selector] || null; },
+    querySelectorAll() { return []; },
+    addEventListener() {},
 };
-global.window = {};
+global.window = {matchMedia() { return {matches: false}; }};
+global.location = {hash: ''};
+global.AgeCalcDateRules = require('./static/js/date-rules.js');
+require('./static/js/sketch-age.js');
 
-const { AgeCalculatorUI } = require('./static/js/age-calculator.js');
-const calculator = Object.create(AgeCalculatorUI.prototype);
-calculator.birthInput = birthInput;
-calculator.birthErrorEl = { textContent: '' };
-calculator.form = form;
-calculator.hiddenDateInput = null;
-calculator.bindCalculationSubmit();
-
-(async () => {
-  listeners['birth:input']();
-  await new Promise(resolve => setImmediate(resolve));
-  assert.strictEqual(resultContainer.classList.shown, false, '입력만으로 결과를 표시하면 안 됩니다.');
-
-  let prevented = false;
-  listeners['form:submit']({ preventDefault() { prevented = true; } });
-  await new Promise(resolve => setImmediate(resolve));
-  assert.strictEqual(prevented, false, '유효한 제출은 결과 URL로 이동해야 합니다.');
-  assert.strictEqual(resultContainer.classList.shown, false, '결과는 새 페이지에서 서버가 표시해야 합니다.');
-})().catch(error => {
-  console.error(error);
-  process.exit(1);
-});
+birth.value = '20230230';
+listeners.input();
+assert.match(error.textContent, /생년월일/);
+let prevented = false;
+listeners.submit({preventDefault() { prevented = true; }});
+assert.equal(prevented, true);
+birth.value = '19921002';
+listeners.input();
+assert.equal(error.textContent, '');
+listeners.submit({preventDefault() { throw Error('Valid native GET was blocked'); }});
 """
         completed = subprocess.run(
             ["node", "-e", program],
@@ -2426,8 +2395,9 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                     f'<link rel="canonical" href="https://agecalc.cloud{path}" />',
                     html,
                 )
+                link_markup = re.sub(r'<svg class="icon tool-list-icon".*?</svg>', '', html, flags=re.S)
                 for link in expected["links"]:
-                    self.assertIn(link, html)
+                    self.assertIn(link, link_markup)
 
     def test_pet_calculator_result_separates_conversion_from_diagnosis(self):
         script = Path("static/js/pet-age.js").read_text(encoding="utf-8")
@@ -2567,16 +2537,16 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
                 for marker in markers:
                     self.assertIn(marker, html)
 
-    def test_age_form_places_the_submit_before_help_and_validation_feedback(self):
+    def test_age_form_groups_date_help_and_errors_with_the_labelled_field(self):
         html = app.test_client().get("/age").get_data(as_text=True)
-
         markers = (
-            "생년월일을 입력하세요 (8자리)",
-            'class="calendar-toggle-container"',
+            'for="birth-input"',
             'id="birth-input"',
-            'type="submit">계산하기</button>',
-            'class="input-help"',
+            'aria-describedby="birth-help birth-error"',
+            'id="birth-help"',
             'id="birth-error"',
+            '<legend>달력 기준</legend>',
+            '<button class="calculate" type="submit">',
         )
         positions = [html.index(marker) for marker in markers]
         self.assertEqual(positions, sorted(positions))
@@ -3636,6 +3606,23 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
         self.assertNotIn(">표·비교<", html)
         self.assertNotIn('class="nav-links"', html)
 
+    def test_age_and_anniversary_pages_share_the_header_categories_and_destinations(self):
+        client = app.test_client()
+        expected_links = [(hub["path"], hub["nav_label"]) for hub in HUB_PAGES]
+        for path in ("/", "/age", "/d-day", "/birth-year-age-table", "/guide"):
+            with self.subTest(path=path):
+                html = client.get(path).get_data(as_text=True)
+                menu = re.search(r'<nav class="mega-nav"[^>]*>(.*?)</nav>', html, re.S)
+                self.assertIsNotNone(menu)
+                self.assertEqual(expected_links, re.findall(
+                    r'<a class="hub-nav-direct[^"]*"[^>]*href="([^"]+)"[^>]*>([^<]+)</a>',
+                    menu.group(1),
+                ))
+                self.assertEqual(1, html.count('id="mobile-nav-panel"'))
+                self.assertEqual(1, html.count('id="desktop-nav-panel"'))
+                self.assertEqual(1, html.count('css/sketch-header.css?'))
+                self.assertEqual(1, html.count('js/navigation.js?'))
+
     def test_mobile_navigation_lists_each_categorys_calculators(self):
         with app.test_request_context("/"):
             html = render_template("partials/header.html", blog_public_indexable=False)
@@ -3655,7 +3642,7 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
             for link in tool_links:
                 path = app.url_map.bind("").build(str(link["endpoint"]))
                 self.assertIn(f'href="{path}"', block)
-                self.assertIn(f'<strong>{link["label"]}</strong>', block)
+                self.assertRegex(block, rf'<strong><svg class="icon tool-list-icon"[^>]*><use [^>]+/></svg>{re.escape(link["label"])}</strong>')
 
     def test_age_hub_labels_the_age_calculator_correctly(self):
         response = app.test_client().get("/age-tools/")
@@ -4474,8 +4461,20 @@ assert.doesNotMatch(html, /birth_date=|year=|month=|day=/);
             self.assertIn(f'href="{href}"', html)
         self.assertNotIn("data-event-promo-mobile-slot", html)
         self.assertNotIn("coupang-event-promotions.js", html)
-        self.assertLess(html.index('class="hero-band utility-hero calculator-page-heading"'), html.index('class="info-coupang-promotions"'))
+        self.assertLess(html.index('id="age-form"'), html.index('class="info-coupang-promotions"'))
         self.assertLess(html.index('class="info-coupang-promotions"'), html.index('class="coupang-mobile-banner"'))
+
+    def test_age_result_affiliate_links_omit_birth_date_referrer(self):
+        with mock.patch.object(app_module, "ADSENSE_REVIEW_MODE", False), mock.patch.object(
+            app_module, "COUPANG_PARTNERS_ENABLED", True
+        ):
+            client = app.test_client()
+            for path, policy in (("/age", "unsafe-url"), ("/age?birth_date=19921002", "origin")):
+                with self.subTest(path=path):
+                    html = client.get(path).get_data(as_text=True)
+                    links = re.findall(r'<a [^>]*href="https://link\.coupang\.com/[^>]+>', html)
+                    self.assertTrue(links)
+                    self.assertTrue(all(f'referrerpolicy="{policy}"' in link for link in links))
 
     def test_other_pages_render_event_promotions_after_hero_band(self):
         client = app.test_client()
