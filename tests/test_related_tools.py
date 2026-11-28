@@ -116,6 +116,7 @@ class RelatedToolTests(unittest.TestCase):
         cases = [
             ("/age?birth_date=20000229&calendar_type=solar", ["/annual-age-calculator?birth_year=2000", "/birthday-dday-calculator"]),
             ("/age?birth_date=20000101&calendar_type=lunar", ["/lunar-birthday-calculator", "/annual-age-calculator?birth_year=2000"]),
+            ("/age?birth_date=19991229&calendar_type=lunar", ["/lunar-birthday-calculator", "/annual-age-calculator?birth_year=2000"]),
             ("/annual-age-calculator?birth_year=1900", ["/age", "/birth-year-age-table"]),
             ("/annual-age-calculator?birth_year=1992", ["/age", "/birth-year-age-table?year=1992"]),
             ("/birth-year-age-table?year=2010", ["/annual-age-calculator?birth_year=2010", "/school-grade-calculator?year=2010"]),

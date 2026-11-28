@@ -11,6 +11,12 @@
 
     function validate() {
         if (birth.value.length !== 8) return '생년월일을 숫자 8자리로 입력해 주세요.';
+        if (form.elements.calendar_type.value === 'lunar') {
+            const month = Number(birth.value.slice(4, 6));
+            const day = Number(birth.value.slice(6));
+            return month >= 1 && month <= 12 && day >= 1 && day <= 30
+                ? '' : '음력 생년월일의 월과 일을 확인해 주세요.';
+        }
         try {
             AgeCalcDateRules.parseBirthDateDigits(birth.value, form.dataset.today);
             return '';

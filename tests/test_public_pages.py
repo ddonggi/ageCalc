@@ -173,6 +173,11 @@ birth.value = '19921002';
 listeners.input();
 assert.equal(error.textContent, '');
 listeners.submit({preventDefault() { throw Error('Valid native GET was blocked'); }});
+form.elements.calendar_type.value = 'lunar';
+birth.value = '19900230';
+listeners.input();
+assert.equal(error.textContent, '');
+listeners.submit({preventDefault() { throw Error('Valid lunar date was blocked'); }});
 """
         completed = subprocess.run(
             ["node", "-e", program],
@@ -216,6 +221,34 @@ listeners.submit({preventDefault() { throw Error('Valid native GET was blocked')
             css,
             r"body\.calculator-flat-page \.container > \.breadcrumbs\s*\{\s*order:\s*0;",
         )
+
+    def test_lunar_result_uses_converted_year_for_solar_calculators(self):
+        client = app.test_client()
+        html = client.get('/age?calendar_type=lunar&birth_date=19991229').get_data(as_text=True)
+        for expected in ('2000-02-04', '토끼띠', '/annual-age-calculator?birth_year=2000',
+                         '/birth-year-age-table?year=2000', '/school-grade-calculator?year=2000'):
+            self.assertIn(expected, html)
+        for calendar in ('solar', 'lunar'):
+            with self.subTest(calendar=calendar):
+                query = {'calendar_type': calendar, 'birth_date': '1999-1-1'}
+                short = client.get('/age', query_string=query).get_data(as_text=True)
+                self.assertIn('value="19990101"', short)
+                self.assertIn('/annual-age-calculator?birth_year=1999', short)
+                self.assertIn('1999.01.01', short)
+
+    def test_malformed_date_is_not_reinterpreted_as_eight_digits(self):
+        for calendar in ('solar', 'lunar'):
+            with self.subTest(calendar=calendar):
+                page = app.test_client().get('/age', query_string={'calendar_type': calendar, 'birth_date': '1999-1-201'})
+                self.assertEqual(200, page.status_code)
+                self.assertIn('data-ready="no"', page.get_data(as_text=True))
+
+    def test_age_discovery_reuses_1900_only_for_supported_destinations(self):
+        response = app.test_client().get('/age?birth_date=19000101')
+        tools = response.get_data(as_text=True).split('class="tool-grid"', 1)[1].split('</section>', 1)[0]
+        self.assertIn('href="/annual-age-calculator?birth_year=1900"', tools)
+        self.assertIn('href="/school-grade-calculator"', tools)
+        self.assertIn('href="/birth-year-age-table"', tools)
 
     def test_age_result_prioritizes_summary_and_safe_related_links(self):
         program = r"""

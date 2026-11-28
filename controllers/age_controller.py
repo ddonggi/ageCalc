@@ -1,3 +1,5 @@
+import re
+
 from models.age_calculator import AgeCalculator
 from korean_lunar_calendar import KoreanLunarCalendar
 
@@ -27,33 +29,26 @@ class AgeController:
                 'age': None
             }
         
-        # 날짜 파싱
+        original_birth_date_string = birth_date_string
+        is_lunar = calendar_type == 'lunar'
+        if is_lunar:
+            match = re.fullmatch(r'([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})', birth_date_string)
+            if not match or not self.lunar_calendar.setLunarDate(*map(int, match.groups()), False):
+                return {
+                    'success': False,
+                    'message': '지원하지 않거나 존재하지 않는 음력 날짜입니다. 평달 생년월일을 확인해주세요.',
+                    'age': None,
+                }
+            birth_date_string = self.lunar_calendar.SolarIsoFormat()
+
         birth_date = self.age_calculator.parse_birth_date(birth_date_string)
-        
         if birth_date is None:
             return {
                 'success': False,
                 'message': '올바른 날짜 형식을 입력해주세요 (YYYY-MM-DD)',
-                'age': None
+                'age': None,
             }
-            
-        # 음력인 경우 양력으로 변환
-        original_birth_date_string = birth_date_string
-        is_lunar = calendar_type == 'lunar'
-        
-        if is_lunar:
-            try:
-                self.lunar_calendar.setLunarDate(birth_date.year, birth_date.month, birth_date.day, False)
-                solar_date_string = self.lunar_calendar.SolarIsoFormat()
-                birth_date = self.age_calculator.parse_birth_date(solar_date_string)
-                birth_date_string = solar_date_string # 계산에 사용할 양력 날짜로 업데이트
-            except Exception as e:
-                return {
-                    'success': False,
-                    'message': '음력 날짜 변환 중 오류가 발생했습니다. 올바른 날짜인지 확인해주세요.',
-                    'age': None
-                }
-        
+
         # 나이 계산
         try:
             age = self.age_calculator.calculate_age(birth_date, reference_date=reference_date)
@@ -71,5 +66,6 @@ class AgeController:
         return {
             'success': True,
             'message': message,
-            'age': age
+            'age': age,
+            'solar_birth_year': birth_date.year,
         }

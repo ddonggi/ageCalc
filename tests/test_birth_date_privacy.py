@@ -155,6 +155,21 @@ class BirthDatePrivacyTests(unittest.TestCase):
                 if today == date(2027, 1, 1) and expected_age == 27:
                     self.assertIn('오늘이 생일입니다', html)
 
+    def test_lunar_month_length_is_validated_before_conversion(self):
+        for digits, iso_date, valid in (
+            ('19900230', '1990-02-30', True),
+            ('19920131', '1992-01-31', False),
+            ('09990101', '0999-01-01', False),
+        ):
+            with self.subTest(digits=digits):
+                result = self.client.post('/age', data={'calendar_type': 'lunar', 'birth_date': iso_date})
+                self.assertEqual(result.status_code, 200)
+                self.assertEqual(result.get_json()['success'], valid)
+                page = self.client.get('/age', query_string={'calendar_type': 'lunar', 'birth_date': digits})
+                self.assertEqual(page.status_code, 200)
+                expected = '1990-03-26' if valid else result.get_json()['message']
+                self.assertIn(expected, page.get_data(as_text=True))
+
     def test_converted_lunar_age_uses_same_date_for_get_and_post(self):
         # Lunar 2000-01-01 is solar 2000-02-05.
         for day, expected_age in ((4, 26), (5, 27)):
