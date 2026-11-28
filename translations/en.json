@@ -33,6 +33,7 @@
     }
   },
   "common": {
+    "result_hint": "Enter the details and calculate to see your result here.",
     "language_fallback_notice": "If this page is unavailable in your chosen language, you will open an age calculator in that language.",
     "language": "Language", "tagline": "Everyday dates, clearly calculated.", "tools": "Calculators",
     "calculate": "Calculate", "reset": "Reset", "result": "Your result", "year": "Year", "month": "Month", "day": "Day",

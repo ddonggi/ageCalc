@@ -66,6 +66,11 @@
     form.requestSubmit();
   }
 
+  function scrollToResult(target) {
+    var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    target.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth", block: "start" });
+  }
+
   function scrollToCalculationResult(form) {
     var targetId = "";
     try { targetId = new URL(form.action, window.location.href).hash.slice(1); } catch (error) {}
@@ -75,7 +80,8 @@
     }
     if (!target) return;
     window.setTimeout(function () {
-      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (!target.getClientRects().length) return;
+      scrollToResult(target);
       target.setAttribute("tabindex", "-1");
       try { target.focus({ preventScroll: true }); } catch (error) { target.focus(); }
     }, 0);
@@ -109,7 +115,7 @@
     var target = document.querySelector(".result-container.show, [id$='-result']:not([hidden]), .birth-year-summary, table.data-table");
     if (!target) return;
     target = target.closest("section") || target;
-    window.setTimeout(function () { target.scrollIntoView({ behavior: "smooth", block: "start" }); }, 0);
+    window.setTimeout(function () { scrollToResult(target); }, 0);
   }
 
   document.addEventListener("DOMContentLoaded", function () {

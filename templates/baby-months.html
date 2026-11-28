@@ -27,12 +27,6 @@
         href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
     <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
-        rel="stylesheet">
-
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <!-- Google tag (gtag.js) -->
@@ -47,7 +41,6 @@
 </head>
 
 <body class="editorial-calculator-page calculator-flat-page">
-    <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
@@ -184,7 +177,6 @@
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
         ↑
     </button>
-    <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
 </body>
 
 </html>

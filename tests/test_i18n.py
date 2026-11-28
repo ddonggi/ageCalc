@@ -188,7 +188,7 @@ class LocalizedPageTests(unittest.TestCase):
             response = self.client.get('/ja/baby-months')
             self.assertEqual(200, response.status_code)
             markup = Markup(response.get_data(as_text=True))
-            self.assertEqual('/ja/baby-months', markup.attrs('a', **{'class': 'brand'})[0]['href'])
+            self.assertEqual('/ja/baby-months', markup.attrs('a', rel='home')[0]['href'])
             self.assertNotIn('/ja/age-calculator', [a.get('href') for a in markup.attrs('a')])
 
 

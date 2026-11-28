@@ -41,92 +41,60 @@
 </head>
 
 <body class="home-page" data-disable-clarity="true">
-    <div id="pixel-background"></div>
+    <a class="hallmark-skip" href="#home-main">본문으로 바로가기</a>
     <div class="container">
         {% include 'partials/header.html' %}
 
+        {% from 'sketch-icons.html' import icon, tool_icon %}
+        <main id="home-main" tabindex="-1">
         <section class="hero-band age-hub-hero editorial-hero" aria-labelledby="home-title">
             <div class="editorial-hero-copy">
-                <p class="eyebrow">Age calculator & life dates</p>
-                <h1 id="home-title">오늘 기준 나이를 바로 계산하세요</h1>
+                <img class="sketch-home-calendar" src="{{ versioned_static('sketch/desk-calendar.svg') }}" width="196" height="145" alt="">
+                <div><h1 id="home-title">오늘의 <span class="sketch-highlight">만 나이</span>는?</h1>
                 <p class="page-intro">
-                    생년월일로 현재 나이와 생활에 필요한 날짜를 확인하세요.
-                </p>
+                    생년월일을 입력해 오늘의 만 나이와 다음 생일까지 남은 날을 확인하세요.
+                </p></div>
             </div>
 
             <div class="editorial-panel-shell">
                 <form id="home-age-form" class="editorial-panel-core" data-clarity-mask="true" action="{{ url_for('index') }}" data-today="{{ today.isoformat() }}" novalidate>
-                    <div class="home-age-reference">
-                        <p class="command-label">기준일</p>
-                        <strong>{{ today.strftime("%Y.%m.%d") }}</strong>
-                    </div>
-
-                    <label for="home-birth-input">생년월일</label>
-                    <input id="home-birth-input" type="text" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" required autocomplete="bday" aria-describedby="home-birth-error">
+                    <label for="home-birth-input">{{ icon('cal') }} 생년월일</label>
+                    <input id="home-birth-input" type="text" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" required spellcheck="false" autocomplete="bday" aria-describedby="home-birth-hint home-birth-error">
+                    <p class="sketch-input-hint" id="home-birth-hint">양력 생년월일을 숫자 8자리로 입력하세요.</p>
                     <p id="home-birth-error" role="alert"></p>
-
-                    <button class="btn btn-primary" type="submit">계산하기</button>
-
-                    <div class="editorial-result-grid" id="home-age-result"{% if related_layout == 'baseline' %} data-baseline-tools{% endif %} aria-live="polite" hidden>
-                        <div class="home-age-result-card home-age-result-card-primary">
-                            <span>만나이</span>
-                            <output id="home-age-value"></output>
-                        </div>
-                        {% if related_layout == 'baseline' %}
-                        <div class="home-age-result-card" id="home-grade-result">
-                            <span>학년</span>
-                            <a id="home-grade-link" data-calculator-url="{{ url_for('school_grade_calculator') }}" href="{{ url_for('school_grade_calculator') }}">학년 계산</a>
-                        </div>
-                        <div class="home-age-result-card" id="home-birthday-result">
-                            <span>생일 D-day</span>
-                            <a href="{{ url_for('birthday_dday_calculator') }}">D-day 계산</a>
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% include 'partials/related-tools.html' %}
+                    <button class="btn btn-primary" type="submit">{{ icon('calc') }} 만 나이 계산하기 <span aria-hidden="true">→</span></button>
+                    <a class="sketch-lunar-link" href="{{ url_for('age') }}">음력 생일로 계산하기</a>
                 </form>
             </div>
+            <section class="sketch-home-result" aria-labelledby="home-result-title">
+                <img class="sketch-home-cat" src="{{ versioned_static('sketch/cat.svg') }}" width="168" height="92" alt="">
+                <div class="home-age-reference">
+                    <h2 id="home-result-title"><span class="sketch-highlight">계산 결과</span></h2>
+                    <time datetime="{{ today.isoformat() }}">기준일 {{ today.strftime("%Y.%m.%d") }}</time>
+                </div>
+                <div class="sketch-home-empty">
+                    {{ icon('cake') }}<p>다음 생일까지 며칠 남았을까요?</p>
+                    <small>생년월일을 입력하면 결과가 표시됩니다.</small>
+                </div>
+                <div class="editorial-result-grid" id="home-age-result"{% if related_layout == 'baseline' %} data-baseline-tools{% endif %} aria-live="polite" hidden>
+                    <div class="home-age-result-card home-age-result-card-primary">
+                        <span>만나이</span><output id="home-age-value"></output>
+                    </div>
+                    {% if related_layout == 'baseline' %}
+                    <div class="home-age-result-card" id="home-grade-result">
+                        <span>학년</span><a id="home-grade-link" data-calculator-url="{{ url_for('school_grade_calculator') }}" href="{{ url_for('school_grade_calculator') }}">학년 계산</a>
+                    </div>
+                    {% endif %}
+                    <div class="home-age-result-card"{% if related_layout == 'baseline' %} id="home-birthday-result"{% endif %}>
+                        <span>다음 생일</span><output id="home-birthday-days"></output>{% if related_layout == 'baseline' %}<a href="{{ url_for('birthday_dday_calculator') }}">D-day 계산</a>{% endif %}
+                    </div>
+                </div>
+                {% include 'partials/related-tools.html' %}
+            </section>
         </section>
-        {% include 'partials/info_coupang_promotions.html' %}
-        {% include 'partials/home_coupang_rails.html' %}
-
-        <section class="section-shell home-life-hubs" aria-labelledby="home-life-hubs-title">
-            <div class="section-heading">
-                <p class="eyebrow">Life Paths</p>
-                <h2 id="home-life-hubs-title">4개의 생활 영역</h2>
-                <p class="section-intro">나이, 학교, 기념일, 반려동물 관련 계산을 한곳에서 찾아보세요.</p>
-            </div>
-            <div class="home-life-hub-grid">
-                {% for hub in life_hubs %}
-                <a class="home-life-hub-card" href="{{ hub.path }}" data-hub-key="{{ hub.key }}">
-                    <article>
-                        <span class="home-life-hub-number">{{ "%02d"|format(loop.index) }}</span>
-                        <p class="eyebrow">{{ hub.eyebrow }}</p>
-                        <h3>{{ hub.title }}</h3>
-                        <p>{{ hub.description }}</p>
-                        <span class="home-life-hub-action">계산하러 가기 <b aria-hidden="true">↗</b></span>
-                    </article>
-                </a>
-                {% endfor %}
-            </div>
-        </section>
-
-        <section class="section-shell home-quick-tools">
-            <div class="section-heading">
-                <p class="eyebrow">Quick Reference</p>
-                <h2>빠른 표·기준 찾기</h2>
-                <p class="section-intro">날짜 입력 없이 출생연도, 입학 시점, 띠를 바로 확인하세요.</p>
-            </div>
-            <nav class="life-hub-link-list" aria-label="빠른 표와 기준 찾기">
-                <a href="{{ url_for('birth_year_age_table') }}"><strong>출생연도 나이표</strong><span>출생연도별 현재 나이 확인</span></a>
-                <a href="{{ url_for('school_grade_calculator') }}"><strong>학년 계산기</strong><span>현재 학년과 초·중·고 입학 시점 확인</span></a>
-                <a href="{{ url_for('birth_year_zodiac_table') }}"><strong>띠 나이표</strong><span>출생연도별 띠 확인</span></a>
-            </nav>
-        </section>
-
         <section class="section-shell home-tool-finder" id="tool-finder" aria-labelledby="tool-finder-title" data-clarity-mask="true">
             <div class="section-heading">
-                <h2 id="tool-finder-title">도구 찾기</h2>
+                <h2 id="tool-finder-title">{{ icon('pencil') }} 도구 찾기</h2>
                 <p class="section-intro">도구 이름이나 필요한 상황으로 계산기를 찾아보세요.</p>
             </div>
             <div class="tool-finder-controls" data-tool-controls hidden>
@@ -147,15 +115,48 @@
             <p data-tool-empty hidden>일치하는 도구가 없습니다. 다른 말로 찾아보세요.</p>
             <ul class="tool-finder-list">
                 {% for item in tool_finder_items %}
-                <li data-tool-endpoint="{{ item.endpoint }}"><a href="{{ item.path }}"><strong>{{ item.title }}</strong>{% if item.summary %}<span>{{ item.summary }}</span>{% endif %}</a></li>
+                <li data-tool-endpoint="{{ item.endpoint }}"><a href="{{ item.path }}"><strong>{{ tool_icon(item.endpoint) }}{{ item.title }}</strong>{% if item.summary %}<span>{{ item.summary }}</span>{% endif %}</a></li>
                 {% endfor %}
             </ul>
             <script id="tool-finder-data" type="application/json">{{ tool_finder_items|tojson }}</script>
         </section>
 
+        {% include 'partials/info_coupang_promotions.html' %}
+        {% include 'partials/home_coupang_rails.html' %}
+
+        <section class="section-shell home-life-hubs" aria-labelledby="home-life-hubs-title">
+            <div class="section-heading">
+                <h2 id="home-life-hubs-title">4개의 생활 영역</h2>
+                <p class="section-intro">나이, 학교, 기념일, 반려동물 관련 계산을 한곳에서 찾아보세요.</p>
+            </div>
+            <div class="home-life-hub-grid">
+                {% for hub in life_hubs %}
+                <a class="home-life-hub-card" href="{{ hub.path }}" data-hub-key="{{ hub.key }}">
+                    <article>
+                        <h3>{{ icon({'age':'cal', 'education':'school', 'anniversary':'cake', 'pets':'paw'}[hub.key], 'tool-list-icon') }}{{ hub.title }}</h3>
+                        <p>{{ hub.description }}</p>
+                        <span class="home-life-hub-action">계산하러 가기</span>
+                    </article>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="section-shell home-quick-tools">
+            <div class="section-heading">
+                <h2>빠른 표·기준 찾기</h2>
+                <p class="section-intro">날짜 입력 없이 출생연도, 입학 시점, 띠를 바로 확인하세요.</p>
+            </div>
+            <nav class="life-hub-link-list" aria-label="빠른 표와 기준 찾기">
+                <a href="{{ url_for('birth_year_age_table') }}"><strong>{{ tool_icon("birth_year_age_table") }}출생연도 나이표</strong><span>출생연도별 현재 나이 확인</span></a>
+                <a href="{{ url_for('school_grade_calculator') }}"><strong>{{ tool_icon("school_grade_calculator") }}학년 계산기</strong><span>현재 학년과 초·중·고 입학 시점 확인</span></a>
+                <a href="{{ url_for('birth_year_zodiac_table') }}"><strong>{{ tool_icon("birth_year_zodiac_table") }}띠 나이표</strong><span>출생연도별 띠 확인</span></a>
+            </nav>
+        </section>
+
+
         <section class="section-shell home-method-note direct-answer">
             <div class="section-heading">
-                <p class="eyebrow">How to use</p>
                 <h2>계산 결과와 기준을 함께 확인하세요</h2>
                 <p class="section-intro">
                     AgeCalc는 생년월일과 기준일을 바탕으로 만나이, 연나이, 학년, 입학년도, 생일 D-day,
@@ -165,12 +166,13 @@
             </div>
         </section>
 
+        </main>
         {% include 'partials/footer.html' %}
     </div>
 
     <div class="cookie-banner" id="cookie-banner">
         <div class="cookie-content">
-            <p>서비스 품질 개선과 방문 통계 확인을 위해 쿠키를 사용합니다. 동의 여부는 아래에서 선택할 수 있으며, 거부해도 주요 기능은 그대로 이용할 수 있습니다.</p>
+            <p>방문 통계용 쿠키 사용을 선택해 주세요. 거부해도 모든 계산기를 이용할 수 있습니다.</p>
             <div class="cookie-buttons">
                 <button id="accept-cookies" class="btn btn-primary">동의</button>
                 <button id="reject-cookies" class="btn btn-secondary">거부</button>

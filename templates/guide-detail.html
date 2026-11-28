@@ -1,3 +1,4 @@
+{% from 'sketch-icons.html' import tool_icon %}
 <!DOCTYPE html>
 <html lang="ko">
 
@@ -29,8 +30,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
     <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
@@ -39,7 +38,6 @@
 </head>
 
 <body class="guide-detail-page editorial-content-page">
-    <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
@@ -75,7 +73,7 @@
                 <p class="eyebrow">관련 계산기</p>
                 <div class="article-links">
                     {% for endpoint, label in page.related_links %}
-                    <a href="{{ url_for(endpoint) }}">{{ label }}</a>
+                    <a href="{{ url_for(endpoint) }}">{{ tool_icon(endpoint) }}{{ label }}</a>
                     {% endfor %}
                 </div>
             </section>
@@ -100,10 +98,10 @@
             <section class="section-shell editorial-prose-section">
                 <div class="section-heading">
                     <p class="eyebrow">기준 비교</p>
-                    <h2>기본 기준과 예외 비교표</h2>
+                    <h2 id="reference-table-title">기본 기준과 예외 비교표</h2>
                 </div>
                 <div class="guide-comparison-table">
-                    <div class="data-table-wrap">
+                    <div class="data-table-wrap" role="region" tabindex="0" aria-labelledby="reference-table-title">
                     <table class="data-table">
                         <thead>
                             <tr>

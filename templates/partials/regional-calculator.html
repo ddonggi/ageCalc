@@ -1,3 +1,6 @@
+{% from 'sketch-icons.html' import tool_icon %}
+{% import 'partials/sketch-localized.html' as sketch with context %}
+{% from 'sketch-icons.html' import sprite, icon %}
 <!DOCTYPE html>
 <html lang="{{ locale_code }}">
 <head>
@@ -21,6 +24,8 @@
     {% endif %}
     <link rel="stylesheet" href="{{ versioned_static('css/i18n.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/regional-calculator.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/sketch-global.css') }}" />
+{% if locale_code != 'ko' %}<link rel="stylesheet" href="{{ versioned_static('css/sketch-collections.css') }}" />{% endif %}
     {% for schema in global_schema %}<script type="application/ld+json" nonce="{{ csp_nonce }}">{{ schema | tojson }}</script>{% endfor %}
     {% include 'partials/adsense.html' %}
     <script src="{{ versioned_static('js/cookie-consent.js') }}" defer></script>
@@ -28,18 +33,13 @@
     <link rel="stylesheet" href="{{ versioned_static('css/related-tools.css') }}" />
     <script src="{{ versioned_static('js/related-tools.js') }}" defer></script>
 </head>
-<body class="global-page regional-page">
-<div class="container">
+<body class="global-page regional-page sketch-localized">
+{% if locale_code != 'ko' %}{{ sprite() }}{% endif %}
+    <div class="container">
     {% if locale_code == 'ko' %}
     {% include 'partials/header.html' %}
     {% else %}
-    <header class="global-header">
-        <div><a class="brand" href="{{ global_home }}">AgeCalc</a><p class="brand-note">{{ ui.tagline }}</p></div>
-        {% include 'partials/language-switcher.html' %}
-    </header>
-    <nav class="global-tools" aria-label="{{ ui.tools }}">
-        {% for tool in global_nav %}<a href="{{ tool.url }}"{% if tool.url == request.path %} aria-current="page"{% endif %}>{{ tool.label }}</a>{% endfor %}
-    </nav>
+    {{ sketch.header() }}
     {% endif %}
     <main>
         {% if locale_code != 'ko' %}
@@ -47,16 +47,12 @@
             {% for item in global_breadcrumbs %}{% if not loop.last %}<a href="{{ item.url }}">{{ item.label }}</a> / {% else %}<span aria-current="page">{{ item.label }}</span>{% endif %}{% endfor %}
         </nav>
         {% endif %}
-        <section class="global-hero regional-hero">
-            <p class="regional-kicker">AgeCalc · {{ locale_config.name }}</p>
-            <h1>{{ copy.h1 }}</h1>
-            <p>{{ copy.intro }}</p>
-        </section>
+        {{ sketch.hero() }}
 
         <div class="global-workspace regional-workspace">
             <section class="global-panel regional-form-panel">
                 <h2>{{ copy.form_title }}</h2>
-                <form method="post" action="{{ request.path }}" autocomplete="off" data-clarity-mask="true" data-calculator-form>
+                <form method="post" action="{{ request.path }}#regional-response" autocomplete="off" data-clarity-mask="true" data-calculator-form>
                     {% if page_key == 'lunar_birthday' %}
                     <div class="regional-field-grid compact">
                         <label>{{ copy.fields.month }}<select name="month" required>{% for number in range(1, 13) %}<option value="{{ number }}"{% if form_values.get('month', '1') == number|string %} selected{% endif %}>{{ number }}</option>{% endfor %}</select></label>
@@ -98,28 +94,31 @@
                         <label>{{ copy.fields.day }}<input type="number" name="day" value="{{ form_values.get('day', '1') }}" min="1" max="31" step="1" /></label>
                     </div>
                     {% endif %}
-                    {% if calculator_error %}<p class="global-error" role="alert">{{ calculator_error }}</p>{% endif %}
-                    <div class="global-actions"><button type="submit">{{ copy.submit }}</button></div>
+                    {% if calculator_error %}<p class="global-error" id="regional-response" tabindex="-1" role="alert">{{ calculator_error }}</p>{% endif %}
+                    <div class="global-actions"><button type="submit">{{ icon('calc') }}{{ copy.submit }}</button></div>
                 </form>
                 <p class="small regional-privacy">{{ copy.privacy_note }}</p>
             </section>
 
             {% if result %}
-            <section class="global-panel regional-result" aria-live="polite" data-clarity-mask="true">
+            <section class="global-panel regional-result" id="regional-response" tabindex="-1" aria-live="polite" data-clarity-mask="true">
                 <p class="regional-kicker">{{ ui.result }}</p>
                 <dl>
                     {% for label, value in result.rows %}<div><dt>{{ copy.labels[label] }}</dt><dd>{{ value }}</dd></div>{% endfor %}
                 </dl>
                 {% if result.table %}
-                <div class="regional-table-wrap"><table><caption>{{ copy.h1 }}</caption><thead><tr><th scope="col">{{ copy.labels.lunar_year }}</th><th scope="col">{{ copy.labels.solar_date }}</th><th scope="col">{{ copy.labels.status }}</th></tr></thead><tbody>
+                <div class="regional-table-wrap" tabindex="0" role="region" aria-labelledby="regional-table-caption"><table><caption id="regional-table-caption">{{ copy.h1 }}</caption><thead><tr><th scope="col">{{ copy.labels.lunar_year }}</th><th scope="col">{{ copy.labels.solar_date }}</th><th scope="col">{{ copy.labels.status }}</th></tr></thead><tbody>
                     {% for row in result.table %}<tr><td>{{ row[0] }}</td><td>{{ row[1] or '—' }}</td><td>{{ row[2] }}</td></tr>{% endfor %}
                 </tbody></table></div>
                 {% endif %}
                 <p class="small">{{ copy.notes[result.note] }}</p>
             </section>
+            {% else %}
+            {{ sketch.empty_result() }}
             {% endif %}
         </div>
         {% include 'partials/related-tools.html' %}
+        {{ sketch.related() }}
 
         <div class="global-copy regional-copy">
             {% for section in copy.sections %}<section{% if loop.first %} class="direct-answer"{% endif %}><h2>{{ section.heading }}</h2>{% for paragraph in section.paragraphs %}<p>{{ paragraph }}</p>{% endfor %}</section>{% endfor %}
@@ -132,7 +131,7 @@
             </aside>
         </div>
         {% set card_paths = related_tool_state().cards|map(attribute='path')|list %}
-        <nav class="related-paths" aria-label="{{ ui.related }}"><h2>{{ ui.related }}</h2><div class="global-tools">{% for tool in global_nav if tool.url != request.path %}<a href="{{ tool.url }}"{% if tool.url in card_paths %} data-also-in-result{% endif %}>{{ tool.label }}</a>{% endfor %}</div></nav>
+        <nav class="related-paths" aria-label="{{ ui.related }}"><h2>{{ ui.related }}</h2><div class="global-tools">{% for tool in global_nav if tool.url != request.path %}<a href="{{ tool.url }}"{% if tool.url in card_paths %} data-also-in-result{% endif %}>{{ tool_icon(tool.key) }}{{ tool.label }}</a>{% endfor %}</div></nav>
     </main>
     <footer class="global-footer">
         <p>{{ ui.footer }}</p>

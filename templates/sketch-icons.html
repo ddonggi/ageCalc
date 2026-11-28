@@ -1,0 +1,30 @@
+{% macro icon(name, klass='') -%}
+<svg class="icon {{ klass }}" aria-hidden="true" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><use href="#sk-{{ name }}"/></svg>
+{%- endmacro %}
+{% macro tool_icon(key) -%}
+{%- set key = key.strip('/').replace('-', '_') -%}
+{% if key in ('cat', 'dog') or key.startswith('pet_') %}{{ icon('paw', 'tool-list-icon') }}
+{%- elif 'school' in key or 'grade' in key or 'college' in key %}{{ icon('school', 'tool-list-icon') }}
+{%- elif 'lunar' in key %}{{ icon('moon', 'tool-list-icon') }}
+{%- elif 'world_time' in key %}{{ icon('globe', 'tool-list-icon') }}
+{%- elif 'hours' in key or 'duration' in key or 'between' in key %}{{ icon('clock', 'tool-list-icon') }}
+{%- elif 'birthday' in key or 'hundred_day' in key or key == '100_day_calculator' %}{{ icon('cake', 'tool-list-icon') }}
+{%- elif 'table' in key or 'business_days' in key %}{{ icon('grid', 'tool-list-icon') }}
+{%- elif 'day' in key or 'date' in key or 'era' in key %}{{ icon('cal', 'tool-list-icon') }}
+{%- else %}{{ icon('calc', 'tool-list-icon') }}{%- endif %}
+{%- endmacro %}
+{% macro sprite() %}
+<svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+<symbol id="sk-cal" viewBox="0 0 32 32"><path fill="#fffaf0" d="m4 8 23-1 1 20-23 1z"/><path fill="#f3a68a" d="m4 8 23-1 .2 6L4 14z"/><path d="m9 4 .5 7m12-7 .5 6"/><path d="m10 18 1 .1m9-.5h1m-9 4q3.6 3.7 7-1"/></symbol>
+<symbol id="sk-grid" viewBox="0 0 32 32"><path fill="#fffdf5" d="m5 6 22 1-1 20-21-.5z"/><path fill="#f4bd6d" d="m5 6 22 1-.3 6-22-.7z"/><path d="m5 18 21 1m-13-6-.2 13m7-13-.4 12"/></symbol>
+<symbol id="sk-school" viewBox="0 0 32 32"><path fill="#cee4e9" d="M2 13 16 6l14 7-14 7z"/><path d="m8 17 .5 6q7 5 15-.1l.2-6M28 15l-.8 9"/><path d="m26 26 1-2 1 3"/></symbol>
+<symbol id="sk-cake" viewBox="0 0 32 32"><path fill="#ffdb97" d="m5 17 21-1 1 11-23 .5z"/><path fill="#fff9ee" d="M4.5 18q1-5 5-3 4-3 7-1 5-2 9 0l1 5q-2 3-5-.2-3 3-6 0-3 3-6 0-3 2-5 0z"/><path d="m10 13-.2-4m7 4V8m6 5V9"/><path fill="#ffa384" d="M8 7q-.5-2 2-5 3 3 1 5zm7-1q0-2 2-5 3 4 1 6zm6 2q0-3 2-5 3 4 1 5z"/></symbol>
+<symbol id="sk-sun" viewBox="0 0 32 32"><circle cx="16" cy="16" r="6" fill="#ffe18a"/><path d="M16 2v5m0 18v5M2 16h5m18 0h5M6 6l3 3m14 14 3 3M6 26l3-3M23 9l3-3"/></symbol>
+<symbol id="sk-moon" viewBox="0 0 32 32"><path fill="#dfdfef" d="M20 4A12 12 0 1 0 28 21Q13 23 20 4z"/></symbol>
+<symbol id="sk-clock" viewBox="0 0 32 32"><circle cx="16" cy="16" r="11" fill="#dfece4"/><path d="m16 9-.5 8 6 3"/></symbol>
+<symbol id="sk-pencil" viewBox="0 0 32 32"><path fill="#ffda82" d="m5 21 15-16 7 6-16 16-8 2z"/><path fill="#f4ab98" d="m20 5 3-3 7 6-3 3z"/><path d="m6 22 5 5m-6-1 2 2m3-7L21 9"/></symbol>
+<symbol id="sk-globe" viewBox="0 0 32 32"><circle cx="16" cy="16" r="12"/><ellipse cx="16" cy="16" rx="5" ry="12"/><path d="M5 12q11 4 22 0M5 20q11-4 22 0"/></symbol>
+<symbol id="sk-calc" viewBox="0 0 32 32"><rect x="6" y="3" width="20" height="26" rx="3" fill="#fff4cf"/><path d="M10 8h12v5H10zM11 18h2m5 0h2m-9 5h2m5 0h2"/></symbol>
+<symbol id="sk-paw" viewBox="0 0 32 32"><g fill="#efb79e"><ellipse cx="6" cy="14" rx="2.7" ry="3.6" transform="rotate(-20 6 14)"/><ellipse cx="12" cy="8" rx="2.8" ry="4"/><ellipse cx="20" cy="8" rx="2.8" ry="4"/><ellipse cx="26" cy="14" rx="2.7" ry="3.6" transform="rotate(20 26 14)"/><path d="M7 23c0-3 3-4 5-7q4-6 8 0c2 3 5 4 5 7q0 5-6 3-3-2-6 0-6 2-6-3z"/></g></symbol>
+</defs></svg>
+{% endmacro %}

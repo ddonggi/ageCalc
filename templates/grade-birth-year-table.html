@@ -23,10 +23,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
     <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
@@ -37,7 +33,6 @@
 </head>
 
 <body class="calculator-flat-page">
-    <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
@@ -167,7 +162,7 @@
         <section class="section-shell" id="preview-2027" aria-labelledby="preview-2027-heading">
             <h2 id="preview-2027-heading">{% if school_year < 2027 %}2027학년도 학년별 출생연도 미리보기{% elif school_year == 2027 %}2027학년도 학년별 출생연도 기준{% else %}2027학년도 학년별 출생연도 참고{% endif %}</h2>
             <p>현재 학년 조회는 {{ school_year }}학년도 기준입니다. 아래 표는 2027학년도(2027년 3월~2028년 2월) 일반 진급 기준입니다. 나이는 2027년 달력연도를 기준으로 표시합니다.</p>
-            <div class="data-table-wrap"><table class="data-table">
+            <div class="data-table-wrap" role="region" tabindex="0" aria-labelledby="preview-2027-heading"><table class="data-table">
                 <caption>2027학년도 초1~고3 출생연도와 2027년 나이</caption>
                 <thead><tr><th scope="col">학년</th><th scope="col">일반 출생연도</th><th scope="col">2027년 연나이</th><th scope="col">2027년 만나이 범위</th></tr></thead>
                 <tbody>{% for row in preview_rows %}<tr><th scope="row">{{ row.short_label }}</th><td>{{ row.birth_year_label }}</td><td>{{ row.annual_age }}</td><td>{{ row.man_age_range }}</td></tr>{% endfor %}</tbody>
@@ -180,10 +175,10 @@
 
         <section class="section-shell">
             <div class="section-heading">
-                <h2>{{ school_year }}학년도 학년별 출생연도표</h2>
+                <h2 id="reference-table-title">{{ school_year }}학년도 학년별 출생연도표</h2>
                 <p class="section-intro">초1부터 고3까지 학년별 보통 출생연도를 표로 정리했습니다.</p>
             </div>
-            <div class="data-table-wrap">
+            <div class="data-table-wrap" role="region" tabindex="0" aria-labelledby="reference-table-title">
                 <table class="data-table birth-year-table">
                     <thead>
                         <tr>

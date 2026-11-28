@@ -24,12 +24,6 @@
         href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
     <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
-        rel="stylesheet">
-
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <!-- Google tag (gtag.js) -->
@@ -43,7 +37,6 @@
 </head>
 
 <body class="editorial-calculator-page calculator-flat-page">
-    <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
         <header class="calculator-page-heading">
@@ -171,7 +164,7 @@
                 <div class="pet-input-panel" data-pet-panel="adoption-date" hidden>
                     <label class="field-label" for="pet-adoption-date">데려온 날 8자리</label>
                     <input type="text" id="pet-adoption-date" name="adoption_date" value="{{ pet_values.adoption_date }}" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" aria-describedby="pet-error">
-                    <p class="input-help">실제 나이가 아니라 오늘까지 함께한 기간을 계산합니다.</p>
+                    <p class="input-help">강아지를 데려온 날짜를 입력하면 함께 지낸 기간을 년·개월로 볼 수 있어요. 생일을 안다면 ‘생일을 알아요’에서 체형별 환산 나이도 확인해 보세요.</p>
                 </div>
                 <small id="pet-error" class="error-msg" aria-live="polite"></small>
                 <button class="btn btn-primary" type="submit">계산하기</button>
@@ -267,7 +260,6 @@
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
         ↑
     </button>
-    <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
 </body>
 
 </html>

@@ -2,7 +2,7 @@
 <aside class="info-coupang-promotions" aria-label="쿠팡 파트너스 이벤트 프로모션">
     <div class="info-coupang-promo-grid">
         {% for promotion in coupang_event_promotions %}
-        <a class="info-coupang-promo" href="{{ promotion.url }}" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="unsafe-url">
+        <a class="info-coupang-promo" href="{{ promotion.url }}" target="_blank" rel="sponsored nofollow noopener" referrerpolicy="{{ coupang_referrer_policy | default('unsafe-url') }}">
             <img src="{{ promotion.image_url }}" alt="{{ promotion.alt }}" width="{{ promotion.width }}" height="{{ promotion.height }}" loading="lazy">
         </a>
         {% endfor %}

@@ -1,0 +1,31 @@
+html:root {
+  color-scheme: light;
+  --space-3xs: 2px; --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px; --space-3xl: 96px; --space-4xl: 144px;
+  --text-xs: 0.75rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.2rem; --text-xl: 1.44rem; --text-2xl: 1.728rem; --text-3xl: 2.074rem;
+  --text-display-s: 1.44rem; --text-display: 1.728rem; --text-section: 1.2rem; --text-title: 1rem; --text-lead: 1rem;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); --ease-in: cubic-bezier(0.7, 0, 0.84, 0); --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms; --dur-short: 220ms; --dur-long: 420ms;
+  --color-error: oklch(52% 0.19 27); --color-success: oklch(50% 0.12 150);
+  --container: 1280px; --gutter: 64px; --gap-columns: 32px; --section-gap-s: 120px; --section-gap: 144px; --section-gap-l: 176px;
+  --z-base: 1; --z-raised: 10; --z-dropdown: 100; --z-sticky: 200; --z-sticky-nav: 300; --z-modal: 400; --z-toast: 500; --z-tooltip: 600;
+  --color-paper: oklch(84% 0.012 245); --color-paper-2: oklch(81% 0.012 245); --color-paper-3: oklch(77% 0.012 245);
+  --color-ink: oklch(16% 0.020 245); --color-ink-2: oklch(24% 0.018 245); --color-muted: oklch(38% 0.016 245);
+  --color-rule: oklch(73% 0.013 240); --color-rule-2: oklch(32% 0.018 240);
+  --color-accent: oklch(45% 0.180 350); --color-accent-2: oklch(37% 0.160 350); --color-accent-ink: oklch(97% 0.006 245); --color-focus: oklch(46% 0.190 350);
+  --color-sheet: oklch(93.5% 0.008 245);
+  --font-display: "Pretendard", "Apple SD Gothic Neo", sans-serif;
+  --font-body: var(--font-display);
+  --font-outlier: ui-monospace, "SFMono-Regular", monospace;
+  --radius-card: 0; --radius-pill: 2px; --rule-hair: 1px; --rule-bar: 2px; --shadow-card: none;
+  --tracking-display: -0.02em; --display-weight: 600;
+  --color-clear: transparent;
+  --lux-canvas: var(--color-paper); --lux-surface: var(--color-sheet); --lux-espresso: var(--color-ink); --lux-text: var(--color-ink-2); --lux-muted: var(--color-muted);
+  --lux-sage: var(--color-accent); --lux-gold: var(--color-accent); --lux-danger: var(--color-error); --lux-border: var(--color-rule); --lux-border-strong: var(--color-rule-2);
+  --lux-sage-soft: var(--color-paper-2); --lux-gold-soft: var(--color-paper-2); --lux-brand: var(--font-display); --lux-body: var(--font-body); --lux-focus: none;
+  --lux-shadow-soft: none; --lux-shadow-panel: none; --lux-radius-shell: 0; --lux-radius-core: 0;
+  --bg: var(--color-paper); --bg-2: var(--color-paper-2); --bg-3: var(--color-paper-3); --paper: var(--color-sheet); --paper-warm: var(--color-paper); --paper-aged: var(--color-paper-2);
+  --surface: var(--color-sheet); --surface-strong: var(--color-sheet); --text: var(--color-ink); --muted: var(--color-muted); --line: var(--color-rule); --line-strong: var(--color-rule-2);
+  --accent-1: var(--color-accent); --accent-2: var(--color-accent); --accent-3: var(--color-accent); --danger: var(--color-error);
+  --shadow: none; --shadow-soft: none; --radius-sm: 2px; --radius-md: 2px; --radius-lg: 0; --radius-xl: 0; --site-font: var(--font-body);
+  --home-ink: var(--color-ink); --home-muted: var(--color-muted); --home-line: var(--color-rule); --home-panel: var(--color-sheet); --home-accent: var(--color-accent);
+}

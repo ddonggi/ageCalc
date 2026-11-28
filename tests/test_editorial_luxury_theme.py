@@ -133,7 +133,8 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
             with self.subTest(path=path):
                 response = self.client.get(path, follow_redirects=True)
                 self.assertEqual(200, response.status_code)
-                self.assertIn("css/editorial-luxury.css", response.get_data(as_text=True))
+                theme = "sketch/sketch.css" if path == "/age" else "css/editorial-luxury.css"
+                self.assertIn(theme, response.get_data(as_text=True))
 
     def test_calculator_pages_use_shared_editorial_structure(self):
         for path in (
@@ -149,7 +150,8 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
                 html = self.client.get(path).get_data(as_text=True)
                 self.assertIn("editorial-calculator-page", html)
                 self.assertIn("editorial-calculator-shell", html)
-                self.assertIn("css/editorial-luxury.css", html)
+                theme = "sketch/sketch.css" if path == "/age" else "css/editorial-luxury.css"
+                self.assertIn(theme, html)
 
     def test_calculator_flat_layout_prioritizes_form_without_flattening_inner_cards(self):
         css = Path("static/css/editorial-luxury.css").read_text()
@@ -367,7 +369,7 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
         )
         self.assertNotIn("border-right: 1px solid var(--lux-border);", theme_css.split("body.home-page .home-life-hub-card", 1)[1].split("}", 1)[0])
 
-    def test_home_life_hubs_use_editorial_dividers_instead_of_cards(self):
+    def test_home_life_hub_articles_have_no_inner_frame(self):
         theme_css = Path("static/css/editorial-luxury.css").read_text()
         grid_rules = self._css_rule_bodies(theme_css, "body.home-page .home-life-hub-grid")
         card_rules = self._css_rule_bodies(theme_css, "body.home-page .home-life-hub-card")
@@ -378,9 +380,9 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
         self.assertIn("background: transparent !important;", card_rules)
         self.assertIn("box-shadow: none !important;", card_rules)
         self.assertIn("transform: none !important;", card_rules)
-        self.assertIn("border: 1px solid rgba(166, 139, 97, .42) !important;", article_rules)
-        self.assertIn("background: var(--lux-surface) !important;", article_rules)
-        self.assertIn("box-shadow: 0 16px 36px rgba(36, 29, 24, .10) !important;", article_rules)
+        self.assertIn("border: 0;", article_rules)
+        self.assertIn("background: transparent;", article_rules)
+        self.assertIn("box-shadow: none;", article_rules)
         self.assertNotIn("body.home-page .life-hub-link-list a", theme_css)
 
         self.assertRegex(
@@ -483,7 +485,7 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
         theme_css = Path("static/css/editorial-luxury.css").read_text()
         card_rules = self._css_rule_bodies(theme_css, "body.home-page .home-life-hub-card article")
         button_rules = self._css_rule_bodies(theme_css, "body.home-page #home-age-form .btn-primary")
-        self.assertIn("grid-template-rows: auto auto auto 1fr auto;", card_rules)
+        self.assertIn("grid-template-rows: auto 1fr auto;", card_rules)
         self.assertIn("background: var(--lux-gold);", button_rules)
         self.assertIn("border-color: var(--lux-gold);", button_rules)
         self.assertIn("color: var(--lux-espresso);", button_rules)
@@ -579,7 +581,7 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
             html,
             r'<input id="home-birth-input" type="text" placeholder="19921002" inputmode="numeric" pattern="\[0-9\]\*" maxlength="8"',
         )
-        self.assertIn('aria-describedby="home-birth-error"', html)
+        self.assertIn('aria-describedby="home-birth-hint home-birth-error"', html)
         self.assertNotIn("입력한 날짜는 저장하지 않습니다.", html)
         self.assertIn('id="home-birth-error" role="alert"', html)
         self.assertIn('id="home-age-result"', html)
@@ -592,7 +594,14 @@ class EditorialLuxuryThemeTests(unittest.TestCase):
         self.assertNotIn('class="age-hub-result-card"', html)
 
     def test_calculator_forms_load_focus_and_enter_submit_behavior(self):
-        html = self.client.get("/age").get_data(as_text=True)
+        age_html = self.client.get("/age").get_data(as_text=True)
+        self.assertIn("js/sketch-age.js", age_html)
+        self.assertIn('type="submit"', age_html)
+        age_script = Path("static/js/sketch-age.js").read_text()
+        self.assertIn("birth.focus(", age_script)
+        self.assertIn("sheet.focus(", age_script)
+
+        html = self.client.get("/annual-age-calculator").get_data(as_text=True)
         script_path = Path("static/js/calculator-form-focus.js")
 
         self.assertIn("js/calculator-form-focus.js", html)

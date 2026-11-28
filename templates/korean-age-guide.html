@@ -22,10 +22,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
     <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
@@ -34,7 +30,6 @@
 </head>
 
 <body>
-    <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
@@ -111,10 +106,10 @@
 
         <section class="section-shell">
             <div class="section-heading">
-                <h2>공식 기준 한눈에 보기</h2>
+                <h2 id="reference-table-title">공식 기준 한눈에 보기</h2>
                 <p class="section-intro">법령과 공식 안내에서 핵심만 추려 정리했습니다.</p>
             </div>
-            <div class="data-table-wrap">
+            <div class="data-table-wrap" role="region" tabindex="0" aria-labelledby="reference-table-title">
                 <table class="data-table birth-year-table">
                     <thead>
                         <tr>

@@ -1,3 +1,4 @@
+{% from 'sketch-icons.html' import tool_icon %}
 {% if has_related_tools %}
 {% set next_tools = related_tool_state() %}
 <nav class="related-tools" data-related-tools data-source="{{ related_source }}" data-locale="{{ locale_code }}"
@@ -12,7 +13,7 @@
         {% for card in next_tools.cards %}
         <a class="related-tool-card" href="{{ card.href }}" referrerpolicy="no-referrer" data-tool="{{ card.key }}" data-calculator-url="{{ card.path }}"
            data-measurable="{{ 'true' if card.measurable else 'false' }}"{% if related_source == 'index' and card.key == 'school_grade_calculator' %} id="home-grade-link"{% endif %}>
-            <strong{% if related_source == 'index' %} id="{{ 'home-grade-result' if card.key == 'school_grade_calculator' else 'home-birthday-result' }}"{% endif %}>{{ card.title }}</strong>
+            <strong{% if related_source == 'index' %} id="{{ 'home-grade-result' if card.key == 'school_grade_calculator' else 'home-birthday-result' }}"{% endif %}>{{ tool_icon(card.key) }}{{ card.title }}</strong>
             <span>{{ card.description }}</span>
         </a>
         {% endfor %}

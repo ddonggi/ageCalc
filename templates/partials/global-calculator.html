@@ -1,3 +1,6 @@
+{% from 'sketch-icons.html' import tool_icon %}
+{% import 'partials/sketch-localized.html' as sketch with context %}
+{% from 'sketch-icons.html' import sprite, icon %}
 {% macro date_fields(name, label, year=true) -%}
 <fieldset data-date="{{ name }}">
     <legend>{{ label }}</legend>
@@ -46,6 +49,8 @@
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     {% endif %}
     <link rel="stylesheet" href="{{ versioned_static('css/i18n.css') }}" />
+    <link rel="stylesheet" href="{{ versioned_static('css/sketch-global.css') }}" />
+{% if locale_code != 'ko' %}<link rel="stylesheet" href="{{ versioned_static('css/sketch-collections.css') }}" />{% endif %}
     {% for schema in global_schema %}
     <script type="application/ld+json" nonce="{{ csp_nonce }}">{{ schema | tojson }}</script>
     {% endfor %}
@@ -70,18 +75,13 @@
     <link rel="stylesheet" href="{{ versioned_static('css/related-tools.css') }}" />
     <script src="{{ versioned_static('js/related-tools.js') }}" defer></script>
 </head>
-<body class="global-page">
+<body class="global-page sketch-localized">
+    {% if locale_code != 'ko' %}{{ sprite() }}{% endif %}
     <div class="container">
         {% if locale_code == 'ko' %}
         {% include 'partials/header.html' %}
         {% else %}
-        <header class="global-header">
-            <div><a class="brand" href="{{ global_home }}">AgeCalc</a><p class="brand-note">{{ ui.tagline }}</p></div>
-            {% include 'partials/language-switcher.html' %}
-        </header>
-        <nav class="global-tools" aria-label="{{ ui.tools }}">
-            {% for tool in global_nav %}<a href="{{ tool.url }}"{% if tool.url == request.path %} aria-current="page"{% endif %}>{{ tool.label }}</a>{% endfor %}
-        </nav>
+        {{ sketch.header() }}
         {% endif %}
         <main>
             {% if locale_code != 'ko' %}
@@ -89,10 +89,7 @@
                 {% for item in global_breadcrumbs %}{% if not loop.last %}<a href="{{ item.url }}">{{ item.label }}</a> / {% else %}<span aria-current="page">{{ item.label }}</span>{% endif %}{% endfor %}
             </nav>
             {% endif %}
-            <section class="global-hero">
-                <h1>{{ copy.h1 }}</h1>
-                <p>{{ copy.intro }}</p>
-            </section>
+            {{ sketch.hero() }}
             <div class="global-workspace">
                 <section class="global-panel">
                     <h2>{{ copy.form_title }}</h2>
@@ -151,7 +148,7 @@
                             <div id="reference-fields" hidden>{{ date_fields('reference', ui.reference_date) }}</div>
                             {% endif %}
                             <p class="global-error" id="calculator-error" role="alert"></p>
-                            <div class="global-actions"><button type="submit">{{ ui.calculate }}</button><button type="reset">{{ ui.reset }}</button></div>
+                            <div class="global-actions"><button type="submit">{{ icon('calc') }}{{ ui.calculate }}</button><button type="reset">{{ ui.reset }}</button></div>
                         </fieldset>
                     </form>
                     <p class="small">{{ ui.privacy_note }}</p>
@@ -186,10 +183,12 @@
                     </section>
                     {% endif %}
                 </section>
+                {{ sketch.empty_result() }}
             </div>
             {% include 'partials/related-tools.html' %}
+        {{ sketch.related() }}
             {% if locale_code == 'ko' and page_key in ('days_between_dates', 'date_add_subtract') %}
-            <nav class="global-tools" aria-label="관련 시간 계산기"><a href="{{ url_for('time_duration_calculator') }}">시각·휴게시간으로 하루 시간 차이 계산</a></nav>
+            <nav class="global-tools" aria-label="관련 시간 계산기"><a href="{{ url_for('time_duration_calculator') }}">{{ tool_icon("time_duration_calculator") }}시각·휴게시간으로 하루 시간 차이 계산</a></nav>
             {% endif %}
             {% if tenure_page %}
             <section class="global-copy" aria-labelledby="tenure-rules-heading">
@@ -221,7 +220,7 @@
             {% endif %}
             {% set card_paths = related_tool_state().cards|map(attribute='path')|list %}
             <nav class="related-paths" aria-label="{{ ui.related }}"><h2>{{ ui.related }}</h2><div class="global-tools">
-                {% for tool in global_nav if tool.url != request.path %}<a href="{{ tool.url }}"{% if tool.url in card_paths %} data-also-in-result{% endif %}>{{ tool.label }}</a>{% endfor %}
+                {% for tool in global_nav if tool.url != request.path %}<a href="{{ tool.url }}"{% if tool.url in card_paths %} data-also-in-result{% endif %}>{{ tool_icon(tool.key) }}{{ tool.label }}</a>{% endfor %}
             </div></nav>
         </main>
         <footer class="global-footer">

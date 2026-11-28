@@ -1,3 +1,4 @@
+{% from 'sketch-icons.html' import tool_icon %}
 <!DOCTYPE html>
 <html lang="ko">
 
@@ -46,7 +47,7 @@
             <div class="life-hub-link-list hub-tool-link-list">
                 {% for link in hub.tool_links %}
                 <a href="{{ url_for(link.endpoint) }}">
-                    <strong>{{ link.label }}</strong>
+                    <strong>{{ tool_icon(link.endpoint) }}{{ link.label }}</strong>
                     <span>{{ link.summary }}</span>
                 </a>
                 {% endfor %}

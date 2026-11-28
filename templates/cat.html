@@ -24,12 +24,6 @@
         href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
     <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
-        rel="stylesheet">
-
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <!-- Google tag (gtag.js) -->
@@ -43,7 +37,6 @@
 </head>
 
 <body class="editorial-calculator-page calculator-flat-page">
-    <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
         <header class="calculator-page-heading">
@@ -88,7 +81,7 @@
                 <div class="pet-input-panel" data-pet-panel="adoption-date" hidden>
                     <label class="field-label" for="pet-adoption-date">데려온 날 8자리</label>
                     <input type="text" id="pet-adoption-date" name="adoption_date" value="{{ pet_values.adoption_date }}" placeholder="19921002" inputmode="numeric" pattern="[0-9]*" maxlength="8" aria-describedby="pet-error">
-                    <p class="input-help">실제 나이가 아니라 오늘까지 함께한 기간을 계산합니다.</p>
+                    <p class="input-help">고양이가 처음 집에 온 날을 입력해 주세요. 입양 당시 몇 살이었는지 몰라도 그날부터 함께 지낸 기간을 확인할 수 있어요.</p>
                 </div>
                 <small id="pet-error" class="error-msg" aria-live="polite"></small>
                 <button class="btn btn-primary" type="submit">계산하기</button>
@@ -185,7 +178,6 @@
     <button id="scroll-top" class="scroll-top-btn" title="맨 위로">
         ↑
     </button>
-    <script src="{{ url_for('static', filename='js/pixel-stickers.js') }}" defer></script>
 </body>
 
 </html>

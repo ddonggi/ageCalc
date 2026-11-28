@@ -38,10 +38,6 @@
         href="{{ url_for('static', filename='images/apple-touch-icon.png') }}" />
     <link rel="manifest" href="{{ url_for('static', filename='images/site.webmanifest') }}" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="{{ versioned_static('css/style.css') }}" />
     <link rel="stylesheet" href="{{ versioned_static('css/editorial-luxury.css') }}" />
     <script src="{{ versioned_static('js/analytics.js') }}" defer></script>
@@ -50,7 +46,6 @@
 </head>
 
 <body class="calculator-flat-page">
-    <div id="pixel-background"></div>
     <div class="container">
         {% include 'partials/header.html' %}
 
@@ -181,10 +176,10 @@
 
         <section class="section-shell">
             <div class="section-heading">
-                <h2>출생년도별 입학년도표</h2>
+                <h2 id="reference-table-title">출생년도별 입학년도표</h2>
                 <p class="section-intro">최근 출생년도를 기준으로 초등학교, 중학교, 고등학교 입학 학년도를 표로 정리했습니다.</p>
             </div>
-            <div class="data-table-wrap">
+            <div class="data-table-wrap" role="region" tabindex="0" aria-labelledby="reference-table-title">
                 <table class="data-table birth-year-table">
                     <thead>
                         <tr>

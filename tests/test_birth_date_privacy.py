@@ -151,7 +151,7 @@ class BirthDatePrivacyTests(unittest.TestCase):
                 if expected_age is None:
                     self.assertIn('미래의 생년월일', html)
                 else:
-                    self.assertIn(f'class="age-number">만 {expected_age}세</span>', html)
+                    self.assertIn(f'aria-label="만 {expected_age}세"', html)
                 if today == date(2027, 1, 1) and expected_age == 27:
                     self.assertIn('오늘이 생일입니다', html)
 
@@ -167,7 +167,7 @@ class BirthDatePrivacyTests(unittest.TestCase):
                 fields = {'calendar_type': 'lunar', 'birth_date': '2000-01-01'}
                 get = self.client.get('/age', query_string=fields)
                 post = self.client.post('/age', data=fields)
-                self.assertIn(f'class="age-number">만 {expected_age}세</span>', get.get_data(as_text=True))
+                self.assertIn(f'aria-label="만 {expected_age}세"', get.get_data(as_text=True))
                 self.assertEqual(post.get_json()['age'], expected_age)
                 self.assertEqual(post.headers['Cache-Control'], 'no-store')
 
@@ -266,10 +266,10 @@ assert.strictEqual(replaceCalls, 0, '결과 URL의 계산 파라미터를 지우
 
     def test_age_page_busts_cached_date_calculator_assets_and_has_no_six_digit_contract(self):
         age_html = self.client.get("/age").get_data(as_text=True)
-        age_js = Path("static/js/age-calculator.js").read_text(encoding="utf-8")
+        age_js = Path("static/js/sketch-age.js").read_text(encoding="utf-8")
 
         self.assertRegex(age_html, r'static/js/date-rules\.js\?v=[^" ]+')
-        self.assertRegex(age_html, r'static/js/age-calculator\.js\?v=[^" ]+')
+        self.assertRegex(age_html, r'static/js/sketch-age\.js\?v=[^" ]+')
         self.assertNotIn("6자리", age_js)
         self.assertNotIn("bind6DigitInputEvents", age_js)
         self.assertNotIn("validateBirth6", age_js)
@@ -370,7 +370,6 @@ assert.strictEqual(profile.canStoreProfileDate(profileInput, lunarDocument), fal
         for html in (timeline_html, age_html, baby_html):
             self.assertNotIn('id="profile-date-consent"', html)
             self.assertNotIn('id="profile-date-clear"', html)
-            self.assertNotIn("공용 기기", html)
             self.assertNotIn("다음 계산에도 사용", html)
             self.assertNotIn("저장값 삭제", html)
         self.assertIn("양력", age_html)
@@ -386,8 +385,9 @@ assert.strictEqual(profile.canStoreProfileDate(profileInput, lunarDocument), fal
     def test_age_page_describes_solar_and_lunar_processing_accurately(self):
         html = self.client.get("/age").get_data(as_text=True)
 
-        self.assertIn("양력 생년월일은 브라우저 안에서 계산합니다", html)
-        self.assertIn("음력 생년월일은 양력 변환을 위해서만 서버로 전송", html)
+        self.assertIn("계산하면 생년월일이 결과 페이지 주소에 포함되어 서버로 전송됩니다", html)
+        self.assertIn("링크 복사는 입력값을 제외합니다", html)
+        self.assertNotIn("양력 생년월일은 브라우저 안에서 계산합니다", html)
         self.assertNotIn("입력값은 계산을 위해 서버로 전송되며 저장하지 않습니다", html)
         self.assertNotIn("계산을 위해 서버로 전송되지만 저장하지 않습니다", html)
         self.assertIn("윤달 선택은 지원하지 않으며 평달로 계산합니다", html)

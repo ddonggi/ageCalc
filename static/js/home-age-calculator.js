@@ -95,6 +95,7 @@
     var result = document.getElementById("home-age-result");
     var ageValue = document.getElementById("home-age-value");
     var gradeLink = document.getElementById("home-grade-link");
+    var birthdayDays = document.getElementById("home-birthday-days");
     var todayIso = form.getAttribute("data-today");
 
     if (!input || !error || !result || !ageValue || !todayIso) {
@@ -121,6 +122,7 @@
       if (!calculation.ok) {
         input.setAttribute("aria-invalid", "true");
         error.textContent = calculation.error;
+        input.focus();
         clearResult();
         return;
       }
@@ -128,6 +130,9 @@
       input.removeAttribute("aria-invalid");
       error.textContent = "";
       ageValue.textContent = calculation.age + "세";
+      if (birthdayDays) {
+        birthdayDays.textContent = calculation.daysToBirthday === 0 ? "오늘" : "D-" + calculation.daysToBirthday;
+      }
       if (gradeLink) {
         var birthYear = normalizeBirthDate(input.value).slice(0, 4);
         var calculatorUrl = gradeLink.getAttribute("data-calculator-url");

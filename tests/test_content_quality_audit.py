@@ -185,12 +185,12 @@ class ContentQualityAuditTests(unittest.TestCase):
 
         self.assertEqual({}, failing)
 
-    def test_operational_audit_allows_warnings_on_46_public_pages(self):
+    def test_operational_audit_has_no_public_page_warnings(self):
         report = audit_local_pages()
 
         self.assertEqual(55, len(report.results))
         self.assertEqual(0, report.error_count)
-        self.assertGreater(report.warning_count, 0)
+        self.assertEqual(report.warning_count, 0)
         self.assertTrue(report.ok)
         self.assertFalse(any(result.path.endswith("/") and result.path != "/" for result in report.results))
 

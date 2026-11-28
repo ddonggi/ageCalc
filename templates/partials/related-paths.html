@@ -1,3 +1,4 @@
+{% from 'sketch-icons.html' import tool_icon %}
 {% if related_paths %}
 {% set group_labels = {
     "before_calculation": ("계산 전에", "기준 먼저 읽기"),
@@ -25,7 +26,7 @@
             <ul>
                 {% for link in group_links %}
                 <li>
-                    <a href="{{ link.path }}">{{ link.label }}</a>
+                    <a href="{{ link.path }}">{% if group_name == "adjacent_tools" %}{{ tool_icon(link.path) }}{% endif %}{{ link.label }}</a>
                     <span>{{ link.summary }}</span>
                 </li>
                 {% endfor %}
