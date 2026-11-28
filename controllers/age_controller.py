@@ -66,5 +66,6 @@ class AgeController:
         return {
             'success': True,
             'message': message,
-            'age': age
+            'age': age,
+            'solar_birth_year': birth_date.year,
         }

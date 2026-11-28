@@ -1,5 +1,6 @@
 import math
 import hashlib
+import re
 from flask import Flask, Response, render_template, request, jsonify, g, send_from_directory, abort, redirect, session, url_for, make_response
 import json
 import os
@@ -1903,25 +1904,22 @@ def age():
     requested_birth_date = request.args.get('birth_date', '').strip()
     calendar_type = request.args.get('calendar_type', 'solar').strip()
     calendar_type = calendar_type if calendar_type in {'solar', 'lunar'} else 'solar'
-    birth_date_digits = ''.join(char for char in requested_birth_date if char.isdigit())
-    birth_date_value = (
-        f'{birth_date_digits[:4]}-{birth_date_digits[4:6]}-{birth_date_digits[6:]}'
-        if len(birth_date_digits) == 8
-        else requested_birth_date
-    )
-    birth_date_display = (
-        birth_date_digits
-        if len(birth_date_digits) == 8
-        else requested_birth_date
-    )
-    result = (
-        AgeController().calculate_age_from_string(birth_date_value, calendar_type, reference_date=today)
-        if requested_birth_date
-        else None
-    )
+    parts = re.fullmatch(r'([0-9]{4})([-./])([0-9]{1,2})\2([0-9]{1,2})', requested_birth_date)
+    if parts:
+        year, _, month, day = parts.groups()
+        birth_date_digits = year + month.zfill(2) + day.zfill(2)
+    else:
+        birth_date_digits = requested_birth_date if re.fullmatch(r'[0-9]{8}', requested_birth_date) else ''
+    birth_date_display = birth_date_digits or requested_birth_date
+    result = None
+    if birth_date_digits:
+        birth_date_value = f'{birth_date_digits[:4]}-{birth_date_digits[4:6]}-{birth_date_digits[6:]}'
+        result = AgeController().calculate_age_from_string(birth_date_value, calendar_type, reference_date=today)
+    elif requested_birth_date:
+        result = {'success': False, 'message': '생년월일을 숫자 8자리로 입력해주세요.', 'age': None}
     result_details = None
-    if result and result.get('success') and len(birth_date_digits) == 8:
-        birth_year = int(birth_date_digits[:4])
+    if result and result.get('success'):
+        birth_year = result['solar_birth_year']
         birth_month = int(birth_date_digits[4:6])
         birth_day = int(birth_date_digits[6:])
         zodiac_animals = (
@@ -1947,7 +1945,7 @@ def age():
                 if days_until == 0
                 else f'다음 생일까지 D-{days_until}'
             )
-        zodiac_emoji, zodiac_animal = zodiac_animals[birth_year % 12]
+        zodiac_emoji, zodiac_animal = zodiac_animals[int(birth_date_digits[:4]) % 12]
         result_details = {
             'birth_year': birth_year,
             'next_birthday_text': next_birthday_text,
